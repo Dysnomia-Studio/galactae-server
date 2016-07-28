@@ -84,7 +84,7 @@ module.exports = function() {
 				  , update = { $set: { resources: newResources} }
 				  , options = { multi: true };
 
-				planets.update(conditions, update, options,function(error){ if(error) { console.log(error);} });
+				planets.update(conditions, update, options,function(error){ if(error) { log(error);} });
 			}
 		});
 	}
@@ -120,16 +120,11 @@ module.exports = function() {
 					}
 
 					if(BlockBuild==0) {
-						console.log(cost);
-						console.log(newResources);
-
 						//We consume resources
 						newResources[3] -= eval(cost.iron);
 						newResources[4] -= eval(cost.aluminium);
 						newResources[5] -= eval(cost.copper);
 						newResources[6] -= eval(cost.titanium);
-
-						console.log(newResources);
 
 						var nextTime = Date.now()+Math.round(cost.time*3600);
 
@@ -137,7 +132,7 @@ module.exports = function() {
 						  , update = { $set: { resources: newResources, nextBuilding: nextTime } }
 						  , options = { multi: true };
 
-						planets.update(conditions, update, options,function(error){ if(error) { console.log(error);} SendMessageToClient({ RandomToken: data.RandomToken, message: "OK"}); getPlanetInfo({planet: data.planet, RandomToken: data.RandomToken}); });
+						planets.update(conditions, update, options,function(error){ if(error) { log(error);} SendMessageToClient({ RandomToken: data.RandomToken, message: "OK"}); getPlanetInfo({planet: data.planet, RandomToken: data.RandomToken}); });
 					} else {
 						SendMessageToClient({ RandomToken: data.RandomToken, message: "ERROR_BUILD"})
 					}		

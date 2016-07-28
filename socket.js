@@ -4,8 +4,8 @@ module.exports = function() {
 	*/
 	var fs = require( 'fs' );
 	var options = {
-	    key: fs.readFileSync('/home/apache/spacegame/node-server/keys/spacegame.elanistudio.eu/privkey.pem'),
-	    cert: fs.readFileSync('/home/apache/spacegame/node-server/keys/spacegame.elanistudio.eu/cert.pem'),
+	    key: fs.readFileSync('./keys/spacegame.elanistudio.eu/privkey.pem'),
+	    cert: fs.readFileSync('./keys/spacegame.elanistudio.eu/cert.pem'),
 	    requestCert: true
 	};
 	var express = require('express');

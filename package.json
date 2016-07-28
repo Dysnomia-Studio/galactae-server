@@ -1,0 +1,17 @@
+{
+  "name": "galactae-server",
+  "version": "0.1.0",
+  "description": "NodeJs Server for Galactae",
+  "author": "Elanis",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "mongoose": "",
+    "fs": "",
+    "express": "",
+    "https": "",
+    "socket.io": ""
+  }
+}

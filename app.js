@@ -1,7 +1,3 @@
-/* Npm Modules */
-var jsdom = require('jsdom').jsdom;
-var $ = require('jquery');
-
 /* Game Files */
 require('./resources')();
 require('./console')();
