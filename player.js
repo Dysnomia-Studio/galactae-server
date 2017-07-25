@@ -47,7 +47,7 @@ module.exports = function() {
 		db.player.searchByName(data.username,function(dataReturned) {
 			if(data.id!=dataReturned.id) {
 				// Kick that Hacker ...
-				io.to(user.sid).emit('server-kick',"INVALID_SESSION");
+				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 			}
 			// Kick double accounts
 			if(dataReturned.sid != "-1") {
@@ -80,9 +80,21 @@ module.exports = function() {
 
 			refreshUserPlanet(data,0);
 			refreshUserUnits(data);
-			refreshUserResearch(data);
-			refreshUserPoints(dataReturned, function(userNewData) {
-				db.player.update(userNewData);
+			refreshUserPoints(dataReturned, function(userNewPoints) {
+				refreshUserResearch(userNewPoints, function(userNewResearch) {
+					db.player.update(userNewResearch);
+
+					// Send data to client
+					var researchOut = {};
+
+					for(var i=0; i<userNewResearch.research.length; i++) {
+						researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+					}
+
+					io.to(data.sid).emit('player-recieve-data',{
+						research: researchOut
+					});
+				});
 			});
 		});
 	}
@@ -95,17 +107,37 @@ module.exports = function() {
 			db.player.update(dataReturned);
 		});
 	}
-	this.refreshUserPoints = function(user,callback,i=0,points=0) {
+	this.calcTotalPlanetPoints= function(user,callback,i=0,points=0) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
 			if(i+1<user.planetlist.length) {
 				refreshUserPoints(user,callback,i+1,points);
 			} else {
+				points *= pointsCoef['planet'];;
 				user.points = points;
 				callback(user);	
 			}
 		});		
+	}
+	this.calcResearchPoints = function(user) {
+		var points = 0;
+
+		for(var i=0; i<user.research.length; i++) {
+			if(user.research[i][1]==-1 && isset(researchCost[user.research[i][0]])) {
+				points+=researchCost[user.research[i][0]];
+			}	
+		}
+
+		points*=pointsCoef['research'];
+
+		return Math.round(points);
+	}
+	this.refreshUserPoints = function(user,callback) {
+		calcTotalPlanetPoints(user,function(newUserData) {
+			newUserData.points += calcResearchPoints(newUserData);
+			callback(newUserData);
+		});	
 	}
 	/* dayBonus */
 	this.dayBonus = function(data,userData,choice) {
@@ -144,7 +176,7 @@ module.exports = function() {
 				getPlanet(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
 						SendMessageToClient({ id: data.id, message: "ERROR_NOT_BELONGING" })
-						log(userData.username+' failed to get bonus on planet ('+userData.pid+') to next level because he doesn\'t own it !',"fail");
+						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");
 						return;
 					}
 

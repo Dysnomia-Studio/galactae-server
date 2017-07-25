@@ -1,9 +1,14 @@
 var db = require('./database');
+var discord = require('./discord');
+discord.connect();
 
 module.exports = function() {
 	this.chatAnalyse = function(data) {
 		var reg=new RegExp("[ ,;]+", "g");
 		var arg=data.message.split(reg);
+		data.message = textToSmileys(data.message);
+		logname = data.username;
+		logmsg = data.message;
 
 		/* Controles de securité */
 		data.send = true;
@@ -39,7 +44,7 @@ module.exports = function() {
 						sendPM(data.sid,data.message,false);
 						sendPM(sid,data.username + ": " + data.newmessage,true);
 					} else if(arg[0].substr(1).toLowerCase()==data.username) {
-						sendPM(data.sid,"NO_PM_YOU",false);
+						sendSM(data.sid,"NO_PM_YOU");
 					} else if(sid==undefined||sid!="-1") {
 						sendSM(data.sid,"PLY_NOT_FOUND");
 					}
@@ -47,6 +52,8 @@ module.exports = function() {
 
 				data.send = false;
 			} else { // Chat Normal messages
+			    var discordmsg = data.username + ": " + data.message;
+
 			    /* Ajout de la div d'utilisateur */
 				data.username = "<span class=\"username\">" + data.username + "</span>";
 
@@ -70,8 +77,16 @@ module.exports = function() {
 			data.send = false;
 		}
 
+		// Log
+		if(data.send) {
+			log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+		} else {
+			log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+		}
+
 	    if(data.send && data.channel !="hud-chat-ally") { // Normal chat
-        	io.emit('chat-message', data);
+        	io.emit('chat-message', { message: data.message, channel: data.channel });
+        	discord.sendChatMessage(data.channel,discordmsg);
     	} else if(data.send && data.channel =="hud-chat-ally" && data.ally!=undefined) { // Allies messages
     		// @ ADD : Ally messages
     	}
@@ -79,9 +94,26 @@ module.exports = function() {
 	this.chatprotect = function(data) {
 		str = data.message;
 
-		/* Suppression des balises html */
-        str = str.replace('<','');
-        str = str.replace('>','');
+		var replace = [
+			['<',''],
+			['>',''],
+			['( . ) ( . )',''],
+			['(.)(.)',''],
+		];
+
+		for(var i=0; i<replace.length; i++) {
+			str = str.split(replace[i][0]).join(replace[i][1])
+		}
+
+		// Si message vide
+		var empty = true;
+		for(var i=0; i<str.length; i++) {
+			if(str[i]!=" ") {
+				empty = false
+			 	break;
+			}
+		}	
+		if(empty) { data.send = false; }
 
         /* Can the player send a message ? */
         if(data.lvl<2) {
@@ -89,6 +121,11 @@ module.exports = function() {
         	sendSM(data.sid,"NO_PERM");
         	// Kick it ...
         	io.to(data.sid).emit('server-kick');
+        }
+        /* Disable links */
+        if(str!=str.replace('http','')) {
+        	data.send = false;
+        	sendSM(data.sid,"NO_LINKS");
         }
 
         data.message = str;

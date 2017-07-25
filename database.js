@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 var planetSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
+	address: String,
 	owner: Schema.Types.ObjectId,
 	resources: Array,
 	Buildings: Array,
@@ -31,6 +32,7 @@ var userSchema = new Schema({
 	dayBonusBest: Number,
 	lastBonus: Number,
 	lastAction: Number,
+	lastResearchUpdate: Number,
 	research: Array
 });
 var users = mongoose.model('users', userSchema);
@@ -49,9 +51,19 @@ var unitsSchema = new Schema({
 	cost: Array,
 	shape: Number,
 	armorType: Number,
-	missChance: Number
+	missChance: Number,
 });
 var units = mongoose.model('units', unitsSchema);
+
+var fleetsSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	name: String,
+	ownerId: Schema.Types.ObjectId,
+	position: String,
+	endMoveTime: Number,
+	units: Array,
+});
+var fleets = mongoose.model('fleets', fleetsSchema);
 
 module.exports = {
 	/**
@@ -151,6 +163,33 @@ module.exports = {
 						  , options = { multi: true };
 
 			units.update(conditions, update, options,function(error) {
+				if(error) { log(error);} 
+			});
+		}
+	},
+
+	/**
+	 * FLEETS
+	 */
+	fleets: {
+		find: function(id,callback) {
+			fleets.findById(id, function (err, obj) {
+				if(isset(obj)) {
+					callback(obj);
+				}
+			});
+		},
+		findByOwner: function(id,callback) {
+			fleets.find({ownerId: id}, function (err, obj) {
+				callback(obj);
+			});
+		},
+		update: function(data) {
+			var conditions = { _id: data._id }
+						  , update = { $set: data }
+						  , options = { multi: true };
+
+			fleets.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
 			});
 		}

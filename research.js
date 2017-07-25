@@ -1,91 +1,33 @@
 var db = require('./database');
 
 module.exports = function() {
-	this.researchBonus = {
-		// Bonus construction
-		cp_mecanisation: -0.05,
-		cp_tracteur: 	 -0.05,
-		cp_materielTp: 	 -0.1,
-	}
-
-	this.refreshUserResearch = function(data) {
-		db.player.searchByName(data.username,function(dataReturned) {		
-			var newData = dataReturned;
-			var researchList = [
-				// Noeud Central
-				"researchCenter",
-				"industrialistion",
-				"phyContemporaine",
-				"thermodynamique",
-				// Mise en orbite et propulsion
-				"prop_thermique",
-				"prop_vSolaire",
-				"prop_ions",
-				"prop_vsl",
-				"prop_hyperespace",
-				"prop_manoeuvre",
-				"prop_advManoeuvre",
-				// Construction et production
-				"cp_mecanisation",
-				"cp_tracteur",
-				"cp_materielTp",
-				"cp_dbRaffinage",
-				// Armes
-				"wep_railgun",
-				"wep_nuke",
-				"wep_laser",
-				"wep_plasma",
-				// Mines Spatiales
-				"wep_mines",
-				"wep_mines_nuke",
-				"wep_mines_iem",
-				// Satellites
-				"wep_sat_railgun",
-				"wep_sat_laser",
-				"wep_sat_plasma",
-				// Autres recherches
-				"misc_astronomie",
-				"misc_telemetrie",
-				"misc_advTelemetrie",
-				"misc_mecStellaire",
-				"misc_phyQuantique",
-				"misc_phySolaire",
-				"misc_calcGravit",
-				"misc_em",
-			];
-
-			// Checks if new research
-			if(researchList.length!=newData.research.length) {
-				for(var i=0; i<researchList.length; i++) {
-					var key = -1;
-					for(var j=0; j<newData.research.length; j++) {
-						if(researchList[i]==newData.research[j][0]) {
-							key = j;
-							break;
-						}
+	this.refreshUserResearch = function(data,callback) {	
+		// Checks if new research
+		if(researchList.length!=data.research.length) {
+			for(var i=0; i<researchList.length; i++) {
+				var key = -1;
+				for(var j=0; j<data.research.length; j++) {
+					if(researchList[i]==data.research[j][0]) {
+						key = j;
+						break;
 					}
-					if(key == -1) {
-						newData.research.push([researchList[i],0]);
-					}
+				}
+				if(key == -1) {
+					data.research.push([researchList[i],0]);
 				}
 			}
+		}
 
-			researchRecalc(newData,function(user) {
-				// Update to database
-				user.lastAction = Date.now();
-				db.player.update(user);	
+		var researchOut = {};
 
-				// Send data to client
-				var researchOut = {};
+		for(var i=0; i<data.research.length; i++) {
+			researchOut[data.research[i][0]] = data.research[i][1];
+		}
 
-				for(var i=0; i<user.research.length; i++) {
-					researchOut[user.research[i][0]] = user.research[i][1];
-				}
-
-				io.to(data.sid).emit('player-recieve-data',{
-					research: researchOut
-				});
-			});
+		researchRecalc(data,researchOut,function(user) {
+			user.lastAction = Date.now();
+			user.lastResearchUpdate = Date.now();
+			callback(user);
 		});
 	}
 	this.getResearch = function(data,research) {
@@ -97,11 +39,83 @@ module.exports = function() {
 		return 0;
 	}
 
-	this.researchRecalc = function(user,callback) {
-		var newUser = user;
+	this.getResearchProduction = function(lvl) {
+		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
+	}
 
-		//@Add: Calcs
+	this.researchRecalc = function(user,research,callback,i=0) {
+		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
-		callback(newUser);
+		db.planet.find(user.planetlist[i],function(planetReturned) {
+			if(isset(research[planetReturned.currResearch]) && isset(researchCost[planetReturned.currResearch]) && research[planetReturned.currResearch] != -1) {
+				research[planetReturned.currResearch] += (getResearchProduction(planetReturned.Buildings[8])*time);
+
+				if(research[planetReturned.currResearch] >= researchCost[planetReturned.currResearch]) {
+					research[planetReturned.currResearch] = -1;
+					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
+				}
+			}
+
+			// Next planet
+			if(i+1<user.planetlist.length) {
+				researchRecalc(user,research,callback,i+1);
+			} else {
+				user.research = [];
+
+				for(var index in research) {
+					user.research.push([index,research[index],]);
+				}
+
+				callback(user);	
+			}
+		});
+	}
+
+	this.ChangePlanetResearch = function(data,pid,research) {
+		getPlanet(data,data.pid,0,function(planetReturned,userReturned) {
+			if(!isset(planetReturned) || !isset(userReturned)) { return; }
+			refreshUserResearch(userReturned, function(userNewResearch) {
+				db.player.update(userNewResearch);
+
+				// Send data to client
+				var researchOut = {};
+
+				for(var i=0; i<userNewResearch.research.length; i++) {
+					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+				}
+
+				var newData = UpdatePlanet(planetReturned,userReturned);
+				if(researchCost[research]!=undefined) { // Just check if it exists ...
+					newData.currResearch = research;
+				}
+
+				db.planet.update(newData);
+
+				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
+
+				io.to(data.sid).emit('player-recieve-data',{
+					research: researchOut,
+				});
+			});
+		});
+	}
+
+	this.ResearchSync = function(data) {
+		db.player.searchByName(data.username,function(dataReturned) {
+			refreshUserResearch(dataReturned, function(userNewResearch) {
+				db.player.update(userNewResearch);
+
+				// Send data to client
+				var researchOut = {};
+
+				for(var i=0; i<userNewResearch.research.length; i++) {
+					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+				}
+
+				io.to(data.sid).emit('player-recieve-data',{
+					research: researchOut
+				});
+			});
+		});
 	}
 }

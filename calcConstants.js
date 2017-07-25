@@ -1,7 +1,24 @@
 module.exports = function() {
 	this.globalConst = {
-		buildingNumber: 	14
+		buildingNumber: 	14,
 	}
+	this.pointsCoef = {
+		planet:				1,
+		research: 			0.02,
+	}
+	/**
+	 * Production
+	 */
+	this.planetRatios = [
+		{ironRatio: 0.35, aluRatio: 0.50, copperRatio: 0.04, titanRatio: 0.10}, // Earth type
+	];
+
+	this.mineralProd = 	[2,-2,145];
+	this.metalProd = 	[1.85,-3,139];
+	this.heliumProd = 	[190,-424,500];
+
+	this.storageRatio = [47.52,8.29];
+	this.heliumStorageRatio = 0.2;
 	/**
 	 * Buildings
 	 */
@@ -22,20 +39,20 @@ module.exports = function() {
 		25	// Mine He3
 	];
 	this.buildingPointCoef = [
-		2, 	// Carriere
-		2,	// Metallurgie
-		3,	// Habitations
-		3,	// Serres
-		2,	// Centrales Solaires
-		1,	// Entrepôts
+		3, 	// Carriere
+		3,	// Metallurgie
+		5,	// Habitations
+		5,	// Serres
+		4,	// Centrales Solaires
+		2,	// Entrepôts
 		10,	// Etat Major
-		5,	// Centre de lancement
+		7,	// Centre de lancement
 		8,	// Centre de recherches
 		4,	// Radar
-		1,	// Reservoir
-		7,	// Chantier naval
-		4,	// Commerce
-		2,	// Mine He3
+		2,	// Reservoir
+		8,	// Chantier naval
+		6,	// Commerce
+		3,	// Mine He3
 	];
 	this.buildCost = {
 		aluminium: [
@@ -131,12 +148,12 @@ module.exports = function() {
 		energy: [
 			// Ground building
 			[725,100000,500000], // Quarry
-			[1000,10000,700], // Metallurgie
-			[400,1100,700], // Living
-			[80000,0,-10000], // Serres
+			[1000,-10000,700], // Metallurgie
+			[400,-1100,700], // Living
+			[0,80000,-10000], // Serres
 			[0,0,0], // Solar panel
 			[35,-200,800], // Warehouse
-			[0,0,0], // Hedquarters
+			[150,200,1200], // Hedquarters
 			[300,-1300,800], // Launching Center
 			[550,-2500,700], // Research Center
 			// Space stations
@@ -146,5 +163,98 @@ module.exports = function() {
 			[0,0,0], // Trade
 			[0,0,0], // He3exp
 		],
-	}
+	};
+	/**
+	 * Research
+	 */
+	this.researchProduction = [-0.05,12,-8];
+	this.researchBonus = {
+		// Bonus construction
+		cp_mecanisation: -0.05,
+		cp_tracteur: 	 -0.05,
+		cp_materielTp: 	 -0.1,
+	};
+	this.researchList = [
+		// Noeud Central
+		"researchCenter",
+		"industrialistion",
+		"phyContemporaine",
+		"thermodynamique",
+		// Mise en orbite et propulsion
+		"prop_thermique",
+		"prop_vSolaire",
+		"prop_ions",
+		"prop_vsl",
+		"prop_hyperespace",
+		"prop_manoeuvre",
+		"prop_advManoeuvre",
+		// Construction et production
+		"cp_mecanisation",
+		"cp_tracteur",
+		"cp_materielTp",
+		"cp_dbRaffinage",
+		// Armes
+		"wep_railgun",
+		"wep_nuke",
+		"wep_laser",
+		"wep_plasma",
+		// Mines Spatiales
+		"wep_mines",
+		"wep_mines_nuke",
+		"wep_mines_iem",
+		// Satellites
+		"wep_sat_railgun",
+		"wep_sat_laser",
+		"wep_sat_plasma",
+		// Autres recherches
+		"misc_astronomie",
+		"misc_telemetrie",
+		"misc_advTelemetrie",
+		"misc_mecStellaire",
+		"misc_phyQuantique",
+		"misc_phySolaire",
+		"misc_calcGravit",
+		"misc_em",
+	];
+	this.researchCost = {
+		researchCenter: 	0,
+		industrialistion: 	8,		
+		phyContemporaine: 	20,	
+		thermodynamique: 	13,
+		// Mise en orbite et propulsion
+		prop_thermique: 	380,
+		prop_vSolaire: 		2300,
+		prop_ions: 			2000,
+		prop_vsl: 			15000,
+		prop_hyperespace: 	35000,
+		prop_manoeuvre: 	450,
+		prop_advManoeuvre: 	700,
+		// Construction et production
+		cp_mecanisation: 	120,
+		cp_tracteur: 	 	150,
+		cp_materielTp: 		350,
+		cp_dbRaffinage: 	100,
+		// Armes
+		wep_railgun:		50,
+		wep_nuke:			180,
+		wep_laser:			260,
+		wep_plasma:			480,
+		// Mines spatiales
+		wep_mines: 			380,
+		wep_mines_nuke:		750,
+		wep_mines_iem:		550,
+		// Satellites
+		wep_sat_railgun:	360,
+		wep_sat_laser:		650,
+		wep_sat_plasma:		1500,
+		// Autres recherches
+		misc_astronomie:	45,
+		misc_telemetrie: 	90,
+		misc_advTelemetrie: 320,
+		misc_mecStellaire: 	340,
+		misc_phyQuantique: 	120,
+		misc_phySolaire: 	280,
+		misc_calcGravit: 	240,
+		misc_em: 			110,
+	};
 }

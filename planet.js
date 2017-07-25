@@ -1,4 +1,5 @@
 var db = require('./database');
+require('./calcConstants')();
 
 module.exports = function() {
 		/**
@@ -73,27 +74,11 @@ module.exports = function() {
 		 * @return     {Object}  The minerals ratio.
 		 */
 		this.GetMineralsRatio = function(type) {
-				switch(type) {
-					case 0: //Earth type
-						ironRatio = 0.35;
-						aluRatio = 0.50;
-						copperRatio = 0.04;
-						titanRatio = 0.10;
-					break;
-					case 1:
-						ironRatio = 0.1;
-						aluRatio = 0.2;
-						copperRatio = 0.3;
-						titanRatio = 0.4;
-					break;
-					default:
-						ironRatio = 42;
-						aluRatio = 42;
-						copperRatio = 42;
-						titanRatio = 42;	
-					break;
-				}
-			return {ironRatio: ironRatio ,aluRatio: aluRatio ,copperRatio: copperRatio ,titanRatio: titanRatio};	
+			if(planetRatios[type]!=undefined) {
+				return planetRatios[type];	
+			} else {
+				return planetRatios[0];
+			}
 		}
 		/**
 		 * Calculates the new resources based on constants building level on a
@@ -106,39 +91,44 @@ module.exports = function() {
 		 * @param      {number}  time        The time period
 		 * @param      {<type>}  user        The user
 		 */
-		this.CalcNewResources = function(resources,buildings,planetType,time,user) {
+		this.CalcNewResources = function(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
+			
+			var oldResources = resources;
 
 			var ratio = GetMineralsRatio(planetType);
 			var ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
-			var baseProd = 1.85*Math.pow(buildings[1],2)-3* buildings[1]+139; // Metaux
-			var baseProd1 = (1.85*Math.pow(buildings[1]+1,2)-3* buildings[1]+1)+139; // Metaux lvl+1
+			var mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) - mineralProd[1]*buildings[0] + mineralProd[2];
+			var metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   - metalProd[1]*buildings[1]   + metalProd[2];
+			var heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  - heliumProd[1]*buildings[13]  + heliumProd[2];
 
-			// Maximal Storage :D
-			var storageRatio = (1.85*Math.pow(buildings[5],2)-3* buildings[5]+139)*(47.52*Math.log(buildings[5]) + 8.29); // Metaux
-			var storageRatio1 = (2*Math.pow(buildings[5],2)-2*buildings[5]+145)*(47.52*Math.log(buildings[5]) + 8.29); // Minerais
+			var warehouseBase = storageRatio[0]*Math.log(buildings[5]) + storageRatio[1];
+
+			var mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) - mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
+			var metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   - metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
+
 			if(buildings[10]!=0) {
-				var storageHelium = ((190*Math.pow(buildings[10],2)-424*buildings[10]+500)/5)*(47.52*Math.log(buildings[10]) + 8.29); // Helium 3
+				var storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  - heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
 			} else {
 				var storageHelium = 0;
 			}
 
 			//Minerals
-			resources[0] += (2*Math.pow(buildings[0],2)-2*buildings[0]+145)*time; //Production Algorithm
-
-			//Helium 3
-			if(buildings[13]!=0) {
-				resources[1] += (190*Math.pow(buildings[13],2)-424*buildings[13]+500)*time;
+			if(currentBuilding!=0) {
+				resources[0] += mineralProdBase*time;
 			}
 
+			//Helium 3
+			if(buildings[13]!=0 && currentBuilding!=13) { resources[1] += heliumProdBase*time; }
+
 			//Metals
-			if(resources[0]-(baseProd/360)>0) { //Verify if you can use basic ressources
+			if(resources[0]-(mineralProdBase*time)>0 && currentBuilding!=1) { //Verify if you can use basic ressources
 			    for(var i=2; i<6; i++) {
-			    	resources[i] += (baseProd*time)*ratios[i-2];
+			    	resources[i] += (metalProdBase*time)*ratios[i-2];
 			    }
 
-				resources[0] -= (baseProd*time); //Consomation Algorithm
+				resources[0] -= (mineralProdBase*time); //Consomation Algorithm
 			} else { // Do the max we can
 			    for(var i=2; i<6; i++) {
 			    	resources[i] += resources[0]*ratios[i-2];
@@ -147,16 +137,16 @@ module.exports = function() {
 				resources[0] = 0;
 			}
 
-			// Max de tout les metaux
-			if((resources[5]>storageRatio*ratio.titanRatio) && 
-				(resources[4]>storageRatio*ratio.copperRatio) && 
-				(resources[3]>storageRatio*ratio.aluRatio) && 
-				(resources[2]>storageRatio*ratio.ironRatio)) {
+			// Si Max de tout les metaux
+			if((resources[5]>metalsStorageBase*ratio.titanRatio) && 
+				(resources[4]>metalsStorageBase*ratio.copperRatio) && 
+				(resources[3]>metalsStorageBase*ratio.aluRatio) && 
+				(resources[2]>metalsStorageBase*ratio.ironRatio)) {
 
-				var min = (resources[2] - storageRatio*ratios[0])/ratios[0];
+				var min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
 
 				for(var i=3; i<6; i++) {
-					var temp = (resources[i] - storageRatio*ratios[i-2])/ratios[i-2];
+					var temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
 
 					if(temp<min) {
 						min = temp;
@@ -169,24 +159,17 @@ module.exports = function() {
 			}
 
 			//Max Storage
-			if(resources[0]>storageRatio1) {
-				resources[0] = storageRatio1;
+			if(resources[0]>mineralStorageBase) {
+				resources[0] = mineralStorageBase;
 			}
 			if(resources[1]>storageHelium) {
 				resources[1] = storageHelium;
 			}
-			if(resources[2]>storageRatio*ratio.ironRatio) { // You can't have more iron than your storage capacity
-				resources[2] = storageRatio*ratio.ironRatio;
-			}
-			if(resources[3]>storageRatio*ratio.aluRatio) { // You can't have more aluminium than your storage capacity
-				resources[3] = storageRatio*ratio.aluRatio;
-			}
-			if(resources[4]>storageRatio*ratio.copperRatio) { // You can't have more copper than your storage capacity
-				resources[4] = storageRatio*ratio.copperRatio;
-			}
-			if(resources[5]>storageRatio*ratio.titanRatio) { // You can't have more titanium than your storage capacity
-				resources[5] = storageRatio*ratio.titanRatio;
-			}
+		    for(var i=2; i<6; i++) {
+		    	if(resources[i]>metalsStorageBase*ratios[i-2]) { // You can't have more iron than your storage capacity
+					resources[i] = metalsStorageBase*ratios[i-2];
+				}
+		    }
 
 			return resources
 		}
@@ -202,7 +185,7 @@ module.exports = function() {
 			getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
-					log(data.username+' failed to update his building ('+data.building+') on planet ('+data.planet+') to next level because he doesn\'t own it !',"fail");
+					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
 					return;
 				} 
 
@@ -263,11 +246,11 @@ module.exports = function() {
 					newData.nextBuilding = data.building;
 
 					SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
-					log(data.username+' updated building '+data.building+' on planet ('+data.planet+') to next level',"success");
+					log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
 
 				} else { // We just update ressources
 					SendMessageToClient({ sid: data.sid, message: errormsg })
-					log(data.username+' failed to update building '+data.building+' on planet ('+data.planet+') to next level ' + errormsg,"fail");
+					log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
 				}
 
 				db.planet.update(newData);
@@ -283,7 +266,7 @@ module.exports = function() {
 		 * @return     {<type>}        		 the updated data
 		 */
 		this.UpdatePlanet = function(planetIn,user) {
-			var data = planetIn;
+			var data = planetIn.toJSON();
 			var currTime = Date.now();
 
 			data.lastResourcesUpdate = currTime;
@@ -308,7 +291,7 @@ module.exports = function() {
 		 * @param      {Object}  groundBuildings  The ground buildings
 		 */
 		this.enoughtEnergy = function(groundBuildings) {
-			var prod = Math.round(2080000*Math.pow(groundBuildings[4],2) + 165000*groundBuildings[4] + 500000);
+			var prod = Math.round(2080000*Math.pow(groundBuildings[4],2) + 165000*groundBuildings[4] + 550000);
 			var cons = 0;
 
 			for(var i=0; i<9; i++) {
@@ -330,13 +313,31 @@ module.exports = function() {
 			getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
-					log(data.username+' failed to update his building ('+data.building+') on planet ('+data.planet+') to next level because he doesn\'t own it !',"fail");
+					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
 					return;
 				}
 
-				data.name = data.name.replace('<','');
-				data.name = data.name.replace('>','');
-				data.name = data.name.replace('/','');
+				// Planetes sans nom ...
+				var empty = true;
+				for(var i=0; i<data.name.length; i++) {
+					if(data.name[i]!=" ") {
+						empty = false
+					 	break;
+					}
+				}	
+				if(empty) { return; }
+
+				var replace = [
+					['<',''],
+					['>',''],
+					['/',''],
+				];
+
+				for(var i=0; i<replace.length; i++) {
+					data.name = data.name.split(replace[i][0]).join(replace[i][1])
+				}
+
+				log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.planet+'), new name: '+data.name);
 
 				var newPlanetData = {};
 				newPlanetData.name = data.name;
@@ -360,12 +361,12 @@ module.exports = function() {
 			var resources = dataIn.resources;
 
 			if(Dtime<0 || dataIn.nextBuildingTime==-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user);
+				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 			} else {
 				// Calcul avec les anciens bâtiments jusqu'a l'update
-				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user);
+				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 				// Calcul avec les nouveaux bâtiments
-				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user);
+				resources = CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
 			}
 
 			return resources
@@ -398,8 +399,8 @@ module.exports = function() {
 				copper: 	Math.round(buildCost["copper"][build][0]*Math.pow(level,2) + 		buildCost["copper"][build][1]*level + 		buildCost["copper"][build][2]),
 				titanium: 	Math.round(buildCost["titanium"][build][0]*Math.pow(level,2) + 		buildCost["titanium"][build][1]*level + 	buildCost["titanium"][build][2]),
 				time: 				   buildCost["time"][build][0]*Math.pow(level,2) + 			buildCost["time"][build][1]*level + 		buildCost["time"][build][2],
-				energy: 	Math.round(buildCost["energy"][build][0]*Math.pow(level,2) + 		buildCost["energy"][build][1]*level + 		buildCost["energy"][build][2]),
-				energy_difference: 	Math.round(buildCost["energy"][build][0]*Math.pow(level,2) + buildCost["energy"][build][1]*level + buildCost["energy"][build][2]) - Math.round(buildCost["energy"][build][0]*Math.pow((level-1),2) + buildCost["energy"][build][1]*(level-1) + buildCost["energy"][build][2])
+				energy: 	Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + 		buildCost["energy"][build][1]*level + 		buildCost["energy"][build][2]),
+				energy_difference: 	Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + buildCost["energy"][build][1]*level + buildCost["energy"][build][2]) - Math.round(Math.pow(buildCost["energy"][build][0]*(level-1),2) + buildCost["energy"][build][1]*(level-1) + buildCost["energy"][build][2])
 			}
 		}
 }

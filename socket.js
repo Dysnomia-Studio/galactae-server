@@ -1,3 +1,5 @@
+var discord = require('./discord');
+
 module.exports = function() {
 	/**
 	* Modules npm
@@ -60,8 +62,6 @@ module.exports = function() {
 			// User
 			data.sid = socket.id;
 			isValidUser(data,function(data) { // Verify identity
-				// Log
-				log('[' + data.channel.substr(9) + '] '+data.username+': ' +data.message);
 				// Execution du code
 				getAlly(data, function() {
 					getLvl(data,chatAnalyse); // Le serveur va verifier les droits de l'utilisateur puis lancer l'analyse du message et l'envoi si necessaire.
@@ -128,6 +128,29 @@ module.exports = function() {
 			}); 
 		});
 
+		// Research
+		socket.on('research-change', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.pid) || !isset(data.username) || !isset(data.research)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+			    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
+				// Execution du code
+			   	ChangePlanetResearch(data,data.pid,data.research);
+			});
+		});
+		socket.on('research-sync', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.pid) || !isset(data.username)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+				// Execution du code
+			   	ResearchSync(data);
+			});
+		});
+
 		// Daily Bonus
 		socket.on('daily-bonus', function (data) {
 			// Vars
@@ -141,6 +164,17 @@ module.exports = function() {
 			   	});
 			}); 
 		});
+
+		// Monitoring
+		socket.on('server-monitore-connect', function(data) {
+			if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
+				adminSid = socket.id;
+				var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+				log("Admin connected from " + clientIpAddress);
+			} else {
+				log("Failed to connect to admin account from " + clientIpAddress);
+			}
+		});
 	});
 	/* SendMessageToClient
 	INPUT: data
@@ -153,9 +187,11 @@ module.exports = function() {
 	OUTPUT: io connection ( array ) */
 	this.SendGeneralMessage = function(msg) {
 		io.emit("server-general-alert",msg);
+		discord.alert(msg);
 	}
 	this.io = io;
 	this.express = express;
 	this.app = app;
 	this.https = https;
+	this.adminSid = "-1";
 };

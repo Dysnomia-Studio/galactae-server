@@ -6,6 +6,7 @@ require('./calcConstants')();
 require('./chat')();
 require('./config')();
 require('./console')();
+var discord = require('./discord');
 require('./player')();
 require('./socket')();
 var db = require('./database');

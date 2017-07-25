@@ -24,7 +24,8 @@ module.exports = function() {
    * @param      {<type>}             type    The type of text (for color)
    * @param      {boolean}            nodate  Activate the date log ?
    */
-  this.log = function (text,type,nodate) {
+  this.log = function (msg,type,nodate) {
+    var text = msg;
     switch(type) {
       case "warn":
       text = redText('WARNING:') + yellowText(text);
@@ -45,7 +46,8 @@ module.exports = function() {
       }
       if(nodate==false||nodate==undefined) { text = logdate() + "  " + text;}
 
-      console.log(text)
+      console.log(text);
+      io.to(adminSid).emit('server-log', getDateTime() + "  " + msg);
   };
   /**
    * Retourner la date en jaune
