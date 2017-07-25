@@ -29,31 +29,82 @@ module.exports = function() {
 		INPUT: planet data ( array )
 		OUTPUT: new data ( array ) */
 		this.CalcNewResources = function(dataIn) {
-			var dataOut = new Array();
+			var dataOut = dataIn.resources;
+			var buildings = dataIn.groundBuilding;
 			var ratio = GetMineralsRatio(dataIn.planetType);
+			var time = (Date.now()-dataIn.lastResourcesUpdate)/1000/3600;
+			var Dtime = Date.now()-dataIn.nextBuildingTime
+
+			var baseProd = 2*Math.pow(buildings[1],2)-3* buildings[1]+139; // Metaux
+			var baseProd1 = (2*Math.pow(buildings[1]+1,2)-3* buildings[1]+1)+139; // Metaux lvl+1
+
+			// Maximal Storage :D
+			var storageRatio = 2*Math.pow(buildings[5],2)-3* buildings[5]+139*(47.52*Math.log(buildings[5]) + 8.29); // Metaux
+			var storageRatio1 = (2.2*Math.pow(buildings[5],2)-3*buildings[5]+145)*(47.52*Math.log(buildings[5]) + 8.29); // Minerais
+
+
 
 			//Minerals
-			dataOut[0] = dataIn.resources[0] + ((dataIn.groundBuilding[0]*300)+100)/360; //Production Algorithm
-			//Petrol
-			dataOut[1] = dataIn.resources[1] + ((dataIn.groundBuilding[1]*300)+100)/360; //Production Algorithm
-			//Gaz
-			dataOut[2] = dataIn.resources[2] + ((dataIn.groundBuilding[2]*300)+100)/360; //Production Algorithm
+			dataOut[0] += (2.2*Math.pow(buildings[0],2)-3*buildings[0]+145)*time; //Production Algorithm
+
+			// Prise en compte du building
+			if(dataIn.nextBuilding==0 && Date.now()>dataIn.nextBuildingTime) {
+				dataOut[0] += ((2.2*Math.pow(buildings[0],2)-3*buildings[0]+145)*Dtime) - (2.2*Math.pow(buildings[0],2)-3*buildings[0]+145)*Dtime;
+			}
+
+			//Helium 3
+			//dataOut[1] = ?; //Space Resource
+
+			// @ADD: prendre en compte dérive du niveau pour H-3
 
 			//Metals
-			if(dataIn.resources[0]-(((dataIn.groundBuilding[3]*200)+100)/360)>0) { //Verify if you can use basic ressources
-				dataOut[3] = dataIn.resources[3] + (((dataIn.groundBuilding[3]*200)+100)/360)*ratio.ironRatio; //Iron
-				dataOut[4] = dataIn.resources[4] + (((dataIn.groundBuilding[3]*200)+100)/360)*ratio.aluRatio; //Aluminium
-				dataOut[5] = dataIn.resources[5] + (((dataIn.groundBuilding[3]*200)+100)/360)*ratio.copperRatio; //Copper
-				dataOut[6] = dataIn.resources[6] + (((dataIn.groundBuilding[3]*200)+100)/360)*ratio.titanRatio; //Titanium
+			if(dataOut[0]-(baseProd/360)>0) { //Verify if you can use basic ressources
+				dataOut[2] += (baseProd*time)*ratio.ironRatio; //Iron
+				dataOut[3] += (baseProd*time)*ratio.aluRatio; //Aluminium
+				dataOut[4] += (baseProd*time)*ratio.copperRatio; //Copper
+				dataOut[5] += (baseProd*time)*ratio.titanRatio; //Titanium
 
-				dataOut[0] -= (((dataIn.groundBuilding[3]*200)+100)/360); //Consomation Algorithm
+				dataOut[0] -= (baseProd*time); //Consomation Algorithm
+
+				//Prise en compte du building
+				if(dataIn.nextBuilding==1 && Date.now()>dataIn.nextBuildingTime && 
+					dataIn.resources[0] 
+					- ((baseProd1*Dtime) 
+						- baseProd*Dtime)>0) {
+
+					dataOut[2] += ((baseProd1*Dtime) - baseProd*Dtime)*ratio.ironRatio;
+					dataOut[3] += ((baseProd1*Dtime) - baseProd*Dtime)*ratio.aluRatio;
+					dataOut[4] += ((baseProd1*Dtime) - baseProd*Dtime)*ratio.copperRatio;
+					dataOut[5] += ((baseProd1*Dtime) - baseProd*Dtime)*ratio.titanRatio;
+
+					dataOut[0] -= ((baseProd1*Dtime) - baseProd*Dtime)
+				}
 			}
-			else { //Modify nothing
-				dataOut[3] = dataIn.resources[3];
-				dataOut[4] = dataIn.resources[4];
-				dataOut[5] = dataIn.resources[5];
-				dataOut[6] = dataIn.resources[6];	
+			else { // Do the max we can
+				dataOut[2] += dataOut[0]*ratio.ironRatio;
+				dataOut[3] += dataOut[0]*ratio.aluRatio;
+				dataOut[4] += dataOut[0]*ratio.copperRatio;
+				dataOut[5] += dataOut[0]*ratio.titanRatio;
+
+				dataOut[0] = 0;
 			}		
+
+			//Max Storage
+			if(dataOut[0]>storageRatio1) {
+				dataOut[0] = storageRatio1;
+			}
+			if(dataOut[2]>storageRatio*ratio.ironRatio) { // You can't have more iron than your storage capacity
+				dataOut[2] = storageRatio*ratio.ironRatio;
+			}
+			if(dataOut[3]>storageRatio*ratio.aluRatio) { // You can't have more aluminium than your storage capacity
+				dataOut[3] = storageRatio*ratio.aluRatio;
+			}
+			if(dataOut[4]>storageRatio*ratio.copperRatio) { // You can't have more copper than your storage capacity
+				dataOut[4] = storageRatio*ratio.copperRatio;
+			}
+			if(dataOut[5]>storageRatio*ratio.titanRatio) { // You can't have more titanium than your storage capacity
+				dataOut[5] = storageRatio*ratio.titanRatio;
+			}
 
 			return dataOut
 		}
@@ -62,117 +113,117 @@ module.exports = function() {
 		INPUT: building id (int), level (int)
 		OUTPUT: cost (data) */
 		this.GetBuildingCost = function(building,level) {
-			switch(building) {
-				case 0: //Quarry
-					cost = {
-						aluminium: 0,
-						iron: Math.round(4*Math.exp(0.3214*level)),
-						copper: 0,
-						titanium:  Math.round(Math.pow(0.75*level,2) + 6.5*level - 2),
-						time: Math.pow(0.037*level,2) + 0.0255*level - 0.05,
-						energy: Math.round(65.2*Math.exp(0.4314*level)),
-						energy_difference: (Math.round(65.2*Math.exp(0.4314*level))-Math.round(65.2*Math.exp(0.4314*(level-1))))
-					}
-				break;
-				case 1: //Metallurgie
-					cost = {
-						aluminium: 0,
-						iron: Math.round(Math.pow(2*level,2) - 2*level + 2), //Structure
-						copper: 0,
-						titanium: Math.round(4.3*Math.pow(level,2) + 6*level + 6),
-						time: 0.0122*Math.exp(0.3676*level),
-						energy: Math.round(360*Math.pow(level,2) -1000*level + 700),
-						energy_difference: Math.round(360*Math.pow(level,2) -1000*level + 700)-Math.round(360*Math.pow(level-1,2) -1000*(level-1) + 700)
-					}
-				break;
-				case 2: //Living
-					cost = {
-						aluminium: 0,
-						iron: Math.round(1.3*Math.pow(level,2) + 13*level - 10),
-						copper: Math.round(0.4*Math.pow(level,2) + 9*level - 5),
-						titanium: 0,
-						time: 0.03*Math.exp(0.3*level),
-						energy: Math.round(400*Math.pow(level,2) - 1100*level + 760),
-						energy_difference: Math.round(400*Math.pow(level,2) - 1100*level + 760)-Math.round(400*Math.pow(level-1,2) - 1100*(level-1) + 760)
-					}
-				break;
-				case 3: //Serres
-					cost = {
-						aluminium: Math.round(0.4*Math.pow(level,2) + 8*level - 3.8), //Structure
-						iron: 0, 
-						copper: 0,
-						titanium: Math.round(1.2*Math.pow(level,2) + 12*level - 3.8),
-						time: 0.035*Math.exp(0.28*level),
-						energy: Math.round(5*level),
-						energy_difference: Math.round(5*level)-Math.round(5*(level-1))
-					}
-				break;
-				case 4: //Solar panel
-					cost = {
-						aluminium: Math.round(Math.pow(0.1*level,2) + 3*level),
-						iron: Math.round(Math.pow(0.25*level,2) + 2*level + 3),
-						copper: Math.round(Math.pow(0.7*level,2) + 7*level - 3),
-						titanium: 0,
-						time: 0.0132*Math.exp(0.3476*level),
-						energy: 0,
-						energy_difference: 0,
-					}
-				break;
-				case 5: //Warehouse
-					cost = {
-						aluminium: 0,
-						iron: Math.round(Math.pow(2*level,2) - 2*level + 2), //Structure
-						copper: 0,
-						titanium: Math.round(Math.pow(4.1*level,2) + 6.07*level + 6.5), //Outside
-						time: 0.0122*Math.exp(0.3676*level),
-						energy: Math.round(2.5*level), //Energy is just for lights :D
-						energy_difference: Math.round(2.5*level)-Math.round(2.5*(level-1)),
-					}
-				break;
-				case 6: //Tank
-					cost = {
-						aluminium: 0,
-						iron: Math.round(Math.pow(2.2*level,2) + level + 2),
-						copper: 0,
-						titanium: Math.round(Math.pow(3.15*level,2) + 7.1*level - 6.5),
-						time: 0.0172*Math.exp(0.33*level),
-						energy: Math.round(2*level), //Energy is just for lights :D
-						energy_difference: Math.round(2.5*level)-Math.round(2.5*(level-1)),
-					}
-				break;
-				case 7: //Shipyard
-					cost = {
-						aluminium: 0,
-						iron: Math.round(4*Math.exp(0.3214*level)),
-						copper: Math.round(Math.pow(level,2) + 3*level + 3),
-						titanium: 0,
-						time: Math.pow(0.04*level,2) + 0.08*level - 0.1,
-						energy: Math.round(4*level), //Energy is just for lights :D
-						energy_difference: Math.round(2.5*level)-Math.round(2.5*(level-1)),
-					}
-				break;
-				case 8: //launchpad
-					cost = {
-						aluminium: 0,
-						iron: 1,
-						copper: Math.round(0.25*Math.pow(level,2) + 4*level),
-						titanium: 0,
-						time: 0.032*Math.exp(0.345*level),
-						energy: Math.round(14.975*Math.pow(level,3.1193)),
-						energy_difference: Math.round(14.975*Math.pow(level,3.1193))-Math.round(14.975*Math.pow(level-1,3.1193)),
-					}
-				break;
-				default:
-					cost = {
-						aluminium: 0,
-						iron: 0,
-						copper: 0,
-						titanium: 0,
-						time: getStringTime(0),
-						energy: 0,
-						energy_difference: 0,
-					}
-			}
+			switch(building)  {
+			case 0: //Quarry
+				cost = {
+					aluminium: 0,
+					iron: Math.round(8*Math.pow(level,2) - 20*level + 17),
+					copper: 0,
+					titanium: Math.round(Math.pow(0.75*level,2) + 6.5*level - 2),
+					time: 0.03*Math.pow(level,2) + 0.05*level -0.2,
+					energy: Math.round(Math.pow(725*level,2) + 100000*level + 500000),
+					energy_difference: (Math.round(Math.pow(725*level,2) + 100000*level + 500000)-Math.round(Math.pow(725*(level-1),2) + 100000*(level-1) + 500000))
+				}
+			break;
+			case 1: //Metallurgie
+				cost = {
+					aluminium: 0,
+					iron: Math.round(Math.pow(2*level,2) - 2*level), //Structure
+					copper: 0,
+					titanium: Math.round(2.8*Math.pow(level,2) + 6*level + 6),
+					time: 0.06*Math.pow(level,2) - 0.15*level + 0.1,
+					energy: Math.round(Math.pow(1000*level,2) + 10000*level + 700),
+					energy_difference: Math.round(Math.pow(1000*level,2) + 10000*level + 700)-Math.round(Math.pow(1000*(level-1),2) + 10000*(level-1) + 700)
+				}
+			break;
+			case 2: //Living
+				cost = {
+					aluminium: 0,
+					iron: Math.round(2.7*Math.pow(level,2) - 6*level + 8),
+					copper: Math.round(0.4*Math.pow(level,2) + 9*level - 5),
+					titanium: 0,
+					time: 0.07*Math.pow(level,2) - 0.1*level + 0.05,
+					energy: Math.round(Math.pow(400*level,2) + 1100*level + 700),
+					energy_difference: Math.round(Math.pow(400*level,2) + 1100*level + 700)-Math.round(Math.pow(400*(level-1),2) + 1100*(level-1) + 700)
+				}
+			break;
+			case 3: //Serres
+				cost = {
+					aluminium: Math.round(0.8*Math.pow(level,2) + 8*level - 5), //Structure
+					iron: 0, 
+					copper: 0,
+					titanium: Math.round(1.2*Math.pow(level,2) + 12*level - 3.8),
+					time: 0.065*Math.pow(level,2) - 0.1*level,
+					energy: Math.round(80000*level - 10000),
+					energy_difference: Math.round(80000*(level-1)-10000)-Math.round(80000*(level-1)-10000)
+				}
+			break;
+			case 4: //Solar panel
+				cost = {
+					aluminium: Math.round(0.6*Math.pow(level,2) + 3*level),
+					iron: Math.round(Math.pow(0.5*level,2) + 2*level),
+					copper: Math.round(0.4*Math.pow(level,2) + 9*level - 5),
+					titanium: 0,
+					time: 0.05*Math.pow(level,2) - 0.1*level + 0.03,
+					energy: 0,
+					energy_difference: 0,
+				}
+			break;
+			case 5: //Warehouse
+				cost = {
+					aluminium: 0,
+					iron: Math.round(1.75*Math.pow(level,2) -1.5*level), //Structure
+					copper: 0,
+					titanium: Math.round(2.5*Math.pow(level,2) + 6*level + 6.5), //Blindage
+					time: 0.035*Math.pow(level,2) + 0.05*level - 0.2,
+					energy: Math.round(Math.pow(35*level,2)-200*level + 800), //Energy is just for lights :D
+					energy_difference: Math.round(Math.pow(35*level,2) -200*level + 800)-Math.round(Math.pow(35*(level-1),2) -200*(level-1) + 800),
+				}
+			break;
+			case 6: //Tank
+				cost = {
+					aluminium: Math.round(0.6*Math.pow(level,2) + 8*level - 6),
+					iron: Math.round(Math.pow(2.2*level,2) + level - 10),
+					copper: 0,
+					titanium: Math.round(2*Math.pow(level,2) + 7*level - 6.5),
+					time: 0.025*Math.pow(level,2) + 0.1*level - 0.2,
+					energy: Math.round(Math.pow(15*level,2)+200*level + 1200), //Energy is just for lights :D
+					energy_difference: Math.round(Math.pow(15*level,2)+200*level + 1200)-Math.round(Math.pow(15*(level-1),2)+200*(level-1) + 1200),
+				}
+			break;
+			case 7: //Shipyard
+				cost = {
+					aluminium: Math.round(Math.pow(0.6*level,2) + 3*level),
+					iron: Math.round(6*Math.pow(level,2) - 20*level + 24),
+					copper: Math.round(0.85*Math.pow(level,2) + 3*level + 3),
+					titanium: Math.round(0.5*Math.pow(level,2) + 6.5*level - 2),
+					time: Math.pow(0.04*level,2) + 0.08*level - 0.1,
+					energy: Math.round(Math.pow(300*level,2)-1300*level + 800),
+					energy_difference: Math.round(Math.pow(300*level,2)-1300*level + 800)-Math.round(Math.pow(300*(level-1),2)-1300*(level-1) + 800),
+				}
+			break;
+			case 8: //Research Center
+				cost = {
+					aluminium: Math.round(0.25*Math.pow(level,2) + 8*level),
+					iron: Math.round(1.25*Math.pow(level,2) - level),
+					copper: Math.round(0.25*Math.pow(level,2) + 4*level),
+					titanium: Math.round(Math.pow(0.8*level,2) + 6.5*level - 2),
+					time: 0.02*Math.pow(level,2) + 0.03*level - 0.1,
+					energy: Math.round(Math.pow(550*level,2)-2500*level + 700),
+					energy_difference: Math.round(Math.pow(550*level,2)-2500*level + 700)-Math.round(Math.pow(550*(level-1),2)-2500*(level-1) + 700),
+				}
+			break;
+			default:
+				cost = {
+					aluminium: 0,
+					iron: 0,
+					copper: 0,
+					titanium: 0,
+					time: 0,
+					energy: 0,
+					energy_difference: 0,
+				}
+		}
 		return cost
 	}
 }

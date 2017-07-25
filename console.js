@@ -14,6 +14,9 @@ module.exports = function() {
   this.yellowText = function(string) {
       return '\u001b[33m'+string+'\u001b[39m';
   };
+  this.blueText = function(string) {
+      return '\u001b[36m'+string+'\u001b[39m';
+  };
   /* 
   log
   Write a thing in console
@@ -24,6 +27,15 @@ module.exports = function() {
     switch(type) {
       case "warn":
       text = redText('WARNING:') + yellowText(text);
+      break;
+      case "error":
+      text = redText('ERROR:') + redText(text);
+      break;
+      case "fail":
+      text = yellowText(text);
+      break;
+      case "success":
+      text = blueText(text);
       break;
       case "info":
       text = greenText(text);
