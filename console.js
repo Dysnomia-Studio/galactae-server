@@ -23,7 +23,7 @@ module.exports = function() {
   this.log = function (text,type,nodate) {
     switch(type) {
       case "warn":
-      text = redText('WARING:') + yellowText(text);
+      text = redText('WARNING:') + yellowText(text);
       break;
       case "info":
       text = greenText(text);
