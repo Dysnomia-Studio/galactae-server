@@ -1,17 +1,24 @@
 /* Game Files */
-require('./resources')();
+require('./planet')();
+require('./units')();
+require('./research')();
+require('./calcConstants')();
 require('./chat')();
+require('./config')();
 require('./console')();
+require('./player')();
 require('./socket')();
-require('./database')();
+var db = require('./database');
 require('./misc')();
 
 /* Connect to database */
-dbconnect();
+db.connect(function() {
+	db.player.clearList();
+});
 
 /**
- * Lancement du serveur en écoutant les connexions arrivant sur le port 34269
+ * Lancement du serveur en écoute
  */
-https.listen(34269, function () {
-  log('Server is listening on *:34269');
+https.listen(globalCfg["serverPort"], function () {
+  log('Server is listening on *:'+globalCfg["serverPort"]);
 });

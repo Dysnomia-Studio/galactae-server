@@ -1,37 +1,79 @@
+var db = require('./database');
+
 module.exports = function() {
 	this.chatAnalyse = function(data) {
+		var reg=new RegExp("[ ,;]+", "g");
+		var arg=data.message.split(reg);
+
 		/* Controles de securité */
 		data.send = true;
 		data = chatprotect(data);
 
+		/* Prepare message */
 		if(data.send) {
 			// Chat Commands
 			if(data.lvl>3 &&data.message.charAt(0)=="!") {
 				data = chatSendCommand(data);
-			}
+			} else if(data.message.charAt(0)=="@") { // Messages privés
+				db.player.searchByName(arg[0].substr(1).toLowerCase(), function(dataReturned) {
+					if(dataReturned==undefined) { return; }
+					var sid = dataReturned.sid;
 
-			// Chat Normal messages
-			if(data.message.charAt(0)!="!") {
+					/* Ajout de la div d'utilisateur */
+					data.username = "<span class=\"username\">" + data.username + "</span>";
+
+					/* Rank before name */
+					if(data.lvl>3) {
+						data.username = "[ADMIN] "+ data.username;
+					}
+					else if(data.lvl>2) {
+						data.username = "[STAFF] "+ data.username;
+					}
+
+					/* Recuperer le vrai message */
+					data.newmessage = data.message.substr(arg[0].length+1);
+					data.message = arg[0] + ": " + data.message.substr(arg[0].length+1)
+
+					/* Envoyer le PM */
+					if(sid!=undefined && sid!="-1" && data.newmessage!="" && sid!=data.sid) {
+						sendPM(data.sid,data.message,false);
+						sendPM(sid,data.username + ": " + data.newmessage,true);
+					} else if(arg[0].substr(1).toLowerCase()==data.username) {
+						sendPM(data.sid,"NO_PM_YOU",false);
+					} else if(sid==undefined||sid!="-1") {
+						sendSM(data.sid,"PLY_NOT_FOUND");
+					}
+				});
+
+				data.send = false;
+			} else { // Chat Normal messages
+			    /* Ajout de la div d'utilisateur */
+				data.username = "<span class=\"username\">" + data.username + "</span>";
+
+				/* Rank before name */
 				if(data.lvl>3) {
-					data.username = "<span style=\"color: #b0291b;\">[ADMIN] "+ data.username +"</span>";
+					data.username = "<span class=\"staff\">[ADMIN] "+ data.username +"</span>";
 				}
 				else if(data.lvl>2) {
-					data.username = "<span style=\"color: #b0291b;\">[STAFF] "+ data.username +"</span>";
+					data.username = "<span class=\"staff\">[STAFF] "+ data.username +"</span>";
 				}
 
 				if(!data.noname) {
 					data.message = "<strong>"+ data.username +" :</strong> "+ data.message;
 				}
 			}
+
 		}
 
-		// If the message ( or protected message ) is empty, don't send it ...
-		if(data.message=="" && message.length > 0) { 
+		// If the message is empty, don't send it ...
+		if(data.message=="" || !isset(data.message)) { 
 			data.send = false;
 		}
 
-	    if(data.send) {
+	    if(data.send && data.channel !="hud-chat-ally") { // Normal chat
         	io.emit('chat-message', data);
+    	} else if(data.send && data.channel =="hud-chat-ally" && data.ally!=undefined) { // Allies messages
+    		// @ ADD : Ally messages
     	}
 	}
 	this.chatprotect = function(data) {
@@ -44,7 +86,9 @@ module.exports = function() {
         /* Can the player send a message ? */
         if(data.lvl<2) {
         	data.send = false;
-        	// @ADD MP to user to say he can't send a message because ...
+        	sendSM(data.sid,"NO_PERM");
+        	// Kick it ...
+        	io.to(data.sid).emit('server-kick');
         }
 
         data.message = str;
@@ -61,31 +105,50 @@ module.exports = function() {
 		switch(arg[0]) {
 			case "!asay":
 				SendGeneralMessage(str.substr(6));
-				msg = "<span style=\"color: #d35400;\">SERVER_ALERT</span> "+str.substr(6);
-				data.noname = true;
+				data.send = false;
 			break;
 			case "!kickgame":
-				// @ Add: return id with name ( arg[1] )
-				// socket: server-kick
-				// @ Add: PM to the admin who kicked
-				msg = "";
+				db.player.searchByName(arg[1], function(dataReturned) {
+					var sid = dataReturned.sid;
+
+					if(sid==undefined) {
+						sendSM(data.sid,"PLY_NOT_FOUND");
+						console.log("Player not found");
+					} else {	
+						console.log("Kicked " + arg[1]);
+	        			sendSM(data.sid,"Kicked " + arg[1]);
+
+						io.to(sid).emit('server-kick',str.substr(arg[0].length+arg[1].length+1));
+					}
+				});
+				
+				data.send = false;
 			break;
+			// @ADD: Ban
 			case "!maintenance":
 				io.emit('server-maintenance');
 				msg = "MAINTENANCE";
 				data.noname = true;
 			break;
 			case "!help":
-				// @ Add: PM commands permitted to this user
-				msg = "";
+				sendSM(data.sid,"HELP");
+				data.send = false;
 			break;
 			default:
-				// @ Add: PM to user command not found
-				msg = "";
+				sendSM(data.sid,"COMMAND_NOT_FOUND");
+				data.send = false;
 		}
 
 		data.message = msg;
 
 		return data; // Needed For some commands ...
+	}
+	/* send private message to a specific player */
+	this.sendPM = function(sid,msg,sound) {
+		io.to(sid).emit("chat-message-private", {msg: msg,sound: sound});
+	}
+	/* send system message to a specific player */
+	this.sendSM = function(sid,msg) {
+		io.to(sid).emit("chat-message-system", msg);
 	}
 }

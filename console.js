@@ -1,10 +1,10 @@
 module.exports = function() {    
-  /* 
-  [color]Text
-  Transfrom Text for a specific color
-  IN: string (string)
-  OUT: colored_string (string)
-  */
+  /**
+   * Color a text
+   *
+   * @param      {string}  text    The text to log
+   * @return     {string}  text    The colored text
+   */
   this.redText = function(string) {
       return '\u001b[31m'+string+'\u001b[39m';
   };
@@ -17,12 +17,13 @@ module.exports = function() {
   this.blueText = function(string) {
       return '\u001b[36m'+string+'\u001b[39m';
   };
-  /* 
-  log
-  Write a thing in console
-  IN: text (string) type(string)
-  OUT: -
-  */
+  /**
+   * Write a thing in console
+   *
+   * @param      {string}  text    The text to log
+   * @param      {<type>}             type    The type of text (for color)
+   * @param      {boolean}            nodate  Activate the date log ?
+   */
   this.log = function (text,type,nodate) {
     switch(type) {
       case "warn":
@@ -46,6 +47,11 @@ module.exports = function() {
 
       console.log(text)
   };
+  /**
+   * Retourner la date en jaune
+   *
+   * @return     {string}  text    Date en jaune
+   */
   this.logdate = function() {
       return yellowText(getDateTime());
   };

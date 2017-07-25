@@ -1,10 +1,9 @@
 module.exports = function() {    
-	/* 
-	getDateTime
-	Get exact date and time
-	IN: -
-	OUT: date(string) 
-	*/
+	/**
+	 * Gets the date time.
+	 *
+	 * @return     {string}  The date time.
+	 */
 	this.getDateTime = function () {
 	    var date = new Date();
 
@@ -27,13 +26,14 @@ module.exports = function() {
 
 		return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
 	};
-	/*
-	isset
-	INPUT: variable
-	OUTPUT: defined ( bool )
-	*/
+	/**
+	 * { function_description }
+	 *
+	 * @param      {(number|string)}  variable  The variable to test
+	 * @return     {boolean}          the variable is set
+	 */
 	this.isset = function(variable) {
-		if(typeof variable !== 'undefined' && variable !== undefined && variable != null && variable != {} && variable != "") {
+		if(variable===0 || (typeof variable !== 'undefined' && variable !== undefined && variable != null && variable != {} && variable != "")) {
 			return true;
 		} else {
 			return false;
