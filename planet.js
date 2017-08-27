@@ -217,7 +217,7 @@ module.exports = function() {
 						errormsg = "BUILDING_ERROR_MAXIMUM";
 					}
 					// Energie ?
-					if(!enoughtEnergy(newData.Buildings)&&data.building<=9) { // Only ground buildings affected by this
+					if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_ENERGY";
 					}
