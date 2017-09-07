@@ -64,10 +64,10 @@ module.exports = function() {
 					// Check if that part exists in that kind of ship
 					if(valid) {
 						valid = false;
-						for(var parts in shipShapesDetails[ship.type][ship.shape]['svg']) {
+						for(var j=0; shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
 							console.log(i);
-							console.log(shipShapesDetails[ship.type][ship.shape]['svg'][parts][6]);
-							if(shipShapesDetails[ship.type][ship.shape]['svg'][parts][6]==i) {
+							console.log(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]);
+							if(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
 								valid = true;
 								break;
 							}
