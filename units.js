@@ -44,7 +44,7 @@ module.exports = function() {
 			}
 
 			// Wrong type/shape
-			if(shipShapesDetails[ship.type]==undefined || shipShapesDetails[ship.type][ship.shape]) {
+			if(shipShapesDetails[ship.type]==undefined || shipShapesDetails[ship.type][ship.shape]==undefined) {
 				errors ++;
 				message = "SHIP_HAS_WRONG_TYPE_OR_SHAPE";
 			}
