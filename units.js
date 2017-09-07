@@ -102,11 +102,11 @@ module.exports = function() {
 				// Save to database
 
 				// Notify client
-				log(data.name + " has succed to create new unit type named " + ship.name,"success");
+				log(data.username + " has succed to create new unit type named " + ship.name,"success");
 				refreshUserUnits(data);
 			} else {
 				// Notify client
-				log(data.name + " has failed to create unit type named " + ship.name,"fail");
+				log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
 				SendMessageToClient({sid: data.sid, message: errorMessage});
 			}
 		}
