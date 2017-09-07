@@ -94,7 +94,7 @@ module.exports = function() {
 
 			// Check researchs
 			if(errors==0) {
-
+				
 			}
 
 			// Saving

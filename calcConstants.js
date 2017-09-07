@@ -203,9 +203,9 @@ module.exports = function() {
 		"wep_mines_nuke",
 		"wep_mines_iem",
 		// Satellites
-		"wep_sat_railgun",
-		"wep_sat_laser",
-		"wep_sat_plasma",
+		"wep_sat_ag1",
+		"wep_sat_ag2",
+		"wep_sat_ag3",
 		// Autres recherches
 		"misc_astronomie",
 		"misc_telemetrie",
@@ -244,9 +244,9 @@ module.exports = function() {
 		wep_mines_nuke:		750,
 		wep_mines_iem:		550,
 		// Satellites
-		wep_sat_railgun:	360,
-		wep_sat_laser:		650,
-		wep_sat_plasma:		1500,
+		wep_sat_ag1:	    360,
+		wep_sat_ag2:		650,
+		wep_sat_ag3:		1500,
 		// Autres recherches
 		misc_astronomie:	45,
 		misc_telemetrie: 	90,
@@ -257,9 +257,41 @@ module.exports = function() {
 		misc_calcGravit: 	240,
 		misc_em: 			110,
 	};
+
+	this.shipResearchDependencies = {
+		// Ship shapes
+		SHIP_SAT_AG1: "wep_sat_ag1",
+		SHIP_SAT_AG2: "wep_sat_ag2",
+		SHIP_SAT_AG3: "wep_sat_ag3",
+
+		// Explosives
+		explosive: "wep_mines",
+		nuke: "wep_nuke",
+		iem: "wep_iem",
+		antimater: "wep_antimater"
+
+		// Cannon
+		railgun: "wep_railgun",
+		laser: "wep_laser",
+		plasma: "wep_plasma",
+
+		// Shields
+
+		// Cloak
+		
+		// Scanners
+		
+		// Propulsion
+		vsl: "prop_vsl",
+		hyperespace: "prop_hyperespace",
+
+		ion: "prop_ions",
+		vsolaire: "prop_vSolaire",
+	}
+
 	this.shipShapesDetails = {
-		SHIP_ORBITAL_DEF: {
-			SHIP_ORBITAL_DEF_SAT: {
+		SHIP_SAT: {
+			SHIP_SAT_AG1: {
 				svg: [
 					// Aile Gauche
 					["struct","rect", 75,175,250,150],
@@ -282,21 +314,6 @@ module.exports = function() {
 				content: {
 					cannon: ["railgun","laser","plasma"],
 					shield: ["none"],
-				},
-				stats: {
-					mass: 0,
-				},
-			},
-			SHIP_ORBITAL_DEF_MINES: {
-				svg: [
-					// Structure
-					["struct","poly",300,100,210,382,445,202,165,202,390,382],
-					["struct","circle",300,250,100],
-					// Arme
-					["explosive","rect"  ,275,225, 50, 50, "explosive_1"],
-				],
-				content: {
-					explosive: ["explosive","iem","nuke","antimater"],
 				},
 				stats: {
 					mass: 0,
