@@ -74,9 +74,8 @@ module.exports = function() {
 
 					// Check if technology exists in that kind of ship
 					if(valid) {
-						valid = false,
-						var type = ship[i].type
-						for(var tech in shipShapesDetails[ship.type][ship.shape]['content'][type]) {
+						valid = false;
+						for(var tech in shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type]) {
 							if(tech==ship[i].value) {
 								valid = true;
 								break;
