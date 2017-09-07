@@ -76,15 +76,13 @@ module.exports = function() {
 					if(valid) {
 						valid = false;
 						for(var j=0; shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
-							console.log(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]);
-							console.log(ship[i].value);
 							if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
 								valid = true;
 								break;
 							}
 						}
 					}
-					console.log(valid);
+
 					if(!valid) {
 						errors++;
 						message = "SHIP_HAS_INVALID_PARTS";
@@ -94,18 +92,33 @@ module.exports = function() {
 			}
 
 
-			// Check researchs
+			// Last check
 			if(errors==0) {
+				db.player.searchByName(data.username,function(userReturned) {
+					// Check research
+					for(var i in ship) {
+						if(i=="name" || i=="type" || i=="shape") { continue; }
 
-			}
+						if(getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+							errors++;
+							message = "NEEDED_RESEARCH_MISSING";
+							break;
+						}
+					}
 
-			// Saving
-			if(errors==0) {
-				// Save to database
+					// Saving
+					if(errors==0) {
+						// Save to database
 
-				// Notify client
-				log(data.username + " has succed to create new unit type named " + ship.name,"success");
-				refreshUserUnits(data);
+						// Notify client
+						log(data.username + " has succed to create new unit type named " + ship.name,"success");
+						refreshUserUnits(data);
+					} else {
+						// Notify client
+						log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+						SendMessageToClient({sid: data.sid, message: errorMessage});
+					}
+				});
 			} else {
 				// Notify client
 				log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
