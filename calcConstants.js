@@ -268,7 +268,7 @@ module.exports = function() {
 		explosive: "wep_mines",
 		nuke: "wep_nuke",
 		iem: "wep_iem",
-		antimater: "wep_antimater"
+		antimater: "wep_antimater",
 
 		// Cannon
 		railgun: "wep_railgun",
