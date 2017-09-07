@@ -61,6 +61,8 @@ module.exports = function() {
 						}
 					}
 
+					console.log(valid);
+
 					// Check if that part exists in that kind of ship
 					if(valid) {
 						valid = false;
@@ -71,7 +73,7 @@ module.exports = function() {
 							}
 						}
 					}
-
+					console.log(valid);
 					// Check if technology exists in that kind of ship
 					if(valid) {
 						valid = false;
@@ -82,7 +84,7 @@ module.exports = function() {
 							}
 						}
 					}
-
+					console.log(valid);
 					if(!valid) {
 						errors++;
 						message = "SHIP_HAS_INVALID_PARTS";
