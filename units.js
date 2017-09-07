@@ -49,7 +49,7 @@ module.exports = function() {
 				message = "SHIP_HAS_WRONG_TYPE_OR_SHAPE";
 			}
 
-			if(errors==0)
+			if(errors==0) {
 				for(var i in ship) {
 					if(i=="name" || i=="type" || i=="shape") { continue; }
 					// Check if that kind of part exists in that kind of ship
