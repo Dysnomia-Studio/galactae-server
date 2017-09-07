@@ -65,20 +65,20 @@ module.exports = function() {
 					if(valid) {
 						valid = false;
 						for(var j=0; shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
-							console.log(i);
-							console.log(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]);
 							if(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
 								valid = true;
 								break;
 							}
 						}
 					}
-					console.log(valid);
+
 					// Check if technology exists in that kind of ship
 					if(valid) {
 						valid = false;
-						for(var tech in shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type]) {
-							if(tech==ship[i].value) {
+						for(var j=0; shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
+							console.log(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]);
+							console.log(ship[i].value);
+							if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
 								valid = true;
 								break;
 							}
