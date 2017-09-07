@@ -67,7 +67,7 @@ module.exports = function() {
 						for(var parts in shipShapesDetails[ship.type][ship.shape]['svg']) {
 							console.log(i);
 							console.log(parts[6]);
-							if(parts[6]==i) {
+							if(shipShapesDetails[ship.type][ship.shape]['svg'][parts][6]==i) {
 								valid = true;
 								break;
 							}
