@@ -151,6 +151,18 @@ module.exports = function() {
 			});
 		});
 
+		// Units
+		socket.on('unit-type-create', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.ship) || !isset(data.username)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+				// Execution du code
+			   	CreateUnitType(data);
+			});
+		});
+
 		// Daily Bonus
 		socket.on('daily-bonus', function (data) {
 			// Vars

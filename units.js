@@ -12,5 +12,15 @@ module.exports = function() {
 				if(units==undefined) { units = []; }
 				io.to(data.sid).emit("units-recieve-data", units);
 			});
+		},
+
+		/**
+		 * Creates an unit type.
+		 *
+		 * @class      CreateUnitType (name)
+		 * @param      {<type>}  data    Data given by client
+		 */
+		this.CreateUnitType = function(data) {
+			console.info(data);
 		}
 }
