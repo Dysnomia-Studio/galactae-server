@@ -64,7 +64,7 @@ module.exports = function() {
 					// Check if that part exists in that kind of ship
 					if(valid) {
 						valid = false;
-						for(var parts in shipShapesDetails[ship.type][ship.shape]['svg']) {*
+						for(var parts in shipShapesDetails[ship.type][ship.shape]['svg']) {
 							console.log(i);
 							console.log(parts[6]);
 							if(parts[6]==i) {
