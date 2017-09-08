@@ -109,6 +109,28 @@ module.exports = function() {
 					// Saving
 					if(errors==0) {
 						// Save to database
+						var shipToSave = {
+							name: ship.name,
+							shipType: ship.type,
+							shipShape: ship.shape,
+							ownerId: data.id,
+							inBuilding: [],
+							parts: [],
+							armorType: 0, // None yet 
+						};
+
+						for(var i in ship) {
+							if(i=="name" || i=="type" || i=="shape") { continue; }
+							
+							shipToSave.parts.push({
+								type: ship[i].type,
+								name: i,
+								tech: ship[i].value
+							});
+						}
+					
+
+						unit.create(shipToSave);
 
 						// Notify client
 						log(data.username + " has succed to create new unit type named " + ship.name,"success");

@@ -41,17 +41,11 @@ var unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
-	note: Number,
-	inBuilding: Array,
-	owned: Array,
+	inBuilding: Array, // [[planet,count,end],[planet,count,end]]
 	shipType: Number,
-	engineType: Number,
-	shieldType: Number,
-	weapons: Array,
-	cost: Array,
-	shape: Number,
+	shipShape: Number,
+	parts: Array,
 	armorType: Number,
-	missChance: Number,
 });
 var units = mongoose.model('units', unitsSchema);
 
@@ -145,6 +139,11 @@ module.exports = {
 	 * UNITS
 	 */
 	unit: {
+		create: function(data) {
+			units.create(data, function(err) {
+				if (err) return handleError(err);
+			});
+		}
 		find: function(id,callback) {
 			units.findById(id, function (err, obj) {
 				if(isset(obj)) {
