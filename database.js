@@ -140,7 +140,7 @@ module.exports = {
 	 */
 	unit: {
 		create: function(data) {
-			data._id = new mongoose.ObjectId();
+			data._id = new mongoose.Types.ObjectId();
 			
 			units.create(data, function(error) {
 				if(error) { log(error);} 
