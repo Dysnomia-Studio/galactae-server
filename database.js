@@ -140,8 +140,8 @@ module.exports = {
 	 */
 	unit: {
 		create: function(data) {
-			units.create(data, function(err) {
-				if (err) return handleError(err);
+			units.create(data, function(error) {
+				if(error) { log(error);} 
 			});
 		},
 		find: function(id,callback) {
