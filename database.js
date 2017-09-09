@@ -143,7 +143,7 @@ module.exports = {
 			units.create(data, function(err) {
 				if (err) return handleError(err);
 			});
-		}
+		},
 		find: function(id,callback) {
 			units.findById(id, function (err, obj) {
 				if(isset(obj)) {
