@@ -140,7 +140,8 @@ module.exports = {
 	 */
 	unit: {
 		create: function(data) {
-			units.insert(data, function(error) {
+			var ship = new units(data);
+			units.save(function(error) {
 				if(error) { log(error);} 
 			});
 		},
