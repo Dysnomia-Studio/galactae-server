@@ -31,8 +31,8 @@ module.exports = function() {
 			// Check entries valdity
 			for(var i in ship) {
 				// Empty fields
-				if(i=="name" || i=="type" || i=="shape") {
-					if(ship[i]==undefined || ship[i].split(' ').join('')=="") {
+				if(i=="name" || i=="type" || i=="shape") { // In facts, the two last verifications won't display error, but they're here to simplify the else
+					if(ship[i].split(' ').join('')=="") {
 						errors ++;
 						message = "SHIP_HAS_NO_NAME";
 						break;
@@ -102,7 +102,11 @@ module.exports = function() {
 					for(var i in ship) {
 						if(i=="name" || i=="type" || i=="shape") { continue; }
 
-						if(getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+						log(ship[i].value);
+						log(shipResearchDependencies[ship[i].value]);
+
+						if(shipResearchDependencies[ship[i].value]!=undefined && getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+							log("NEEDED_RESEARCH_MISSING");
 							errors++;
 							message = "NEEDED_RESEARCH_MISSING";
 							break;
