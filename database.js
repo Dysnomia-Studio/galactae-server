@@ -140,8 +140,9 @@ module.exports = {
 	 */
 	unit: {
 		create: function(data) {
-			var ship = new units(data);
-			ship.save(function(error) {
+			data._id = new mongoose.ObjectId();
+			
+			units.create(data, function(error) {
 				if(error) { log(error);} 
 			});
 		},
