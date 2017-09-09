@@ -102,11 +102,7 @@ module.exports = function() {
 					for(var i in ship) {
 						if(i=="name" || i=="type" || i=="shape") { continue; }
 
-						log(ship[i].value);
-						log(shipResearchDependencies[ship[i].value]);
-
 						if(shipResearchDependencies[ship[i].value]!=undefined && getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
-							log("NEEDED_RESEARCH_MISSING");
 							errors++;
 							message = "NEEDED_RESEARCH_MISSING";
 							break;
@@ -137,7 +133,7 @@ module.exports = function() {
 						}
 					
 
-						unit.create(shipToSave);
+						db.unit.create(shipToSave);
 
 						// Notify client
 						log(data.username + " has succed to create new unit type named " + ship.name,"success");
