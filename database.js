@@ -141,7 +141,7 @@ module.exports = {
 	unit: {
 		create: function(data) {
 			var ship = new units(data);
-			units.save(function(error) {
+			ship.save(function(error) {
 				if(error) { log(error);} 
 			});
 		},
