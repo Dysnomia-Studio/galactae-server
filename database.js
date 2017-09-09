@@ -42,10 +42,10 @@ var unitsSchema = new Schema({
 	name: String,
 	ownerId: Schema.Types.ObjectId,
 	inBuilding: Array, // [[planet,count,end],[planet,count,end]]
-	shipType: Number,
-	shipShape: Number,
+	shipType: String,
+	shipShape: String,
 	parts: Array,
-	armorType: Number,
+	armorType: String,
 });
 var units = mongoose.model('units', unitsSchema);
 
