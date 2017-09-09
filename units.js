@@ -25,6 +25,9 @@ module.exports = function() {
 			var errorMessage = "";
 			var ship = data.ship;
 
+			// That block 90% of tries to crash :p
+			if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
+
 			// Check entries valdity
 			for(var i in ship) {
 				// Empty fields
