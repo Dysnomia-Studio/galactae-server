@@ -123,7 +123,7 @@ module.exports = function() {
         	io.to(data.sid).emit('server-kick');
         }
         /* Disable links */
-        if(str!=str.replace('http://','') || str!=str.replace('https://','') || str!=str.replace('www.','')) {
+        if(str!=str.replace('://','') || str!=str.replace('www.','')) {
         	data.send = false;
         	sendSM(data.sid,"NO_LINKS");
         }
