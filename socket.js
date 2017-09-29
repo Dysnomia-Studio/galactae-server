@@ -53,7 +53,7 @@ module.exports = function() {
 			db.player.searchBySid(data.sid, function(user) {
 				if(!isset(user) || !isset(user.name) || !isset(user.id)) { return; }
 				// Log
-				log(user.username+' ('+ user.id + ' | ' + socket.id +') disconnected');
+				log(user.name+' ('+ user.id + ' | ' + socket.id +') disconnected');
 				// Execution du code
 				disconnectPlayer(user);
 			}); 
