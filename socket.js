@@ -51,6 +51,7 @@ module.exports = function() {
 			var data = {};
 			data.sid = socket.id;
 			db.player.searchBySid(data.sid, function(user) {
+				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
 				// Log
 				log(user.username+' ('+ user.id + ' | ' + socket.id +') disconnected');
 				// Execution du code
