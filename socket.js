@@ -50,7 +50,12 @@ module.exports = function() {
 		socket.on('disconnect', function() {
 			var user = {};
 			user.sid = socket.id;
-			disconnectPlayer(user);
+			db.player.searchBySid(user.sid, function(user) {
+				// Log
+				log(user.username+' ('+ user.id + ' | ' + socket.id +') disconnected');
+				// Execution du code
+				disconnectPlayer(user);
+			}); 
 		});
 
 		/**
