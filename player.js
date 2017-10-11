@@ -141,7 +141,7 @@ module.exports = function() {
 			newUserData.points += calcResearchPoints(newUserData);
 
 			// Money
-			newUserData.points += (userData.money*pointsCoef['money']);
+			newUserData.points += (newUserData.money*pointsCoef['money']);
 
 			newUserData.point = Math.round(newUserData.points);
 			callback(newUserData);
