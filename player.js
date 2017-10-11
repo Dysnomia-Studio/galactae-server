@@ -143,7 +143,7 @@ module.exports = function() {
 			// Money
 			newUserData.points += (newUserData.money*pointsCoef['money']);
 
-			newUserData.point = Math.round(newUserData.points);
+			newUserData.points = Math.round(newUserData.points);
 			callback(newUserData);
 		});	
 	}
