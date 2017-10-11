@@ -111,10 +111,12 @@ module.exports = function() {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
+			points += Math.round()
+
 			if(i+1<user.planetlist.length) {
 				refreshUserPoints(user,callback,i+1,points);
 			} else {
-				points *= pointsCoef['planet'];;
+				points *= pointsCoef['planet'];
 				user.points = points;
 				callback(user);	
 			}
@@ -131,11 +133,17 @@ module.exports = function() {
 
 		points*=pointsCoef['research'];
 
-		return Math.round(points);
+		return points;
 	}
 	this.refreshUserPoints = function(user,callback) {
 		calcTotalPlanetPoints(user,function(newUserData) {
+			// Recherches
 			newUserData.points += calcResearchPoints(newUserData);
+
+			// Money
+			newUserData.points += (userData.money*pointsCoef['money']);
+
+			newUserData.point = Math.round(newUserData.points);
 			callback(newUserData);
 		});	
 	}

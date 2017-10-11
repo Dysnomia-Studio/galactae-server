@@ -4,9 +4,10 @@ module.exports = function() {
 	}
 	this.pointsCoef = {
 		planet:				1,
-		research: 			0.02,
+		research: 			0.1,
+		money: 			    0.0001,
 	}
-	/**
+	/** 
 	 * Production
 	 */
 	this.planetRatios = [
