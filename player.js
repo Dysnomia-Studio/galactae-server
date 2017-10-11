@@ -111,8 +111,6 @@ module.exports = function() {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
-			points += Math.round()
-
 			if(i+1<user.planetlist.length) {
 				refreshUserPoints(user,callback,i+1,points);
 			} else {
