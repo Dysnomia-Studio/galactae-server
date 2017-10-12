@@ -30,6 +30,7 @@ var userSchema = new Schema({
 	lastConnected: Number,
 	dayBonusStreak: Number,
 	dayBonusBest: Number,
+	beginnerProtectEnd: Number,
 	lastBonus: Number,
 	lastAction: Number,
 	lastResearchUpdate: Number,
