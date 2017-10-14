@@ -222,7 +222,7 @@ module.exports = function() {
 
 						break;
 					default:
-						log("Command " + data.cmd + " not found !")
+						log("Command " + data.cmd + " not found !");
 				}
 			} else {
 				log("Failed to execute admin command from " + clientIpAddress);
