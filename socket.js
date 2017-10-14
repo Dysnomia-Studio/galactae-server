@@ -205,8 +205,9 @@ module.exports = function() {
 					return;
 				}
 
+				log("Executing admin command (" + data.cmd + ") from " + clientIpAddress);
+
 				switch(data.cmd) {
-					log("Executing admin command (" + data.cmd + ") from " + clientIpAddress);
 					case "maintenanceOn":
 
 						break;
