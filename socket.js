@@ -195,15 +195,19 @@ module.exports = function() {
 		});
 
 		socket.on('admin-request-cmd', function(data) {
+			log("1");
 			if(!isset(data.cmd)) {
 				return;
 			}
 			var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 			if(socket.id==adminSid) {
+			log("2");
+
 				if(typeof(data.cmd) !== "string") {
 					return;
 				}
+			log("3");
 
 				log("Executing admin command (" + data.cmd + ") from " + clientIpAddress);
 
