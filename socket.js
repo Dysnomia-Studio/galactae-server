@@ -198,6 +198,7 @@ module.exports = function() {
 			if(!isset(data.cmd)) {
 				return;
 			}
+			var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 			if(socket.id==adminSid) {
 				if(typeof(data.cmd) !== "string") {
