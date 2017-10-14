@@ -183,7 +183,7 @@ module.exports = function() {
 			}); 
 		});
 
-		// Monitoring
+		// Admin panel
 		socket.on('server-monitore-connect', function(data) {
 			if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
 				adminSid = socket.id;
@@ -193,6 +193,41 @@ module.exports = function() {
 				log("Failed to connect to admin account from " + clientIpAddress);
 			}
 		});
+
+		socket.on('admin-request-cmd', function(data) {
+			if(!isset(data.cmd)) {
+				return;
+			}
+
+			if(socket.id==adminSid) {
+				if(typeof(data.cmd) !== "string") {
+					return;
+				}
+
+				switch(data.cmd) {
+					log("Executing admin command (" + data.cmd + ") from " + clientIpAddress);
+					case "maintenanceOn":
+
+						break;
+					case "maintenanceOff":
+
+						break;
+					case "restart":
+
+						break;
+					case "start":
+
+						break;
+					case "stop":
+
+						break;
+					default:
+						log("Command " + data.cmd + " not found !")
+				}
+			} else {
+				log("Failed to execute admin command from " + clientIpAddress);
+			}
+		})
 	});
 	/* SendMessageToClient
 	INPUT: data

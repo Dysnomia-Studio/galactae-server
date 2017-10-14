@@ -122,7 +122,7 @@ module.exports = function() {
 		return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
 	};
 	/**
-	 * { function_description }
+	 * Check if a variable is set
 	 *
 	 * @param      {(number|string)}  variable  The variable to test
 	 * @return     {boolean}          the variable is set
