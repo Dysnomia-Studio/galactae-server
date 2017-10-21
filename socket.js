@@ -229,10 +229,18 @@ module.exports = function() {
 						preventConnection = true;
 						preventConnection = 'RESTARTING_SERVER';
 						io.emit('server-kick');
+
+						var decompte = 15;
 						
-						setTimeout(function() {
-							process.exit(); // Well, the pm2 auto restart will do its work
-						},3000);
+						setInterval(function() {
+							if(decompte>0) {
+								log('Restarting server in ' + decompte-- + 'seconds')
+							} else {
+								log('Restarting now !')
+								process.exit(); // Well, the pm2 auto restart will do its work
+							}
+							
+						},1000)
 						break;
 					case "start":
 
