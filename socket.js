@@ -15,6 +15,8 @@ module.exports = function() {
 	var https = require('https').createServer(options, app);
 	var io = require('socket.io')(https);
 	var db = require('./database');
+	var preventConnection = false;
+	var preventConnectionMsg = "";
 
 	io.on('connection', function (socket) {
 		/**
@@ -23,6 +25,13 @@ module.exports = function() {
 		socket.on('game-connect', function (user) {
 			// Vars
 			if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
+
+			if(preventConnection==true) {
+				sendSM(socket.id,preventConnectionMsg);
+				io.to(socket.id).emit('server-kick');
+				return;
+			}
+
 			// User
 			user.sid = socket.id;
 			// Log
@@ -216,7 +225,14 @@ module.exports = function() {
 
 						break;
 					case "restart":
-
+						sendSM('RESTARTING_SERVER');
+						preventConnection = true;
+						preventConnection = 'RESTARTING_SERVER';
+						io.emit('server-kick');
+						
+						setTimeout(function() {
+							process.exit(); // Well, the pm2 auto restart will do its work
+						},3000);
 						break;
 					case "start":
 
