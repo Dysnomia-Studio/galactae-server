@@ -234,7 +234,7 @@ module.exports = function() {
 						
 						setInterval(function() {
 							if(decompte>0) {
-								log('Restarting server in ' + decompte-- + 'seconds')
+								log('Restarting server in ' + decompte-- + ' seconds')
 							} else {
 								log('Restarting now !')
 								process.exit(); // Well, the pm2 auto restart will do its work
