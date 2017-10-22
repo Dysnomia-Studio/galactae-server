@@ -204,7 +204,7 @@ module.exports = function() {
 		});
 
 		socket.on('admin-request-cmd', function(data) {
-			if(!isset(data.cmd)) {
+			if(!isset(data) || !isset(data.cmd)) {
 				return;
 			}
 			
