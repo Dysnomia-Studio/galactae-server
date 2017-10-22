@@ -146,16 +146,14 @@ module.exports = function() {
 			break;
 			case "!kickgame":
 				db.player.searchByName(arg[1], function(dataReturned) {
-					var sid = dataReturned.sid;
-
-					if(sid==undefined) {
+					if(!isset(dataReturned.sid)) {
 						sendSM(data.sid,"PLY_NOT_FOUND");
 						console.log("Player not found");
 					} else {	
 						console.log("Kicked " + arg[1]);
 	        			sendSM(data.sid,"Kicked " + arg[1]);
 
-						io.to(sid).emit('server-kick',str.substr(arg[0].length+arg[1].length+1));
+						io.to(dataReturned.sid).emit('server-kick',str.substr(arg[0].length+arg[1].length+1));
 					}
 				});
 				
