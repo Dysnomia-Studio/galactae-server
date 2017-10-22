@@ -146,7 +146,7 @@ module.exports = function() {
 			break;
 			case "!kickgame":
 				db.player.searchByName(arg[1], function(dataReturned) {
-					if(!isset(dataReturned.sid)) {
+					if(!isset(dataReturned) || !isset(dataReturned.sid)) {
 						sendSM(data.sid,"PLY_NOT_FOUND");
 						console.log("Player not found");
 					} else {	
