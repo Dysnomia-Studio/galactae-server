@@ -195,10 +195,11 @@ module.exports = function() {
 		// Admin panel
 		socket.on('server-monitore-connect', function(data) {
 			if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
+
+			var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 			
 			if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
 				adminSid = socket.id;
-				var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 				log("Admin connected from " + clientIpAddress);
 			} else {
 				log("Failed to connect to admin account from " + clientIpAddress);
