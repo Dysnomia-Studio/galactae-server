@@ -194,6 +194,8 @@ module.exports = function() {
 
 		// Admin panel
 		socket.on('server-monitore-connect', function(data) {
+			if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
+			
 			if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
 				adminSid = socket.id;
 				var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
@@ -252,7 +254,7 @@ module.exports = function() {
 						log("Command " + data.cmd + " not found !");
 				}
 			} else {
-				log("Failed to execute admin command from " + clientIpAddress);
+				log("Failed to execute admin command from " + clientIpAddress + ": ERR_NOT_LOGGED");
 			}
 		})
 	});
