@@ -228,10 +228,9 @@ module.exports = function() {
 
 						break;
 					case "restart":
-						sendSM('RESTARTING_SERVER');
 						preventConnection = true;
 						preventConnection = 'RESTARTING_SERVER';
-						io.emit('server-kick');
+						io.emit('server-reboot');
 
 						var decompte = 15;
 						
