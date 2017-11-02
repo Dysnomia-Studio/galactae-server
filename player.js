@@ -83,6 +83,7 @@ module.exports = function() {
 			refreshUserPoints(dataReturned, function(userNewPoints) {
 				refreshUserResearch(userNewPoints, function(userNewResearch) {
 					db.player.update(userNewResearch);
+					plCount++;
 
 					// Send data to client
 					var researchOut = {};
@@ -105,6 +106,7 @@ module.exports = function() {
 			if(!isset(dataReturned)) { return; }
 			dataReturned.sid = "-1";
 			db.player.update(dataReturned);
+			plCount--;
 		});
 	}
 	this.calcTotalPlanetPoints= function(user,callback,i=0,points=0) {

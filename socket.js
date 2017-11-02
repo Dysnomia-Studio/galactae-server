@@ -17,6 +17,7 @@ module.exports = function() {
 	var db = require('./database');
 	var preventConnection = false;
 	var preventConnectionMsg = "";
+	this.plCount = 0;
 
 	io.on('connection', function (socket) {
 		/**
@@ -231,6 +232,7 @@ module.exports = function() {
 						preventConnection = true;
 						preventConnection = 'RESTARTING_SERVER';
 						io.emit('server-reboot');
+						discord.alert('Restarting game server ...');
 
 						var decompte = 15;
 						
