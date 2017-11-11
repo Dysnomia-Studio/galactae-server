@@ -7,8 +7,7 @@ module.exports = function() {
 	var fs = require( 'fs' );
 	var options = {
 		key: fs.readFileSync(process.cwd() + '/keys/privkey.pem'),
-		cert: fs.readFileSync(process.cwd() + '/keys/cert.pem'),
-		requestCert: true
+		cert: fs.readFileSync(process.cwd() + '/keys/cert.pem')
 	};
 	var express = require('express');
 	var app = express();
@@ -195,7 +194,6 @@ module.exports = function() {
 
 		// Admin panel
 		socket.on('server-monitore-connect', function(data) {
-			log('Connect event server-monitore-connect');
 			if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
 
 			var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
