@@ -195,6 +195,7 @@ module.exports = function() {
 
 		// Admin panel
 		socket.on('server-monitore-connect', function(data) {
+			log('Connect event server-monitore-connect');
 			if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
 
 			var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
