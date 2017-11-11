@@ -114,6 +114,13 @@ module.exports = function() {
 				var storageHelium = 0;
 			}
 
+			// Molecular compression, enhance max storage
+			if(getResearch(user,"cp_molecular_compression")) {
+				mineralStorageBase *= researchBonus["cp_molecular_compression"];
+				metalsStorageBase *= researchBonus["cp_molecular_compression"];
+				storageHelium *= researchBonus["cp_molecular_compression"];
+			}
+
 			//Minerals
 			if(currentBuilding!=0) {
 				resources[0] += mineralProdBase*time;

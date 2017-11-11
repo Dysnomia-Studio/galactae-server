@@ -174,6 +174,7 @@ module.exports = function() {
 		cp_mecanisation: -0.05,
 		cp_tracteur: 	 -0.05,
 		cp_materielTp: 	 -0.1,
+		cp_molecular_compression: 1.1,
 	};
 	this.researchList = [
 		// Noeud Central
@@ -194,6 +195,7 @@ module.exports = function() {
 		"cp_tracteur",
 		"cp_materielTp",
 		"cp_dbRaffinage",
+		"cp_molecular_compression",
 		// Armes
 		"wep_railgun",
 		"wep_nuke",
@@ -235,6 +237,7 @@ module.exports = function() {
 		cp_tracteur: 	 	150,
 		cp_materielTp: 		350,
 		cp_dbRaffinage: 	100,
+		cp_molecular_compression: 180,
 		// Armes
 		wep_railgun:		50,
 		wep_nuke:			180,
