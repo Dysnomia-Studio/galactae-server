@@ -1,6 +1,6 @@
 {
   "name": "galactae-server",
-  "version": "0.1.0",
+  "version": "0.4.5",
   "description": "NodeJs Server for Galactae",
   "author": "Elanis",
   "main": "app.js",
@@ -12,6 +12,8 @@
     "fs": "",
     "express": "",
     "https": "",
-    "socket.io": ""
+    "socket.io": "",
+    "pm2": "",
+    "discord.js": ""
   }
 }
