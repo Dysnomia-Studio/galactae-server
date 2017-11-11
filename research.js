@@ -7,13 +7,13 @@ module.exports = function() {
 			for(var i in researchList) {
 				var key = -1;
 				for(var j=0; j<data.research.length; j++) {
-					if(i==data.research[j][0]) {
+					if(researchList[i]==data.research[j][0]) {
 						key = j;
 						break;
 					}
 				}
 				if(key == -1) {
-					data.research.push([i,0]);
+					data.research.push([researchList[i],0]);
 				}
 			}
 		}
