@@ -135,7 +135,7 @@ module.exports = function() {
 						}
 					
 
-						db.unit.create(shipToSave, function(data) {
+						db.unit.create(shipToSave, function(newData) {
 							// Notify client
 							log(data.username + " has succed to create new unit type named " + ship.name,"success");
 							refreshUserUnits(data);
