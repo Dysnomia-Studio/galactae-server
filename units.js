@@ -8,6 +8,7 @@ module.exports = function() {
 		 * @return     {socket}  units   list of units types
 		 */
 		this.refreshUserUnits = function(data) {
+			console.info(data);
 			db.unit.findByOwner(data.id,function(units) {
 				if(units==undefined) { units = []; }
 				io.to(data.sid).emit("units-recieve-data", units);
