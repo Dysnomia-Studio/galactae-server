@@ -135,11 +135,11 @@ module.exports = function() {
 						}
 					
 
-						db.unit.create(shipToSave);
-
-						// Notify client
-						log(data.username + " has succed to create new unit type named " + ship.name,"success");
-						refreshUserUnits(data);
+						db.unit.create(shipToSave, function(data) {
+							// Notify client
+							log(data.username + " has succed to create new unit type named " + ship.name,"success");
+							refreshUserUnits(data);
+						});
 					} else {
 						// Notify client
 						log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");

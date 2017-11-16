@@ -143,11 +143,12 @@ module.exports = {
 	 * UNITS
 	 */
 	unit: {
-		create: function(data) {
+		create: function(data,callback) {
 			data._id = new mongoose.Types.ObjectId();
 			
 			units.create(data, function(error) {
-				if(error) { log(error);} 
+				if(error) { log(error);}
+				if(callback) { callback(data); } 
 			});
 		},
 		find: function(id,callback) {
