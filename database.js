@@ -47,6 +47,8 @@ var unitsSchema = new Schema({
 	shipShape: String,
 	parts: Array,
 	armorType: String,
+	owned: Number,
+	note: Number,
 });
 var units = mongoose.model('units', unitsSchema);
 

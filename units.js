@@ -119,7 +119,9 @@ module.exports = function() {
 							ownerId: data.id,
 							inBuilding: [],
 							parts: [],
-							armorType: 0, // None yet 
+							armorType: 0, // None yet
+							note: 0, // Not yet
+							owned: 0,
 						};
 
 						for(var i in ship) {
