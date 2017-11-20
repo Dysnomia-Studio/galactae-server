@@ -81,7 +81,6 @@ module.exports = function() {
 				gvt: dataReturned.gvt
 			});
 
-			refreshUserPlanet(data,0);
 			refreshUserUnits(data);
 			refreshUserPoints(dataReturned, function(userNewPoints) {
 				refreshUserResearch(userNewPoints, function(userNewResearch) {
@@ -98,6 +97,8 @@ module.exports = function() {
 					io.to(data.sid).emit('player-recieve-data',{
 						research: researchOut
 					});
+
+					refreshUserPlanet(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 				});
 			});
 		});
