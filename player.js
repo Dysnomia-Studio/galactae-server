@@ -61,8 +61,11 @@ module.exports = function() {
 			var minuit = Date.now() - (Date.now()%jour);
 			var hierMinuit = minuit - jour;
 			var dayStreak = dataReturned.dayBonusStreak+1; 
+			var bonusBest = dataReturned.dayBonusBest;
 
 			if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
+
+			if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
 			if(dataReturned.lastBonus < minuit) { 
 				io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: dataReturned.dayBonusBest}); 
