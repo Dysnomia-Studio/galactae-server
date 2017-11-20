@@ -68,7 +68,7 @@ module.exports = function() {
 			if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
 			if(dataReturned.lastBonus < minuit) { 
-				io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: dataReturned.dayBonusBest}); 
+				io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
 			}
 
 			dataReturned.lastConnected = Date.now();
