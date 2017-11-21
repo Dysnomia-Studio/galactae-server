@@ -115,7 +115,7 @@ module.exports = function() {
 			}
 
 			// Molecular compression, enhance max storage
-			if(getResearch(user,"cp_molecular_compression")) {
+			if(getResearch(user,"cp_molecular_compression")==-1) {
 				mineralStorageBase *= researchBonus["cp_molecular_compression"];
 				metalsStorageBase *= researchBonus["cp_molecular_compression"];
 				storageHelium *= researchBonus["cp_molecular_compression"];
