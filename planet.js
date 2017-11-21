@@ -198,7 +198,6 @@ module.exports = function() {
 
 				var timeSpeed = 1;
 
-
 				var currTime = Date.now();
 
 				// Calc new planet data
@@ -224,9 +223,13 @@ module.exports = function() {
 						errormsg = "BUILDING_ERROR_MAXIMUM";
 					}
 					// Energie ?
-					if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
-						BlockBuild = true;
-						errormsg = "BUILDING_ERROR_ENERGY";
+					if(!BlockBuild) {
+						newData.Buildings[data.building]++; // Only for calcs
+						if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
+							BlockBuild = true;
+							errormsg = "BUILDING_ERROR_ENERGY";
+						}
+						newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 					}
 
 				// Research bonus
