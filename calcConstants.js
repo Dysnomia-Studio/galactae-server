@@ -20,6 +20,9 @@ module.exports = function() {
 
 	this.storageRatio = [47.52,8.29];
 	this.heliumStorageRatio = 0.2;
+
+	this.electricity = [2080000,165000,550000];
+	this.habGen = [25447,419910,-250000];
 	/**
 	 * Buildings
 	 */
@@ -163,6 +166,24 @@ module.exports = function() {
 			[0,0,0], // Shipyard
 			[0,0,0], // Trade
 			[0,0,0], // He3exp
+		],
+		habitants: [
+			// Ground building
+			[700,90120,60000], // Quarry
+			[1300,72010,-32359], // Metallurgie
+			[0,0,0], // Living
+			[2035,24090,15464], // Serres
+			[323,18721,-3092], // Solar panel
+			[1640,12231,-6422], // Warehouse
+			[0,1750,-1250], // Hedquarters
+			[1550,40504,0], // Launching Center
+			[1000,22439,30231], // Research Center
+			// Space stations
+			[0,267,-167], // Radar
+			[800,14500,-1500], // Tank
+			[2205,32000,20000], // Shipyard
+			[7000,18000,20000], // Trade
+			[3029,10533,18000], // He3exp
 		],
 	};
 	/**

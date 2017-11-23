@@ -222,37 +222,42 @@ module.exports = function() {
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_MAXIMUM";
 					}
-					// Energie ?
+					// Energie ? Habitants ?
 					if(!BlockBuild) {
 						newData.Buildings[data.building]++; // Only for calcs
 						if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
 							BlockBuild = true;
 							errormsg = "BUILDING_ERROR_ENERGY";
 						}
+						if(!enoughtPeople(newData.Buildings)) {
+							BlockBuild = true;
+							errormsg = "BUILDING_ERROR_PEOPLE";
+						}
 						newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 					}
 
-				// Research bonus
-					if(getResearch(userReturned,"cp_mecanisation") == -1) {
-						timeSpeed += researchBonus.cp_mecanisation;
-					}
-					if(data.building>8) {
-						if(getResearch(userReturned,"cp_tracteur") == -1) {
-							timeSpeed += researchBonus.cp_tracteur;
-						}
-						if(getResearch(userReturned,"cp_materielTp") == -1) {
-							timeSpeed += researchBonus.cp_materielTp;
-						}
-					}
 
 				if(!BlockBuild) {
+					// Research bonus
+						if(getResearch(userReturned,"cp_mecanisation") == -1) {
+							timeSpeed += researchBonus.cp_mecanisation;
+						}
+						if(data.building>8) {
+							if(getResearch(userReturned,"cp_tracteur") == -1) {
+								timeSpeed += researchBonus.cp_tracteur;
+							}
+							if(getResearch(userReturned,"cp_materielTp") == -1) {
+								timeSpeed += researchBonus.cp_materielTp;
+							}
+						}
+
 					// We consume resources
 					newData.resources[2] -= eval(cost.iron);
 					newData.resources[3] -= eval(cost.aluminium);
 					newData.resources[4] -= eval(cost.copper);
 					newData.resources[5] -= eval(cost.titanium);
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000);	
+					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
 					newData.nextBuilding = data.building;
 
 					SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
@@ -298,13 +303,31 @@ module.exports = function() {
 		/**
 		 * Is there enought energy on planet ?
 		 *
-		 * @param      {Object}  groundBuildings  The ground buildings
+		 * @param      {Object}  groundBuildings  The ground buildings list
 		 */
 		this.enoughtEnergy = function(groundBuildings) {
-			var prod = Math.round(2080000*Math.pow(groundBuildings[4],2) + 165000*groundBuildings[4] + 550000);
+			var prod = Math.round(electricity[0]*Math.pow(groundBuildings[4],2) + electricity[1]*groundBuildings[4] + electricity[2]);
 			var cons = 0;
 
 			for(var i=0; i<9; i++) {
+				cons += parseInt(GetBuildingCost(i,groundBuildings[i]).energy);
+			}
+
+			if(prod<cons) {
+				return false;
+			}
+			return true;
+		}
+		/**
+		 * Is there enought people on planet ?
+		 *
+		 * @param      {Object}  buildings  The buildings list
+		 */
+		this.enoughtPeople = function(buildings) {
+			var prod = Math.round(habGen[0]*Math.pow(groundBuildings[2],2) + habGen[1]*groundBuildings[2] + habGen[2]);
+			var cons = 0;
+
+			for(var i=0; i<14; i++) {
 				cons += parseInt(GetBuildingCost(i,groundBuildings[i]).energy);
 			}
 
@@ -410,7 +433,9 @@ module.exports = function() {
 				titanium: 	Math.round(buildCost["titanium"][build][0]*Math.pow(level,2) + 		buildCost["titanium"][build][1]*level + 	buildCost["titanium"][build][2]),
 				time: 				   buildCost["time"][build][0]*Math.pow(level,2) + 			buildCost["time"][build][1]*level + 		buildCost["time"][build][2],
 				energy: 	Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + 		buildCost["energy"][build][1]*level + 		buildCost["energy"][build][2]),
-				energy_difference: 	Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + buildCost["energy"][build][1]*level + buildCost["energy"][build][2]) - Math.round(Math.pow(buildCost["energy"][build][0]*(level-1),2) + buildCost["energy"][build][1]*(level-1) + buildCost["energy"][build][2])
+				energy_difference: Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + buildCost["energy"][build][1]*level +       buildCost["energy"][build][2] 
+				                        - Math.pow(buildCost["energy"][build][0]*(level-1),2) + buildCost["energy"][build][1]*(level-1) +   buildCost["energy"][build][2])
+				habitants:  Math.round(buildCost["habitants"][build][0]*Math.pow(level,2) +		buildCost["habitants"][build][1]*level + 	buildCost["habitants"][build][2]),
 			}
 		}
 }

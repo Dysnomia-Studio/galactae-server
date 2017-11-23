@@ -57,6 +57,8 @@ var fleetsSchema = new Schema({
 	name: String,
 	ownerId: Schema.Types.ObjectId,
 	position: String,
+	orbitPosition: Number,
+	orbitPoints: Array,
 	endMoveTime: Number,
 	units: Array,
 });
