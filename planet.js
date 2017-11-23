@@ -434,10 +434,10 @@ module.exports = function() {
 				time: 				   buildCost["time"][build][0]*Math.pow(level,2) + 			buildCost["time"][build][1]*level + 		buildCost["time"][build][2],
 				energy: 	Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + 		buildCost["energy"][build][1]*level + 		buildCost["energy"][build][2]),
 				energy_difference: Math.round(Math.pow(buildCost["energy"][build][0]*level,2) + buildCost["energy"][build][1]*level +       buildCost["energy"][build][2] 
-				                        - Math.pow(buildCost["energy"][build][0]*(level-1),2) + buildCost["energy"][build][1]*(level-1) +   buildCost["energy"][build][2]),
+				                        - (Math.pow(buildCost["energy"][build][0]*(level-1),2) + buildCost["energy"][build][1]*(level-1) +   buildCost["energy"][build][2]),
 				habitants:  Math.round(buildCost["habitants"][build][0]*Math.pow(level,2) +		buildCost["habitants"][build][1]*level + 	buildCost["habitants"][build][2]),
 				habitants_difference: Math.round(buildCost["habitants"][build][0]*Math.pow(level,2) +	buildCost["habitants"][build][1]*level + 	buildCost["habitants"][build][2]
-					                         - buildCost["habitants"][build][0]*Math.pow((level-1),2) +	buildCost["habitants"][build][1]*(level-1) + buildCost["habitants"][build][2]),
+					                         - (buildCost["habitants"][build][0]*Math.pow((level-1),2) +	buildCost["habitants"][build][1]*(level-1) + buildCost["habitants"][build][2])),
 			}
 		}
 }
