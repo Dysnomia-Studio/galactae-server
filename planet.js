@@ -324,11 +324,11 @@ module.exports = function() {
 		 * @param      {Object}  buildings  The buildings list
 		 */
 		this.enoughtPeople = function(buildings) {
-			var prod = Math.round(habGen[0]*Math.pow(groundBuildings[2],2) + habGen[1]*groundBuildings[2] + habGen[2]);
+			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
 
 			for(var i=0; i<14; i++) {
-				cons += parseInt(GetBuildingCost(i,groundBuildings[i]).energy);
+				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);
 			}
 
 			if(prod<cons) {
