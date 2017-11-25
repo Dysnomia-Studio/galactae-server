@@ -347,8 +347,8 @@ module.exports = function() {
 		 * @param      {Object}  buildings  The buildings list
 		 */
 		this.enoughtPeople = function(planet, callback) {
-			var people = getPeople(planet, function(planet, prod, cons) {
-				if(people[0]<people[1]) {
+			getPeople(planet, function(planet, prod, cons) {
+				if(prod<cons) {
 					callback(planet,false);
 				}
 				callback(planet,true);
