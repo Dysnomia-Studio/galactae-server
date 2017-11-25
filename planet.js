@@ -229,48 +229,52 @@ module.exports = function() {
 							BlockBuild = true;
 							errormsg = "BUILDING_ERROR_ENERGY";
 						}
-						if(!enoughtPeople(newData.Buildings)) {
-							BlockBuild = true;
-							errormsg = "BUILDING_ERROR_PEOPLE";
-						}
-						newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 					}
 
+				enoughtPeople(newData, function(newData,enoughtPeople) {
+					if(!enoughtPeople) {
+						BlockBuild = true;
+						errormsg = "BUILDING_ERROR_PEOPLE";
+					}
+					newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 
-				if(!BlockBuild) {
-					// Research bonus
-						if(getResearch(userReturned,"cp_mecanisation") == -1) {
-							timeSpeed += researchBonus.cp_mecanisation;
-						}
-						if(data.building>8) {
-							if(getResearch(userReturned,"cp_tracteur") == -1) {
-								timeSpeed += researchBonus.cp_tracteur;
+					if(!BlockBuild) {
+						// Research bonus
+							if(getResearch(userReturned,"cp_mecanisation") == -1) {
+								timeSpeed += researchBonus.cp_mecanisation;
 							}
-							if(getResearch(userReturned,"cp_materielTp") == -1) {
-								timeSpeed += researchBonus.cp_materielTp;
+							if(data.building>8) {
+								if(getResearch(userReturned,"cp_tracteur") == -1) {
+									timeSpeed += researchBonus.cp_tracteur;
+								}
+								if(getResearch(userReturned,"cp_materielTp") == -1) {
+									timeSpeed += researchBonus.cp_materielTp;
+								}
 							}
-						}
 
-					// We consume resources
-					newData.resources[2] -= eval(cost.iron);
-					newData.resources[3] -= eval(cost.aluminium);
-					newData.resources[4] -= eval(cost.copper);
-					newData.resources[5] -= eval(cost.titanium);
+						// We consume resources
+						newData.resources[2] -= eval(cost.iron);
+						newData.resources[3] -= eval(cost.aluminium);
+						newData.resources[4] -= eval(cost.copper);
+						newData.resources[5] -= eval(cost.titanium);
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
-					newData.nextBuilding = data.building;
+						newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
+						newData.nextBuilding = data.building;
 
-					SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
-					log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
+						SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
+						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
 
-				} else { // We just update ressources
-					SendMessageToClient({ sid: data.sid, message: errormsg })
-					log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
-				}
+					} else { // We just update ressources
+						SendMessageToClient({ sid: data.sid, message: errormsg })
+						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
+					}
 
-				db.planet.update(newData);
+					db.planet.update(newData);
 
-				sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
+					sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
+
+					newData.Buildings[data.building]--; // Revert new building, it's not builded yet
+				});
 			});
 		}
 		/**
@@ -318,12 +322,15 @@ module.exports = function() {
 			}
 			return true;
 		}
+
 		/**
-		 * Is there enought people on planet ?
+		 * Gets the people count
 		 *
-		 * @param      {Object}  buildings  The buildings list
+		 * @param      {<type>}    planet    Planet data
+		 * @param      {Function}  callback  Function needed to called back
 		 */
-		this.enoughtPeople = function(buildings) {
+		this.getPeople = function(planet, callback) {
+			var buildings = planet.Buildings;
 			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
 
@@ -331,10 +338,21 @@ module.exports = function() {
 				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);
 			}
 
-			if(prod<cons) {
-				return false;
-			}
-			return true;
+			callback(planet,prod,cons);
+		}
+
+		/**
+		 * Is there enought people on planet ?
+		 *
+		 * @param      {Object}  buildings  The buildings list
+		 */
+		this.enoughtPeople = function(planet, callback) {
+			var people = getPeople(planet, function(planet, prod, cons) {
+				if(people[0]<people[1]) {
+					callback(planet,false);
+				}
+				callback(planet,true);
+			});
 		}
 		/**
 		 * Change the planet name

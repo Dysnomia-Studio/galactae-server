@@ -1,12 +1,13 @@
 module.exports = function() {
 	this.globalConst = {
 		buildingNumber: 	14,
-	}
+		maxFleetSize:   300000, // Number of people
+	};
 	this.pointsCoef = {
 		planet:				1,
 		research: 			0.08,
 		money: 			    0.0001,
-	}
+	};
 	/** 
 	 * Production
 	 */
@@ -282,7 +283,7 @@ module.exports = function() {
 		misc_calcGravit: 	240,
 		misc_em: 			110,
 	};
-
+	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
 		// Ship shapes
 		SHIP_SAT_AG1: "wep_sat_ag1",
@@ -312,8 +313,7 @@ module.exports = function() {
 
 		ion: "prop_ions",
 		vsolaire: "prop_vSolaire",
-	}
-
+	};
 	this.shipShapesDetails = {
 		SHIP_SAT: {
 			SHIP_SAT_AG1: {

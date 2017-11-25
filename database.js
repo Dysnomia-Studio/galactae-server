@@ -13,7 +13,11 @@ var planetSchema = new Schema({
 	nextBuildingTime: Number,
 	lastResourcesUpdate: Number,
 	points: Number,
-	currResearch: String
+	currResearch: String,
+	unitBuildingID: Schema.Types.ObjectId,
+	unitBuildingCount: Number,
+	unitBuildingEndTime: Number,
+	unitBuildingFleetID: Schema.Types.ObjectId,
 });
 var planets = mongoose.model('planets', planetSchema);
 
@@ -42,7 +46,7 @@ var unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
-	inBuilding: Array, // [[planet,count,end],[planet,count,end]]
+	cost: Array, // [Fe,Al,Cu,Ti,Population,Time]
 	shipType: String,
 	shipShape: String,
 	parts: Array,
@@ -56,11 +60,13 @@ var fleetsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
+	motherPlanetId: Schema.Types.ObjectId,
 	position: String,
 	orbitPosition: Number,
 	orbitPoints: Array,
 	endMoveTime: Number,
 	units: Array,
+	population: Number,
 });
 var fleets = mongoose.model('fleets', fleetsSchema);
 
@@ -84,16 +90,19 @@ module.exports = {
 	player: {
 		searchByName: function(name,callback) {
 			users.findOne({name: name}, function (err, objReturned) {
+				if(err) { log(err); }
 				callback(objReturned)
 			});
 		},
 		searchById: function(id,callback) {
 			users.findById(id, function (err, objReturned) {
+				if(err) { log(err); }
 				callback(objReturned);
 			});
 		},
 		searchBySid: function(sid,callback) {
 			users.findOne({sid: sid}, function (err, objReturned) {
+				if(err) { log(err); }
 				callback(objReturned)
 			});
 		},
@@ -125,6 +134,7 @@ module.exports = {
 	planet: {
 		find: function(pid,callback) {
 			planets.findById(pid, function (err, planetReturned) {
+				if(err) { log(err); }
 				if(isset(planetReturned)) {
 					callback(planetReturned);
 				}
@@ -136,7 +146,7 @@ module.exports = {
 						  , options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
-				if(error) { log(error);} 
+				if(error) { log(error); } 
 			});
 		}
 	},
@@ -149,12 +159,13 @@ module.exports = {
 			data._id = new mongoose.Types.ObjectId();
 			
 			units.create(data, function(error) {
-				if(error) { log(error);}
+				if(error) { log(error); }
 				if(callback) { callback(data); } 
 			});
 		},
 		find: function(id,callback) {
 			units.findById(id, function (err, obj) {
+				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
 				}
@@ -162,6 +173,7 @@ module.exports = {
 		},
 		findByOwner: function(id,callback) {
 			units.find({ownerId: id}, function (err, obj) {
+				if(err) { log(err); }
 				callback(obj);
 			});
 		},
@@ -179,9 +191,10 @@ module.exports = {
 	/**
 	 * FLEETS
 	 */
-	fleets: {
+	fleet: {
 		find: function(id,callback) {
 			fleets.findById(id, function (err, obj) {
+				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
 				}
@@ -189,6 +202,7 @@ module.exports = {
 		},
 		findByOwner: function(id,callback) {
 			fleets.find({ownerId: id}, function (err, obj) {
+				if(err) { log(err); }
 				callback(obj);
 			});
 		},

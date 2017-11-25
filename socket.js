@@ -177,6 +177,16 @@ module.exports = function() {
 			   	CreateUnitType(data);
 			});
 		});
+		socket.on('unit-build', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.unit) || !isset(data.count) || !isset(data.fleet)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+				// Execution du code
+			   	BuildUnit(data);
+			});
+		})
 
 		// Daily Bonus
 		socket.on('daily-bonus', function (data) {
