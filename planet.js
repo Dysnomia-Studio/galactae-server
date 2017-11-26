@@ -272,8 +272,6 @@ module.exports = function() {
 					db.planet.update(newData);
 
 					sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
-
-					newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 				});
 			});
 		}
