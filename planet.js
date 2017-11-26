@@ -222,9 +222,11 @@ module.exports = function() {
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_MAXIMUM";
 					}
+
+					newData.Buildings[data.building]++; // Only for calcs
+
 					// Energie ? Habitants ?
-					if(!BlockBuild) {
-						newData.Buildings[data.building]++; // Only for calcs
+					if(!BlockBuild) {	
 						if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
 							BlockBuild = true;
 							errormsg = "BUILDING_ERROR_ENERGY";
