@@ -3,17 +3,17 @@ var db = require('./database');
 module.exports = function() {
 	this.refreshUserResearch = function(data,callback) {	
 		// Checks if new research
-		if(researchList.length!=data.research.length) {
-			for(var i in researchList) {
+		if(researchNamesList.length!=data.research.length) {
+			for(var i in researchNamesList) {
 				var key = -1;
 				for(var j=0; j<data.research.length; j++) {
-					if(researchList[i]==data.research[j][0]) {
+					if(researchNamesList[i]==data.research[j][0]) {
 						key = j;
 						break;
 					}
 				}
 				if(key == -1) {
-					data.research.push([researchList[i],0]);
+					data.research.push([researchNamesList[i],0]);
 				}
 			}
 		}
@@ -72,11 +72,22 @@ module.exports = function() {
 	}
 
 	this.ChangePlanetResearch = function(data,pid,research) {
+		if(!isset(researchList[research])) { return; }
 		getPlanet(data,data.pid,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
 			refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
+				// Check if you have parent research
+				var researchedParent = true;
+				for(var i in researchList[research].parents) {
+					if(!isset(researchList[research].parents[i]) ||
+						getResearch(userNewResearch,researchList[research].parents[i])!=-1) {
+						researchedParent = false;
+						break;
+					}
+				}
+				
 				// Send data to client
 				var researchOut = {};
 
@@ -85,8 +96,13 @@ module.exports = function() {
 				}
 
 				var newData = UpdatePlanet(planetReturned,userReturned);
-				if(researchCost[research]!=undefined) { // Just check if it exists ...
+				
+				if(researchedParent && researchCost[research]!=undefined) { // Just check if it exists ...
 					newData.currResearch = research;
+				}
+
+				if(!researchedParent) {
+					SendMessageToClient({ sid: data.sid, message: "RESEARCH_MISSSING_PARENTS"});
 				}
 
 				db.planet.update(newData);
