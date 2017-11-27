@@ -102,7 +102,7 @@ module.exports = function() {
 				}
 
 				if(!researchedParent) {
-					SendMessageToClient({ sid: data.sid, message: "RESEARCH_MISSSING_PARENTS"});
+					SendMessageToClient({ sid: data.sid, message: "MISSING_PARENTS"});
 				}
 
 				db.planet.update(newData);
