@@ -278,11 +278,42 @@ module.exports = function() {
 			});
 		}
 		/**
+		 * Update units
+		 *
+		 * @class      UpdateUnits (name)
+		 * @param      {<type>}  planetIn  data needed to be updated
+		 * @param      {<type>}  user      The user
+		 */
+		this.UpdateUnits = function(planetIn,user) {
+			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
+				var newFleet = fleetReturned.toJSON();
+				var set = false;
+
+				for(var i in newFleet.units) {
+					if(newFleet.units[i][0] == newFleet.unitBuildingID) {
+						newFleet.units[i][1] += newFleet.unitBuildingCount;
+						set=true;
+						break;
+					}
+				}
+
+				if(!set) {
+					newFleet.push([newFleet.unitBuildingID,newFleet.unitBuildingCount]);
+				}
+
+				db.fleet.update(newFleet, function() {
+					refreshUserUnits(user);
+				});
+			});
+		}
+
+		/**
 		 * Update the planet data
 		 *
 		 * @class      UpdatePlanet (name)
-		 * @param      {<type>}  planetIn 	 data needed to be updated
-		 * @return     {<type>}        		 the updated data
+		 * @param      {<type>}  planetIn  data needed to be updated
+		 * @param      {<type>}  user      The user
+		 * @return     {<type>}  the updated data
 		 */
 		this.UpdatePlanet = function(planetIn,user) {
 			var data = planetIn.toJSON();
@@ -300,6 +331,15 @@ module.exports = function() {
 				data.Buildings[data.nextBuilding]++;
 				data.nextBuildingTime = -1;
 				data.nextBuilding = -1;
+			}
+
+			// Update units
+			if(currTime>data.unitBuildingEndTime) {
+				UpdateUnits(planetIn,user);
+				data.unitBuildingEndTime = -1;
+				data.unitBuildingID = -1;
+				data.unitBuildingCount = -1;
+				data.unitBuildingFleetID = -1;
 			}
 
 			return data;
@@ -333,6 +373,8 @@ module.exports = function() {
 			var buildings = planet.Buildings;
 			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
+
+			// @ADD: count current buildings & current units
 
 			for(var i=0; i<14; i++) {
 				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);

@@ -206,13 +206,17 @@ module.exports = {
 				callback(obj);
 			});
 		},
-		update: function(data) {
+		update: function(data,callback) {
 			var conditions = { _id: data._id }
 						  , update = { $set: data }
 						  , options = { multi: true };
 
 			fleets.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
+
+				if(callback) {
+					callback();
+				}
 			});
 		}
 	},
