@@ -28,6 +28,18 @@ module.exports = function() {
 		// That block 90% of tries to crash :p
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
 
+		// Filter name
+		var replace = [
+			['<',''],
+			['>',''],
+			['( . ) ( . )',''],
+			['(.)(.)',''],
+		];
+
+		for(var i=0; i<replace.length; i++) {
+			ship.name = ship.name.split(replace[i][0]).join(replace[i][1])
+		}
+
 		// Check entries valdity
 		for(var i in ship) {
 			// Empty fields
