@@ -14,6 +14,11 @@ module.exports = function() {
 		});
 	},
 
+	this.calcUnitCosts = function(data) {
+		// @ADD: Calc unit cost
+		return [0,0,0,0,0,0];
+	}
+
 	/**
 	 * Creates an unit type.
 	 *
@@ -122,6 +127,8 @@ module.exports = function() {
 
 				// Saving
 				if(errors==0) {
+					cost = calcUnitCosts();
+
 					// Save to database
 					var shipToSave = {
 						name: ship.name,
@@ -129,6 +136,7 @@ module.exports = function() {
 						shipShape: ship.shape,
 						ownerId: data.id,
 						inBuilding: [],
+						cost: cost,
 						parts: [],
 						armorType: 0, // None yet
 						note: 0, // Not yet
