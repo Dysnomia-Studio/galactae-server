@@ -198,7 +198,7 @@ module.exports = function() {
 
 								// Compare
 								for(var i=0; i<shipToSave.parts.length; i++) {
-									for(var id in x) {
+									for(var id in shipToSave.parts[i]) {
 										if(shipToSave.parts[i][id] !== unitList[currObj].parts[i][id]) {
 											duplicate = true;
 											break;
