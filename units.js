@@ -159,19 +159,57 @@ module.exports = function() {
 						});
 					}
 				
-					db.unit.findByOwner(data.id,function(obj) {
+					db.unit.findByOwner(data.id,function(unitList) {
 						var duplicate = false;
 						var duplicateName = false;
 
-						for(var i in obj) {
-							if(obj[i].name == shipToSave.name) {
+						for(var currObj in unitList) {
+							if(unitList[currObj].name == shipToSave.name) {
 								duplicateName = true;
 								break;
 							}
 
-							if(i == "parts") {
-								// @ADD: Duplicate parts
-							}
+							if(unitList[currObj].shipType == shipToSave.shipType && 
+								unitList[currObj].shipShape == shipToSave.shipShape &&
+								unitList[currObj].parts.length == shipToSave.parts.length) {
+
+								// Sort
+								unitList[currObj].parts.sort(function(a,b) {
+									if(a.name < b.name) {
+										return -1;
+									}
+									if(a.name > b.name) {
+										return 1;
+									}
+
+									return 0;
+								});
+
+								shipToSave.parts.sort(function(a,b) {
+									if(a.name < b.name) {
+										return -1;
+									}
+									if(a.name > b.name) {
+										return 1;
+									}
+
+									return 0;
+								});
+
+								// Compare
+								for(var i=0; i<shipToSave.parts.length; i++) {
+									for(var id in x) {
+										if(shipToSave.parts[i][id] !== unitList[currObj].parts[i][id]) {
+											duplicate = true;
+											break;
+										}
+									}
+
+									if(duplicate) {
+										break;
+									}
+								}
+							} // End check parts
 						}
 
 
