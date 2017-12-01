@@ -171,6 +171,12 @@ module.exports = {
 				}
 			});
 		},
+		findByParts: function(id,parts,callback) {
+			units.find({ownerId: id, parts: parts}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		}
 		findByOwner: function(id,callback) {
 			units.find({ownerId: id}, function (err, obj) {
 				if(err) { log(err); }

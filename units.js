@@ -14,6 +14,12 @@ module.exports = function() {
 		});
 	},
 
+	/**
+	 * Calculates the unit costs.
+	 *
+	 * @param      {<type>}  data    The data
+	 * @return     {Array}   Unit total cost
+	 */
 	this.calcUnitCosts = function(data) {
 		// @ADD: Calc unit cost
 		return [0,0,0,0,0,0];
@@ -153,22 +159,30 @@ module.exports = function() {
 						});
 					}
 				
-
-					db.unit.create(shipToSave, function(newData) {
-						// Notify client
-						log(data.username + " has succed to create new unit type named " + ship.name,"success");
-						refreshUserUnits(data);
+					db.units.findByParts(data.id,shipToSave.parts,function(obj) {
+						if(!isset(obj)) {
+							db.unit.create(shipToSave, function(newData) {
+								// Notify client
+								log(data.username + " has succed to create new unit type named " + ship.name,"success");
+								refreshUserUnits(data);
+							});
+						} else {
+							message = "SHIP_TYPE_ALREADY_EXISTS";
+							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+							SendMessageToClient({sid: data.sid, message: message});	
+						}
 					});
+
 				} else {
 					// Notify client
 					log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-					SendMessageToClient({sid: data.sid, message: errorMessage});
+					SendMessageToClient({sid: data.sid, message: message});
 				}
 			});
 		} else {
 			// Notify client
 			log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-			SendMessageToClient({sid: data.sid, message: errorMessage});
+			SendMessageToClient({sid: data.sid, message: message});
 		}
 	}
 
