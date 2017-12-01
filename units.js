@@ -159,7 +159,7 @@ module.exports = function() {
 						});
 					}
 				
-					db.units.findByParts(data.id,shipToSave.parts,function(obj) {
+					db.unit.findByParts(data.id,shipToSave.parts,function(obj) {
 						if(!isset(obj)) {
 							db.unit.create(shipToSave, function(newData) {
 								// Notify client
