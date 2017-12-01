@@ -176,7 +176,7 @@ module.exports = {
 				if(err) { log(err); }
 				callback(obj);
 			});
-		}
+		},
 		findByOwner: function(id,callback) {
 			units.find({ownerId: id}, function (err, obj) {
 				if(err) { log(err); }
