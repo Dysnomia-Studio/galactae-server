@@ -159,15 +159,34 @@ module.exports = function() {
 						});
 					}
 				
-					db.unit.findByParts(data.id,shipToSave.parts,function(obj) {
-						if(!isset(obj)) {
+					db.unit.findByOwner(data.id,function(obj) {
+						var duplicate = false;
+						var duplicateName = false;
+
+						for(var i in obj) {
+							if(obj[i].name == shipToSave.name) {
+								duplicateName = true;
+								break;
+							}
+
+							if(i == "parts") {
+								// @ADD: Duplicate parts
+							}
+						}
+
+
+						if(!duplicate && !duplicateName) {
 							db.unit.create(shipToSave, function(newData) {
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
 								refreshUserUnits(data);
 							});
-						} else {
+						} else if(duplicate) {
 							message = "SHIP_TYPE_ALREADY_EXISTS";
+							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+							SendMessageToClient({sid: data.sid, message: message});	
+						} else {
+							message = "SHIP_NAME_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
 							SendMessageToClient({sid: data.sid, message: message});	
 						}
