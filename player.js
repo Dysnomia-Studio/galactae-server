@@ -58,7 +58,6 @@ module.exports = function() {
 				return;
 			}
 
-			log("1");
 			dataReturned.sid = data.sid;
 			
 			var jour = 24*60*60*1000;
@@ -85,10 +84,7 @@ module.exports = function() {
 				gvt: dataReturned.gvt
 			});
 
-			log("2");
 			refreshUserUnits(data);
-			log("3");
-
 			refreshUserPoints(dataReturned, function(userNewPoints) {
 			log("4");
 
@@ -124,7 +120,7 @@ module.exports = function() {
 			plCount--;
 		});
 	}
-	this.calcTotalPlanetPoints= function(user,callback,i=0,points=0) {
+	this.calcTotalPlanetPoints= function(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
@@ -160,7 +156,7 @@ module.exports = function() {
 
 			newUserData.points = Math.round(newUserData.points);
 			callback(newUserData);
-		});	
+		},0,0);	
 	}
 	/* dayBonus */
 	this.dayBonus = function(data,userData,choice) {
