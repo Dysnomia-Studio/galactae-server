@@ -23,7 +23,7 @@ module.exports = function() {
 	this.heliumStorageRatio = 0.2;
 
 	this.electricity = [2080000,165000,550000];
-	this.habGen = [25447,419910,-200000];
+	this.habGen = [25447,419910,-170000];
 	/**
 	 * Buildings
 	 */
