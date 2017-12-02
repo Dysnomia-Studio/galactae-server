@@ -281,7 +281,7 @@ module.exports = function() {
 		// Cuirasse
 		cuirasse_small: 	{ cost: 2580, parents: ["prop_ions","misc_advTelemetrie"] },
 		// Corvet
-		corvet_small: 		{ cost: 680, parents: ["prop_main", "misc_advTelemetrie"] }
+		corvet_small: 		{ cost: 680, parents: ["prop_main", "misc_advTelemetrie"] },
 		// Carrier
 		carrier_small: 		{ cost: 2580, parents: ["figther_light_interceptor","prop_ions"] },
 		carrier_medium: 	{ cost: 2850, parents: ["carrier_small"] },
