@@ -20,10 +20,13 @@ module.exports = function() {
 						if(pid==userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
 						    if(i==0 && decalage < 0) {
 						    	pid = userReturned.planetlist[longueur+decalage];
+						    	log("i==0 && decalage < 0");
 						    } else if(i>=(longueur-decalage) && decalage > 0) {
-						    	pid = userReturned.planetlist[decalage-1];				    	
+						    	pid = userReturned.planetlist[decalage-1];
+						    	log("i>=(longueur-decalage) && decalage > 0");			    	
 							} else {
 								pid = userReturned.planetlist[i+decalage];
+						    	log("else");
 							}
 
 						    valid = true;
@@ -33,6 +36,7 @@ module.exports = function() {
 					// Si pas d'info, on met la premiere planete dans la liste
 					if(!valid) {
 						pid = userReturned.planetlist[0];
+						log("!valid")
 					}
 					db.planet.find(pid,function(planetReturned) {
 						callback(planetReturned,userReturned);
