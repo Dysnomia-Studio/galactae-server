@@ -376,10 +376,15 @@ module.exports = function() {
 	 */
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
-		// Ship shapes
+		// Satelites shapes
 		SHIP_SAT_AG1: "wep_sat_ag1",
 		SHIP_SAT_AG2: "wep_sat_ag2",
 		SHIP_SAT_AG3: "wep_sat_ag3",
+
+		// Mines
+		SHIP_WEP_MINES: "wep_mines",
+		SHIP_WEP_MINES_IEM: "wep_mines_iem",
+		SHIP_WEP_MINES_NUKE: "wep_mines_nuke",
 
 		// Explosives
 		explosive: "wep_mines",
@@ -406,7 +411,7 @@ module.exports = function() {
 		vsolaire: "prop_vSolaire",
 	};
 	this.shipShapesDetails = {
-		SHIP_SAT: {
+		SHIP_DEF: {
 			SHIP_SAT_AG1: {
 				svg: [
 					// Aile Gauche
@@ -437,7 +442,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_BATTLECRUISER: {
-			SHIP_SMALL: {
+			SHIP_BATTLECRUISER_SMALL: {
 				svg: [
 					// Structure
 					["struct","path","M200",130,"Q",300,165,200,200,"L100",200,"L100",130,"L200",130], // Moteur gauche
@@ -449,9 +454,9 @@ module.exports = function() {
 					// Boucliers
 					["shield","rect",200,225, 50, 50, "shield_1"],
 					// Propulseurs
-					["sub_propulsion","rect"  , 80,225, 50, 50, "prop_1"],
-					["sup_propulsion","rect"  ,120,140, 50, 50, "prop_2"],
-					["sup_propulsion","rect"  ,120,310, 50, 50, "prop_3"],
+					["sup_propulsion","rect"  , 80,225, 50, 50, "prop_1"],
+					["sub_propulsion","rect"  ,120,140, 50, 50, "prop_2"],
+					["sub_propulsion","rect"  ,120,310, 50, 50, "prop_3"],
 				],
 				content: {
 					cannon: ["railgun","laser","plasma"],
@@ -466,7 +471,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_CUIRASSE: {
-			SHIP_SMALL: {
+			SHIP_CUIRASSE_SMALL: {
 				svg: [],
 				content: {},
 				stats: {
@@ -475,7 +480,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_FIGHTER: {
-			SHIP_SMALL: {
+			SHIP_FIGHTER_SMALL: {
 				svg: [
 					["struct","poly",100,100,70,250,100,400,170,400,250,250,170,100], // Ailes
 					["struct","poly",60,205,50,250,60,295,510,280,520,250,510,220], // Corps
@@ -493,7 +498,7 @@ module.exports = function() {
 					mass: 0,
 				},
 			},
-			SHIP_MEDIUM: {
+			SHIP_FIGHTER_MEDIUM: {
 				svg: [
 					["struct","path","M50",300,"Q",300,-100,550,300], // Arriere
 					["struct","path","M260",228,"Q",300,130,340,228], // Avant
@@ -514,7 +519,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_CORVET: {
-			SHIP_SMALL: {
+			SHIP_CORVET_SMALL: {
 				svg: [			
 					["struct","rect"  , 50,150,120, 60], // Moteur 1
 					["struct","rect"  , 50,290,120, 60], // Moteur 2
@@ -541,7 +546,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_CARRIER: {
-			SHIP_MEDIUM: {
+			SHIP_CARRIER_MEDIUM: {
 				svg: [
 					["struct","path","M400",200,"Q",500,250,400,300,"L50",300,"Q",0,250,50,200,"L400",200], // Centre	
 					["struct","poly",60,200,60,130,220,130,240,200], // Aile gauche avant 
