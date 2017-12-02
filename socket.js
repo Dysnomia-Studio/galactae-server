@@ -23,14 +23,19 @@ module.exports = function() {
 		* Log de connexion et de déconnexion des utilisateurs
 		*/
 		socket.on('game-connect', function (user) {
+			log("1");
 			// Vars
 			if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
+			log("2");
 
 			if(preventConnection==true) {
+			log("3");
 				sendSM(socket.id,preventConnectionMsg);
 				io.to(socket.id).emit('server-kick');
 				return;
 			}
+			log("4");
+
 
 			// User
 			user.sid = socket.id;
