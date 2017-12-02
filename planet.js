@@ -12,6 +12,7 @@ module.exports = function() {
 		 */
 		this.getPlanet = function(user,pid,decalage,callback) {
 			db.player.searchById(user.id, function(userReturned) {
+				console.info(userReturned);
 				if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
 					var longueur = userReturned.planetlist.length;
 					var valid = false;
