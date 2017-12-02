@@ -486,7 +486,7 @@ module.exports = function() {
 		this.GetBuildingCost = function(build,level) {
 			if(build < 0 || build > globalConst["buildingNumber"]) { return; }
 
-			return {
+			var retour = {
 				aluminium: 	Math.round(buildCost["aluminium"][build][0]*Math.pow(level,2) +		buildCost["aluminium"][build][1]*level + 	buildCost["aluminium"][build][2]),
 				iron: 		Math.round(buildCost["iron"][build][0]*Math.pow(level,2) +			buildCost["iron"][build][1]*level + 		buildCost["iron"][build][2]),
 				copper: 	Math.round(buildCost["copper"][build][0]*Math.pow(level,2) + 		buildCost["copper"][build][1]*level + 		buildCost["copper"][build][2]),
@@ -499,5 +499,12 @@ module.exports = function() {
 				habitants_difference: Math.round(buildCost["habitants"][build][0]*Math.pow(level,2) +	buildCost["habitants"][build][1]*level + 	buildCost["habitants"][build][2]
 					                         - (buildCost["habitants"][build][0]*Math.pow((level-1),2) +	buildCost["habitants"][build][1]*(level-1) + buildCost["habitants"][build][2])),
 			}
+
+			if(build == 1) {
+				retour.habitants_difference = retour.habitants;
+				retour.energy_difference = retour.energy;
+			}
+
+			return retour;
 		}
 }
