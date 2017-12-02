@@ -500,7 +500,7 @@ module.exports = function() {
 					                         - (buildCost["habitants"][build][0]*Math.pow((level-1),2) +	buildCost["habitants"][build][1]*(level-1) + buildCost["habitants"][build][2])),
 			};
 
-			if(build == 1) {
+			if(level == 1) {
 				retour.habitants_difference = retour.habitants;
 				retour.energy_difference = retour.energy;
 			}
