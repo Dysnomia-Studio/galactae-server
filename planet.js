@@ -12,7 +12,6 @@ module.exports = function() {
 		 */
 		this.getPlanet = function(user,pid,decalage,callback) {
 			db.player.searchById(user.id, function(userReturned) {
-				console.info(userReturned);
 				if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
 					var longueur = userReturned.planetlist.length;
 					var valid = false;
@@ -21,13 +20,10 @@ module.exports = function() {
 						if(pid==userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
 						    if(i==0 && decalage < 0) {
 						    	pid = userReturned.planetlist[longueur+decalage];
-						    	log("i==0 && decalage < 0");
 						    } else if(i>=(longueur-decalage) && decalage > 0) {
-						    	pid = userReturned.planetlist[decalage-1];
-						    	log("i>=(longueur-decalage) && decalage > 0");			    	
+						    	pid = userReturned.planetlist[decalage-1];		    	
 							} else {
 								pid = userReturned.planetlist[i+decalage];
-						    	log("else");
 							}
 
 						    valid = true;
