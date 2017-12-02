@@ -122,6 +122,7 @@ module.exports = function() {
 	}
 	this.calcTotalPlanetPoints= function(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
+			log(i);
 			points += planetReturned.points;
 
 			if(i+1<user.planetlist.length) {
