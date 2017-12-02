@@ -125,8 +125,10 @@ module.exports = function() {
 			log(i);
 			points += planetReturned.points;
 
-			if(i+1<user.planetlist.length) {
-				refreshUserPoints(user,callback,(i+1),points);
+			i++;
+			
+			if(i<user.planetlist.length) {
+				refreshUserPoints(user,callback,i,points);
 			} else {
 				points *= pointsCoef['planet'];
 				user.points = points;
