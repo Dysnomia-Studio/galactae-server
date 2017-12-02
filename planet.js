@@ -378,6 +378,7 @@ module.exports = function() {
 			// @ADD: count current buildings & current units
 
 			for(var i=0; i<14; i++) {
+				if(buildings[i]==0) { continue; }
 				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);
 			}
 
