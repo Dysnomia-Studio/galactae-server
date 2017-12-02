@@ -23,7 +23,7 @@ module.exports = function() {
 	this.heliumStorageRatio = 0.2;
 
 	this.electricity = [2080000,165000,550000];
-	this.habGen = [25447,419910,-250000];
+	this.habGen = [25447,419910,-200000];
 	/**
 	 * Buildings
 	 */
@@ -170,7 +170,7 @@ module.exports = function() {
 		],
 		habitants: [
 			// Ground building
-			[700,90120,60000], // Quarry
+			[700,90120,-60000], // Quarry
 			[1300,72010,-32359], // Metallurgie
 			[0,0,0], // Living
 			[2035,24090,15464], // Serres
