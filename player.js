@@ -130,8 +130,8 @@ module.exports = function() {
 		var points = 0;
 
 		for(var i=0; i<user.research.length; i++) {
-			if(user.research[i][1]==-1 && isset(researchCost[user.research[i][0]])) {
-				points+=researchCost[user.research[i][0]];
+			if(user.research[i][1]==-1 && isset(researchList[user.research[i][0]].cost)) {
+				points+=researchList[user.research[i][0]].cost;
 			}	
 		}
 
