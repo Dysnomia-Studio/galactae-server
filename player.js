@@ -44,31 +44,21 @@ module.exports = function() {
 	}
 	/* Connect Player */
 	this.connectPlayer = function(data) {	
-			log("5");
-
 		db.player.searchByName(data.username,function(dataReturned) {
-			log("6");
-
 			if(data.id!=dataReturned.id) {
-			log("7");
-
 				// Kick that Hacker ...
 				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 				return;
 			}
-			log("8");
 
 			// Kick double accounts
 			if(dataReturned.sid != "-1") {
-			log("9");
-
 				io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
 				log(dataReturned.name +' ('+ dataReturned.id + ' | ' + dataReturned.sid +') was kicked because of double sessions.');
 				return;
 			}
-			log("10");
 
-
+			log("1");
 			dataReturned.sid = data.sid;
 			
 			var jour = 24*60*60*1000;
@@ -95,9 +85,16 @@ module.exports = function() {
 				gvt: dataReturned.gvt
 			});
 
+			log("2");
 			refreshUserUnits(data);
+			log("3");
+
 			refreshUserPoints(dataReturned, function(userNewPoints) {
+			log("4");
+
 				refreshUserResearch(userNewPoints, function(userNewResearch) {
+			log("5");
+
 					db.player.update(userNewResearch);
 					plCount++;
 
