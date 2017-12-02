@@ -250,7 +250,7 @@ module.exports = function() {
 		phyContemporaine: 	{ cost: 20, parents: ["researchCenter"] },	
 		thermodynamique: 	{ cost: 13, parents: ["researchCenter"] },
 		// Mise en orbite et propulsion
-		prop_main: 			{ cost: 380, parents: ["thermodynamique","misc_mecStellaire",] },
+		prop_main: 			{ cost: 380, parents: ["thermodynamique","misc_mecStellaire"] },
 		prop_vSolaire: 		{ cost: 2300, parents: ["prop_main","misc_phySolaire"] },
 		prop_ions: 			{ cost: 2000, parents: ["prop_main","misc_phyQuantique"] },
 		prop_vsl: 			{ cost: 15000, parents: ["prop_ions","misc_advTelemetrie"] },
@@ -272,6 +272,19 @@ module.exports = function() {
 		wep_mines: 			{ cost: 380, parents: ["misc_calcGravit","misc_telemetrie"] },
 		wep_mines_nuke:		{ cost: 750, parents: ["wep_mines","wep_nuke"] },
 		wep_mines_iem:		{ cost: 550, parents: ["wep_mines","misc_em"] },
+		// Figther
+		figther_light_interceptor: { cost: 550, parents: ["prop_main", "misc_advTelemetrie"] },
+		figther_heavy_interceptor: { cost: 850, parents: ["figther_light_interceptor"] },
+		figther_bomber: 	{ cost: 1320, parents: ["figther_heavy_interceptor", "wep_nuke"] },
+		// Battlecruiser
+		battlecruiser_small: { cost: 2550, parents: ["prop_ions","misc_advTelemetrie"] },
+		// Cuirasse
+		cuirasse_small: 	{ cost: 2580, parents: ["prop_ions","misc_advTelemetrie"] },
+		// Corvet
+		corvet_small: 		{ cost: 680, parents: ["prop_main", "misc_advTelemetrie"] }
+		// Carrier
+		carrier_small: 		{ cost: 2580, parents: ["figther_light_interceptor","prop_ions"] },
+		carrier_medium: 	{ cost: 2850, parents: ["carrier_small"] },
 		// Satellites
 		wep_sat_ag1:		{ cost: 360, parents: ["misc_calcGravit","misc_telemetrie"] },
 		wep_sat_ag2:		{ cost: 650, parents: ["wep_sat_ag1","misc_advTelemetrie"] },
@@ -285,91 +298,6 @@ module.exports = function() {
 		misc_phySolaire: 	{ cost: 280, parents: ["misc_phyQuantique"] },
 		misc_calcGravit: 	{ cost: 240, parents: ["misc_astronomie"] },
 		misc_em: 			{ cost: 110, parents: ["phyContemporaine"] },
-	};
-	this.researchNamesList = [
-		// Noeud Central
-		"researchCenter",
-		"industrialistion",
-		"phyContemporaine",
-		"thermodynamique",
-		// Mise en orbite et propulsion
-		"prop_main",
-		"prop_vSolaire",
-		"prop_ions",
-		"prop_vsl",
-		"prop_hyperespace",
-		"prop_manoeuvre",
-		"prop_advManoeuvre",
-		// Construction et production
-		"cp_mecanisation",
-		"cp_tracteur",
-		"cp_materielTp",
-		"cp_dbRaffinage",
-		"cp_molecular_compression",
-		// Armes
-		"wep_railgun",
-		"wep_nuke",
-		"wep_laser",
-		"wep_plasma",
-		// Mines Spatiales
-		"wep_mines",
-		"wep_mines_nuke",
-		"wep_mines_iem",
-		// Satellites
-		"wep_sat_ag1",
-		"wep_sat_ag2",
-		"wep_sat_ag3",
-		// Autres recherches
-		"misc_astronomie",
-		"misc_telemetrie",
-		"misc_advTelemetrie",
-		"misc_mecStellaire",
-		"misc_phyQuantique",
-		"misc_phySolaire",
-		"misc_calcGravit",
-		"misc_em",
-	];
-	this.researchCost = {
-		researchCenter: 	0,
-		industrialistion: 	8,		
-		phyContemporaine: 	20,	
-		thermodynamique: 	13,
-		// Mise en orbite et propulsion
-		prop_main: 			380,
-		prop_vSolaire: 		2300,
-		prop_ions: 			2000,
-		prop_vsl: 			15000,
-		prop_hyperespace: 	35000,
-		prop_manoeuvre: 	450,
-		prop_advManoeuvre: 	700,
-		// Construction et production
-		cp_mecanisation: 	120,
-		cp_tracteur: 	 	150,
-		cp_materielTp: 		350,
-		cp_dbRaffinage: 	100,
-		cp_molecular_compression: 180,
-		// Armes
-		wep_railgun:		50,
-		wep_nuke:			180,
-		wep_laser:			260,
-		wep_plasma:			480,
-		// Mines spatiales
-		wep_mines: 			380,
-		wep_mines_nuke:		750,
-		wep_mines_iem:		550,
-		// Satellites
-		wep_sat_ag1:	    360,
-		wep_sat_ag2:		650,
-		wep_sat_ag3:		1500,
-		// Autres recherches
-		misc_astronomie:	45,
-		misc_telemetrie: 	90,
-		misc_advTelemetrie: 320,
-		misc_mecStellaire: 	340,
-		misc_phyQuantique: 	120,
-		misc_phySolaire: 	280,
-		misc_calcGravit: 	240,
-		misc_em: 			110,
 	};
 	/**
 	 * Units
@@ -385,6 +313,22 @@ module.exports = function() {
 		SHIP_WEP_MINES: "wep_mines",
 		SHIP_WEP_MINES_IEM: "wep_mines_iem",
 		SHIP_WEP_MINES_NUKE: "wep_mines_nuke",
+
+		// Fighter
+		SHIP_FIGHTER_SMALL: "figther_light_interceptor",
+		SHIP_FIGHTER_MEDIUM: "figther_heavy_interceptor",
+
+		// Battlecruiser
+		SHIP_BATTLECRUISER_SMALL: "battlecruiser_small",
+
+		// Cuirasse
+		SHIP_CUIRASSE_SMALL: "cuirasse_small",
+
+		// Corvet
+		SHIP_CORVET_SMALL: "corvet_small",
+
+		// Carrier
+		SHIP_CARRIER_MEDIUM: "carrier_medium",
 
 		// Explosives
 		explosive: "wep_mines",

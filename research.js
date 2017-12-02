@@ -3,17 +3,17 @@ var db = require('./database');
 module.exports = function() {
 	this.refreshUserResearch = function(data,callback) {	
 		// Checks if new research
-		if(researchNamesList.length!=data.research.length) {
-			for(var i in researchNamesList) {
+		if(researchList.length!=data.research.length) {
+			for(var name in researchList) {
 				var key = -1;
 				for(var j=0; j<data.research.length; j++) {
-					if(researchNamesList[i]==data.research[j][0]) {
+					if(name==data.research[j][0]) {
 						key = j;
 						break;
 					}
 				}
 				if(key == -1) {
-					data.research.push([researchNamesList[i],0]);
+					data.research.push([name,0]);
 				}
 			}
 		}
@@ -47,10 +47,10 @@ module.exports = function() {
 		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
-			if(isset(research[planetReturned.currResearch]) && isset(researchCost[planetReturned.currResearch]) && research[planetReturned.currResearch] != -1) {
+			if(isset(research[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && research[planetReturned.currResearch] != -1) {
 				research[planetReturned.currResearch] += (getResearchProduction(planetReturned.Buildings[8])*time);
 
-				if(research[planetReturned.currResearch] >= researchCost[planetReturned.currResearch]) {
+				if(research[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
 					research[planetReturned.currResearch] = -1;
 					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
 				}
@@ -97,7 +97,7 @@ module.exports = function() {
 
 				var newData = UpdatePlanet(planetReturned,userReturned);
 				
-				if(researchedParent && researchCost[research]!=undefined) { // Just check if it exists ...
+				if(researchedParent && researchList[research] != undefined) { // Just check if it exists ...
 					newData.currResearch = research;
 				}
 
