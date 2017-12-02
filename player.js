@@ -86,11 +86,7 @@ module.exports = function() {
 
 			refreshUserUnits(data);
 			refreshUserPoints(dataReturned, function(userNewPoints) {
-			log("4");
-
 				refreshUserResearch(userNewPoints, function(userNewResearch) {
-			log("5");
-
 					db.player.update(userNewResearch);
 					plCount++;
 
@@ -122,14 +118,13 @@ module.exports = function() {
 	}
 	this.calcTotalPlanetPoints= function(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
-			log(i);
 			points += planetReturned.points;
 
 			i++;
 			
 			if(i<user.planetlist.length) {
 				calcTotalPlanetPoints(user,callback,i,points);
-			} else {
+			} else { 
 				points *= pointsCoef['planet'];
 				user.points = points;
 				callback(user);	
