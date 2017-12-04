@@ -33,7 +33,6 @@ module.exports = function() {
 					// Si pas d'info, on met la premiere planete dans la liste
 					if(!valid) {
 						pid = userReturned.planetlist[0];
-						log("!valid")
 					}
 					db.planet.find(pid,function(planetReturned) {
 						callback(planetReturned,userReturned);

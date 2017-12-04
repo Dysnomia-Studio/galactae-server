@@ -81,8 +81,9 @@ module.exports = function() {
 				// Check if you have parent research
 				var researchedParent = true;
 				for(var i in researchList[research].parents) {
-					if(!isset(researchList[research].parents[i]) ||
-						getResearch(userNewResearch,researchList[research].parents[i])!=-1) {
+					if((!isset(researchList[research].parents[i]) ||
+						getResearch(userNewResearch,researchList[research].parents[i])!=-1) &&
+						researchList[research].parents[i] != "researchCenter") {
 						researchedParent = false;
 						break;
 					}
