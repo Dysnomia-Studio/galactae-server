@@ -70,6 +70,12 @@ var fleetsSchema = new Schema({
 });
 var fleets = mongoose.model('fleets', fleetsSchema);
 
+var statsSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	plCount: Number,
+});
+var stats = mongoose.model('stats', statsSchema);
+
 module.exports = {
 	/**
 	 * Used to connect to database
@@ -220,4 +226,16 @@ module.exports = {
 			});
 		}
 	},
+
+	stat: {
+		submit: function() {
+			data = {};
+			data._id = new mongoose.Types.ObjectId();
+			data.plCount = plCount;
+			
+			stats.create(data, function(error) {
+				if(error) { log(error); }
+			});
+		},
+	}
 }

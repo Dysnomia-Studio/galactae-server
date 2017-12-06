@@ -15,6 +15,19 @@ require('./misc')();
 /* Connect to database */
 db.connect(function() {
 	db.player.clearList();
+
+	/**
+	 * Stats Auto Submit to db
+	 */
+	var statsInterval = 5 * 60 * 1000;
+
+	setTimeout(function() {
+		db.stat.submit();
+
+		setInterval(function() {
+			db.stat.submit();
+		},statsInterval)
+	},statsInterval - Date.now()%statsInterval);
 });
 
 /**
