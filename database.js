@@ -228,10 +228,11 @@ module.exports = {
 	},
 
 	stat: {
-		submit: function() {
+		submit: function(currTime) {
 			data = {};
 			data._id = new mongoose.Types.ObjectId();
 			data.plCount = plCount;
+			data.time = currTime;
 			
 			stats.create(data, function(error) {
 				if(error) { log(error); }
