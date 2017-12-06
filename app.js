@@ -22,10 +22,10 @@ db.connect(function() {
 	var statsInterval = 5 * 60 * 1000;
 
 	setTimeout(function() {
-		db.stat.submit(Date.now()%statsInterval);
+		db.stat.submit(Date.now()%statsInterval - Date.now()%statsInterval);
 
 		setInterval(function() {
-			db.stat.submit(Date.now()%statsInterval);
+			db.stat.submit(Date.now()%statsInterval - Date.now()%statsInterval);
 		},statsInterval)
 	},statsInterval - Date.now()%statsInterval);
 });
