@@ -73,6 +73,7 @@ var fleets = mongoose.model('fleets', fleetsSchema);
 var statsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	plCount: Number,
+	time: Number,
 });
 var stats = mongoose.model('stats', statsSchema);
 
