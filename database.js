@@ -46,7 +46,7 @@ var unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
-	cost: Array, // [Fe,Al,Cu,Ti,Population,Time]
+	cost: Array, // [Al,Fe,Ti,Cu,Time,Population]
 	shipType: String,
 	shipShape: String,
 	parts: Array,

@@ -20,9 +20,23 @@ module.exports = function() {
 	 * @param      {<type>}  data    The data
 	 * @return     {Array}   Unit total cost
 	 */
-	this.calcUnitCosts = function(data) {
-		// @ADD: Calc unit cost
-		return [0,0,0,0,0,0];
+	this.calcUnitCosts = function(shipType,parts) {
+		var totalCost = shipCosts[shipType];
+
+		for(var id in parts) {
+			if(!isset(shipCosts[parts[id].name])) { // If we do our work, this would never happend but that's a security measure ..
+				log("Cost is not defined for part " + parts[id].name + " in ship " + shipType,"error");
+				return [-1];
+			}
+
+			var addCost = shipCosts[parts[id].name];
+
+			for(var i=0; i<6; i++) {
+				totalCost[i] += addCost[i];
+			}
+		}
+
+		return totalCost;
 	}
 
 	/**
@@ -133,8 +147,6 @@ module.exports = function() {
 
 				// Saving
 				if(errors==0) {
-					cost = calcUnitCosts();
-
 					// Save to database
 					var shipToSave = {
 						name: ship.name,
@@ -142,7 +154,7 @@ module.exports = function() {
 						shipShape: ship.shape,
 						ownerId: data.id,
 						inBuilding: [],
-						cost: cost,
+						cost: [],
 						parts: [],
 						armorType: 0, // None yet
 						note: 0, // Not yet
@@ -158,6 +170,10 @@ module.exports = function() {
 							tech: ship[i].value
 						});
 					}
+
+					shipToSave.cost = calcUnitCosts(shipShape,shipToSave.parts);
+
+					if(cost[0] == -1) { return; } // There's something wrong ... Security measure
 				
 					db.unit.findByOwner(data.id,function(unitList) {
 						var duplicate = false;
@@ -260,17 +276,17 @@ module.exports = function() {
 
 			db.unit.find(data.unit, function(unitReturned) {
 				if(!isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
-				var totalCost = [];
+				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
 				for(var i in unitReturned.cost) {
 					totalCost = unitReturned.cost[i]*inputData.count;
 				}
 
-				if(totalCost[0] > planetReturned.resources[2] ||
-					totalCost[1] > planetReturned.resources[3] ||
-					totalCost[2] > planetReturned.resources[4] ||
-					totalCost[3] > planetReturned.resources[5]) {
+				if(totalCost[1] > planetReturned.resources[2] ||
+					totalCost[0] > planetReturned.resources[3] ||
+					totalCost[3] > planetReturned.resources[4] ||
+					totalCost[2] > planetReturned.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
 					log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
 					SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
@@ -279,7 +295,7 @@ module.exports = function() {
 
 				getPeople(newData, function(planetReturned,enoughtPeople) {
 					// Check if planet have enough population
-					if(prod < (cons + totalCost[4])) {
+					if(prod < (cons + totalCost[5])) {
 						log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
 						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
 						return;
@@ -294,7 +310,7 @@ module.exports = function() {
 						if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
 
 						// Check if fleet max size is reached
-						if((fleetReturned.population + totalCost[4]) > globalCost[maxFleetSize]) { 
+						if((fleetReturned.population + totalCost[5]) > globalCost[maxFleetSize]) { 
 							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
@@ -304,7 +320,7 @@ module.exports = function() {
 						var newPlanet = planetReturned.toJSON();
 						newPlanet.unitBuildingID = data.unit;
 						newPlanet.unitBuildingCount = data.count;
-						newPlanet.unitBuildingEndTime = Date.now() + totalCost[5];
+						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
 						newPlanet.unitBuildingFleetID = data.fleet;
 
 						db.planet.update(newPlanet);
