@@ -171,7 +171,7 @@ module.exports = function() {
 						});
 					}
 
-					shipToSave.cost = calcUnitCosts(shipShape,shipToSave.parts);
+					shipToSave.cost = calcUnitCosts(ship.shape,shipToSave.parts);
 
 					if(cost[0] == -1) { return; } // There's something wrong ... Security measure
 				
