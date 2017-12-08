@@ -24,12 +24,12 @@ module.exports = function() {
 		var totalCost = shipCosts[shipType];
 
 		for(var id in parts) {
-			if(!isset(shipCosts[parts[id].name])) { // If we do our work, this would never happend but that's a security measure ..
+			if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
 				log("Cost is not defined for part " + parts[id].tech + " in ship " + shipType,"error");
 				return [-1];
 			}
 
-			var addCost = shipCosts[parts[id].name];
+			var addCost = shipCosts[parts[id].tech];
 
 			for(var i=0; i<6; i++) {
 				totalCost[i] += addCost[i];
