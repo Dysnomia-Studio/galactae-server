@@ -567,5 +567,7 @@ module.exports = function() {
 		// Propulsions supraluminiques
 		vsl: 			[ 65,120, 60, 20,0.55,  80],
 		hyperespace: 	[ 80,150, 90, 25,0.75, 160],
+
+		none: [0,0,0,0,0,0],
 	};
 }
