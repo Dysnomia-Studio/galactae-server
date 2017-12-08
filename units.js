@@ -25,7 +25,7 @@ module.exports = function() {
 
 		for(var id in parts) {
 			if(!isset(shipCosts[parts[id].name])) { // If we do our work, this would never happend but that's a security measure ..
-				log("Cost is not defined for part " + parts[id].name + " in ship " + shipType,"error");
+				log("Cost is not defined for part " + parts[id].tech + " in ship " + shipType,"error");
 				return [-1];
 			}
 
@@ -173,7 +173,7 @@ module.exports = function() {
 
 					shipToSave.cost = calcUnitCosts(ship.shape,shipToSave.parts);
 
-					if(cost[0] == -1) { return; } // There's something wrong ... Security measure
+					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
 				
 					db.unit.findByOwner(data.id,function(unitList) {
 						var duplicate = false;
