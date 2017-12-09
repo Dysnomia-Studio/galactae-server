@@ -130,12 +130,12 @@ module.exports = function() {
 			if(buildings[13]!=0 && currentBuilding!=13) { resources[1] += heliumProdBase*time; }
 
 			//Metals
-			if(resources[0]-(mineralProdBase*time)>0 && currentBuilding!=1) { //Verify if you can use basic ressources
+			if(resources[0]-(metalProdBase*time)>0 && currentBuilding!=1) { //Verify if you can use basic ressources
 			    for(var i=2; i<6; i++) {
 			    	resources[i] += (metalProdBase*time)*ratios[i-2];
 			    }
 
-				resources[0] -= (mineralProdBase*time); //Consomation Algorithm
+				resources[0] -= (metalProdBase*time); //Consomation Algorithm
 			} else { // Do the max we can
 			    for(var i=2; i<6; i++) {
 			    	resources[i] += resources[0]*ratios[i-2];

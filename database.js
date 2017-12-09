@@ -63,7 +63,7 @@ var fleetsSchema = new Schema({
 	motherPlanetId: Schema.Types.ObjectId,
 	position: String,
 	orbitPosition: Number,
-	orbitPoints: Array,
+	points: Array,
 	endMoveTime: Number,
 	units: Array,
 	population: Number,
@@ -213,6 +213,12 @@ module.exports = {
 				callback(obj);
 			});
 		},
+		findByMotherPlanet: function(planetId,callback) {
+			fleets.find({motherPlanetId: id}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
 		update: function(data,callback) {
 			var conditions = { _id: data._id }
 						  , update = { $set: data }
@@ -225,7 +231,15 @@ module.exports = {
 					callback();
 				}
 			});
-		}
+		},
+		create: function(data,callback) {
+			data._id = new mongoose.Types.ObjectId();
+			
+			fleets.create(data, function(error) {
+				if(error) { log(error); }
+				if(callback) { callback(data); } 
+			});
+		},
 	},
 
 	stat: {

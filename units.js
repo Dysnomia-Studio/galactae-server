@@ -329,5 +329,47 @@ module.exports = function() {
 				});
 			});			
 		});
+	}
+
+	this.CreateFleet = function(data) {
+		getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
+			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
+
+			db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
+				// Check max count
+				if(fleetReturned.length >= hqFleetCount[planetReturned.Buildings[6] - 1]) {
+					SendMessageToClient({ sid: inputData.sid, message: "FLEET_MAX_REACHED" });
+					return;
+				}
+
+				// Check name
+				for(var i in fleetReturned) {
+					if(fleetReturned.name == data.fname) {
+						SendMessageToClient({ sid: inputData.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
+						return;
+					}
+				}
+
+				// Add it to db
+				var newFleet = {
+					name: data.name,
+					ownerId: data.id,
+					motherPlanetId: data.planet,
+					position: planetReturned.address,
+					orbitPosition: 0,
+					points: 0,
+					endMoveTime: -1,
+					units: [],
+					population: 0,
+				};
+
+				db.fleet.create(newFleet, function() {
+					// Send new list to client
+					UpdateClientFleets(data);
+				});
+					
+			});
+		});
+		
 	}	
 }

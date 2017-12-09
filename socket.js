@@ -186,7 +186,19 @@ module.exports = function() {
 				// Execution du code
 			   	BuildUnit(data);
 			});
-		})
+		});
+
+		// Fleets
+		socket.on('fleet-create', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.fname)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+				// Execution du code
+			   	CreateFleet(data);
+			});
+		});
 
 		// Daily Bonus
 		socket.on('daily-bonus', function (data) {
