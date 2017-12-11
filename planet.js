@@ -52,7 +52,7 @@ module.exports = function() {
 
 				var newData = UpdatePlanet(planetReturned,userReturned);
 
-				refreshUserFleets(planetReturned.id);
+				refreshUserFleets(planetReturned.id,data.sid);
 
 				db.planet.update(newData);
 

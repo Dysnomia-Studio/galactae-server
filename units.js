@@ -18,14 +18,14 @@ module.exports = function() {
 		});
 	},
 
-	this.refreshUserFleets = function(pid) {
+	this.refreshUserFleets = function(pid,sid) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findByMotherPlanet(pid,function(fleet) {
 			if(fleet==undefined) { fleet = []; }
-			io.to(data.sid).emit("fleet-recieve-data", fleet);
+			io.to(sid).emit("fleet-recieve-data", fleet);
 		});
 	}
 

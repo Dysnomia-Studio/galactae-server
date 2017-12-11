@@ -214,7 +214,7 @@ module.exports = {
 			});
 		},
 		findByMotherPlanet: function(planetId,callback) {
-			fleets.find({motherPlanetId: id}, function (err, obj) {
+			fleets.find({motherPlanetId: planetId}, function (err, obj) {
 				if(err) { log(err); }
 				callback(obj);
 			});
