@@ -23,7 +23,7 @@ module.exports = function() {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.unit.findByMotherPlanet(pid,function(fleet) {
+		db.fleet.findByMotherPlanet(pid,function(fleet) {
 			if(fleet==undefined) { fleet = []; }
 			io.to(data.sid).emit("fleet-recieve-data", fleet);
 		});
