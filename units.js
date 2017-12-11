@@ -8,11 +8,26 @@ module.exports = function() {
 	 * @return     {socket}  units   list of units types
 	 */
 	this.refreshUserUnits = function(data) {
+		/**
+		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
+		 * YOU NEED TO AUTH USER BEFORE !
+		 */
 		db.unit.findByOwner(data.id,function(units) {
 			if(units==undefined) { units = []; }
 			io.to(data.sid).emit("units-recieve-data", units);
 		});
 	},
+
+	this.refreshUserFleets = function(pid) {
+		/**
+		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
+		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
+		 */
+		db.unit.findByMotherPlanet(pid,function(fleet) {
+			if(fleet==undefined) { fleet = []; }
+			io.to(data.sid).emit("fleet-recieve-data", fleet);
+		});
+	}
 
 	/**
 	 * Calculates the unit costs.
