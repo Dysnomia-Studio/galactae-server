@@ -318,19 +318,8 @@ module.exports = function() {
 
 					// Check if you have required buildings
 
-					db.fleet.find(data.fleet, function(fleetReturned) {
-						if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
-
-						// Check if this fleet is in orbit and belong to this planet
-						if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
-
-						// Check if fleet max size is reached
-						if((fleetReturned.population + totalCost[5]) > globalCost[maxFleetSize]) { 
-							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
-							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
-							return;
-						}
-
+					// Check fleet
+					function callBackAfterfleet(planetReturned,totalCost,inputData,globalCost,data) {
 						// Create entry in planet db for in-build unit
 						var newPlanet = planetReturned.toJSON();
 						newPlanet.unitBuildingID = data.unit;
@@ -339,52 +328,81 @@ module.exports = function() {
 						newPlanet.unitBuildingFleetID = data.fleet;
 
 						db.planet.update(newPlanet);
-						
-					});
-				});
+					}
+
+					if(data.fleet == -1 && isset(data.fleetName)) {
+						// Check if fleet max size is reached
+						if(totalCost[5] > globalCost[maxFleetSize]) { 
+							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							return;
+						}
+
+						CreateFleet(data,planetReturned,function() {
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost,data);
+						});
+					} else {
+						db.fleet.find(data.fleet, function(fleetReturned) {
+							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
+
+							// Check if this fleet is in orbit and belong to this planet
+							if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
+
+							// Check if fleet max size is reached
+							if((fleetReturned.population + totalCost[5]) > globalCost[maxFleetSize]) { 
+								log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+								SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+								return;
+							}
+
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost,data);
+						});
+					}
+				});	
 			});			
 		});
 	}
 
-	this.CreateFleet = function(data) {
-		getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
-			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
+	this.CreateFleet = function(data,planetReturned,callback) {
+		/**
+		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
+		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
+		 */
+		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
+			// Check max count
+			if(fleetReturned.length >= hqFleetCount[planetReturned.Buildings[6] - 1]) {
+				SendMessageToClient({ sid: inputData.sid, message: "FLEET_MAX_REACHED" });
+				return;
+			}
 
-			db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
-				// Check max count
-				if(fleetReturned.length >= hqFleetCount[planetReturned.Buildings[6] - 1]) {
-					SendMessageToClient({ sid: inputData.sid, message: "FLEET_MAX_REACHED" });
+			// Check name
+			for(var i in fleetReturned) {
+				if(fleetReturned.name == data.fleetName) {
+					SendMessageToClient({ sid: inputData.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
+			}
 
-				// Check name
-				for(var i in fleetReturned) {
-					if(fleetReturned.name == data.fname) {
-						SendMessageToClient({ sid: inputData.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
-						return;
-					}
-				}
+			// Add it to db
+			var newFleet = {
+				name: data.fleetName,
+				ownerId: data.id,
+				motherPlanetId: data.planet,
+				position: planetReturned.address,
+				orbitPosition: 0,
+				points: 0,
+				endMoveTime: -1,
+				units: [],
+				population: 0,
+			};
 
-				// Add it to db
-				var newFleet = {
-					name: data.name,
-					ownerId: data.id,
-					motherPlanetId: data.planet,
-					position: planetReturned.address,
-					orbitPosition: 0,
-					points: 0,
-					endMoveTime: -1,
-					units: [],
-					population: 0,
-				};
+			db.fleet.create(newFleet, function() {
+				// Send new list to client
+				UpdateClientFleets(data);
 
-				db.fleet.create(newFleet, function() {
-					// Send new list to client
-					UpdateClientFleets(data);
-				});
-					
+				if(callback) { callback(); }
 			});
+				
 		});
-		
 	}	
 }
