@@ -327,6 +327,7 @@ module.exports = function() {
 						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
 						newPlanet.unitBuildingFleetID = data.fleet;
 
+						// Update database
 						db.planet.update(newPlanet);
 					}
 
