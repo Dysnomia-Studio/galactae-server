@@ -329,7 +329,7 @@ module.exports = function() {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(planetReturned,totalCost,inputData,globalCost) {
+					function callBackAfterfleet(planetReturned,totalCost,inputData) {
 						// Create entry in planet db for in-build unit
 						var newPlanet = planetReturned.toJSON();
 						newPlanet.unitBuildingID = inputData.unit;
@@ -343,14 +343,14 @@ module.exports = function() {
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
-						if(totalCost[5] > globalCost[maxFleetSize]) { 
+						if(totalCost[5] > globalConst["maxFleetSize"]) { 
 							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
 						CreateFleet(inputData,planetReturned,function() {
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost);
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
@@ -360,13 +360,13 @@ module.exports = function() {
 							if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
 
 							// Check if fleet max size is reached
-							if((fleetReturned.population + totalCost[5]) > globalCost[maxFleetSize]) { 
+							if((fleetReturned.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
 								log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 								SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost);
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
 						});
 					}
 				});	
