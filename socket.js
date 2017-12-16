@@ -188,22 +188,11 @@ module.exports = function() {
 			});
 		});
 		socket.on('unit-build', function(data) {
-			log("1");
-			console.info(data);
-			console.log(isset(data));
-			console.log(isset(data.id));
-			console.log(isset(data.username));
-			console.log(isset(data.planet));
-			console.log(isset(data.unit));
-			console.log(isset(data.count));
-			console.log(isset(data.fleet));
 			// Vars
 			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.unit) || !isset(data.count) || !isset(data.fleet)) { return; }
 			// User
 			data.sid = socket.id;
 			isValidUser(data,function(data) { // Verify identity
-			log("2");
-
 				// Execution du code
 			   	BuildUnit(data);
 			});
