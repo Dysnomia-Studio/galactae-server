@@ -294,17 +294,10 @@ module.exports = function() {
 	this.BuildUnit = function(inputData) {
 		// Check if planet, unit & fleet belong to player
 		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned) {
-			log("4");
-
-			console.info(planetReturned);
-			console.info( userReturned );
-
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
-			log("5");
 
 			// Check no fleet is currently building
 			if(planetReturned.unitBuildingEndTime > Date.now()) { return; }
-			log("6");
 
 			db.unit.find(inputData.unit, function(unitReturned) {
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
@@ -325,7 +318,7 @@ module.exports = function() {
 					return;
 				}
 
-				getPeople(newData, function(planetReturned,enoughtPeople) {
+				getPeople(planetReturned, function(planetReturned, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
 						log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
