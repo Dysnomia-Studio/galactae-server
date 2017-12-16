@@ -350,7 +350,7 @@ module.exports = function() {
 						}
 
 						CreateFleet(inputData,planetReturned,function() {
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
+							callBackAfterfleet(planetReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
@@ -366,7 +366,7 @@ module.exports = function() {
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
+							callBackAfterfleet(planetReturned,totalCost,inputData);
 						});
 					}
 				});	
