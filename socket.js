@@ -177,6 +177,16 @@ module.exports = function() {
 			   	CreateUnitType(data);
 			});
 		});
+		socket.on('unit-type-delete', function(data) {
+			// Vars
+			if(!isset(data) || !isset(data.id) || !isset(data.unit) || !isset(data.username)) { return; }
+			// User
+			data.sid = socket.id;
+			isValidUser(data,function(data) { // Verify identity
+				// Execution du code
+			   	DeleteUnitType(data);
+			});
+		});
 		socket.on('unit-build', function(data) {
 			// Vars
 			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.unit) || !isset(data.count) || !isset(data.fleet)) { return; }
@@ -185,18 +195,6 @@ module.exports = function() {
 			isValidUser(data,function(data) { // Verify identity
 				// Execution du code
 			   	BuildUnit(data);
-			});
-		});
-
-		// Fleets
-		socket.on('fleet-create', function(data) {
-			// Vars
-			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.fname)) { return; }
-			// User
-			data.sid = socket.id;
-			isValidUser(data,function(data) { // Verify identity
-				// Execution du code
-			   	CreateFleet(data);
 			});
 		});
 

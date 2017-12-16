@@ -274,6 +274,16 @@ module.exports = function() {
 		}
 	}
 
+	this.DeleteUnitType = function(data) {
+		db.unit.find(data.unit, function(unitReturned) {
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
+
+			//@ADD: count
+
+			db.unit.delete(data.unit);
+		});
+	}
+
 	/**
 	 * Builds an unit.
 	 *
@@ -290,7 +300,7 @@ module.exports = function() {
 			if(planetReturned.unitBuildingEndTime > Date.now()) { return; }
 
 			db.unit.find(data.unit, function(unitReturned) {
-				if(!isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
+				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
 				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
@@ -327,7 +337,7 @@ module.exports = function() {
 						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
 						newPlanet.unitBuildingFleetID = data.fleet;
 
-						// Update database
+						// Update database 
 						db.planet.update(newPlanet);
 					}
 
@@ -342,7 +352,7 @@ module.exports = function() {
 						CreateFleet(data,planetReturned,function() {
 							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost,data);
 						});
-					} else {
+					} else if(data.fleet != -1) {
 						db.fleet.find(data.fleet, function(fleetReturned) {
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
 

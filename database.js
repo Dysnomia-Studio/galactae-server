@@ -173,7 +173,7 @@ module.exports = {
 		find: function(id,callback) {
 			units.findById(id, function (err, obj) {
 				if(err) { log(err); }
-				if(isset(obj)) {
+				if(callback) {
 					callback(obj);
 				}
 			});
