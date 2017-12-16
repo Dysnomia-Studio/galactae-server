@@ -189,6 +189,7 @@ module.exports = function() {
 		});
 		socket.on('unit-build', function(data) {
 			log("1");
+			console.info(data);
 			console.log(isset(data));
 			console.log(isset(data.id));
 			console.log(isset(data.username));
