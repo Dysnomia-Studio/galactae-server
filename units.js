@@ -292,12 +292,12 @@ module.exports = function() {
 	 * @param      string  unitData  What need to build ?
 	 */
 	this.BuildUnit = function(inputData) {
-		log("3");
-		console.info(inputData);
-
 		// Check if planet, unit & fleet belong to player
 		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned) {
 			log("4");
+
+			console.info(planetReturned);
+			console.info( userReturned );
 
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 			log("5");
