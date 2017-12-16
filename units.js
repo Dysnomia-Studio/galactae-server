@@ -292,12 +292,18 @@ module.exports = function() {
 	 * @param      string  unitData  What need to build ?
 	 */
 	this.BuildUnit = function(inputData) {
+			log("3");
+
 		// Check if planet, unit & fleet belong to player
 		getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
+			log("4");
+
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
+			log("5");
 
 			// Check no fleet is currently building
 			if(planetReturned.unitBuildingEndTime > Date.now()) { return; }
+			log("6");
 
 			db.unit.find(data.unit, function(unitReturned) {
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
