@@ -409,7 +409,7 @@ module.exports = function() {
 
 			db.fleet.create(newFleet, function() {
 				// Send new list to client
-				UpdateClientFleets(data);
+				refreshUserFleets(data.planet,data.sid);
 
 				if(callback) { callback(); }
 			});
