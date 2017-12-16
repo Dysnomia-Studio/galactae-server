@@ -296,7 +296,7 @@ module.exports = function() {
 		console.info(inputData);
 
 		// Check if planet, unit & fleet belong to player
-		getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
+		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned) {
 			log("4");
 
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
@@ -306,7 +306,7 @@ module.exports = function() {
 			if(planetReturned.unitBuildingEndTime > Date.now()) { return; }
 			log("6");
 
-			db.unit.find(data.unit, function(unitReturned) {
+			db.unit.find(inputData.unit, function(unitReturned) {
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
 				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
@@ -336,19 +336,19 @@ module.exports = function() {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(planetReturned,totalCost,inputData,globalCost,data) {
+					function callBackAfterfleet(planetReturned,totalCost,inputData,globalCost) {
 						// Create entry in planet db for in-build unit
 						var newPlanet = planetReturned.toJSON();
-						newPlanet.unitBuildingID = data.unit;
-						newPlanet.unitBuildingCount = data.count;
+						newPlanet.unitBuildingID = inputData.unit;
+						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
-						newPlanet.unitBuildingFleetID = data.fleet;
+						newPlanet.unitBuildingFleetID = inputData.fleet;
 
 						// Update database 
 						db.planet.update(newPlanet);
 					}
 
-					if(data.fleet == -1 && isset(data.fleetName)) {
+					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalCost[maxFleetSize]) { 
 							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
@@ -356,11 +356,11 @@ module.exports = function() {
 							return;
 						}
 
-						CreateFleet(data,planetReturned,function() {
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost,data);
+						CreateFleet(inputData,planetReturned,function() {
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost);
 						});
-					} else if(data.fleet != -1) {
-						db.fleet.find(data.fleet, function(fleetReturned) {
+					} else if(inputData.fleet != -1) {
+						db.fleet.find(inputData.fleet, function(fleetReturned) {
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
 
 							// Check if this fleet is in orbit and belong to this planet
@@ -373,7 +373,7 @@ module.exports = function() {
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost,data);
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData,globalCost);
 						});
 					}
 				});	
