@@ -392,14 +392,14 @@ module.exports = function() {
 		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planetReturned.Buildings[6] - 1]) {
-				SendMessageToClient({ sid: inputData.sid, message: "FLEET_MAX_REACHED" });
+				SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
 				return;
 			}
 
 			// Check name
 			for(var i=0; i<fleetReturned.length; i++) {
 				if(fleetReturned.name == data.fleetName) {
-					SendMessageToClient({ sid: inputData.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
+					SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
 			}
