@@ -304,8 +304,8 @@ module.exports = function() {
 				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
-				for(var i in unitReturned.cost) {
-					totalCost[i] = unitReturned.cost[i]*inputData.count;
+				for(var i=0; i<unitReturned.cost.length; i++) {
+					totalCost[i] = parseInt(unitReturned.cost[i])*inputData.count;
 				}
 
 				if(totalCost[1] > planetReturned.resources[2] ||
@@ -344,7 +344,7 @@ module.exports = function() {
 						// Update database 
 						db.planet.update(newPlanet);
 
-						sendPlanetDataToUser({data: newPlanet, id: data.id, sid: data.sid });
+						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
 						log(inputData.name+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + planetReturned.name + ' (' +inputData.planet+')',"success");
 					}
