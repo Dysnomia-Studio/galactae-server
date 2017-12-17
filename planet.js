@@ -54,6 +54,8 @@ module.exports = function() {
 
 				db.planet.update(newData);
 
+				refreshUserFleets(planetIn._id,user.sid);
+
 				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
 		}
@@ -303,7 +305,7 @@ module.exports = function() {
 
 				db.fleet.update(newFleet, function() {
 					refreshUserUnits(user);
-					refreshUserFleets(planetIn._id,user.sid)
+					refreshUserFleets(planetIn._id,user.sid);
 				});
 			});
 		}
