@@ -54,7 +54,7 @@ module.exports = function() {
 
 				db.planet.update(newData);
 
-				refreshUserFleets(planetIn._id,user.sid);
+				refreshUserFleets(newData._id,data.sid);
 
 				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
