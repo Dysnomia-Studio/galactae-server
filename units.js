@@ -398,7 +398,7 @@ module.exports = function() {
 
 			// Check name
 			for(var i=0; i<fleetReturned.length; i++) {
-				if(fleetReturned.name == data.fleetName) {
+				if(fleetReturned[i].name == data.fleetName) {
 					SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
