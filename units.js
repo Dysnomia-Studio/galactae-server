@@ -24,7 +24,6 @@ module.exports = function() {
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findByMotherPlanet(pid,function(fleet) {
-			console.log(fleet==undefined);
 			if(fleet==undefined) { fleet = []; }
 			io.to(sid).emit("fleet-recieve-data", fleet);
 		});

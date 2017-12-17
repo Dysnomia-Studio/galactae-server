@@ -52,8 +52,6 @@ module.exports = function() {
 
 				var newData = UpdatePlanet(planetReturned,userReturned);
 
-				refreshUserFleets(planetReturned.id,data.sid);
-
 				db.planet.update(newData);
 
 				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
@@ -291,7 +289,7 @@ module.exports = function() {
 				var newFleet = fleetReturned.toJSON();
 				var set = false;
 
-				for(var i in newFleet.units) {
+				for(var i=0; i<newFleet.units.length; i++) {
 					if(newFleet.units[i][0] == planetIn.unitBuildingID) {
 						newFleet.units[i][1] += planetIn.unitBuildingCount;
 						set=true;
