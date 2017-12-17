@@ -329,13 +329,13 @@ module.exports = function() {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(planetReturned,totalCost,inputData) {
+					function callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData) {
 						// Create entry in planet db for in-build unit
 						var newPlanet = planetReturned.toJSON();
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
-						newPlanet.unitBuildingFleetID = inputData.fleet;
+						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Update database 
 						db.planet.update(newPlanet);
@@ -349,8 +349,8 @@ module.exports = function() {
 							return;
 						}
 
-						CreateFleet(inputData,planetReturned,function() {
-							callBackAfterfleet(planetReturned,totalCost,inputData);
+						CreateFleet(inputData,planetReturned,function(fleetReturned) {
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
@@ -366,7 +366,7 @@ module.exports = function() {
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,totalCost,inputData);
+							callBackAfterfleet(planetReturned,fleetReturned,totalCost,inputData);
 						});
 					}
 				});	
@@ -407,11 +407,11 @@ module.exports = function() {
 				population: 0,
 			};
 
-			db.fleet.create(newFleet, function() {
+			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
 				refreshUserFleets(data.planet,data.sid);
 
-				if(callback) { callback(); }
+				if(callback) { callback(newFleet); }
 			});
 				
 		});
