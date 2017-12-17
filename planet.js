@@ -292,19 +292,20 @@ module.exports = function() {
 				var set = false;
 
 				for(var i in newFleet.units) {
-					if(newFleet.units[i][0] == newFleet.unitBuildingID) {
-						newFleet.units[i][1] += newFleet.unitBuildingCount;
+					if(newFleet.units[i][0] == planetIn.unitBuildingID) {
+						newFleet.units[i][1] += planetIn.unitBuildingCount;
 						set=true;
 						break;
 					}
 				}
 
 				if(!set) {
-					newFleet.push([newFleet.unitBuildingID,newFleet.unitBuildingCount]);
+					newFleet.units.push([planetIn.unitBuildingID,planetIn.unitBuildingCount]);
 				}
 
 				db.fleet.update(newFleet, function() {
 					refreshUserUnits(user);
+					refreshUserFleets(planetIn._id,user.sid)
 				});
 			});
 		}
