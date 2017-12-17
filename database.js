@@ -78,6 +78,7 @@ var statsSchema = new Schema({
 var stats = mongoose.model('stats', statsSchema);
 
 module.exports = {
+	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
