@@ -24,6 +24,7 @@ module.exports = function() {
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findByMotherPlanet(pid,function(fleet) {
+			console.log(fleet==undefined);
 			if(fleet==undefined) { fleet = []; }
 			io.to(sid).emit("fleet-recieve-data", fleet);
 		});
@@ -313,7 +314,7 @@ module.exports = function() {
 					totalCost[3] > planetReturned.resources[4] ||
 					totalCost[2] > planetReturned.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
-					log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
+					log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
 					SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
 					return;
 				}
@@ -321,7 +322,7 @@ module.exports = function() {
 				getPeople(planetReturned, function(planetReturned, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
-						log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
+						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
 						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
 						return;
 					}
@@ -330,8 +331,6 @@ module.exports = function() {
 
 					// Check fleet
 					function callBackAfterfleet(planetReturned,fleetReturned,userReturned,totalCost,inputData) {
-						console.info(totalCost);
-
 						// Create entry in planet db for in-build unit
 						var newPlanet = UpdatePlanet(planetReturned,userReturned);
 						newPlanet.unitBuildingID = inputData.unit;
@@ -340,19 +339,23 @@ module.exports = function() {
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
+						newPlanet.resources[2] -= totalCost[1];
+						newPlanet.resources[3] -= totalCost[0];
+						newPlanet.resources[4] -= totalCost[3];
+						newPlanet.resources[5] -= totalCost[2];
 
 						// Update database 
 						db.planet.update(newPlanet);
 
 						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
-						log(inputData.name+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + planetReturned.name + ' (' +inputData.planet+')',"success");
+						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + planetReturned.name + ' (' +inputData.planet+')',"success");
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst["maxFleetSize"]) { 
-							log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+							log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
@@ -369,7 +372,7 @@ module.exports = function() {
 
 							// Check if fleet max size is reached
 							if((fleetReturned.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
-								log(inputData.name +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+								log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 								SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 								return;
 							}
