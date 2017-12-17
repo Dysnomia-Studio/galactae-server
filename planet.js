@@ -340,9 +340,9 @@ module.exports = function() {
 			if(currTime>data.unitBuildingEndTime) {
 				UpdateUnits(planetIn,user);
 				data.unitBuildingEndTime = -1;
-				data.unitBuildingID = -1;
+				data.unitBuildingID = "-1";
 				data.unitBuildingCount = -1;
-				data.unitBuildingFleetID = -1;
+				data.unitBuildingFleetID = "-1";
 			}
 
 			return data;
