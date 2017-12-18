@@ -190,10 +190,16 @@ module.exports = {
 						  , update = { $set: data }
 						  , options = { multi: true };
 
-			units.update(conditions, update, options,function(error) {
-				if(error) { log(error);} 
+			units.update(conditions, update, options,function(err) {
+				if(err) { log(err);} 
+			});
+		},
+		delete: function(id) {
+			units.findByIdAndRemove(id,function(err) {
+				if(err) { log(err);} 
 			});
 		}
+
 	},
 
 	/**
