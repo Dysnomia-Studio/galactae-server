@@ -279,12 +279,12 @@ module.exports = function() {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
 
 			if(unitReturned.owned != 0) {
-				log(data.username + " has failed to delete unit model named " + ship.name + " because it's used by some units.","fail");
+				log(data.username + " has failed to delete unit model named " + unitReturned.name + " because it's used by some units.","fail");
 				SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
 				return;
 			}
 
-			log(data.username + " has succed to delete unit model named " + ship.name + ".","fail");
+			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","fail");
 			SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
 			db.unit.delete(data.unit);
