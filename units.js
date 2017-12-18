@@ -278,9 +278,18 @@ module.exports = function() {
 		db.unit.find(data.unit, function(unitReturned) {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
 
-			//@ADD: count
+			if(unitReturned.owned != 0) {
+				log(data.username + " has failed to delete unit model named " + ship.name + " because it's used by some units.","fail");
+				SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
+				return;
+			}
+
+			log(data.username + " has succed to delete unit model named " + ship.name + ".","fail");
+			SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
 			db.unit.delete(data.unit);
+
+			refreshUserUnits();
 		});
 	}
 
@@ -329,7 +338,7 @@ module.exports = function() {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(planetReturned,fleetReturned,userReturned,totalCost,inputData) {
+					function callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
 						// Create entry in planet db for in-build unit
 						var newPlanet = UpdatePlanet(planetReturned,userReturned);
 						newPlanet.unitBuildingID = inputData.unit;
@@ -343,8 +352,14 @@ module.exports = function() {
 						newPlanet.resources[4] -= totalCost[3];
 						newPlanet.resources[5] -= totalCost[2];
 
-						// Update database 
+						// Update planet 
 						db.planet.update(newPlanet);
+
+						// Update unit
+						var newUnit = unitReturned.toJSON();
+						newUnit.owned += inputData.count;
+
+						db.unit.update(newUnit);
 
 						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
@@ -360,7 +375,7 @@ module.exports = function() {
 						}
 
 						CreateFleet(inputData,planetReturned,function(fleetReturned) {
-							callBackAfterfleet(planetReturned,fleetReturned,userReturned,totalCost,inputData);
+							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
@@ -376,7 +391,7 @@ module.exports = function() {
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,fleetReturned,userReturned,totalCost,inputData);
+							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					}
 				});	
