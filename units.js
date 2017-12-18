@@ -289,7 +289,7 @@ module.exports = function() {
 
 			db.unit.delete(data.unit);
 
-			refreshUserUnits();
+			refreshUserUnits(data);
 		});
 	}
 
