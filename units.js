@@ -276,7 +276,7 @@ module.exports = function() {
 
 	this.DeleteUnitType = function(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
 
 			if(unitReturned.owned != 0) {
 				log(data.username + " has failed to delete unit model named " + ship.name + " because it's used by some units.","fail");
