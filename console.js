@@ -1,10 +1,10 @@
 var fs = require( 'fs' );
 
-var errorFile = fs.createWriteStream(process.cwd() + '/galactae.error.log', { flags: 'a' });
+var errorFile = fs.createWriteStream('/galactae.error.log', { flags: 'a' });
 process.stderr.pipe(errorFile);
 
 module.exports = function() {   
-  this.logFile = fs.createWriteStream(process.cwd() + '/galactae.log', { flags: 'a' });
+  this.logFile = fs.createWriteStream('/galactae.log', { flags: 'a' });
 
   /**
    * Color a text
