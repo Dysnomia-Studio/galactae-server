@@ -1,7 +1,7 @@
 var fs = require( 'fs' );
 
 var errorFile = fs.createWriteStream(process.cwd() + '/galactae.error.log', { flags: 'a' });
-proc.stderr.pipe(errorFile);
+process.stderr.pipe(errorFile);
 
 module.exports = function() {   
   this.logFile = fs.createWriteStream(process.cwd() + '/galactae.log', { flags: 'a' });
