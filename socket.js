@@ -4,7 +4,7 @@ module.exports = function() {
 	/**
 	* Modules npm
 	*/
-	var fs = require( 'fs' );
+	var fs = require('fs');
 	var options = {
 		key: fs.readFileSync(process.cwd() + '/keys/privkey.pem'),
 		cert: fs.readFileSync(process.cwd() + '/keys/cert.pem')

@@ -1,4 +1,11 @@
-module.exports = function() {    
+var fs = require( 'fs' );
+
+var errorFile = fs.createWriteStream(process.cwd() + '/galactae.error.log', { flags: 'a' });
+proc.stderr.pipe(errorFile);
+
+module.exports = function() {   
+  this.logFile = fs.createWriteStream(process.cwd() + '/galactae.log', { flags: 'a' });
+
   /**
    * Color a text
    *
@@ -48,6 +55,7 @@ module.exports = function() {
 
       console.log(text);
       io.to(adminSid).emit('server-log', getDateTime() + "  " + msg);
+      logFile.write(getDateTime() + "  " + msg);
   };
   /**
    * Retourner la date en jaune

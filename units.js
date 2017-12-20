@@ -284,7 +284,7 @@ module.exports = function() {
 				return;
 			}
 
-			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","fail");
+			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","success");
 			SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
 			db.unit.delete(data.unit);
