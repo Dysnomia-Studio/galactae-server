@@ -55,7 +55,7 @@ module.exports = function() {
 
       console.log(text);
       io.to(adminSid).emit('server-log', getDateTime() + "  " + msg);
-      logFile.write(getDateTime() + "  " + msg);
+      logFile.write(getDateTime() + "  " + msg + "\n");
   };
   /**
    * Retourner la date en jaune
