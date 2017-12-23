@@ -305,8 +305,10 @@ module.exports = function() {
 		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
+			var newPlanet = UpdatePlanet(planetReturned,userReturned);
+
 			// Check no fleet is currently building
-			if(planetReturned.unitBuildingEndTime > Date.now()) {
+			if(newPlanet.unitBuildingEndTime > Date.now()) {
 				log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because another is already building.');
 				SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
@@ -321,17 +323,17 @@ module.exports = function() {
 					totalCost[i] = parseFloat(unitReturned.cost[i])*inputData.count;
 				}
 
-				if(totalCost[1] > planetReturned.resources[2] ||
-					totalCost[0] > planetReturned.resources[3] ||
-					totalCost[3] > planetReturned.resources[4] ||
-					totalCost[2] > planetReturned.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
+				if(totalCost[1] > newPlanet.resources[2] ||
+					totalCost[0] > newPlanet.resources[3] ||
+					totalCost[3] > newPlanet.resources[4] ||
+					totalCost[2] > newPlanet.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
 					log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
 					SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
 					return;
 				}
 
-				getPeople(planetReturned, function(planetReturned, prod, cons) {
+				getPeople(newPlanet, function(newPlanet, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
 						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
@@ -342,9 +344,8 @@ module.exports = function() {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
+					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
 						// Create entry in planet db for in-build unit
-						var newPlanet = UpdatePlanet(planetReturned,userReturned);
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + Math.round(totalCost[4] * 3600 * 1000);
@@ -367,7 +368,7 @@ module.exports = function() {
 
 						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
-						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + planetReturned.name + ' (' +inputData.planet+')',"success");
+						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')',"success");
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
@@ -378,15 +379,15 @@ module.exports = function() {
 							return;
 						}
 
-						CreateFleet(inputData,planetReturned,function(fleetReturned) {
-							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
+						CreateFleet(inputData,newPlanet,function(fleetReturned) {
+							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
 
 							// Check if this fleet is in orbit and belong to this planet
-							if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
+							if(fleetReturned.position != newPlanet.address || fleetReturned.motherPlanetId != newPlanet.id) { return; }
 
 							// Check if fleet max size is reached
 							if((fleetReturned.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
@@ -395,7 +396,7 @@ module.exports = function() {
 								return;
 							}
 
-							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
+							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					}
 				});	
@@ -403,14 +404,14 @@ module.exports = function() {
 		});
 	}
 
-	this.CreateFleet = function(data,planetReturned,callback) {
+	this.CreateFleet = function(data,planet,callback) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
 			// Check max count
-			if(fleetReturned.length >= hqFleetCount[planetReturned.Buildings[6] - 1]) {
+			if(fleetReturned.length >= hqFleetCount[planet.Buildings[6] - 1]) {
 				SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
 				return;
 			}
@@ -428,7 +429,7 @@ module.exports = function() {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: data.planet,
-				position: planetReturned.address,
+				position: planet.address,
 				orbitPosition: 0,
 				points: 0,
 				endMoveTime: -1,

@@ -12,6 +12,7 @@ var planetSchema = new Schema({
 	nextBuilding: Number,
 	nextBuildingTime: Number,
 	lastResourcesUpdate: Number,
+	lastUnitUpdate: Number,
 	points: Number,
 	currResearch: String,
 	unitBuildingID: Schema.Types.ObjectId,

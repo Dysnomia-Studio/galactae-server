@@ -286,26 +286,45 @@ module.exports = function() {
 		 * @param      {<type>}  planetIn  data needed to be updated
 		 * @param      {<type>}  user      The user
 		 */
-		this.UpdateUnits = function(planetIn,user) {
+		this.UpdateUnits = function(planetIn,user,currTime) {
 			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-				var newFleet = fleetReturned.toJSON();
-				var set = false;
+				db.units.find(planetIn.unitBuildingID, function(unitReturned) {
 
-				for(var i=0; i<newFleet.units.length; i++) {
-					if(newFleet.units[i][0] == planetIn.unitBuildingID) {
-						newFleet.units[i][1] += planetIn.unitBuildingCount;
-						set=true;
-						break;
+					if(currTime>planetIn.unitBuildingEndTime) { // total add
+						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+
+						unitCount = restantDepuisSynchro;
+					} else { // Partial add
+					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+
+					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+
+					 	var unitCount = restantDepuisSynchro - restant;
 					}
-				}
 
-				if(!set) {
-					newFleet.units.push([planetIn.unitBuildingID,planetIn.unitBuildingCount]);
-				}
+					if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
+						unitCount = planetIn.unitBuildingCount;
+					}
 
-				db.fleet.update(newFleet, function() {
-					refreshUserUnits(user);
-					refreshUserFleets(planetIn._id,user.sid);
+					var newFleet = fleetReturned.toJSON();
+					var set = false;
+
+					for(var i=0; i<newFleet.units.length; i++) {
+						if(newFleet.units[i][0] == planetIn.unitBuildingID) {
+							newFleet.units[i][1] += unitCount;
+							set=true;
+							break;
+						}
+					}
+
+					if(!set) {
+						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
+					}
+
+					db.fleet.update(newFleet, function() {
+						refreshUserUnits(user);
+						refreshUserFleets(planetIn._id,user.sid);
+					});	
 				});
 			});
 		}
@@ -337,13 +356,18 @@ module.exports = function() {
 			}
 
 			// Update units
+			if(unitBuildingEndTime != -1) {
+				UpdateUnits(planetIn,user,currTime);
+			}
+
 			if(currTime>data.unitBuildingEndTime) {
-				UpdateUnits(planetIn,user);
 				data.unitBuildingEndTime = -1;
 				data.unitBuildingID = db.Schema.Types.ObjectId("-1");
 				data.unitBuildingCount = -1;
 				data.unitBuildingFleetID = db.Schema.Types.ObjectId("-1");
 			}
+
+			data.lastUnitUpdate = currTime;
 
 			return data;
 		}
