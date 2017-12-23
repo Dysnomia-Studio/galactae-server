@@ -301,7 +301,6 @@ module.exports = function() {
 	 * @param      string  unitData  What need to build ?
 	 */
 	this.BuildUnit = function(inputData) {
-		console.log('Build Unit');
 		// Check if planet, unit & fleet belong to player
 		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
@@ -345,6 +344,9 @@ module.exports = function() {
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + (totalCost[4] * 3600 * 1000);
+						console.log( Date.now());
+						console.log(totalCost[4] * 3600 * 1000);
+						console.log( Date.now() + (totalCost[4] * 3600 * 1000));
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
@@ -379,11 +381,8 @@ module.exports = function() {
 							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
-						console.log('find...');
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
-							console.log('found !');
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
-							console.log('security passed !');
 
 							// Check if this fleet is in orbit and belong to this planet
 							if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
