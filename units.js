@@ -343,7 +343,7 @@ module.exports = function() {
 						var newPlanet = UpdatePlanet(planetReturned,userReturned);
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
-						newPlanet.unitBuildingEndTime = Date.now() + totalCost[4];
+						newPlanet.unitBuildingEndTime = Date.now() + (totalCost[4] * 3600 * 1000);
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
@@ -379,7 +379,9 @@ module.exports = function() {
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
+							console.log('found !');
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
+							console.log('security passed !');
 
 							// Check if this fleet is in orbit and belong to this planet
 							if(fleetReturned.position != planetReturned.address || fleetReturned.motherPlanetId != planetReturned.id) { return; }
