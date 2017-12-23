@@ -188,11 +188,16 @@ module.exports = function() {
 			});
 		});
 		socket.on('unit-build', function(data) {
+			console.log('unit-build');
 			// Vars
 			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.unit) || !isset(data.count) || !isset(data.fleet)) { return; }
 			// User
 			data.sid = socket.id;
+			console.log('isset');
+
 			isValidUser(data,function(data) { // Verify identity
+			console.log('isValidUser');
+
 				// Execution du code
 			   	BuildUnit(data);
 			});
