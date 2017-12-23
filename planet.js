@@ -356,7 +356,7 @@ module.exports = function() {
 			}
 
 			// Update units
-			if(unitBuildingEndTime != -1) {
+			if(data.unitBuildingEndTime != -1) {
 				UpdateUnits(planetIn,user,currTime);
 			}
 
