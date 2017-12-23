@@ -306,7 +306,11 @@ module.exports = function() {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
 			// Check no fleet is currently building
-			if(planetReturned.unitBuildingEndTime > Date.now()) { return; }
+			if(planetReturned.unitBuildingEndTime > Date.now()) {
+				log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because another is already building.');
+				SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
+				return;
+			}
 
 			db.unit.find(inputData.unit, function(unitReturned) {
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
