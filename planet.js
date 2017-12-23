@@ -353,10 +353,7 @@ module.exports = function() {
 			data.resources = UpdateResources(planetIn,user);
 			// Update points
 			data.points = calcPlanetPoints(planetIn);
-			console.log(data.points);
 			data.points += parseFloat(calcFleetPoints(fleetList));
-			console.log(calcFleetPoints(fleetList));
-			console.log(data.points);
 
 			// Update buildings
 			if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
