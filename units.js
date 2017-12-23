@@ -344,6 +344,7 @@ module.exports = function() {
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + (totalCost[4] * 3600 * 1000);
+						console.info(totalCost);
 						console.log( Date.now());
 						console.log(totalCost[4] * 3600 * 1000);
 						console.log( Date.now() + (totalCost[4] * 3600 * 1000));
