@@ -35,7 +35,7 @@ module.exports = function() {
 						pid = userReturned.planetlist[0];
 					}
 					db.planet.find(pid,function(planetReturned) {
-						db.fleet.findByMotherPlanet(planetReturned._id, function() {
+						db.fleet.findByMotherPlanet(planetReturned._id, function(fleetReturned) {
 							callback(planetReturned,userReturned,fleetReturned);
 						});
 					});
