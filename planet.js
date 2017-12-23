@@ -289,8 +289,8 @@ module.exports = function() {
 		 * @param      {<type>}  user      The user
 		 */
 		this.UpdateUnits = function(planetIn,user,currTime) {
-			db.fleet.findByMotherPlanet(planetIn.unitBuildingFleetID, function(fleetReturned) {
-				db.units.find(planetIn.unitBuildingID, function(unitReturned) {
+			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
+				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
 						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
