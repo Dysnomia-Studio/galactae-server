@@ -323,7 +323,7 @@ module.exports = function() {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}
 
-					newFleet.points += unitCount * pointsCoef['units'];
+					newFleet.points += unitCount * unitReturned.cost[5] * pointsCoef['units'];
 
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
