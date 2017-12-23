@@ -189,6 +189,7 @@ module.exports = function() {
 		});
 		socket.on('unit-build', function(data) {
 			console.log('unit-build');
+			console.info(data);
 			// Vars
 			if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.unit) || !isset(data.count) || !isset(data.fleet)) { return; }
 			// User
