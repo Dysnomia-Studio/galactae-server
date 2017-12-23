@@ -519,7 +519,7 @@ module.exports = function() {
 				points += fleets[i].points;
 			}
 
-			return points
+			return Math.round(points);
 		}
 
 		/**
