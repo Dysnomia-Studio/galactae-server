@@ -35,7 +35,9 @@ module.exports = function() {
 						pid = userReturned.planetlist[0];
 					}
 					db.planet.find(pid,function(planetReturned) {
-						callback(planetReturned,userReturned);
+						db.fleet.findByMotherPlanet(planetReturned._id, function() {
+							callback(planetReturned,userReturned,fleetReturned);
+						});
 					});
 				}
 			});
@@ -48,9 +50,9 @@ module.exports = function() {
 		 * @param      {number}  decalage  le decalage de planete
 		 */
 		this.refreshUserPlanet = function(data,decalage=0) {
-			getPlanet(data,data.pid,decalage,function(planetReturned,userReturned) {
+			getPlanet(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
 
-				var newData = UpdatePlanet(planetReturned,userReturned);
+				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);
 
 				db.planet.update(newData);
 
@@ -191,7 +193,7 @@ module.exports = function() {
 		this.planetBuild = function(data) {
 			// Mauvais n° de batiment
 			if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
-			getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
+			getPlanet(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
@@ -203,7 +205,7 @@ module.exports = function() {
 				var currTime = Date.now();
 
 				// Calc new planet data
-				var newData = UpdatePlanet(planetReturned,userReturned);
+				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);
 
 				// Vars for this building test
 				var cost = GetBuildingCost(data.building,newData.Buildings[data.building]+1);
@@ -321,6 +323,8 @@ module.exports = function() {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}
 
+					newFleet.points += unitCount * pointsCoef['units'];
+
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
 						refreshUserFleets(planetIn._id,user.sid);
@@ -337,7 +341,7 @@ module.exports = function() {
 		 * @param      {<type>}  user      The user
 		 * @return     {<type>}  the updated data
 		 */
-		this.UpdatePlanet = function(planetIn,user) {
+		this.UpdatePlanet = function(planetIn,user,fleetList) {
 			var data = planetIn.toJSON();
 			var currTime = Date.now();
 
@@ -347,6 +351,7 @@ module.exports = function() {
 			data.resources = UpdateResources(planetIn,user);
 			// Update points
 			data.points = calcPlanetPoints(planetIn);
+			data.points += calcFleetPoints(fleetList);
 
 			// Update buildings
 			if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
@@ -431,7 +436,7 @@ module.exports = function() {
 		 * @param      {<type>}  data    data
 		 */
 		this.ChangePlanetName = function(data) {
-			getPlanet(data,data.planet,0,function(planetReturned,userReturned) {
+			getPlanet(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
@@ -503,6 +508,18 @@ module.exports = function() {
 
 			return points
 		}
+
+		this.calcFleetPoints = function(fleets) {
+			var points = 0;
+
+			// Building points count
+			for(var i=0; i<fleets.length; i++) {
+				points += fleets[i].points;
+			}
+
+			return points
+		}
+
 		/**
 		 * Gets the building cost.
 		 *
