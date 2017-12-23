@@ -319,9 +319,6 @@ module.exports = function() {
 				// Check if planet have enough resources
 				for(var i=0; i<unitReturned.cost.length; i++) {
 					totalCost[i] = parseFloat(unitReturned.cost[i])*inputData.count;
-					console.log(parseFloat(unitReturned.cost[i]));
-					console.log(inputData.count);
-					console.log(parseFloat(unitReturned.cost[i])*inputData.count);
 				}
 
 				if(totalCost[1] > planetReturned.resources[2] ||
@@ -351,10 +348,6 @@ module.exports = function() {
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + (totalCost[4] * 3600 * 1000);
-						console.info(totalCost);
-						console.log( Date.now());
-						console.log(totalCost[4] * 3600 * 1000);
-						console.log( Date.now() + (totalCost[4] * 3600 * 1000));
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
