@@ -354,7 +354,7 @@ module.exports = function() {
 			// Update points
 			data.points = calcPlanetPoints(planetIn);
 			console.log(data.points);
-			data.points += calcFleetPoints(fleetList);
+			data.points += parseFloat(calcFleetPoints(fleetList));
 			console.log(calcFleetPoints(fleetList));
 			console.log(data.points);
 
