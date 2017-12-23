@@ -304,6 +304,8 @@ module.exports = function() {
 					 	var unitCount = restantDepuisSynchro - restant;
 					}
 
+					if(unitCount == 0) { return; } // Prevent some bugs
+
 					if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
 						unitCount = planetIn.unitBuildingCount;
 					}
@@ -323,7 +325,7 @@ module.exports = function() {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}
 
-					newFleet.points += unitCount * unitReturned.cost[5] * pointsCoef['units'];
+					newFleet.points += parseFloat(unitCount * unitReturned.cost[5]) * pointsCoef['units'];
 
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
