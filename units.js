@@ -378,6 +378,7 @@ module.exports = function() {
 							callBackAfterfleet(planetReturned,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1) {
+						console.log('find...');
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
 							console.log('found !');
 							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
