@@ -347,7 +347,7 @@ module.exports = function() {
 						var newPlanet = UpdatePlanet(planetReturned,userReturned);
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingCount = inputData.count;
-						newPlanet.unitBuildingEndTime = Date.now() + (totalCost[4] * 3600 * 1000);
+						newPlanet.unitBuildingEndTime = Date.now() + Math.round(totalCost[4] * 3600 * 1000);
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
