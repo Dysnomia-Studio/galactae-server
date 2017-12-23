@@ -519,7 +519,7 @@ module.exports = function() {
 
 			// Building points count
 			for(var i=0; i<fleets.length; i++) {
-				points += fleets[i].points;
+				points += parseFloat(fleets[i].points);
 			}
 
 			return points;
