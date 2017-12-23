@@ -315,6 +315,9 @@ module.exports = function() {
 				// Check if planet have enough resources
 				for(var i=0; i<unitReturned.cost.length; i++) {
 					totalCost[i] = parseInt(unitReturned.cost[i])*inputData.count;
+					console.log(parseInt(unitReturned.cost[i]));
+					console.log(inputData.count);
+					console.log(parseInt(unitReturned.cost[i])*inputData.count);
 				}
 
 				if(totalCost[1] > planetReturned.resources[2] ||
