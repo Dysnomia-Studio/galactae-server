@@ -289,7 +289,7 @@ module.exports = function() {
 		 * @param      {<type>}  user      The user
 		 */
 		this.UpdateUnits = function(planetIn,user,currTime) {
-			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
+			db.fleet.findByMotherPlanet(planetIn.unitBuildingFleetID, function(fleetReturned) {
 				db.units.find(planetIn.unitBuildingID, function(unitReturned) {
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
