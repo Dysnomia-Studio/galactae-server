@@ -367,10 +367,9 @@ module.exports = function() {
 						db.unit.update(newUnit);
 
 						// Update fleet
-						var newFleet = fleetReturned.toJSON();
-						newFleet.population += totalCost[5];
+						fleetReturned.population += totalCost[5];
 
-						db.fleet.update(newFleet);
+						db.fleet.update(fleetReturned);
 
 						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
@@ -390,19 +389,20 @@ module.exports = function() {
 						});
 					} else if(inputData.fleet != -1) {
 						db.fleet.find(inputData.fleet, function(fleetReturned) {
-							if(!isset(fleetReturned.ownerId) || fleetReturned.ownerId != inputData.id) { return; }
+							var newFleet = fleetReturned.toJSON();
+							if(!isset(newFleet.ownerId) || newFleet.ownerId != inputData.id) { return; }
 
 							// Check if this fleet is in orbit and belong to this planet
-							if(fleetReturned.position != newPlanet.address || fleetReturned.motherPlanetId != newPlanet.id) { return; }
+							if(newFleet.position != newPlanet.address || newFleet.motherPlanetId != newPlanet.id) { return; }
 
 							// Check if fleet max size is reached
-							if((fleetReturned.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
+							if((newFleet.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
 								log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
 								SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 								return;
 							}
 
-							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
+							callBackAfterfleet(newPlanet,newFleet,userReturned,unitReturned,totalCost,inputData);
 						});
 					}
 				});	
