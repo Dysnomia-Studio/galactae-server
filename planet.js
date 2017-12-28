@@ -237,7 +237,7 @@ module.exports = function() {
 						}
 					}
 
-				enoughtPeople(newData, function(newData,enoughtPeople) {
+				enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
 					if(!enoughtPeople) {
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_PEOPLE";
@@ -325,7 +325,8 @@ module.exports = function() {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}
 
-					newFleet.points += parseFloat(unitCount * unitReturned.cost[5]) * pointsCoef['units'];
+					var popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
+					newFleet.points += parseFloat(unitCount * popCost) * pointsCoef['units'];
 
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
@@ -403,16 +404,25 @@ module.exports = function() {
 		 * @param      {<type>}    planet    Planet data
 		 * @param      {Function}  callback  Function needed to called back
 		 */
-		this.getPeople = function(planet, callback) {
+		this.getPeople = function(planet, fleets, callback) {
 			var buildings = planet.Buildings;
 			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
 
-			// @ADD: count current buildings & current units
-
+			// Buildings
 			for(var i=0; i<14; i++) {
 				if(buildings[i]==0) { continue; }
+				if(i==planet.nextBuilding) {
+					// Current in-build building
+					cons += parseInt(GetBuildingCost(i,buildings[i] + 1).habitants);
+					continue; 
+				}
 				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);
+			}
+
+			// Units builded and in-build
+			for(var i=0; i<fleets.length) {
+				cons += fleets[i].population;
 			}
 
 			callback(planet,prod,cons);
@@ -423,8 +433,8 @@ module.exports = function() {
 		 *
 		 * @param      {Object}  buildings  The buildings list
 		 */
-		this.enoughtPeople = function(planet, callback) {
-			getPeople(planet, function(planet, prod, cons) {
+		this.enoughtPeople = function(planet, fleets, callback) {
+			getPeople(planet, fleets, function(planet, prod, cons) {
 				if(prod<cons) {
 					callback(planet,false);
 				}
