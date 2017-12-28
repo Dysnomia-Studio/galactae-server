@@ -421,7 +421,7 @@ module.exports = function() {
 			}
 
 			// Units builded and in-build
-			for(var i=0; i<fleets.length) {
+			for(var i=0; i<fleets.length; i++) {
 				cons += fleets[i].population;
 			}
 
