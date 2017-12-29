@@ -22,7 +22,7 @@ module.exports = {
 		client.on('message', function(message) {
 			if(message.author.username=="servers-chat") { return; }
 			if(message.channel.name.substr(0,globalCfg["serverName"].length)==globalCfg["serverName"]) { // If it's a message for this server then send it to chat
-				var msg = message.content.toString();
+				var msg = message.cleanContent;
 				if(msg!=msg.replace('http','')) { return; }
 				if(msg.length==0) { return; }
 
