@@ -322,6 +322,10 @@ module.exports = function() {
 
 				var choosenFleet = undefined;
 				fleetList.forEach(function(fleet) {
+					console.log('FLEET: ' + fleet.name);
+					console.log(fleet._id);
+					console.log(fleet.id);
+					console.log(inputData.fleet);
 					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
 						choosenFleet = fleet;
 					}
