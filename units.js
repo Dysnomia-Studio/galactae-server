@@ -321,8 +321,7 @@ module.exports = function() {
 				if(unitReturned.shipType == "SHIP_DEF") { inputData.fleet = -2; }
 
 				var choosenFleet = undefined;
-				var fleetListJSON = fleetList.toJSON();
-				fleetListJSON.forEach(function(fleet) {
+				fleetList.forEach(function(fleet) {
 					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
 						choosenFleet = fleet;
 					}
