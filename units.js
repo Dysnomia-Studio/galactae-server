@@ -322,15 +322,6 @@ module.exports = function() {
 
 				var choosenFleet = undefined;
 				fleetList.forEach(function(fleet) {
-					console.log('FLEET: ' + fleet.name);
-					console.log(fleet._id);
-					console.info(fleet._id);
-					console.log(fleet.id);
-					console.info(fleet.id);
-					console.log(inputData.fleet);
-					console.info(inputData.fleet);
-					console.log(fleet._id == inputData.fleet);
-					console.log(fleet.id == inputData.fleet);
 					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
 						choosenFleet = fleet;
 					}
@@ -418,7 +409,7 @@ module.exports = function() {
 						CreateFleet(inputData,newPlanet,function(fleetReturned) {
 							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
-					} else if(inputData.fleet != -1 && choosenFleet === undefined) {
+					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
 						if(choosenFleet.position != newPlanet.address || choosenFleet.motherPlanetId != newPlanet.id) { return; }
 
