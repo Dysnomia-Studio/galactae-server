@@ -422,6 +422,7 @@ module.exports = function() {
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
 					}  else {
+						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet isn\'t valid.');
 						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
 					}
 				});	
