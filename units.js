@@ -412,7 +412,7 @@ module.exports = function() {
 					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
 						if(choosenFleet.position != newPlanet.address || choosenFleet.motherPlanetId != newPlanet._id) { 
-							console.log(choosenFleet.motherPlanetId != newPlanet._id);
+							console.log(""+choosenFleet.motherPlanetId != ""+newPlanet._id);
 							console.log(choosenFleet.motherPlanetId);
 							console.log(newPlanet._id);
 							return; }
