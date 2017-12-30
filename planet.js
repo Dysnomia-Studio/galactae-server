@@ -326,7 +326,11 @@ module.exports = function() {
 					}
 
 					var popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
+					console.log(parseFloat(newFleet.points));
+					console.log(parseFloat(unitCount * popCost));
+					console.log(parseFloat(unitCount * popCost) * pointsCoef['units']);
 					newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef['units'];
+					console.log(newFleet.points);
 
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
