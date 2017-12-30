@@ -421,6 +421,8 @@ module.exports = function() {
 						}
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
+					}  else {
+						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
 					}
 				});	
 			});			
