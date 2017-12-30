@@ -64,7 +64,7 @@ var fleetsSchema = new Schema({
 	motherPlanetId: Schema.Types.ObjectId,
 	position: String,
 	orbitPosition: Number,
-	points: Array,
+	points: Number,
 	endMoveTime: Number,
 	units: Array,
 	population: Number,
