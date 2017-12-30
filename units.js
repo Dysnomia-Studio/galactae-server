@@ -414,9 +414,7 @@ module.exports = function() {
 						if(choosenFleet.position != newPlanet.address || choosenFleet.motherPlanetId != newPlanet._id) { 
 							console.log(choosenFleet.motherPlanetId != newPlanet._id);
 							console.log(choosenFleet.motherPlanetId);
-							console.info(choosenFleet);
 							console.log(newPlanet._id);
-							console.info(newPlanet);
 							return; }
 
 						// Check if fleet max size is reached
