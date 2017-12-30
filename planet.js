@@ -331,6 +331,7 @@ module.exports = function() {
 					console.log(parseFloat(unitCount * popCost) * pointsCoef['units']);
 					newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef['units'];
 					console.log(newFleet.points);
+					newFleet.points = "" + newFleet.points;
 
 					db.fleet.update(newFleet, function() {
 						refreshUserUnits(user);
@@ -359,6 +360,7 @@ module.exports = function() {
 			// Update points
 			data.points = calcPlanetPoints(planetIn);
 			data.points += parseFloat(calcFleetPoints(fleetList));
+			data.points = Math.round(data.points);
 
 			// Update buildings
 			if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
