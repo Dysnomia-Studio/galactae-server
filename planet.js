@@ -299,7 +299,7 @@ module.exports = function() {
 					} else { // Partial add
 					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
 						console.log(planetIn.unitBuildingEndTime - currTime);
-						console.log((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+						console.log((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
 						console.log(Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000)));
 						console.log('');
 
