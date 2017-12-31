@@ -396,6 +396,7 @@ module.exports = function() {
 						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
 						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')',"success");
+						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
