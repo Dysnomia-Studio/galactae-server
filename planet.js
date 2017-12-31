@@ -298,10 +298,16 @@ module.exports = function() {
 						unitCount = restantDepuisSynchro;
 					} else { // Partial add
 					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
-						console.log(restant);
+						console.log(planetIn.unitBuildingEndTime - currTime);
+						console.log((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+						console.log(Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]));
+						console.log('');
 
 					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
-						console.log(restantDepuisSynchro);
+						console.log((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate));
+						console.log((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+						console.log(Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]));
+						console.log('');
 
 					 	var unitCount = restantDepuisSynchro - restant;
 						console.log(unitCount);
