@@ -293,20 +293,20 @@ module.exports = function() {
 				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
-						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
 						console.log(restantDepuisSynchro);
 						unitCount = restantDepuisSynchro;
 					} else { // Partial add
-					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
 						console.log(planetIn.unitBuildingEndTime - currTime);
 						console.log((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
-						console.log(Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]));
+						console.log(Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000)));
 						console.log('');
 
-					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
 						console.log((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate));
-						console.log((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
-						console.log(Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]));
+						console.log((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
+						console.log(Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000)));
 						console.log('');
 
 					 	var unitCount = restantDepuisSynchro - restant;
