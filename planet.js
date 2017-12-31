@@ -293,13 +293,13 @@ module.exports = function() {
 				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
-						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
 
 						unitCount = restantDepuisSynchro;
 					} else { // Partial add
-					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
 
-					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
 
 					 	var unitCount = restantDepuisSynchro - restant;
 					}
@@ -314,7 +314,7 @@ module.exports = function() {
 					var set = false;
 
 					for(var i=0; i<newFleet.units.length; i++) {
-						if(newFleet.units[i][0] == planetIn.unitBuildingID) {
+						if(""+newFleet.units[i][0] == ""+planetIn.unitBuildingID) {
 							newFleet.units[i][1] += unitCount;
 							set=true;
 							break;
