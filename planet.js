@@ -294,14 +294,18 @@ module.exports = function() {
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
 						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
-
+						console.log(restantDepuisSynchro);
 						unitCount = restantDepuisSynchro;
 					} else { // Partial add
 					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/unitReturned.cost[4]);
+						console.log(restant);
 
 					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/unitReturned.cost[4]);
+						console.log(restantDepuisSynchro);
 
 					 	var unitCount = restantDepuisSynchro - restant;
+						console.log(unitCount);
+					 	
 					}
 
 					if(unitCount == 0) { return; } // Prevent some bugs
