@@ -14,7 +14,7 @@ module.exports = function() {
 	var https = require('https').createServer(options, app);
 	var io = require('socket.io')(https);
 	var db = require('./database');
-	var preventConnection = false;
+	var preventConnection = true;
 	var preventConnectionMsg = "";
 	this.plCount = 0;
 

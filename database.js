@@ -86,10 +86,10 @@ module.exports = {
 	connect: function(callback) {
 		mongoose.connect(globalCfg["dbAdress"], { useMongoClient: true });
 		MongoDB = mongoose.connection;
-		MongoDB.on('error', function(err) { log(err.message,"warn"); });
+		MongoDB.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		MongoDB.once('open', function() {
 			log('Successfuly connected to database server.');
-			callback();
+			callback(true);
 		});	
 	},
 

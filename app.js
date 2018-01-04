@@ -13,7 +13,15 @@ var db = require('./database');
 require('./misc')();
 
 /* Connect to database */
-db.connect(function() {
+db.connect(function(success) {
+	if(!success) {
+		log('Failed to connect to db ! Blocking user connections ...',"warn");
+		preventConnection = true;
+		return;
+	}
+
+	preventConnection = false;
+
 	db.player.clearList();
 
 	/**
