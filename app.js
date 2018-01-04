@@ -8,7 +8,6 @@ require('./config')();
 require('./console')();
 var discord = require('./discord');
 require('./player')();
-require('./socket')();
 var db = require('./database');
 require('./misc')();
 
@@ -16,11 +15,10 @@ require('./misc')();
 db.connect(function(success) {
 	if(!success) {
 		log('Failed to connect to db ! Blocking user connections ...',"warn");
-		preventConnection = true;
 		return;
 	}
 
-	preventConnection = false;
+	require('./socket')();
 
 	db.player.clearList();
 
