@@ -84,7 +84,7 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		mongoose.connect(globalCfg["dbAdress"], { useMongoClient: true });
+		mongoose.connect(globalCfg["dbAdress"], { useMongoClient: true, auth: { authdb:"admin" } });
 		MongoDB = mongoose.connection;
 		MongoDB.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		MongoDB.once('open', function() {
