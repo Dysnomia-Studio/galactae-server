@@ -95,8 +95,6 @@ module.exports = function() {
 		str = data.message;
 
 		var replace = [
-			['<','&lsaquo;'],
-			['>','&rsaquo;'],
 			['( . ) ( . )',''],
 			['(.)(.)',''],
 		];
@@ -104,6 +102,7 @@ module.exports = function() {
 		for(var i=0; i<replace.length; i++) {
 			str = str.split(replace[i][0]).join(replace[i][1])
 		}
+		str = normalizeText(str);
 
 		// Si message vide
 		var empty = true;

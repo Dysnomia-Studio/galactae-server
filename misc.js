@@ -58,8 +58,9 @@ var charList = [
     ["§","&sect;"],
     ["¤","&curren;"],
     ["¦","&brvbar;"],
+    ['<','&lsaquo;'],
+    ['>','&rsaquo;'],
 ];
-
 
 var smileys = [
     [":D","😃"],
