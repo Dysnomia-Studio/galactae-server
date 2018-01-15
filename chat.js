@@ -95,8 +95,8 @@ module.exports = function() {
 		str = data.message;
 
 		var replace = [
-			['<',''],
-			['>',''],
+			['<','&lsaquo;'],
+			['>','&rsaquo;'],
 			['( . ) ( . )',''],
 			['(.)(.)',''],
 		];
