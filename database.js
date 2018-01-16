@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+/**
+ * Server schemas
+ */
 var planetSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
@@ -20,7 +23,6 @@ var planetSchema = new Schema({
 	unitBuildingEndTime: Number,
 	unitBuildingFleetID: Schema.Types.ObjectId,
 });
-var planets = mongoose.model('planets', planetSchema);
 
 var userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
@@ -41,7 +43,6 @@ var userSchema = new Schema({
 	lastResearchUpdate: Number,
 	research: Array
 });
-var users = mongoose.model('users', userSchema);
 
 var unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
@@ -55,7 +56,6 @@ var unitsSchema = new Schema({
 	owned: Number,
 	note: Number,
 });
-var units = mongoose.model('units', unitsSchema);
 
 var fleetsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
@@ -69,28 +69,73 @@ var fleetsSchema = new Schema({
 	units: Array,
 	population: Number,
 });
-var fleets = mongoose.model('fleets', fleetsSchema);
 
 var statsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	plCount: Number,
 	time: Number,
 });
-var stats = mongoose.model('stats', statsSchema);
+
+var planets;
+var users;
+var units;
+var fleets;
+var stats;
+
+/**
+ * General schemas
+ */
+var userPrivilegesSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	server_name: String,
+	user_privilege_lvl: Number,
+	user_whitelist: Number
+});
+
+var serverSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	server_name: String,
+	server_maintenance: Number
+});
+
+var privileges;
+var servers;
 
 module.exports = {
-	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		mongoose.connect(globalCfg["dbAdress"], { useMongoClient: true });
-		MongoDB = mongoose.connection;
-		MongoDB.on('error', function(err) { log(err.message,"warn"); callback(false); });
-		MongoDB.once('open', function() {
-			log('Successfuly connected to database server.');
+		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		var mongoGen = mongoose.createConnection('***REMOVED***');
+
+		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoSrv.once('open', function() {
+			log('Successfuly connected to server database.');
 			callback(true);
 		});	
+
+
+		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoGen.once('open', function() {
+			log('Successfuly connected to general database.');
+			callback(true);
+		});	
+
+		/**
+		 * Server schemas
+		 */
+		planets = mongoSrv.model('planets', planetSchema);
+		users = mongoSrv.model('users', userSchema);
+		units = mongoSrv.model('units', unitsSchema);
+		fleets = mongoSrv.model('fleets', fleetsSchema);
+		stats = mongoSrv.model('stats', statsSchema);
+
+		/**
+		 * General schemas
+		 */
+		privileges = mongoGen.model('privileges', userPrivilegesSchema);
+		servers = mongoGen.model('servers', serverSchema);
 	},
 
 	/**
@@ -261,5 +306,27 @@ module.exports = {
 				if(error) { log(error); }
 			});
 		},
-	}
+	},
+
+	privilege: {
+		find: function(id,callback) {
+			privileges.findById(id, function (err, obj) {
+				if(err) { log(err); }
+				if(isset(obj)) {
+					callback(obj);
+				}
+			});
+		},
+	},
+
+	server: {
+		find: function(name,callback) {
+			privileges.find({server_name: name}, function (err, obj) {
+				if(err) { log(err); }
+				if(isset(obj)) {
+					callback(obj);
+				}
+			});
+		},
+	},
 }
