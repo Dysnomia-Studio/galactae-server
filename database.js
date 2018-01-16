@@ -106,8 +106,8 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
-		var mongoGen = mongoose.createConnection('***REMOVED***');
+		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"], { useMongoClient: true });
+		var mongoGen = mongoose.createConnection('***REMOVED***', { useMongoClient: true });
 
 		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		mongoSrv.once('open', function() {
