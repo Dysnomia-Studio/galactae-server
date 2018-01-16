@@ -321,7 +321,7 @@ module.exports = {
 
 	server: {
 		find: function(name,callback) {
-			privileges.find({server_name: name}, function (err, obj) {
+			servers.find({server_name: name}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
