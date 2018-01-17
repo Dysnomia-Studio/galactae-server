@@ -4,92 +4,93 @@ discord.connect();
 
 module.exports = function() {
 	this.chatAnalyse = function(data) {
-		var reg=new RegExp("[ ,;]+", "g");
-		var arg=data.message.split(reg);
-		data.message = textToSmileys(data.message);
-		logname = data.username;
-		logmsg = data.message;
+		db.privilege.find(data.id, function(userPrivileges) {
+			var reg=new RegExp("[ ,;]+", "g");
+			var args=data.message.split(reg);
+			data.message = textToSmileys(data.message);
 
-		/* Controles de securité */
-		data.send = true;
-		data = chatprotect(data);
+			logname = data.username;
+			logmsg = data.message;
 
-		/* Prepare message */
-		if(data.send) {
-			// Chat Commands
-			if(data.lvl>3 &&data.message.charAt(0)=="!") {
+			/* Controles de securité */
+			data.send = true;
+			data.lvl = userPrivileges.user_privilege_lvl;
+			data = chatprotect(data);
+
+			if(!data.send) { 
+				log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+				return; 
+			}
+
+			/**
+			 * Lvl:
+			 * 1: member
+			 * 2: moderator
+			 * 3: operator
+			 * 4: administrator
+			 */
+			var rank = "";
+			switch(data.lvl) {
+				case 2:
+				case 3:
+					rank = "[STAFF] ";
+					break;
+				case 4:
+					rank = "[ADMIN] ";
+					break;
+				default:
+			}
+
+			var discordmsg = rank + data.username + ": " + data.message;
+			data.username = "<span class=\"username\">" + data.username + "</span>";
+
+			if(data.message.charAt(0)=="!" && data.lvl > 1) {
 				data = chatSendCommand(data);
 			} else if(data.message.charAt(0)=="@") { // Messages privés
-				db.player.searchByName(arg[0].substr(1).toLowerCase(), function(dataReturned) {
+				db.player.searchByName(args[0].substr(1).toLowerCase(), function(dataReturned) {
 					if(dataReturned==undefined) { return; }
 					var sid = dataReturned.sid;
 
-					/* Ajout de la div d'utilisateur */
-					data.username = "<span class=\"username\">" + data.username + "</span>";
-
-					/* Rank before name */
-					if(data.lvl>3) {
-						data.username = "[ADMIN] "+ data.username;
-					}
-					else if(data.lvl>2) {
-						data.username = "[STAFF] "+ data.username;
-					}
-
 					/* Recuperer le vrai message */
-					data.newmessage = data.message.substr(arg[0].length+1);
-					data.message = arg[0] + ": " + data.message.substr(arg[0].length+1)
+					data.newmessage = data.message.substr(args[0].length+1);
+					data.message = args[0] + ": " + data.message.substr(args[0].length+1)
 
 					/* Envoyer le PM */
 					if(sid!=undefined && sid!="-1" && data.newmessage!="" && sid!=data.sid) {
 						sendPM(data.sid,data.message,false);
 						sendPM(sid,data.username + ": " + data.newmessage,true);
-					} else if(arg[0].substr(1).toLowerCase()==data.username) {
+					} else if(args[0].substr(1).toLowerCase()==data.username) {
 						sendSM(data.sid,"NO_PM_YOU");
-					} else if(sid==undefined||sid!="-1") {
+					} else if(sid==undefined || sid!="-1") {
 						sendSM(data.sid,"PLY_NOT_FOUND");
 					}
 				});
 
 				data.send = false;
-			} else { // Chat Normal messages
-			    var discordmsg = data.username + ": " + data.message;
-
-			    /* Ajout de la div d'utilisateur */
-				data.username = "<span class=\"username\">" + data.username + "</span>";
-
-				/* Rank before name */
-				if(data.lvl>3) {
-					data.username = "<span class=\"staff\">[ADMIN] "+ data.username +"</span>";
-				}
-				else if(data.lvl>2) {
-					data.username = "<span class=\"staff\">[STAFF] "+ data.username +"</span>";
-				}
+			} else { // Normal messages
+				data.username = "<span class=\"staff\">" + rank + " " + data.username + "</span>";
 
 				if(!data.noname) {
 					data.message = "<strong>"+ data.username +" :</strong> "+ data.message;
 				}
 			}
 
-		}
+			if(!data.send) { 
+				log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+				return; 
+			}
+			if(data.message=="" || !isset(data.message)) { return; }
 
-		// If the message is empty, don't send it ...
-		if(data.message=="" || !isset(data.message)) { 
-			data.send = false;
-		}
+		    if(data.channel !="hud-chat-ally") { // Normal chat
+		    	log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+	        	io.emit('chat-message', { message: data.message, channel: data.channel });
+	        	discord.sendChatMessage(data.channel,discordmsg);
+	    	} else if(data.ally!=undefined) { // Allies messages
+	    		log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+	    		// @ ADD : Ally messages
+	    	}
 
-		// Log
-		if(data.send) {
-			log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-		} else {
-			log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-		}
-
-	    if(data.send && data.channel !="hud-chat-ally") { // Normal chat
-        	io.emit('chat-message', { message: data.message, channel: data.channel });
-        	discord.sendChatMessage(data.channel,discordmsg);
-    	} else if(data.send && data.channel =="hud-chat-ally" && data.ally!=undefined) { // Allies messages
-    		// @ ADD : Ally messages
-    	}
+		});
 	}
 	this.chatprotect = function(data) {
 		str = data.message;
@@ -134,34 +135,47 @@ module.exports = function() {
 	this.chatSendCommand = function(data) {
 		var str = data.message;
 		var reg=new RegExp("[ ,;]+", "g");
-		var arg=str.split(reg);
+		var args=str.split(reg);
 		var msg = "";
 		data.noname = false;
 
-		switch(arg[0]) {
+		switch(args[0]) {
 			case "!asay":
 				SendGeneralMessage(str.substr(6));
 				data.send = false;
-			break;
-			case "!kickgame":
-				db.player.searchByName(arg[1], function(dataReturned) {
+				break;
+			case "!kick":
+				if(data.lvl<3) { return; } // Admin & Operators only
+				
+				db.player.searchByName(args[1], function(dataReturned) {
 					if(!isset(dataReturned) || !isset(dataReturned.sid)) {
 						sendSM(data.sid,"PLY_NOT_FOUND");
 						console.log("Player not found");
 					} else {	
-						console.log("Kicked " + arg[1]);
-	        			sendSM(data.sid,"Kicked " + arg[1]);
+						console.log("Kicked " + args[1]);
+	        			sendSM(data.sid,"Kicked " + args[1]);
 
-						io.to(dataReturned.sid).emit('server-kick',str.substr(arg[0].length+arg[1].length+1));
+						io.to(dataReturned.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
 					}
 				});
 				
 				data.send = false;
-			break;
-			// @ADD: Ban
+				break;
+			case "!chatkick":
+				// @ADD: Chat kick
+				break;
+			case "!ban":
+				if(data.lvl<3) { return; } // Admin & Operators only
+				// @ADD: Ban
+				break;
+			case "!chatban":
+				// @ADD: Chat ban
+				break;
 			case "!maintenance":
+				if(data.lvl<4) { return; } // Admin only
 				io.emit('server-maintenance');
 				msg = "MAINTENANCE";
+				maintenance = true;
 				data.noname = true;
 			break;
 			case "!help":

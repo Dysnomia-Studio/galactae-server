@@ -79,8 +79,7 @@ module.exports = function() {
 			data.sid = socket.id;
 			isValidUser(data,function(data) { // Verify identity
 				// Execution du code
-				getAlly(data, function() {
-					getLvl(data,chatAnalyse); // Le serveur va verifier les droits de l'utilisateur puis lancer l'analyse du message et l'envoi si necessaire.
+				getAlly(data, chatAnalyse);
 				});	
 			}); 	
 		});

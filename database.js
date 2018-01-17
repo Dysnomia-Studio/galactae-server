@@ -314,7 +314,7 @@ module.exports = {
 
 	privilege: {
 		find: function(id,callback) {
-			privileges.findById(id, function (err, obj) {
+			privileges.find({_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
@@ -324,8 +324,8 @@ module.exports = {
 	},
 
 	server: {
-		find: function(name,callback) {
-			servers.find({server_name: name}, function (err, obj) {
+		find: function(callback) {
+			servers.find({server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);

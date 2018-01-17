@@ -26,14 +26,6 @@ module.exports = function() {
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
-	/* Get the player lvl */
-	this.getLvl = function(data,callback) {
-		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj)) { return; }
-			data.lvl = obj.lvl;
-			callback(data);
-		})
-	}
 	/* Get player ally */
 	this.getAlly = function(data,callback) {
 		db.player.searchById(data.id,function(obj) {
