@@ -6,8 +6,10 @@ module.exports = function() {
 	this.chatAnalyse = function(data) {
 		console.log("4");
 		db.userGameId.find(data.id, function(userGameIdObj) {
+			console.log(userGameIdObj);
 			console.log("5");
-			db.privilege.find(userGameIdObj.user_id, function(userPrivileges) {
+			db.privilege.find(db.Schema.Types.ObjectId(userGameIdObj.user_id), function(userPrivileges) {
+				console.info(userPrivileges);
 				console.log("6");
 				var reg=new RegExp("[ ,;]+", "g");
 				var args=data.message.split(reg);
