@@ -73,15 +73,12 @@ module.exports = function() {
 		* Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
 		*/
 		socket.on('chat-send', function (data) {
-			console.log("1");
 			// Vars
 			if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.message)) { return; }
-			console.log("2");
 			// User
 			data.sid = socket.id;
 			isValidUser(data,function(data) { // Verify identity
 				// Execution du code
-				console.log("3");
 				getAlly(data, chatAnalyse);	
 			}); 	
 		});

@@ -323,6 +323,17 @@ module.exports = {
 		},
 	},
 
+	userGameIds: {
+		find: function(id,callback) {
+			servers.find({game_id: id}, function (err, obj) {
+				if(err) { log(err); }
+				if(isset(obj)) {
+					callback(obj);
+				}
+			});
+		},
+	},
+
 	server: {
 		find: function(callback) {
 			servers.find({server_name: globalCfg['serverGlobalName']}, function (err, obj) {
