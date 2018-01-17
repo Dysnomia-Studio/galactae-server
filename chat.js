@@ -4,7 +4,10 @@ discord.connect();
 
 module.exports = function() {
 	this.chatAnalyse = function(data) {
+		console.log("1");
 		db.privilege.find(data.id, function(userPrivileges) {
+		console.log("2");
+
 			var reg=new RegExp("[ ,;]+", "g");
 			var args=data.message.split(reg);
 			data.message = textToSmileys(data.message);

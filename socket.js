@@ -74,7 +74,7 @@ module.exports = function() {
 		*/
 		socket.on('chat-send', function (data) {
 			// Vars
-			if(!isset(data) || !isset(data.message)) { return; }
+			if(!isset(data) || !isset(data.name) || !isset(data.id) || !isset(data.message)) { return; }
 			// User
 			data.sid = socket.id;
 			isValidUser(data,function(data) { // Verify identity
