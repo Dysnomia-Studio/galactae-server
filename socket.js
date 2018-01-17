@@ -75,7 +75,7 @@ module.exports = function() {
 		socket.on('chat-send', function (data) {
 			console.log("1");
 			// Vars
-			if(!isset(data) || !isset(data.name) || !isset(data.id) || !isset(data.message)) { return; }
+			if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.message)) { return; }
 			console.log("2");
 			// User
 			data.sid = socket.id;
