@@ -7,9 +7,9 @@ module.exports = function() {
 		console.log("4");
 		db.userGameId.find(data.id, function(userGameIdObj) {
 			console.info(userGameIdObj);
-			console.info(userGameIdObj.user_id);
+			console.info(userGameIdObj[0].user_id);
 			console.log("5");
-			db.privilege.find(userGameIdObj.user_id, function(userPrivileges) {
+			db.privilege.find(userGameIdObj[0].user_id, function(userPrivileges) {
 				console.info(userPrivileges);
 				console.log("6");
 				var reg=new RegExp("[ ,;]+", "g");
