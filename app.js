@@ -13,14 +13,16 @@ var db = require('./database');
 require('./misc')();
 
 /* Connect to database */
-db.connect(function(success) {
+db.connect(function(success,general=false) {
 	if(!success) {
 		log('Failed to connect to db ! Blocking user connections ...',"warn");
 		preventConnection = true;
 		return;
 	}
 
-	db.player.clearList();
+	if(!general) {
+		db.player.clearList();
+	}
 
 	/**
 	 * Stats Auto Submit to db

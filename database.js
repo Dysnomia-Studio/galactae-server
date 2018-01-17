@@ -102,25 +102,13 @@ var privileges;
 var servers;
 
 module.exports = {
+	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
 		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"], { useMongoClient: true });
 		var mongoGen = mongoose.createConnection('***REMOVED***', { useMongoClient: true });
-
-		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
-		mongoSrv.once('open', function() {
-			log('Successfuly connected to server database.');
-			callback(true);
-		});	
-
-
-		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
-		mongoGen.once('open', function() {
-			log('Successfuly connected to general database.');
-			callback(true);
-		});	
 
 		/**
 		 * Server schemas
@@ -136,6 +124,22 @@ module.exports = {
 		 */
 		privileges = mongoGen.model('privileges', userPrivilegesSchema);
 		servers = mongoGen.model('servers', serverSchema);
+
+		/**
+		 * Events
+		 */
+		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoSrv.once('open', function() {
+			log('Successfuly connected to server database.');
+			callback(true);
+		});	
+
+
+		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoGen.once('open', function() {
+			log('Successfuly connected to general database.');
+			callback(true,true);
+		});	
 	},
 
 	/**

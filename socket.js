@@ -16,6 +16,7 @@ module.exports = function() {
 	var db = require('./database');
 	var preventConnection = preventConnection || false;
 	var preventConnectionMsg = "";
+	var maintenance = false;
 	this.plCount = 0;
 
 	io.on('connection', function (socket) {
@@ -243,10 +244,10 @@ module.exports = function() {
 
 				switch(data.cmd) {
 					case "maintenanceOn":
-
+						maintenance = true;
 						break;
 					case "maintenanceOff":
-
+						maintenance = false;
 						break;
 					case "restart":
 						preventConnection = true;
