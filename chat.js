@@ -4,14 +4,8 @@ discord.connect();
 
 module.exports = function() {
 	this.chatAnalyse = function(data) {
-		console.log("4");
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			console.info(userGameIdObj);
-			console.info(userGameIdObj[0].user_id);
-			console.log("5");
 			db.privilege.find(userGameIdObj[0].user_id, function(userPrivileges) {
-				console.info(userPrivileges);
-				console.log("6");
 				var reg=new RegExp("[ ,;]+", "g");
 				var args=data.message.split(reg);
 				data.message = textToSmileys(data.message);
@@ -50,6 +44,8 @@ module.exports = function() {
 
 				var discordmsg = rank + data.username + ": " + data.message;
 				data.username = "<span class=\"username\">" + data.username + "</span>";
+
+				console.log(data.lvl);
 
 				if(data.message.charAt(0)=="!" && data.lvl > 1) {
 					data = chatSendCommand(data);
