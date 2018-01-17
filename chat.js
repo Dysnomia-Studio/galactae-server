@@ -15,10 +15,8 @@ module.exports = function() {
 
 				/* Controles de securité */
 				data.send = true;
-				console.info(userPrivileges);
-				console.log(userPrivileges.user_privilege_lvl);
-				console.log(data.lvl);
-				data.lvl = userPrivileges.user_privilege_lvl;
+
+				data.lvl = userPrivileges[0].user_privilege_lvl;
 				data = chatprotect(data);
 
 				if(!data.send) { 
@@ -47,8 +45,6 @@ module.exports = function() {
 
 				var discordmsg = rank + data.username + ": " + data.message;
 				data.username = "<span class=\"username\">" + data.username + "</span>";
-
-				console.log(data.lvl);
 
 				if(data.message.charAt(0)=="!" && data.lvl > 1) {
 					data = chatSendCommand(data);
