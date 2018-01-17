@@ -148,7 +148,7 @@ module.exports = function() {
 				data.send = false;
 				break;
 			case "!kick":
-				if(data.lvl<3) { return data; } // Admin & Operators only
+				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
 				
 				db.player.searchByName(args[1], function(dataReturned) {
 					if(!isset(dataReturned) || !isset(dataReturned.sid)) {
@@ -168,18 +168,18 @@ module.exports = function() {
 				// @ADD: Chat kick
 				break;
 			case "!ban":
-				if(data.lvl<3) { return data; } // Admin & Operators only
+				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
 				// @ADD: Ban
 				break;
 			case "!chatban":
 				// @ADD: Chat ban
 				break;
 			case "!maintenance":
-				if(data.lvl<4) { return data; } // Admin only
+				if(data.lvl<4) { data.send = false; return data; } // Admin only
 				io.emit('server-maintenance');
-				msg = "MAINTENANCE";
+				SendGeneralMessage("MAINTENANCE");
 				maintenance = true;
-				data.noname = true;
+				data.send = true;
 			break;
 			case "!help":
 				sendSM(data.sid,"HELP");
