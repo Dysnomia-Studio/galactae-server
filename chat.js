@@ -16,6 +16,8 @@ module.exports = function() {
 				/* Controles de securité */
 				data.send = true;
 				console.info(userPrivileges);
+				console.log(userPrivileges.user_privilege_lvl);
+				console.log(data.lvl);
 				data.lvl = userPrivileges.user_privilege_lvl;
 				data = chatprotect(data);
 
