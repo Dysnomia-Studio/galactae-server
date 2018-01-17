@@ -5,7 +5,7 @@ discord.connect();
 module.exports = function() {
 	this.chatAnalyse = function(data) {
 		console.log("4");
-		db.userGameIds.find(data.id, function(userGameIdsObj) {
+		db.userGameId.find(data.id, function(userGameIdObj) {
 			console.log("5");
 			db.privilege.find(userGameIdsObj.user_id, function(userPrivileges) {
 				console.log("6");

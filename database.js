@@ -98,8 +98,16 @@ var serverSchema = new Schema({
 	server_maintenance: Number
 });
 
+var userGameIdSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	user_id: String,
+	game_id: String,
+	server_name: String
+});
+
 var privileges;
 var servers;
+var userGameIds;
 
 module.exports = {
 	Schema: Schema,
@@ -124,6 +132,7 @@ module.exports = {
 		 */
 		privileges = mongoGen.model('privileges', userPrivilegesSchema);
 		servers = mongoGen.model('servers', serverSchema);
+		userGameIds = mongoGen.model('game_ids', userGameIdSchema);
 
 		/**
 		 * Events
@@ -323,9 +332,9 @@ module.exports = {
 		},
 	},
 
-	userGameIds: {
+	userGameId: {
 		find: function(id,callback) {
-			servers.find({game_id: id}, function (err, obj) {
+			userGameIds.find({game_id: id}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
