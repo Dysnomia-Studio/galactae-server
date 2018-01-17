@@ -4,9 +4,9 @@ discord.connect();
 
 module.exports = function() {
 	this.chatAnalyse = function(data) {
-		console.log("1");
+		console.log("4");
 		db.privilege.find(data.id, function(userPrivileges) {
-		console.log("2");
+		console.log("5");
 
 			var reg=new RegExp("[ ,;]+", "g");
 			var args=data.message.split(reg);
