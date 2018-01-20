@@ -16,7 +16,11 @@ module.exports = function() {
 				/* Controles de securité */
 				data.send = true;
 
-				data.lvl = userPrivileges[0].user_privilege_lvl;
+				if(isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
+					data.lvl = userPrivileges[0].user_privilege_lvl;
+				} else {
+					data.lvl = 1;
+				}
 				data = chatprotect(data);
 
 				if(!data.send) { 
@@ -135,6 +139,32 @@ module.exports = function() {
 
         return data;
 	}
+
+	this.chatSearchTarget = function(currUser, name,callback) {
+		db.player.searchByName(name, function(dataReturned) {
+			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
+				sendSM(currUser.sid,"PLY_NOT_FOUND");
+				log("Player not found");
+			} else {
+				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
+					db.privilege.find(targetGameIdObj[0].user_id, function(targetPrivileges) {
+						var targetLvl = 1;
+						if(isset(targetPrivileges[0]) && isset(targetPrivileges[0].user_privilege_lvl)) {
+							targetLvl = targetPrivileges[0].user_privilege_lvl;
+						}
+
+						if(currUser.lvl > targetLvl) {
+							callback(dataReturned);
+						} else {
+							sendSM(currUser.sid,"PERMISSION_DENIED");
+							log("Permission denied");
+						}
+					});
+				});
+			}
+		});
+	}
+
 	this.chatSendCommand = function(data) {
 		var str = data.message;
 		var reg=new RegExp("[ ,;]+", "g");
@@ -150,16 +180,11 @@ module.exports = function() {
 			case "!kick":
 				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
 				
-				db.player.searchByName(args[1], function(dataReturned) {
-					if(!isset(dataReturned) || !isset(dataReturned.sid)) {
-						sendSM(data.sid,"PLY_NOT_FOUND");
-						console.log("Player not found");
-					} else {	
-						console.log("Kicked " + args[1]);
-	        			sendSM(data.sid,"Kicked " + args[1]);
+				chatSearchTarget(data, args[1], function(target) {
+					log("Kicked " + args[1]);
+					sendSM(data.sid,"Kicked " + args[1]);
 
-						io.to(dataReturned.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
-					}
+					io.to(target.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
 				});
 				
 				data.send = false;

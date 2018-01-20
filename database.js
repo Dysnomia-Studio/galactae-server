@@ -325,9 +325,8 @@ module.exports = {
 		find: function(id,callback) {
 			privileges.find({_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
-				if(isset(obj)) {
-					callback(obj);
-				}
+				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
+				callback(obj);
 			});
 		},
 	},
