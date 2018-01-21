@@ -181,15 +181,15 @@ module.exports = function() {
 				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
 				
 				chatSearchTarget(data, args[1], function(target) {
-					log("Kicked " + args[1]);
-					sendSM(data.sid,"Kicked " + args[1]);
-
-					target.sid = -1;
-					db.player.update(target);
+					log("Banned " + args[1]);
+					sendSM(data.sid,"Banned " + args[1]);					
 
 					// @ADD: ban in database
 
 					io.to(target.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
+
+					target.sid = -1;
+					db.player.update(target);
 				});
 				
 				data.send = false;
