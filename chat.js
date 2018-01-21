@@ -186,7 +186,8 @@ module.exports = function() {
 
 					// @ADD: ban in database
 
-					io.to(target.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
+					let sid = "" + target.sid;
+					io.to(sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
 
 					target.sid = -1;
 					db.player.update(target);

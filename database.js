@@ -156,7 +156,7 @@ module.exports = {
 	 */
 	player: {
 		searchByName: function(name,callback) {
-			users.findOne({name: name}, function (err, objReturned) {
+			users.findOne({ name: { $regex: new RegExp("^" + name.toLowerCase(), "i") } }, function (err, objReturned) {
 				if(err) { log(err); }
 				callback(objReturned)
 			});
