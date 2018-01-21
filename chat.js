@@ -177,27 +177,32 @@ module.exports = function() {
 				SendGeneralMessage(str.substr(6));
 				data.send = false;
 				break;
-			case "!kick":
+			case "!ban":
 				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
 				
 				chatSearchTarget(data, args[1], function(target) {
 					log("Kicked " + args[1]);
 					sendSM(data.sid,"Kicked " + args[1]);
 
+					target.sid = -1;
+					db.player.update(target);
+
+					// @ADD: ban in database
+
 					io.to(target.sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
 				});
 				
 				data.send = false;
 				break;
-			case "!chatkick":
-				// @ADD: Chat kick
-				break;
-			case "!ban":
-				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
-				// @ADD: Ban
-				break;
-			case "!chatban":
-				// @ADD: Chat ban
+			case "!mute":
+				chatSearchTarget(data, args[1], function(target) {
+					log("Mute " + args[1]);
+					sendSM(data.sid,"Muted " + args[1]);
+
+					// @ADD: send message to user, he was muted
+
+					// @ADD: mute in database
+				});
 				break;
 			case "!maintenance":
 				if(data.lvl<4) { data.send = false; return data; } // Admin only
