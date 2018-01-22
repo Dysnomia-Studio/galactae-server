@@ -186,8 +186,8 @@ module.exports = function() {
 					var banTime = parseChatTime(args[2]);
 					var now = Date.now();
 
-					log("Banned " + banTime " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
-					sendSM(data.sid,"Banned " + banTime " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					log("Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					sendSM(data.sid,"Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 
 					db.ban.create({
 						user_id: target.id,
@@ -212,8 +212,8 @@ module.exports = function() {
 					var muteTime = parseChatTime(args[2]);
 					var now = Date.now();
 
-					log("Banned " + muteTime " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
-					sendSM(data.sid,"Banned " + muteTime " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
+					log("Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
+					sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
 
 					db.ban.create({
 						user_id: target.id,
