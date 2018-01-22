@@ -105,9 +105,21 @@ var userGameIdSchema = new Schema({
 	server_name: String
 });
 
+var userBanSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	user_id: String,
+	server_name: String,
+	ban_type: Number, // 1 = Chat, 2 = Game
+	ban_begin: Number,
+	ban_end: Number,
+	ban_reason: String,
+	admin: String
+});
+
 var privileges;
 var servers;
 var userGameIds;
+var bans;
 
 module.exports = {
 	Schema: Schema,
@@ -133,6 +145,7 @@ module.exports = {
 		privileges = mongoGen.model('privileges', userPrivilegesSchema);
 		servers = mongoGen.model('servers', serverSchema);
 		userGameIds = mongoGen.model('game_ids', userGameIdSchema);
+		bans = mongoGen.model('bans', userBanSchema);
 
 		/**
 		 * Events
@@ -352,4 +365,17 @@ module.exports = {
 			});
 		},
 	},
+
+	ban: {
+		find: function(id,callback) {
+
+		},
+		create: function(data) {
+			data._id = new mongoose.Types.ObjectId();
+			
+			bans.create(data, function(error) {
+				if(error) { log(error); } 
+			});
+		},
+	}
 }

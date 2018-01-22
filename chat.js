@@ -5,7 +5,8 @@ discord.connect();
 module.exports = function() {
 	this.chatAnalyse = function(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			db.privilege.find(userGameIdObj[0].user_id, function(userPrivileges) {
+			data.user_id = userGameIdObj[0].user_id;
+			db.privilege.find(data.user_id, function(userPrivileges) {
 				var reg=new RegExp("[ ,;]+", "g");
 				var args=data.message.split(reg);
 				data.message = textToSmileys(data.message);
@@ -171,42 +172,64 @@ module.exports = function() {
 		var args=str.split(reg);
 		var msg = "";
 		data.noname = false;
+		data.send = false;
 
 		switch(args[0]) {
 			case "!asay":
 				SendGeneralMessage(str.substr(6));
-				data.send = false;
 				break;
 			case "!ban":
-				if(data.lvl<3) { data.send = false; return data; } // Admin & Operators only
+				if(data.lvl<3) { return data; } // Admin & Operators only
 				
 				chatSearchTarget(data, args[1], function(target) {
-					log("Banned " + args[1]);
-					sendSM(data.sid,"Banned " + args[1]);					
+					var banMessage = args.splice(3,args.length).join(" ");
+					var banTime = parseChatTime(args[2]);
+					var now = Date.now();
 
-					// @ADD: ban in database
+					log("Banned " + banTime " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					sendSM(data.sid,"Banned " + banTime " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 
-					let sid = "" + target.sid;
-					io.to(sid).emit('server-kick',str.substr(args[0].length+args[1].length+1));
+					db.ban.create({
+						user_id: target.id,
+						server_name: globalCfg["serverGlobalName"],
+						ban_type: 2,
+						ban_begin: now,
+						ban_end: now + banTime,
+						ban_reason: banMessage,
+						admin: data.user_id
+					});
+
+					let sid = "" + target.sid;					
+					io.to(sid).emit('server-kick', banMessage);
 
 					target.sid = -1;
 					db.player.update(target);
 				});
-				
-				data.send = false;
 				break;
 			case "!mute":
 				chatSearchTarget(data, args[1], function(target) {
-					log("Mute " + args[1]);
-					sendSM(data.sid,"Muted " + args[1]);
+					var muteMessage = args.splice(3,args.length).join(" ");
+					var muteTime = parseChatTime(args[2]);
+					var now = Date.now();
 
-					// @ADD: send message to user, he was muted
+					log("Banned " + muteTime " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
+					sendSM(data.sid,"Banned " + muteTime " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
 
-					// @ADD: mute in database
+					db.ban.create({
+						user_id: target.id,
+						server_name: globalCfg["serverGlobalName"],
+						ban_type: 1,
+						ban_begin: now,
+						ban_end: now + muteTime,
+						ban_reason: muteMessage,
+						admin: data.user_id
+					});
+					
+					io.to(target.sid).emit('chat-mute', {muteTime: muteTime, message: muteMessage});
 				});
 				break;
 			case "!maintenance":
-				if(data.lvl<4) { data.send = false; return data; } // Admin only
+				if(data.lvl<4) { return data; } // Admin only
 				io.emit('server-maintenance');
 				SendGeneralMessage("MAINTENANCE");
 				maintenance = true;
@@ -214,11 +237,9 @@ module.exports = function() {
 			break;
 			case "!help":
 				sendSM(data.sid,"HELP");
-				data.send = false;
 			break;
 			default:
 				sendSM(data.sid,"COMMAND_NOT_FOUND");
-				data.send = false;
 		}
 
 		data.message = msg;
