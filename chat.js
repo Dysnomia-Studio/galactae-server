@@ -193,12 +193,12 @@ module.exports = function() {
 				break;
 			case "!ban":
 				if(data.lvl<3) { return data; } // Admin & Operators only	
-				if(args.length<4) { return; }
+				if(args.length<4) { return data; }
 
 				chatSearchTarget(data, args[1], function(target) {
 					var banMessage = args.splice(3,args.length).join(" ");
 					var banTime = parseChatTime(args[2]);
-					if(banTime < 1) { log("Invalid Time"); return; }
+					if(banTime < 1) { log("Invalid Time"); return data; }
 					var now = Date.now();
 
 					log("Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
@@ -222,12 +222,12 @@ module.exports = function() {
 				});
 				break;
 			case "!mute":
-				if(args.length<4) { return; }
+				if(args.length<4) { return data; }
 
 				chatSearchTarget(data, args[1], function(target) {
 					var muteMessage = args.splice(3,args.length).join(" ");
 					var muteTime = parseChatTime(args[2]);
-					if(muteTime < 1) { log("Invalid Time"); return; }
+					if(muteTime < 1) { log("Invalid Time"); return data; }
 					var now = Date.now();
 
 					log("Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
