@@ -367,8 +367,15 @@ module.exports = {
 	},
 
 	ban: {
-		find: function(id,callback) {
-
+		find: function(uid,type,callback) {
+			bans.find({
+				user_id: uid,
+				server_name: globalCfg['serverGlobalName'],
+				ban_type: type
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
 		},
 		create: function(data) {
 			data._id = new mongoose.Types.ObjectId();
