@@ -401,15 +401,15 @@ module.exports = class planet {
 		 * @param      {<type>}    planet    Planet data
 		 * @param      {Function}  callback  Function needed to called back
 		 */
-		static getPeople(planet, fleets, callback) {
-			var buildings = planet.Buildings;
+		static getPeople(planetData, fleets, callback) {
+			var buildings = planetData.Buildings;
 			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
 
 			// Buildings
 			for(var i=0; i<14; i++) {
 				if(buildings[i]==0) { continue; }
-				if(i==planet.nextBuilding) {
+				if(i==planetData.nextBuilding) {
 					// Current in-build building
 					cons += parseInt(planet.GetBuildingCost(i,buildings[i] + 1).habitants);
 					continue; 
@@ -422,7 +422,7 @@ module.exports = class planet {
 				cons += fleets[i].population;
 			}
 
-			callback(planet,prod,cons);
+			callback(planetData,prod,cons);
 		}
 
 		/**
