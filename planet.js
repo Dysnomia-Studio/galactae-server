@@ -55,7 +55,7 @@ module.exports = class planet {
 
 				units.refreshFleets(newData._id,data.sid);+
 
-				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
+				planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
 		}
 		/**
@@ -274,7 +274,7 @@ module.exports = class planet {
 
 					db.planet.update(newData);
 
-					sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
+					planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
 				});
 			});
 		}
@@ -477,7 +477,7 @@ module.exports = class planet {
 				var newPlanetData = {};
 				newPlanetData.name = data.name;
 
-				sendPlanetDataToUser({data: newPlanetData, planet: data.planet, id: data.id, sid: data.sid });
+				planet.sendPlanetDataToUser({data: newPlanetData, planet: data.planet, id: data.id, sid: data.sid });
 
 				var newPlanetData = planetReturned.toJSON();
 				newPlanetData.name = data.name;
