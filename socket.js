@@ -107,7 +107,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	planetBuild(data);
+				   	planet.build(data);
 				}); 
 			});
 
