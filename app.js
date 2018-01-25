@@ -14,7 +14,7 @@ var io = require('socket.io')(https);
 /**
  * Global vars
  */
-var preventConnection = preventConnection || false;
+global.preventConnection = false;
 var preventConnectionMsg = "";
 var maintenance = false;
 var plCount = 0;
