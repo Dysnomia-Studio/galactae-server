@@ -97,7 +97,7 @@ module.exports = class planet {
 			
 			var oldResources = resources;
 
-			var ratio = GetMineralsRatio(planetType);
+			var ratio = planet.GetMineralsRatio(planetType);
 			var ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
 			var mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) - mineralProd[1]*buildings[0] + mineralProd[2];
