@@ -1,4 +1,4 @@
-module.exports = function(fs, io, adminSid) {   
+module.exports = function() {   
   //this.errorFile = fs.createWriteStream('/galactae.error.log', { flags: 'a' });
   //process.stderr.pipe(this.errorFile);
   this.logFile = fs.createWriteStream('/galactae.log', { flags: 'a' });

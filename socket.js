@@ -1,5 +1,5 @@
 module.exports = class websocket {
-	static init(io) {
+	static init() {
 		io.on('connection', function (socket) {
 			/**
 			* Log de connexion et de déconnexion des utilisateurs
