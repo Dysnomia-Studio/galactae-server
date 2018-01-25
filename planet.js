@@ -187,12 +187,12 @@ module.exports = class planet {
 		 * @class      TryBuilding (name)
 		 * @param      {<type>}  data    data
 		 */
-		static planetBuild(data) {
+		static build(data) {
 			// Mauvais n° de batiment
 			if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
 			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
+					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
 					return;
 				} 
@@ -205,7 +205,7 @@ module.exports = class planet {
 				var newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				// Vars for this building test
-				var cost = GetBuildingCost(data.building,newData.Buildings[data.building]+1);
+				var cost = planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
 				var BlockBuild = false;
 				var errormsg = "BUILD_ERROR"; // Message d'erreur par defaut
 					// Cost verif
@@ -234,7 +234,7 @@ module.exports = class planet {
 						}
 					}
 
-				enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
+				planet.enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
 					if(!enoughtPeople) {
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_PEOPLE";
@@ -264,11 +264,11 @@ module.exports = class planet {
 						newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
 						newData.nextBuilding = data.building;
 
-						SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
+						websocket.SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
 						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
 
 					} else { // We just update ressources
-						SendMessageToClient({ sid: data.sid, message: errormsg })
+						websocket.SendMessageToClient({ sid: data.sid, message: errormsg })
 						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
 					}
 
@@ -447,7 +447,7 @@ module.exports = class planet {
 		static rename(data) {
 			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
+					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
 					return;
 				}

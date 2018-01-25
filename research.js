@@ -101,7 +101,7 @@ module.exports = class research {
 				}
 
 				if(!researchedParent) {
-					SendMessageToClient({ sid: data.sid, message: "MISSING_PARENTS"});
+					websocket.SendMessageToClient({ sid: data.sid, message: "MISSING_PARENTS"});
 				}
 
 				db.planet.update(newData);

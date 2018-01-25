@@ -251,24 +251,24 @@ module.exports = class units {
 						} else if(duplicate) {
 							message = "SHIP_TYPE_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-							SendMessageToClient({sid: data.sid, message: message});	
+							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
 							message = "SHIP_NAME_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-							SendMessageToClient({sid: data.sid, message: message});	
+							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						}
 					});
 
 				} else {
 					// Notify client
 					log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-					SendMessageToClient({sid: data.sid, message: message});
+					websocket.SendMessageToClient({sid: data.sid, message: message});
 				}
 			});
 		} else {
 			// Notify client
 			log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-			SendMessageToClient({sid: data.sid, message: message});
+			websocket.SendMessageToClient({sid: data.sid, message: message});
 		}
 	}
 
@@ -278,12 +278,12 @@ module.exports = class units {
 
 			if(unitReturned.owned != 0) {
 				log(data.username + " has failed to delete unit model named " + unitReturned.name + " because it's used by some units.","fail");
-				SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
+				websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
 				return;
 			}
 
 			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","success");
-			SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
+			websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
 			db.unit.delete(data.unit);
 
@@ -308,7 +308,7 @@ module.exports = class units {
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
 				log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because another is already building.');
-				SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
+				websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
 			}
 
@@ -349,15 +349,15 @@ module.exports = class units {
 					totalCost[2] > newPlanet.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
 					log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
-					SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
+					websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
 					return;
 				}
 
-				getPeople(newPlanet,fleetList, function(newPlanet, prod, cons) {
+				planet.getPeople(newPlanet,fleetList, function(newPlanet, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
 						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
-						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
+						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
 						return;
 					}
 
@@ -391,17 +391,17 @@ module.exports = class units {
 
 						db.fleet.update(fleetReturned);
 
-						sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
 						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')',"success");
-						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
+						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst["maxFleetSize"]) { 
 							log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
-							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
@@ -415,14 +415,14 @@ module.exports = class units {
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
 							log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
-							SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
 					}  else {
 						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet isn\'t valid.');
-						SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
+						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
 					}
 				});	
 			});			
@@ -437,14 +437,14 @@ module.exports = class units {
 		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planet.Buildings[6] - 1]) {
-				SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
+				websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
 				return;
 			}
 
 			// Check name
 			for(var i=0; i<fleetReturned.length; i++) {
 				if(fleetReturned[i].name == data.fleetName) {
-					SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
+					websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
 			}

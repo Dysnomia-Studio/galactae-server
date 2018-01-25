@@ -182,7 +182,7 @@ module.exports = class player {
 			if(choice==2 && helium!=0) {
 				planet.find(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
-						SendMessageToClient({ id: data.id, message: "ERROR_NOT_BELONGING" })
+						websocket.SendMessageToClient({ id: data.id, message: "ERROR_NOT_BELONGING" })
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");
 						return;
 					}

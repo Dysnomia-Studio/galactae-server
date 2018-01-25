@@ -261,7 +261,7 @@ module.exports = class websocket {
 			})
 		});
 	}
-	/* SendMessageToClient
+	/* websocket.SendMessageToClient
 	INPUT: data
 	OUTPUT: io connection ( array ) */
 	static SendMessageToClient(data) {

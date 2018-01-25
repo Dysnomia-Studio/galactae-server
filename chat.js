@@ -184,7 +184,7 @@ module.exports = class chat {
 
 		switch(args[0]) {
 			case "!asay":
-				SendGeneralMessage(str.substr(6));
+				websocket.SendGeneralMessage(str.substr(6));
 				break;
 			case "!ban":
 				if(data.lvl<3) { return data; } // Admin & Operators only	
@@ -244,7 +244,7 @@ module.exports = class chat {
 			case "!maintenance":
 				if(data.lvl<4) { return data; } // Admin only
 				io.emit('server-maintenance');
-				SendGeneralMessage("MAINTENANCE");
+				websocket.SendGeneralMessage("MAINTENANCE");
 				maintenance = true;
 				data.send = true;
 			break;
