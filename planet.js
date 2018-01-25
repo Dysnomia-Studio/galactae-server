@@ -49,7 +49,7 @@ module.exports = class planet {
 		static refresh(data,decalage=0) {
 			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
 
-				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);
+				var newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				db.planet.update(newData);
 
@@ -202,7 +202,7 @@ module.exports = class planet {
 				var currTime = Date.now();
 
 				// Calc new planet data
-				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);
+				var newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				// Vars for this building test
 				var cost = GetBuildingCost(data.building,newData.Buildings[data.building]+1);
@@ -335,12 +335,12 @@ module.exports = class planet {
 		/**
 		 * Update the planet data
 		 *
-		 * @class      UpdatePlanet (name)
+		 * @class      update (name)
 		 * @param      {<type>}  planetIn  data needed to be updated
 		 * @param      {<type>}  user      The user
 		 * @return     {<type>}  the updated data
 		 */
-		static UpdatePlanet(planetIn,user,fleetList) {
+		static update(planetIn,user,fleetList) {
 			var data = planetIn.toJSON();
 			var currTime = Date.now();
 
