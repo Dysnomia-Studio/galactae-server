@@ -14,8 +14,8 @@ module.exports = class units {
 			if(units==undefined) { units = []; }
 			io.to(data.sid).emit("units-recieve-data", units);
 		});
-	},
-
+	}
+	
 	static refreshFleets(pid,sid) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
