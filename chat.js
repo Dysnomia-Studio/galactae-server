@@ -108,7 +108,7 @@ module.exports = class chat {
 		});
 	}
 	static protect(data) {
-		str = data.message;
+		var str = data.message;
 
 		var replace = [
 			['( . )( . )',''],
