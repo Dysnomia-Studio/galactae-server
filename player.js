@@ -113,7 +113,7 @@ module.exports = class player {
 			i++;
 			
 			if(i<user.planetlist.length) {
-				calcTotalPlanetPoints(user,callback,i,points);
+				player.calcTotalPlanetPoints(user,callback,i,points);
 			} else { 
 				points *= pointsCoef['planet'];
 				user.points = points;
@@ -135,9 +135,9 @@ module.exports = class player {
 		return points;
 	}
 	static refreshPoints(user,callback) {
-		calcTotalPlanetPoints(user,function(newUserData) {
+		player.calcTotalPlanetPoints(user,function(newUserData) {
 			// Recherches
-			newUserData.points += calcResearchPoints(newUserData);
+			newUserData.points += player.calcResearchPoints(newUserData);
 
 			// Money
 			newUserData.points += (newUserData.money*pointsCoef['money']);
