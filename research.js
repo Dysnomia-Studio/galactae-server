@@ -41,27 +41,27 @@ module.exports = class research {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
 
-	static recalc(user,research,callback,i=0) {
+	static recalc(user,researchData,callback,i=0) {
 		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
-			if(isset(research[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && research[planetReturned.currResearch] != -1) {
-				research[planetReturned.currResearch] += (getResearchProduction(planetReturned.Buildings[8])*time);
+			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] != -1) {
+				researchData[planetReturned.currResearch] += (research.getResearchProduction(planetReturned.Buildings[8])*time);
 
-				if(research[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
-					research[planetReturned.currResearch] = -1;
+				if(researchData[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
+					researchData[planetReturned.currResearch] = -1;
 					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
 				}
 			}
 
 			// Next planet
 			if(i+1<user.planetlist.length) {
-				research.recalc(user,research,callback,i+1);
+				research.recalc(user,researchData,callback,i+1);
 			} else {
 				user.research = [];
 
-				for(var index in research) {
-					user.research.push([index,research[index],]);
+				for(var index in researchData) {
+					user.research.push([index,researchData[index],]);
 				}
 
 				callback(user);	
