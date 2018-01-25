@@ -1,7 +1,4 @@
-var db = require('./database');
-require('./calcConstants')();
-
-module.exports = function() {
+module.exports = class planet {
 		/**
 		 * Gets the planet information.
 		 *
@@ -10,7 +7,7 @@ module.exports = function() {
 		 * @param      {number}    decalage  decalage de n°
 		 * @param      {Function}  callback  Function needed to call back
 		 */
-		this.getPlanet = function(user,pid,decalage,callback) {
+		static find(user,pid,decalage,callback) {
 			db.player.searchById(user.id, function(userReturned) {
 				if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
 					var longueur = userReturned.planetlist.length;
@@ -49,8 +46,8 @@ module.exports = function() {
 		 * @param      {<type>}  data      data sent by user
 		 * @param      {number}  decalage  le decalage de planete
 		 */
-		this.refreshUserPlanet = function(data,decalage=0) {
-			getPlanet(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
+		static refreshUserPlanet(data,decalage=0) {
+			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
 
 				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);
 
@@ -66,7 +63,7 @@ module.exports = function() {
 		 *
 		 * @param      {<type>}  data    data
 		 */
-		this.sendPlanetDataToUser = function(data) {
+		static sendPlanetDataToUser(data) {
 			data.sNow = Date.now();
 			io.to(data.sid).emit("planet-recieve-data", data );
 		}
@@ -77,7 +74,7 @@ module.exports = function() {
 		 * @param      {<type>}  type    The type of planet
 		 * @return     {Object}  The minerals ratio.
 		 */
-		this.GetMineralsRatio = function(type) {
+		static GetMineralsRatio(type) {
 			if(planetRatios[type]!=undefined) {
 				return planetRatios[type];	
 			} else {
@@ -95,7 +92,7 @@ module.exports = function() {
 		 * @param      {number}  time        The time period
 		 * @param      {<type>}  user        The user
 		 */
-		this.CalcNewResources = function(resources,buildings,planetType,time,user,currentBuilding) {
+		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
 			
 			var oldResources = resources;
@@ -190,10 +187,10 @@ module.exports = function() {
 		 * @class      TryBuilding (name)
 		 * @param      {<type>}  data    data
 		 */
-		this.planetBuild = function(data) {
+		static planetBuild(data) {
 			// Mauvais n° de batiment
 			if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
-			getPlanet(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
+			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
@@ -288,7 +285,7 @@ module.exports = function() {
 		 * @param      {<type>}  planetIn  data needed to be updated
 		 * @param      {<type>}  user      The user
 		 */
-		this.UpdateUnits = function(planetIn,user,currTime) {
+		static UpdateUnits(planetIn,user,currTime) {
 			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
 				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
 					var unitCount = 0;
@@ -343,7 +340,7 @@ module.exports = function() {
 		 * @param      {<type>}  user      The user
 		 * @return     {<type>}  the updated data
 		 */
-		this.UpdatePlanet = function(planetIn,user,fleetList) {
+		static UpdatePlanet(planetIn,user,fleetList) {
 			var data = planetIn.toJSON();
 			var currTime = Date.now();
 
@@ -384,7 +381,7 @@ module.exports = function() {
 		 *
 		 * @param      {Object}  groundBuildings  The ground buildings list
 		 */
-		this.enoughtEnergy = function(groundBuildings) {
+		static enoughtEnergy(groundBuildings) {
 			var prod = Math.round(electricity[0]*Math.pow(groundBuildings[4],2) + electricity[1]*groundBuildings[4] + electricity[2]);
 			var cons = 0;
 
@@ -404,7 +401,7 @@ module.exports = function() {
 		 * @param      {<type>}    planet    Planet data
 		 * @param      {Function}  callback  Function needed to called back
 		 */
-		this.getPeople = function(planet, fleets, callback) {
+		static getPeople(planet, fleets, callback) {
 			var buildings = planet.Buildings;
 			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 			var cons = 0;
@@ -433,7 +430,7 @@ module.exports = function() {
 		 *
 		 * @param      {Object}  buildings  The buildings list
 		 */
-		this.enoughtPeople = function(planet, fleets, callback) {
+		static enoughtPeople(planet, fleets, callback) {
 			getPeople(planet, fleets, function(planet, prod, cons) {
 				if(prod<cons) {
 					callback(planet,false);
@@ -444,11 +441,11 @@ module.exports = function() {
 		/**
 		 * Change the planet name
 		 *
-		 * @class      ChangePlanetName (name)
+		 * @class      rename (name)
 		 * @param      {<type>}  data    data
 		 */
-		this.ChangePlanetName = function(data) {
-			getPlanet(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
+		static rename(data) {
+			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
 					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
@@ -494,7 +491,7 @@ module.exports = function() {
 		 * @class      CalcResources (name)
 		 * @param      {<type>}  dataIn  Input planet data
 		 */
-		this.UpdateResources = function(dataIn,user) {
+		static UpdateResources(dataIn,user) {
 			var Dtime = Date.now()-dataIn.nextBuildingTime;
 			var resources = dataIn.resources;
 
@@ -510,7 +507,7 @@ module.exports = function() {
 			return resources
 		}
 
-		this.calcPlanetPoints = function(dataIn) {
+		static calcPlanetPoints(dataIn) {
 			var points = 0;
 
 			// Building points count
@@ -521,7 +518,7 @@ module.exports = function() {
 			return points
 		}
 
-		this.calcFleetPoints = function(fleets) {
+		static calcFleetPoints(fleets) {
 			var points = 0;
 
 			// Building points count
@@ -540,7 +537,7 @@ module.exports = function() {
 		 * @param      {number}  level   The level asked
 		 * @return     {<type>}  The building cost.
 		 */
-		this.GetBuildingCost = function(build,level) {
+		static GetBuildingCost(build,level) {
 			if(build < 0 || build > globalConst["buildingNumber"]) { return; }
 
 			var retour = {

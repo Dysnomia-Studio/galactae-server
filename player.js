@@ -1,12 +1,10 @@
-var db = require('./database');
-
-module.exports = function() {
+module.exports = class player {
 	/* Is Valid ? */
-	this.isValidUser = function(user,callback) {
+	static isValid(user,callback) {
 		if(isset(user.username)&&isset(user.id)) {
 			db.player.searchBySid(user.sid,function(searchSid) {
 				if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
-					if(canAct(searchSid)) { // Don't spam ^^
+					if(player.canAct(searchSid)) { // Don't spam ^^
 						callback(user);
 
 						var newData = searchSid;
@@ -21,13 +19,13 @@ module.exports = function() {
 		}
 	}
 	/* Does the player can act ? */
-	this.canAct = function(user) {
-		var minTime = 250; //time in ms
+	static canAct(user) {
+		var minTime = 350; //time in ms
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
 	/* Get player ally */
-	this.getAlly = function(data,callback) {
+	static getAlly(data,callback) {
 		db.player.searchById(data.id,function(obj) {
 			if(!isset(obj)) { return; }
 			data.ally = obj.ally;
@@ -35,7 +33,7 @@ module.exports = function() {
 		})
 	}
 	/* Connect Player */
-	this.connectPlayer = function(data) {	
+	static connect(data) {	
 		db.player.searchByName(data.username,function(dataReturned) {
 			if(data.id!=dataReturned.id) {
 				// Kick that Hacker ...
@@ -99,7 +97,7 @@ module.exports = function() {
 		});
 	}
 	/* Disconnect Player */
-	this.disconnectPlayer = function(data) {
+	static disconnect(data) {
 		if(!isset(data.sid)) { return; }
 		db.player.searchBySid(data.sid,function(dataReturned) {
 			if(!isset(dataReturned)) { return; }
@@ -108,7 +106,7 @@ module.exports = function() {
 			plCount--;
 		});
 	}
-	this.calcTotalPlanetPoints= function(user,callback,i,points) {
+	static calcTotalPlanetPoints(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
@@ -123,7 +121,7 @@ module.exports = function() {
 			}
 		});		
 	}
-	this.calcResearchPoints = function(user) {
+	static calcResearchPoints(user) {
 		var points = 0;
 
 		for(var i=0; i<user.research.length; i++) {
@@ -136,7 +134,7 @@ module.exports = function() {
 
 		return points;
 	}
-	this.refreshUserPoints = function(user,callback) {
+	static refreshUserPoints(user,callback) {
 		calcTotalPlanetPoints(user,function(newUserData) {
 			// Recherches
 			newUserData.points += calcResearchPoints(newUserData);
@@ -149,7 +147,7 @@ module.exports = function() {
 		},0,0);	
 	}
 	/* dayBonus */
-	this.dayBonus = function(data,userData,choice) {
+	static dayBonus(data,userData,choice) {
 		var jour = 24*60*60*1000;
 		var minuit = Date.now() - (Date.now()%jour);
 		var hierMinuit = minuit - jour;
@@ -182,7 +180,7 @@ module.exports = function() {
 			else { credits = 500; } // @ADD: generate random special bonus
 
 			if(choice==2 && helium!=0) {
-				getPlanet(userData,userData.pid,0,function(planetReturned) {
+				planet.find(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
 						SendMessageToClient({ id: data.id, message: "ERROR_NOT_BELONGING" })
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");

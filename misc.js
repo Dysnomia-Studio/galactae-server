@@ -96,11 +96,11 @@ var smileys = [
 
 module.exports = function() {    
 	/**
-	 * Gets the date time.
-	 *
-	 * @return     {string}  The date time.
-	 */
-	this.getDateTime = function () {
+     * Gets the date time.
+     *
+     * @return     {string}  The date time.
+     */
+    this.getDateTime = function() {
 	    var date = new Date();
 
 	    var hour = date.getHours();
@@ -122,13 +122,14 @@ module.exports = function() {
 
 		return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
 	};
+
 	/**
-	 * Check if a variable is set
-	 *
-	 * @param      {(number|string)}  variable  The variable to test
-	 * @return     {boolean}          the variable is set
-	 */
-	this.isset = function(variable) {
+      * Check if a variable is set
+      *
+      * @param      {anything}  variable  The variable needs to be tested
+      * @return     {boolean}   True if the variable is set, False otherwise
+      */
+    this.isset = function(variable) {
 		if(variable===0 || (typeof variable !== 'undefined' && variable !== undefined && variable != null && variable != {} && variable != "")) {
 			return true;
 		} else {
@@ -138,8 +139,8 @@ module.exports = function() {
 	/**
 	 * Normalize a text to be compatible with sockets
 	 *
-	 * @param      {<type>}  str     The string
-	 * @return     {<type>}  normalized string
+	 * @param      {string}  str     Raw text
+	 * @return     {string}  normalized text
 	 */
 	this.normalizeText = function(str) {
 	    for(var i=0; i<charList.length; i++) {
@@ -148,6 +149,12 @@ module.exports = function() {
 
 		return str;
 	}
+    /**
+     * Unnormalize a text
+     *
+     * @param      {string}  str     Raw text
+     * @return     {string}  normalized text
+     */
 	this.unNormalizeText = function(str) {
 	    for(var i=0; i<charList.length; i++) {
 	        str = str.split(charList[i][1]).join(charList[i][0]);
@@ -155,7 +162,12 @@ module.exports = function() {
 
 	    return str;
 	}
-
+    /**
+     * Parse smileys in text
+     *
+     * @param      {string}  str     Raw text
+     * @return     {string}  parsed text
+     */
     this.textToSmileys = function(str) {
         for(var i=0; i<smileys.length; i++) {
             str = str.split(smileys[i][0]).join(smileys[i][1]);
@@ -164,6 +176,12 @@ module.exports = function() {
         return str;
     }
 
+    /**
+     * Parse text given in a chat command
+     *
+     * @param      {string}  str     The time to parse
+     * @return     {number}  Time parsed in seconds
+     */
     this.parseChatTime = function(str) {
         var unit = str.charAt(str.length-1).toLowerCase();
         var count = parseInt(str.substr[0,str.length-1]);

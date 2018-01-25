@@ -9,14 +9,14 @@ const token = '***REMOVED***';
 
 module.exports = {
 	/**
-	 * Used to connect to discord server
+	 * Connect to discord server, and listen messages
 	 */
 	connect: function(callback) {
 		client.login(token);
 
 		client.on('ready', function() {
 			log('Connected to discord server bot');
-			client.user.setGame('Galactae: Space Age Dawn');
+			client.user.setActivity('Galactae: Space Age Dawn');
 		});
 
 		client.on('message', function(message) {
@@ -39,11 +39,22 @@ module.exports = {
 			}
 		});
 	},
+	/**
+	 * Transmit a message to discord
+	 *
+	 * @param      {string}  channelName  The channel name
+	 * @param      {string}  message      The message
+	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg["serverName"] + "-" + channelName.substr(9);
 		var channel = client.channels.find('name',channelName);
 		channel.send(unNormalizeText(message));
 	},
+	/**
+	 * Alert something on discord global chat of this server
+	 *
+	 * @param      {string}  message  The message
+	 */
 	alert: function(message) {
 		var channelName = globalCfg["serverName"] + "-global";
 		var channel = client.channels.find('name',channelName);

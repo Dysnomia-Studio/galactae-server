@@ -302,7 +302,7 @@ module.exports = function() {
 	 */
 	this.BuildUnit = function(inputData) {
 		// Check if planet, unit & fleet belong to player
-		getPlanet(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
+		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
 			var newPlanet = UpdatePlanet(planetReturned,userReturned,fleetList);

@@ -127,8 +127,8 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"], { useMongoClient: true });
-		var mongoGen = mongoose.createConnection('***REMOVED***', { useMongoClient: true });
+		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		var mongoGen = mongoose.createConnection('***REMOVED***');
 
 		/**
 		 * Server schemas

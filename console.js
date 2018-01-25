@@ -1,9 +1,6 @@
-var fs = require( 'fs' );
-
-var errorFile = fs.createWriteStream('/galactae.error.log', { flags: 'a' });
-process.stderr.pipe(errorFile);
-
-module.exports = function() {   
+module.exports = function(fs, io, adminSid) {   
+  //this.errorFile = fs.createWriteStream('/galactae.error.log', { flags: 'a' });
+  //process.stderr.pipe(this.errorFile);
   this.logFile = fs.createWriteStream('/galactae.log', { flags: 'a' });
 
   /**

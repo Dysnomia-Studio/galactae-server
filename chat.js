@@ -1,9 +1,5 @@
-var db = require('./database');
-var discord = require('./discord');
-discord.connect();
-
-module.exports = function() {
-	this.chatAnalyse = function(data) {
+module.exports = class chat {
+	static analyse(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
 			data.user_id = userGameIdObj[0].user_id;
 			db.ban.find(data.user_id, 1, function(banObj) {
@@ -32,7 +28,7 @@ module.exports = function() {
 					} else {
 						data.lvl = 1;
 					}
-					data = chatprotect(data);
+					data = chat.protect(data);
 
 					if(!data.send) { 
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
@@ -62,7 +58,7 @@ module.exports = function() {
 					data.username = "<span class=\"username\">" + data.username + "</span>";
 
 					if(data.message.charAt(0)=="!" && data.lvl > 1) {
-						data = chatSendCommand(data);
+						data = chat.sendCommand(data);
 					} else if(data.message.charAt(0)=="@") { // Messages privés
 						db.player.searchByName(args[0].substr(1).toLowerCase(), function(dataReturned) {
 							if(dataReturned==undefined) { return; }
@@ -74,12 +70,12 @@ module.exports = function() {
 
 							/* Envoyer le PM */
 							if(sid!=undefined && sid!="-1" && data.newmessage!="" && sid!=data.sid) {
-								sendPM(data.sid,data.message,false);
-								sendPM(sid,data.username + ": " + data.newmessage,true);
+								chat.sendPM(data.sid,data.message,false);
+								chat.sendPM(sid,data.username + ": " + data.newmessage,true);
 							} else if(args[0].substr(1).toLowerCase()==data.username) {
-								sendSM(data.sid,"NO_PM_YOU");
+								chat.sendSM(data.sid,"NO_PM_YOU");
 							} else if(sid==undefined || sid!="-1") {
-								sendSM(data.sid,"PLY_NOT_FOUND");
+								chat.sendSM(data.sid,"PLY_NOT_FOUND");
 							}
 						});
 
@@ -111,7 +107,7 @@ module.exports = function() {
 			});
 		});
 	}
-	this.chatprotect = function(data) {
+	static protect(data) {
 		str = data.message;
 
 		var replace = [
@@ -139,14 +135,14 @@ module.exports = function() {
         /* Can the player send a message ? */
         if(data.lvl<2) {
         	data.send = false;
-        	sendSM(data.sid,"NO_PERM");
+        	chat.sendSM(data.sid,"NO_PERM");
         	// Kick it ...
         	io.to(data.sid).emit('server-kick');
         }
         /* Disable links */
         if(str!=str.replace('://','') || str!=str.replace('www.','')) {
         	data.send = false;
-        	sendSM(data.sid,"NO_LINKS");
+        	chat.sendSM(data.sid,"NO_LINKS");
         }
 
         data.message = str;
@@ -154,10 +150,10 @@ module.exports = function() {
         return data;
 	}
 
-	this.chatSearchTarget = function(currUser, name,callback) {
+	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
 			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
-				sendSM(currUser.sid,"PLY_NOT_FOUND");
+				chat.sendSM(currUser.sid,"PLY_NOT_FOUND");
 				log("Player not found");
 			} else {
 				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
@@ -170,7 +166,7 @@ module.exports = function() {
 						if(currUser.lvl > targetLvl) {
 							callback(dataReturned);
 						} else {
-							sendSM(currUser.sid,"PERMISSION_DENIED");
+							chat.sendSM(currUser.sid,"PERMISSION_DENIED");
 							log("Permission denied");
 						}
 					});
@@ -178,8 +174,7 @@ module.exports = function() {
 			}
 		});
 	}
-
-	this.chatSendCommand = function(data) {
+	static sendCommand(data) {
 		var str = data.message;
 		var reg=new RegExp("[ ,;]+", "g");
 		var args=str.split(reg);
@@ -195,14 +190,14 @@ module.exports = function() {
 				if(data.lvl<3) { return data; } // Admin & Operators only	
 				if(args.length<4) { return data; }
 
-				chatSearchTarget(data, args[1], function(target) {
+				chat.searchTarget(data, args[1], function(target) {
 					var banMessage = args.splice(3,args.length).join(" ");
 					var banTime = parseChatTime(args[2]);
 					if(banTime < 1) { log("Invalid Time"); return data; }
 					var now = Date.now();
 
 					log("Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
-					sendSM(data.sid,"Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					chat.sendSM(data.sid,"Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 
 					db.ban.create({
 						user_id: target.id,
@@ -224,14 +219,14 @@ module.exports = function() {
 			case "!mute":
 				if(args.length<4) { return data; }
 
-				chatSearchTarget(data, args[1], function(target) {
+				chat.searchTarget(data, args[1], function(target) {
 					var muteMessage = args.splice(3,args.length).join(" ");
 					var muteTime = parseChatTime(args[2]);
 					if(muteTime < 1) { log("Invalid Time"); return data; }
 					var now = Date.now();
 
 					log("Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
-					sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
+					chat.sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
 
 					db.ban.create({
 						user_id: target.id,
@@ -254,10 +249,10 @@ module.exports = function() {
 				data.send = true;
 			break;
 			case "!help":
-				sendSM(data.sid,"HELP");
+				chat.sendSM(data.sid,"HELP");
 			break;
 			default:
-				sendSM(data.sid,"COMMAND_NOT_FOUND");
+				chat.sendSM(data.sid,"COMMAND_NOT_FOUND");
 		}
 
 		data.message = msg;
@@ -265,11 +260,11 @@ module.exports = function() {
 		return data; // Needed For some commands ...
 	}
 	/* send private message to a specific player */
-	this.sendPM = function(sid,msg,sound) {
+	static chat.sendPM(sid,msg,sound) {
 		io.to(sid).emit("chat-message-private", {msg: msg,sound: sound});
 	}
 	/* send system message to a specific player */
-	this.sendSM = function(sid,msg) {
+	static chat.sendSM(sid,msg) {
 		io.to(sid).emit("chat-message-system", msg);
 	}
 }

@@ -1,7 +1,5 @@
-var db = require('./database');
-
-module.exports = function() {
-	this.refreshUserResearch = function(data,callback) {	
+module.exports = class research {
+	static refreshUserResearch(data,callback) {	
 		// Checks if new research
 		if(researchList.length!=data.research.length) {
 			for(var name in researchList) {
@@ -30,7 +28,7 @@ module.exports = function() {
 			callback(user);
 		});
 	}
-	this.getResearch = function(data,research) {
+	static getResearch(data,research) {
 		for(var i=0; i<data.research.length; i++) {
 			if(data.research[i][0]==research) {
 				return data.research[i][1];
@@ -39,11 +37,11 @@ module.exports = function() {
 		return 0;
 	}
 
-	this.getResearchProduction = function(lvl) {
+	static getResearchProduction(lvl) {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
 
-	this.researchRecalc = function(user,research,callback,i=0) {
+	static researchRecalc(user,research,callback,i=0) {
 		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
@@ -71,9 +69,9 @@ module.exports = function() {
 		});
 	}
 
-	this.ChangePlanetResearch = function(data,pid,research) {
+	static ChangePlanetResearch(data,pid,research) {
 		if(!isset(researchList[research])) { return; }
-		getPlanet(data,data.pid,0,function(planetReturned,userReturned) {
+		planet.find(data,data.pid,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
 			refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
@@ -117,7 +115,7 @@ module.exports = function() {
 		});
 	}
 
-	this.ResearchSync = function(data) {
+	static ResearchSync(data) {
 		db.player.searchByName(data.username,function(dataReturned) {
 			refreshUserResearch(dataReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
