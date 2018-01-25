@@ -260,11 +260,11 @@ module.exports = class chat {
 		return data; // Needed For some commands ...
 	}
 	/* send private message to a specific player */
-	static chat.sendPM(sid,msg,sound) {
+	static sendPM(sid,msg,sound) {
 		io.to(sid).emit("chat-message-private", {msg: msg,sound: sound});
 	}
 	/* send system message to a specific player */
-	static chat.sendSM(sid,msg) {
+	static sendSM(sid,msg) {
 		io.to(sid).emit("chat-message-system", msg);
 	}
 }
