@@ -347,7 +347,7 @@ module.exports = class planet {
 			data.lastResourcesUpdate = currTime;
 
 			// Update resources
-			data.resources = UpdateResources(planetIn,user);
+			data.resources = planet.UpdateResources(planetIn,user);
 			// Update points
 			data.points = calcPlanetPoints(planetIn);
 			data.points += parseFloat(calcFleetPoints(fleetList));
@@ -362,7 +362,7 @@ module.exports = class planet {
 
 			// Update units
 			if(data.unitBuildingEndTime != -1) {
-				UpdateUnits(planetIn,user,currTime);
+				planet.UpdateUnits(planetIn,user,currTime);
 			}
 
 			if(currTime>data.unitBuildingEndTime) {
