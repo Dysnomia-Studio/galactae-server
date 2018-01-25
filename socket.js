@@ -132,7 +132,7 @@ module.exports = class websocket {
 				player.isValid(data,function(data) { // Verify identity
 				    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
 					// Execution du code
-				   	ChangePlanetResearch(data,data.pid,data.research);
+				   	research.ChangePlanetResearch(data,data.pid,data.research);
 				});
 			});
 			socket.on('research-sync', function(data) {
@@ -142,7 +142,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	ResearchSync(data);
+				   	research.sync(data);
 				});
 			});
 
@@ -154,7 +154,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	CreateUnitType(data);
+				   	unit.createType(data);
 				});
 			});
 			socket.on('unit-type-delete', function(data) {
@@ -164,7 +164,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	DeleteUnitType(data);
+				   	unit.deleteType(data);
 				});
 			});
 			socket.on('unit-build', function(data) {
@@ -175,7 +175,7 @@ module.exports = class websocket {
 
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	BuildUnit(data);
+				   	unit.build(data);
 				});
 			});
 
@@ -188,7 +188,7 @@ module.exports = class websocket {
 				player.isValid(data.user,function(user) { // Verify identity
 					// Execution du code
 				   	db.player.searchBySid(user.sid,function(dataReturned) {
-				   		dayBonus(dataReturned,user,data.choice);
+				   		player.dayBonus(dataReturned,user,data.choice);
 				   	});
 				}); 
 			});

@@ -115,7 +115,7 @@ module.exports = class research {
 		});
 	}
 
-	static ResearchSync(data) {
+	static sync(data) {
 		db.player.searchByName(data.username,function(dataReturned) {
 			refreshUserResearch(dataReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);

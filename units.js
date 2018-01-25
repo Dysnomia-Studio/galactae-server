@@ -58,7 +58,7 @@ module.exports = class units {
 	 * @class      CreateUnitType (name)
 	 * @param      {<type>}  data    Data given by client
 	 */
-	static CreateUnitType(data) {
+	static createType(data) {
 		var errors = 0;
 		var errorMessage = "";
 		var ship = data.ship;
@@ -272,7 +272,7 @@ module.exports = class units {
 		}
 	}
 
-	static DeleteUnitType(data) {
+	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
 
@@ -294,11 +294,11 @@ module.exports = class units {
 	/**
 	 * Builds an unit.
 	 *
-	 * @class      BuildUnit (name)
+	 * @class      build (name)
 	 * @param      string  planet    Where to build that ?
 	 * @param      string  unitData  What need to build ?
 	 */
-	static BuildUnit(inputData) {
+	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
 		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
