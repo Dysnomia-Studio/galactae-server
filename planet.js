@@ -430,12 +430,12 @@ module.exports = class planet {
 		 *
 		 * @param      {Object}  buildings  The buildings list
 		 */
-		static enoughtPeople(planet, fleets, callback) {
-			planet.getPeople(planet, fleets, function(planet, prod, cons) {
+		static enoughtPeople(planetData, fleets, callback) {
+			planet.getPeople(planetData, fleets, function(planet, prod, cons) {
 				if(prod<cons) {
-					callback(planet,false);
+					callback(planetData,false);
 				}
-				callback(planet,true);
+				callback(planetData,true);
 			});
 		}
 		/**
