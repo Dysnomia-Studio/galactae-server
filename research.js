@@ -56,7 +56,7 @@ module.exports = class research {
 
 			// Next planet
 			if(i+1<user.planetlist.length) {
-				researchRecalc(user,research,callback,i+1);
+				research.recalc(user,research,callback,i+1);
 			} else {
 				user.research = [];
 
