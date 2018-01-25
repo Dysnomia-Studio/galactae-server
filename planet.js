@@ -53,7 +53,7 @@ module.exports = class planet {
 
 				db.planet.update(newData);
 
-				refreshUserFleets(newData._id,data.sid);+
+				units.refreshFleets(newData._id,data.sid);+
 
 				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
@@ -325,8 +325,8 @@ module.exports = class planet {
 					newFleet.points = "" + newFleet.points;
 
 					db.fleet.update(newFleet, function() {
-						refreshUserUnits(user);
-						refreshUserFleets(planetIn._id,user.sid);
+						units.refreshUnits(user);
+						units.refreshFleets(planetIn._id,user.sid);
 					});	
 				});
 			});

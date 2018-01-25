@@ -75,7 +75,7 @@ module.exports = class player {
 			});
 
 			units.refreshUnits(data);
-			units.refreshPoints(dataReturned, function(userNewPoints) {
+			player.refreshPoints(dataReturned, function(userNewPoints) {
 				research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 					db.player.update(userNewResearch);
 					plCount++;
@@ -134,7 +134,7 @@ module.exports = class player {
 
 		return points;
 	}
-	static refreshUserPoints(user,callback) {
+	static refreshPoints(user,callback) {
 		calcTotalPlanetPoints(user,function(newUserData) {
 			// Recherches
 			newUserData.points += calcResearchPoints(newUserData);
