@@ -151,7 +151,7 @@ module.exports = class units {
 				for(var i in ship) {
 					if(i=="name" || i=="type" || i=="shape") { continue; }
 
-					if(shipResearchDependencies[ship[i].value]!=undefined && getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+					if(shipResearchDependencies[ship[i].value]!=undefined && research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
 						errors++;
 						message = "NEEDED_RESEARCH_MISSING";
 						break;

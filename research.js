@@ -80,7 +80,7 @@ module.exports = class research {
 				var researchedParent = true;
 				for(var i in researchList[research].parents) {
 					if((!isset(researchList[research].parents[i]) ||
-						getResearch(userNewResearch,researchList[research].parents[i])!=-1) &&
+						research.getResearch(userNewResearch,researchList[research].parents[i])!=-1) &&
 						researchList[research].parents[i] != "researchCenter") {
 						researchedParent = false;
 						break;

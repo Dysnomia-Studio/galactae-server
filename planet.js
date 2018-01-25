@@ -116,7 +116,7 @@ module.exports = class planet {
 			}
 
 			// Molecular compression, enhance max storage
-			if(getResearch(user,"cp_molecular_compression")==-1) {
+			if(research.getResearch(user,"cp_molecular_compression")==-1) {
 				mineralStorageBase *= researchBonus["cp_molecular_compression"];
 				metalsStorageBase *= researchBonus["cp_molecular_compression"];
 				storageHelium *= researchBonus["cp_molecular_compression"];
@@ -243,14 +243,14 @@ module.exports = class planet {
 
 					if(!BlockBuild) {
 						// Research bonus
-							if(getResearch(userReturned,"cp_mecanisation") == -1) {
+							if(research.getResearch(userReturned,"cp_mecanisation") == -1) {
 								timeSpeed += researchBonus.cp_mecanisation;
 							}
 							if(data.building>8) {
-								if(getResearch(userReturned,"cp_tracteur") == -1) {
+								if(research.getResearch(userReturned,"cp_tracteur") == -1) {
 									timeSpeed += researchBonus.cp_tracteur;
 								}
-								if(getResearch(userReturned,"cp_materielTp") == -1) {
+								if(research.getResearch(userReturned,"cp_materielTp") == -1) {
 									timeSpeed += researchBonus.cp_materielTp;
 								}
 							}
