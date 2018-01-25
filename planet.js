@@ -228,7 +228,7 @@ module.exports = class planet {
 
 					// Energie ? Habitants ?
 					if(!BlockBuild) {	
-						if(!enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
+						if(!planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
 							BlockBuild = true;
 							errormsg = "BUILDING_ERROR_ENERGY";
 						}
@@ -386,7 +386,7 @@ module.exports = class planet {
 			var cons = 0;
 
 			for(var i=0; i<9; i++) {
-				cons += parseInt(GetBuildingCost(i,groundBuildings[i]).energy);
+				cons += parseInt(planet.GetBuildingCost(i,groundBuildings[i]).energy);
 			}
 
 			if(prod<cons) {
@@ -411,10 +411,10 @@ module.exports = class planet {
 				if(buildings[i]==0) { continue; }
 				if(i==planet.nextBuilding) {
 					// Current in-build building
-					cons += parseInt(GetBuildingCost(i,buildings[i] + 1).habitants);
+					cons += parseInt(planet.GetBuildingCost(i,buildings[i] + 1).habitants);
 					continue; 
 				}
-				cons += parseInt(GetBuildingCost(i,buildings[i]).habitants);
+				cons += parseInt(planet.GetBuildingCost(i,buildings[i]).habitants);
 			}
 
 			// Units builded and in-build
@@ -431,7 +431,7 @@ module.exports = class planet {
 		 * @param      {Object}  buildings  The buildings list
 		 */
 		static enoughtPeople(planet, fleets, callback) {
-			getPeople(planet, fleets, function(planet, prod, cons) {
+			planet.getPeople(planet, fleets, function(planet, prod, cons) {
 				if(prod<cons) {
 					callback(planet,false);
 				}
