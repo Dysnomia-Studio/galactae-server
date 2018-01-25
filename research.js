@@ -22,7 +22,7 @@ module.exports = class research {
 			researchOut[data.research[i][0]] = data.research[i][1];
 		}
 
-		researchRecalc(data,researchOut,function(user) {
+		research.recalc(data,researchOut,function(user) {
 			user.lastAction = Date.now();
 			user.lastResearchUpdate = Date.now();
 			callback(user);
@@ -41,7 +41,7 @@ module.exports = class research {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
 
-	static researchRecalc(user,research,callback,i=0) {
+	static recalc(user,research,callback,i=0) {
 		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
