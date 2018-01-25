@@ -349,7 +349,7 @@ module.exports = class planet {
 			// Update resources
 			data.resources = planet.UpdateResources(planetIn,user);
 			// Update points
-			data.points = calcPlanetPoints(planetIn);
+			data.points = planet.calcPlanetPoints(planetIn);
 			data.points += parseFloat(calcFleetPoints(fleetList));
 			data.points = Math.round(data.points);
 
