@@ -17,8 +17,8 @@ module.exports = class chat {
 					var args=data.message.split(reg);
 					data.message = textToSmileys(data.message);
 
-					logname = data.username;
-					logmsg = data.message;
+					var logname = data.username;
+					var logmsg = data.message;
 
 					/* Controles de securité */
 					data.send = true;
