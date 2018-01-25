@@ -74,7 +74,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	planet.refreshUserPlanet(data,0);
+				   	planet.refresh(data,0);
 				});
 			});
 			// Next/Prev planet
@@ -85,7 +85,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	planet.refreshUserPlanet(data,-1);
+				   	planet.refresh(data,-1);
 				}); 
 			});
 			socket.on('planet-ask-data-next', function (data) {
@@ -95,7 +95,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	planet.refreshUserPlanet(data,1);
+				   	planet.refresh(data,1);
 				}); 
 			});
 

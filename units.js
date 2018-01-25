@@ -1,13 +1,11 @@
-var db = require('./database');
-
-module.exports = function() {
+module.exports = class units {
 	/**
 	 * Get and send unit data to user
 	 *
 	 * @param      {object}  data    user data
 	 * @return     {socket}  units   list of units types
 	 */
-	this.refreshUserUnits = function(data) {
+	static refreshUnits(data) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER BEFORE !
@@ -18,7 +16,7 @@ module.exports = function() {
 		});
 	},
 
-	this.refreshUserFleets = function(pid,sid) {
+	static refreshFleets(pid,sid) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
@@ -35,7 +33,7 @@ module.exports = function() {
 	 * @param      {<type>}  data    The data
 	 * @return     {Array}   Unit total cost
 	 */
-	this.calcUnitCosts = function(shipType,parts) {
+	static calcUnitCosts(shipType,parts) {
 		var totalCost = shipCosts[shipType];
 
 		for(var id in parts) {
@@ -60,7 +58,7 @@ module.exports = function() {
 	 * @class      CreateUnitType (name)
 	 * @param      {<type>}  data    Data given by client
 	 */
-	this.CreateUnitType = function(data) {
+	static CreateUnitType(data) {
 		var errors = 0;
 		var errorMessage = "";
 		var ship = data.ship;
@@ -274,7 +272,7 @@ module.exports = function() {
 		}
 	}
 
-	this.DeleteUnitType = function(data) {
+	static DeleteUnitType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
 
@@ -300,7 +298,7 @@ module.exports = function() {
 	 * @param      string  planet    Where to build that ?
 	 * @param      string  unitData  What need to build ?
 	 */
-	this.BuildUnit = function(inputData) {
+	static BuildUnit(inputData) {
 		// Check if planet, unit & fleet belong to player
 		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
@@ -431,7 +429,7 @@ module.exports = function() {
 		});
 	}
 
-	this.CreateFleet = function(data,planet,callback) {
+	static CreateFleet(data,planet,callback) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !

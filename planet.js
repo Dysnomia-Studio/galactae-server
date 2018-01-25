@@ -46,7 +46,7 @@ module.exports = class planet {
 		 * @param      {<type>}  data      data sent by user
 		 * @param      {number}  decalage  le decalage de planete
 		 */
-		static refreshUserPlanet(data,decalage=0) {
+		static refresh(data,decalage=0) {
 			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
 
 				var newData = UpdatePlanet(planetReturned,userReturned,fleetReturned);

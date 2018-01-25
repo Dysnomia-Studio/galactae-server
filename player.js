@@ -74,9 +74,9 @@ module.exports = class player {
 				gvt: dataReturned.gvt
 			});
 
-			refreshUserUnits(data);
-			refreshUserPoints(dataReturned, function(userNewPoints) {
-				refreshUserResearch(userNewPoints, function(userNewResearch) {
+			units.refreshUnits(data);
+			units.refreshPoints(dataReturned, function(userNewPoints) {
+				research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 					db.player.update(userNewResearch);
 					plCount++;
 
@@ -91,7 +91,7 @@ module.exports = class player {
 						research: researchOut
 					});
 
-					refreshUserPlanet(data,0); // THIS HAVE TO BE AFTER RESEARCHS
+					planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 				});
 			});
 		});
