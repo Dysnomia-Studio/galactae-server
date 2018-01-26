@@ -303,7 +303,7 @@ module.exports = class units {
 		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
-			var newPlanet = UpdatePlanet(planetReturned,userReturned,fleetList);
+			var newPlanet = planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
