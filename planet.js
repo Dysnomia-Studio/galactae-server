@@ -53,7 +53,7 @@ module.exports = class planet {
 
 				db.planet.update(newData);
 
-				units.refreshFleets(newData._id,data.sid);+
+				units.refreshFleets(newData._id,data.sid);
 
 				planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
