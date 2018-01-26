@@ -175,7 +175,7 @@ module.exports = class websocket {
 
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	unit.build(data);
+				   	units.build(data);
 				});
 			});
 
