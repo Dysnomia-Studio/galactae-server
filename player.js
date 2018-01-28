@@ -33,65 +33,80 @@ module.exports = class player {
 		})
 	}
 	/* Connect Player */
-	static connect(data) {	
-		db.player.searchByName(data.username,function(dataReturned) {
-			if(data.id!=dataReturned.id) {
-				// Kick that Hacker ...
-				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
-				return;
-			}
+	static connect(data) {
+		db.userGameId.find(data.id, function(userGameIdObj) {
+			data.user_id = userGameIdObj[0].user_id;
+			db.ban.find(data.user_id, 2, function(banObj) {
+				if(isset(banObj)) {
+					var now = Date.now();
+					for(var i=0; banObj.length; banObj++) {
+						if(banObj[i].ban_end < now) {
+							// @ADD: Message
+							return;
+						}
+					}
+				}
 
-			// Kick double accounts
-			if(dataReturned.sid != "-1") {
-				io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-				log(dataReturned.name +' ('+ dataReturned.id + ' | ' + dataReturned.sid +') was kicked because of double sessions.');
-				return;
-			}
-
-			dataReturned.sid = data.sid;
-			
-			var jour = 24*60*60*1000;
-			var minuit = Date.now() - (Date.now()%jour);
-			var hierMinuit = minuit - jour;
-			var dayStreak = dataReturned.dayBonusStreak+1; 
-			var bonusBest = dataReturned.dayBonusBest;
-
-			if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
-
-			if(dayStreak > bonusBest) { bonusBest = dayStreak; }
-
-			if(dataReturned.lastBonus < minuit) { 
-				io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
-			}
-
-			dataReturned.lastConnected = Date.now();
-
-			// Add to player list
-			
-
-			io.to(dataReturned.sid).emit('player-recieve-data',{
-				money: dataReturned.money,
-				gvt: dataReturned.gvt
-			});
-
-			units.refreshUnits(data);
-			player.refreshPoints(dataReturned, function(userNewPoints) {
-				research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-					db.player.update(userNewResearch);
-					plCount++;
-
-					// Send data to client
-					var researchOut = {};
-
-					for(var i=0; i<userNewResearch.research.length; i++) {
-						researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+				db.player.searchByName(data.username,function(dataReturned) {
+					if(data.id!=dataReturned.id) {
+						// Kick that Hacker ...
+						io.to(data.sid).emit('server-kick',"INVALID_SESSION");
+						return;
 					}
 
-					io.to(data.sid).emit('player-recieve-data',{
-						research: researchOut
+					// Kick double accounts
+					if(dataReturned.sid != "-1") {
+						io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
+						log(dataReturned.name +' ('+ dataReturned.id + ' | ' + dataReturned.sid +') was kicked because of double sessions.');
+						return;
+					}
+
+					dataReturned.sid = data.sid;
+					
+					var jour = 24*60*60*1000;
+					var minuit = Date.now() - (Date.now()%jour);
+					var hierMinuit = minuit - jour;
+					var dayStreak = dataReturned.dayBonusStreak+1; 
+					var bonusBest = dataReturned.dayBonusBest;
+
+					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
+
+					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
+
+					if(dataReturned.lastBonus < minuit) { 
+						io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+					}
+
+					dataReturned.lastConnected = Date.now();
+
+					// Add to player list
+					
+
+					io.to(dataReturned.sid).emit('player-recieve-data',{
+						money: dataReturned.money,
+						gvt: dataReturned.gvt
 					});
 
-					planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
+					units.refreshUnits(data);
+					player.refreshPoints(dataReturned, function(userNewPoints) {
+						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
+							db.player.update(userNewResearch);
+							plCount++;
+
+							// Send data to client
+							var researchOut = {};
+
+							for(var i=0; i<userNewResearch.research.length; i++) {
+								researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+							}
+
+							io.to(data.sid).emit('player-recieve-data',{
+								research: researchOut
+							});
+
+							planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
+						});
+					});
 				});
 			});
 		});
