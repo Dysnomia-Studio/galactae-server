@@ -117,7 +117,7 @@ module.exports = class research {
 
 	static sync(data) {
 		db.player.searchByName(data.username,function(dataReturned) {
-			refreshUserResearch(dataReturned, function(userNewResearch) {
+			research.refreshUserResearch(dataReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Send data to client

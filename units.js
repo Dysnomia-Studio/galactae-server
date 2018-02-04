@@ -287,7 +287,7 @@ module.exports = class units {
 
 			db.unit.delete(data.unit);
 
-			refreshUserUnits(data);
+			units.refreshUnits(data);
 		});
 	}
 
@@ -405,12 +405,13 @@ module.exports = class units {
 							return;
 						}
 
-						CreateFleet(inputData,newPlanet,function(fleetReturned) {
+						units.CreateFleet(inputData,newPlanet,function(fleetReturned) {
 							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
-						if(choosenFleet.position != newPlanet.address || ""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
+						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { return; } // @ADD: message
+						if(""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
@@ -464,7 +465,7 @@ module.exports = class units {
 
 			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
-				refreshUserFleets(data.planet,data.sid);
+				units.refreshFleets(data.planet,data.sid);
 
 				if(callback) { callback(newFleet); }
 			});
