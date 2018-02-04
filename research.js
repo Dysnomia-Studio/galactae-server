@@ -95,7 +95,7 @@ module.exports = class research {
 					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 				}
 
-				var newData = UpdatePlanet(planetReturned,userReturned);
+				var newData = planet.update(planetReturned,userReturned);
 				
 				if(researchedParent && researchList[researchData] != undefined) { // Just check if it exists ...
 					newData.currResearch = researchData;
@@ -107,7 +107,7 @@ module.exports = class research {
 
 				db.planet.update(newData);
 
-				sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
+				planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 
 				io.to(data.sid).emit('player-recieve-data',{
 					research: researchOut,
