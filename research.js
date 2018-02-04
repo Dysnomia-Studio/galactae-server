@@ -71,7 +71,7 @@ module.exports = class research {
 
 	static ChangePlanetResearch(data,pid,researchData) {
 		if(!isset(researchList[researchData])) { return; }
-		planet.find(data,data.pid,0,function(planetReturned,userReturned) {
+		planet.find(data,data.pid,0,function(planetReturned,userReturned,fleetReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
 
 			research.refreshUserResearch(userReturned, function(userNewResearch) {
@@ -95,7 +95,7 @@ module.exports = class research {
 					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 				}
 
-				var newData = planet.update(planetReturned,userReturned);
+				var newData = planet.update(planetReturned,userReturned,fleetReturned);
 				
 				if(researchedParent && researchList[researchData] != undefined) { // Just check if it exists ...
 					newData.currResearch = researchData;
