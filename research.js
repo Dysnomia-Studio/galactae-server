@@ -69,19 +69,20 @@ module.exports = class research {
 		});
 	}
 
-	static ChangePlanetResearch(data,pid,research) {
-		if(!isset(researchList[research])) { return; }
+	static ChangePlanetResearch(data,pid,researchData) {
+		if(!isset(researchList[researchData])) { return; }
 		planet.find(data,data.pid,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
+
 			research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
 				var researchedParent = true;
-				for(var i in researchList[research].parents) {
-					if((!isset(researchList[research].parents[i]) ||
-						research.getResearch(userNewResearch,researchList[research].parents[i])!=-1) &&
-						researchList[research].parents[i] != "researchCenter") {
+				for(var i in researchList[researchData].parents) {
+					if((!isset(researchList[researchData].parents[i]) ||
+						research.getResearch(userNewResearch,researchList[researchData].parents[i])!=-1) &&
+						researchList[researchData].parents[i] != "researchCenter") {
 						researchedParent = false;
 						break;
 					}
@@ -96,8 +97,8 @@ module.exports = class research {
 
 				var newData = UpdatePlanet(planetReturned,userReturned);
 				
-				if(researchedParent && researchList[research] != undefined) { // Just check if it exists ...
-					newData.currResearch = research;
+				if(researchedParent && researchList[researchData] != undefined) { // Just check if it exists ...
+					newData.currResearch = researchData;
 				}
 
 				if(!researchedParent) {
@@ -116,8 +117,8 @@ module.exports = class research {
 	}
 
 	static sync(data) {
-		db.player.searchByName(data.username,function(dataReturned) {
-			research.refreshUserResearch(dataReturned, function(userNewResearch) {
+		db.player.searchByName(data.username,function(userReturned) {
+			research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Send data to client
