@@ -73,7 +73,7 @@ module.exports = class research {
 		if(!isset(researchList[research])) { return; }
 		planet.find(data,data.pid,0,function(planetReturned,userReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
-			refreshUserResearch(userReturned, function(userNewResearch) {
+			research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research

@@ -168,6 +168,12 @@ module.exports = {
 	 * PLAYERS
 	 */
 	player: {
+		findAll: function(callback) {
+			users.find({ }, function (err, objReturned) {
+				if(err) { log(err); }
+				callback(objReturned)
+			});
+		},
 		searchByName: function(name,callback) {
 			users.findOne({ name: { $regex: new RegExp("^" + name.toLowerCase(), "i") } }, function (err, objReturned) {
 				if(err) { log(err); }
