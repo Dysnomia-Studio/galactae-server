@@ -154,7 +154,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	unit.createType(data);
+				   	units.createType(data);
 				});
 			});
 			socket.on('unit-type-delete', function(data) {
@@ -164,7 +164,7 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 					// Execution du code
-				   	unit.deleteType(data);
+				   	units.deleteType(data);
 				});
 			});
 			socket.on('unit-build', function(data) {
