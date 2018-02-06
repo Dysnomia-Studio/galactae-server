@@ -210,11 +210,12 @@ module.exports = function() {
 		phyContemporaine:	[4813,5333],
 		thermodynamique:	[4900,4467],
 		// Mise en orbite et propulsion
-		prop_thermique:		[4313,3933],
+		prop_main:			[4313,3933],
 		prop_vSolaire:		[3600,4250],
 		prop_ions:			[5922,4114],
-		prop_vsl:			[6918,4196],
-		prop_hyperespace:	[7800,4150],
+		prop_plasma:		[6918,4196],
+		prop_vsl:			[7800,4150],
+		prop_hyperespace:	[8700,4100],
 		prop_manoeuvre:		[4813,3433],
 		prop_advManoeuvre:	[5000,3000],
 		// Construction et production
@@ -232,6 +233,19 @@ module.exports = function() {
 		wep_mines:			[5300,6600],
 		wep_mines_nuke:		[6250,6600],
 		wep_mines_iem:		[4600,6100],
+		// Figther
+		figther_light_interceptor: [6100,3700],
+		figther_heavy_interceptor: [6150,3400],
+		figther_bomber: 	[6250,3100],
+		// Battlecruiser
+		battlecruiser_small: [7800,4900],
+		// Cuirasse
+		cuirasse_small: 	[7500,4500],
+		// Corvet
+		corvet_small: 		[6600,3800],
+		// Carrier
+		carrier_small: 		[5750,3600],
+		carrier_medium: 	[5700,3300],
 		// Satellites
 		wep_sat_ag1:		[5300,7100],
 		wep_sat_ag2:		[6350,7500],
@@ -257,6 +271,7 @@ module.exports = function() {
 		prop_main: 			{ cost: 380, parents: ["thermodynamique","misc_mecStellaire"] },
 		prop_vSolaire: 		{ cost: 2300, parents: ["prop_main","misc_phySolaire"] },
 		prop_ions: 			{ cost: 2000, parents: ["prop_main","misc_phyQuantique"] },
+		prop_plasma:		{ cost: 2500, parents: ["prop_ions","misc_phyQuantique"] },
 		prop_vsl: 			{ cost: 15000, parents: ["prop_ions","misc_advTelemetrie"] },
 		prop_hyperespace: 	{ cost: 35000, parents: ["prop_vsl"] },
 		prop_manoeuvre: 	{ cost: 450, parents: ["prop_main"] },
@@ -345,7 +360,11 @@ module.exports = function() {
 		laser: "wep_laser",
 		plasma: "wep_plasma",
 
-		// Shields
+		// Shields & Defences
+		magnetic: "def_shield_magnetic",
+		turret: "def_turret",
+		singularity: "def_shield_singularity",
+		projector: "def_shield_projector",
 
 		// Cloak
 		
@@ -356,6 +375,7 @@ module.exports = function() {
 		hyperespace: "prop_hyperespace",
 
 		ion: "prop_ions",
+		pplasma: "prop_plasma",
 		vsolaire: "prop_vSolaire",
 	};
 	this.shipShapesDetails = {
@@ -409,7 +429,7 @@ module.exports = function() {
 				content: {
 					cannon: ["railgun","laser","plasma"],
 					rocketLauncher: ["explosive","nuke","antimater"],
-					sub_propulsion: ["ion"],
+					sub_propulsion: ["ion","pplasma"],
 					sup_propulsion: ["vsl","hyperespace"],
 					shield: ["none","magnetic","turret"],
 				},
@@ -435,7 +455,7 @@ module.exports = function() {
 				],
 				content: {
 					cannon: ["railgun","laser","plasma"],
-					sub_propulsion: ["ion"],
+					sub_propulsion: ["ion","pplasma"],
 					sup_propulsion: ["vsl","hyperespace"],
 					shield: ["none","magnetic","turret","singularity","projector"],
 				},
@@ -457,7 +477,7 @@ module.exports = function() {
 				],
 				content: {
 					cannon: ["railgun","laser","plasma"],
-					sub_propulsion: ["ion","vsolaire"],
+					sub_propulsion: ["vsolaire","ion"],
 				},
 				stats: {
 					mass: 0,
@@ -476,7 +496,7 @@ module.exports = function() {
 				],
 				content: {
 					cannon: ["railgun","laser","plasma"],
-					sub_propulsion: ["ion","vsolaire"],
+					sub_propulsion: ["vsolaire","ion"],
 				},
 				stats: {
 					mass: 0,
@@ -502,7 +522,7 @@ module.exports = function() {
 				content: {
 					cloak: ["none"],
 					scanner: ["none"],
-					sub_propulsion: ["ion","vsolaire"],
+					sub_propulsion: ["vsolaire","ion","pplasma"],
 					sup_propulsion: ["vsl","hyperespace"],
 				},
 				stats: {
@@ -531,7 +551,7 @@ module.exports = function() {
 				],
 				content: {
 					hangar: ["none"],
-					sub_propulsion: ["ion"],
+					sub_propulsion: ["ion","pplasma"],
 					sup_propulsion: ["vsl","hyperespace"],
 					shield: ["none","magnetic","turret","projector"],
 				},
@@ -541,7 +561,7 @@ module.exports = function() {
 			},
 		},
 	};
-	this.shipCosts = { // [Al,Fe,Ti,Cu,Time,Population]
+	this.shipCosts =  { // [Al,Fe,Ti,Cu,Time,Population]
 		/**
 		 * Ship shapes
 		 */
@@ -572,7 +592,6 @@ module.exports = function() {
 		/**
 		 * Ship parts
 		 */
-
 		// Boom
 		explosive: 		[  1, 10,  3,  3,0.05,0],
 		nuke: 			[  3, 12,  5,  4,0.08,0],
@@ -584,6 +603,7 @@ module.exports = function() {
 		plasma: 		[ 10, 15,  7,  8,0.15,0],
 		// Propulsions subluminiques
 		ion: 			[ 80, 60, 40,  5,0.25,0],
+		plasma: 		[130, 90, 60, 10,0.40,0],
 		vsolaire: 		[120, 45, 35, 15,0.35,0],
 		// Propulsions supraluminiques
 		vsl: 			[ 65,120, 60, 20,0.55,  80],
