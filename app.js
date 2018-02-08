@@ -10,6 +10,7 @@ var express = require('express');
 var app = express();
 global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
+io.set("transports", ["websocket","xhr-polling","polling"]);
 
 /**
  * Global vars
