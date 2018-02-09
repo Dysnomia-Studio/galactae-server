@@ -132,13 +132,6 @@ module.exports = class chat {
 		}	
 		if(empty) { data.send = false; }
 
-        /* Can the player send a message ? */
-        if(data.lvl<2) {
-        	data.send = false;
-        	chat.sendSM(data.sid,"NO_PERM");
-        	// Kick it ...
-        	io.to(data.sid).emit('server-kick');
-        }
         /* Disable links */
         if(str!=str.replace('://','') || str!=str.replace('www.','')) {
         	data.send = false;
