@@ -186,7 +186,7 @@ module.exports = function() {
         var unit = str.charAt(str.length-1).toLowerCase();
         var count = parseInt(str.substr[0,str.length-1]);
 
-        if(typeof count != "number" || isNan(count)) {
+        if(typeof count != "number" || isNaN(count)) {
             return -1; // Send error code
         }
 
