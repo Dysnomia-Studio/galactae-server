@@ -100,17 +100,17 @@ module.exports = class planet {
 			var ratio = planet.GetMineralsRatio(planetType);
 			var ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
-			var mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) - mineralProd[1]*buildings[0] + mineralProd[2];
-			var metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   - metalProd[1]*buildings[1]   + metalProd[2];
-			var heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  - heliumProd[1]*buildings[13]  + heliumProd[2];
+			var mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
+			var metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
+			var heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
 			var warehouseBase = storageRatio[0]*Math.log(buildings[5]) + storageRatio[1];
 
-			var mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) - mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
-			var metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   - metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
+			var mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
+			var metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
 
 			if(buildings[10]!=0) {
-				var storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  - heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
+				var storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
 			} else {
 				var storageHelium = 0;
 			}

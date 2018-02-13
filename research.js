@@ -45,6 +45,8 @@ module.exports = class research {
 		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
+			var newPlanet = planetReturned.toJSON();
+
 			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] != -1) {
 				researchData[planetReturned.currResearch] += (research.getResearchProduction(planetReturned.Buildings[8])*time);
 
@@ -53,6 +55,8 @@ module.exports = class research {
 					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
 				}
 			}
+
+			db.planet.update(newPlanet);
 
 			// Next planet
 			if(i+1<user.planetlist.length) {

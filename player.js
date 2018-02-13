@@ -4,7 +4,7 @@ module.exports = class player {
 		if(isset(user.username)&&isset(user.id)) {
 			db.player.searchBySid(user.sid,function(searchSid) {
 				if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
-					if(player.canAct(searchSid)) { // Don't spam ^^
+					if(player.canAct(searchSid)) { // Don't spam
 						callback(user);
 
 						var newData = searchSid;
