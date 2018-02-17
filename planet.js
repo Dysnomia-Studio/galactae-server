@@ -86,11 +86,11 @@ module.exports = class planet {
 		 * specific time period.
 		 *
 		 * @class      CalcNewResources (resources)
-		 * @param      {<type>}  resources   The old resources
+		 * @param      {array}   resources   The old resources
 		 * @param      {number}  buildings   The buildings levels
-		 * @param      {<type>}  planetType  The planet type
+		 * @param      {number}  planetType  The planet type
 		 * @param      {number}  time        The time period
-		 * @param      {<type>}  user        The user
+		 * @param      {object}  user        The user
 		 */
 		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
@@ -137,7 +137,7 @@ module.exports = class planet {
 			    }
 
 				resources[0] -= (metalProdBase*time); //Consomation Algorithm
-			} else { // Do the max we can
+			} else if(currentBuilding!=1) { // Do the max we can
 			    for(var i=2; i<6; i++) {
 			    	resources[i] += resources[0]*ratios[i-2];
 			    }
@@ -253,6 +253,9 @@ module.exports = class planet {
 								if(research.getResearch(userReturned,"cp_materielTp") == -1) {
 									timeSpeed += researchBonus.cp_materielTp;
 								}
+							}
+							if(data.building > 8) { // Faster if shipyard have higher lvl
+								cost.time *= (1-(buildLvlUnitBuildingSpeedBonus*newData.Buildings[7]));
 							}
 
 						// We consume resources

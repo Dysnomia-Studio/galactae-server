@@ -307,7 +307,7 @@ module.exports = class units {
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
-				log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because another is already building.');
+				log(inputData.username +' failed to build units because another is already building.');
 				websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
 			}
@@ -348,7 +348,7 @@ module.exports = class units {
 					totalCost[3] > newPlanet.resources[4] ||
 					totalCost[2] > newPlanet.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
-					log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough resources.');
+					log(inputData.username +' failed to build units because of no enough resources.');
 					websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
 					return;
 				}
@@ -356,7 +356,7 @@ module.exports = class units {
 				planet.getPeople(newPlanet,fleetList, function(newPlanet, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
-						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because of no enough people.');
+						log(inputData.username +' failed to build units because of no enough people.');
 						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
 						return;
 					}
@@ -400,7 +400,7 @@ module.exports = class units {
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst["maxFleetSize"]) { 
-							log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+							log(inputData.username +' failed to build units because fleet will be too big.');
 							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
@@ -415,14 +415,14 @@ module.exports = class units {
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
-							log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet will be too big.');
+							log(inputData.username +' failed to build units because fleet will be too big.');
 							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
 					}  else {
-						log(inputData.username +' ('+ inputData.id + ' | ' + inputData.sid +') failed to build units because fleet isn\'t valid.');
+						log(inputData.username +' failed to build units because fleet isn\'t valid.');
 						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
 					}
 				});	
