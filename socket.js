@@ -17,7 +17,7 @@ module.exports = class websocket {
 				// User
 				user.sid = socket.id;
 				// Log
-				log(user.username + ' connected');
+				log(user.username + ' ('+socket.id+') connected');
 				// Execution du code
 				player.connect(user);
 			});
@@ -29,7 +29,7 @@ module.exports = class websocket {
 				user.sid = socket.id;
 				player.isValid(user,function(user) { // Verify identity
 					// Log
-					log(user.username + ' disconnected');
+					log(user.username + ' ('+socket.id+') disconnected');
 					// Execution du code
 					player.disconnect(user);
 				}); 
@@ -44,7 +44,7 @@ module.exports = class websocket {
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user) || !isset(user.name) || !isset(user.id)) { return; }
 					// Log
-					log(user.username + ' disconnected');
+					log(user.name + ' ('+socket.id+') disconnected');
 					// Execution du code
 					player.disconnect(user);
 				}); 
