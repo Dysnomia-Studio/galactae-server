@@ -36,6 +36,16 @@ module.exports = class planet {
 							callback(planetReturned,userReturned,fleetReturned);
 						});
 					});
+				} else {
+					db.planet.find(pid,function(planetReturned) {
+						if(!isset(planetReturned)) { return; }
+						db.player.searchById(planetReturned.owner, function(userReturned) {
+							if(!isset(userReturned)) { return; }
+							var planetData = filterOtherPlayerData(planetReturned, userReturned);
+
+							io.to(user.sid).emit("planet-recieve-other-data", planetData );
+						});
+					});
 				}
 			});
 		}
@@ -48,7 +58,6 @@ module.exports = class planet {
 		 */
 		static refresh(data,decalage=0) {
 			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-
 				var newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				db.planet.update(newData);
@@ -533,12 +542,31 @@ module.exports = class planet {
 		}
 
 		/**
+		 * Filter planet & user data to be returned to a player
+		 *
+		 * @param      {object}  planet  The planet
+		 * @param      {object}  user    The user
+		 * @return     {object}  filtered data
+		 */
+		static filterOtherPlayerData(planet,user) {
+			var returnData = {
+				name: planet.name,
+				address: planet.address,
+				ownerName: user.name,
+				planetType: planet.planetType,
+				points: planet.points,
+			};
+
+			return returnData;
+		}
+
+		/**
 		 * Gets the building cost.
 		 *
 		 * @class      GetBuildingCost (name)
-		 * @param      {<type>}  build   The building id
+		 * @param      {number}  build   The building id
 		 * @param      {number}  level   The level asked
-		 * @return     {<type>}  The building cost.
+		 * @return     {object}  The building cost.
 		 */
 		static GetBuildingCost(build,level) {
 			if(build < 0 || build > globalConst["buildingNumber"]) { return; }
