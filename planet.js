@@ -555,6 +555,7 @@ module.exports = class planet {
 				ownerName: user.name,
 				planetType: planet.planetType,
 				points: planet.points,
+				ally: user.ally,
 			};
 
 			return returnData;

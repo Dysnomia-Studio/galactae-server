@@ -215,9 +215,11 @@ module.exports = function() {
 		prop_ions:			[5922,4114],
 		prop_plasma:		[6918,4196],
 		prop_vsl:			[7800,4150],
-		prop_hyperespace:	[8700,4100],
+		prop_wd:			[8700,4100],
+		prop_hyperespace:	[9600,4050],
 		prop_manoeuvre:		[4813,3433],
 		prop_advManoeuvre:	[5000,3000],
+		prop_suprastability:[7850,3850],
 		// Construction et production
 		cp_mecanisation:	[6000,4600],
 		cp_tracteur:		[6300,4950],
@@ -273,9 +275,11 @@ module.exports = function() {
 		prop_ions: 			{ cost: 2000, parents: ["prop_main","misc_phyQuantique"] },
 		prop_plasma:		{ cost: 2500, parents: ["prop_ions","misc_phyQuantique"] },
 		prop_vsl: 			{ cost: 15000, parents: ["prop_ions","misc_advTelemetrie"] },
-		prop_hyperespace: 	{ cost: 35000, parents: ["prop_vsl"] },
+		prop_wd: 			{ cost: 24000, parents: ["prop_vsl"] },
+		prop_hyperespace: 	{ cost: 35000, parents: ["prop_wd"] },
 		prop_manoeuvre: 	{ cost: 450, parents: ["prop_main"] },
 		prop_advManoeuvre: 	{ cost: 700, parents: ["prop_manoeuvre"] },
+		prop_suprastability:{ cost: 5000, parents: ["prop_vsl","misc_phySolaire"] },
 		// Construction et production
 		cp_mecanisation: 	{ cost: 120, parents: ["industrialistion"] },
 		cp_tracteur: 	 	{ cost: 150, parents: ["industrialistion"] },
@@ -372,6 +376,7 @@ module.exports = function() {
 		
 		// Propulsion
 		vsl: "prop_vsl",
+		wd: "prop_wd",
 		hyperespace: "prop_hyperespace",
 
 		ion: "prop_ions",
@@ -430,7 +435,7 @@ module.exports = function() {
 					cannon: ["railgun","laser","plasma"],
 					rocketLauncher: ["explosive","nuke","antimater"],
 					sub_propulsion: ["ion","pplasma"],
-					sup_propulsion: ["vsl","hyperespace"],
+					sup_propulsion: ["vsl","wd"],
 					shield: ["none","magnetic","turret"],
 				},
 				stats: {
@@ -456,7 +461,7 @@ module.exports = function() {
 				content: {
 					cannon: ["railgun","laser","plasma"],
 					sub_propulsion: ["ion","pplasma"],
-					sup_propulsion: ["vsl","hyperespace"],
+					sup_propulsion: ["vsl","wd"],
 					shield: ["none","magnetic","turret","singularity","projector"],
 				},
 				stats: {
@@ -523,7 +528,7 @@ module.exports = function() {
 					cloak: ["none"],
 					scanner: ["none"],
 					sub_propulsion: ["vsolaire","ion","pplasma"],
-					sup_propulsion: ["vsl","hyperespace"],
+					sup_propulsion: ["vsl","wd"],
 				},
 				stats: {
 					mass: 0,
@@ -552,7 +557,7 @@ module.exports = function() {
 				content: {
 					hangar: ["none"],
 					sub_propulsion: ["ion","pplasma"],
-					sup_propulsion: ["vsl","hyperespace"],
+					sup_propulsion: ["vsl","wd","hyperespace"],
 					shield: ["none","magnetic","turret","projector"],
 				},
 				stats: {
