@@ -1,22 +1,20 @@
 module.exports = class player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		if(isset(user.username)&&isset(user.id)) {
-			db.player.searchBySid(user.sid,function(searchSid) {
-				if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
-					if(player.canAct(searchSid)) { // Don't spam
-						callback(user);
+		db.player.searchBySid(user.sid,function(searchSid) {
+			if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
+				if(player.canAct(searchSid)) { // Don't spam
+					callback(user);
 
-						var newData = searchSid;
-						newData.lastAction = Date.now();
-						db.player.update(newData);	
-					}
-				} else {
-					// Kick that Hacker ...
-					io.to(user.sid).emit('server-kick',"INVALID_SESSION");
+					var newData = searchSid;
+					newData.lastAction = Date.now();
+					db.player.update(newData);	
 				}
-			});	
-		}
+			} else {
+				// Kick that Hacker ...
+				io.to(user.sid).emit('server-kick',"INVALID_SESSION");
+			}
+		});	
 	}
 	/* Does the player can act ? */
 	static canAct(user) {
@@ -48,47 +46,45 @@ module.exports = class player {
 				}
 
 				db.player.searchByName(data.username,function(dataReturned) {
-					if(data.id!=dataReturned.id) {
+					var newPlayer = dataReturned.toJSON();
+					if(data.id!=newPlayer.id) {
 						// Kick that Hacker ...
 						io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 						return;
 					}
 
 					// Kick double accounts
-					if(dataReturned.sid != "-1") {
-						io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-						log(dataReturned.name +' ('+ dataReturned.id + ' | ' + dataReturned.sid +') was kicked because of double sessions.');
+					if(newPlayer.sid != "-1") {
+						io.to(newPlayer.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
+						log(newPlayer.name +' ('+ newPlayer.sid +') was kicked because of double sessions.');
 						return;
 					}
 
-					dataReturned.sid = data.sid;
+					newPlayer.sid = data.sid;
 					
 					var jour = 24*60*60*1000;
 					var minuit = Date.now() - (Date.now()%jour);
 					var hierMinuit = minuit - jour;
-					var dayStreak = dataReturned.dayBonusStreak+1; 
-					var bonusBest = dataReturned.dayBonusBest;
+					var dayStreak = newPlayer.dayBonusStreak+1; 
+					var bonusBest = newPlayer.dayBonusBest;
 
 					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
 					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
-					if(dataReturned.lastBonus < minuit) { 
-						io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+					if(newPlayer.lastBonus < minuit) { 
+						io.to(newPlayer.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
 					}
 
-					dataReturned.lastConnected = Date.now();
+					newPlayer.lastConnected = Date.now();		
 
-					// Add to player list
-					
-
-					io.to(dataReturned.sid).emit('player-recieve-data',{
-						money: dataReturned.money,
-						gvt: dataReturned.gvt
+					io.to(newPlayer.sid).emit('player-recieve-data',{
+						money: newPlayer.money,
+						gvt: newPlayer.gvt
 					});
 
 					units.refreshUnits(data);
-					player.refreshPoints(dataReturned, function(userNewPoints) {
+					player.refreshPoints(newPlayer, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 							db.player.update(userNewResearch);
 							plCount++;
