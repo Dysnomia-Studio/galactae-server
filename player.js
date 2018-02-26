@@ -59,32 +59,31 @@ module.exports = class player {
 						return;
 					}
 
-					var newPlayer = dataReturned.toJSON();
-					newPlayer.sid = data.sid;
+					dataReturned.sid = data.sid;
 					
 					var jour = 24*60*60*1000;
 					var minuit = Date.now() - (Date.now()%jour);
 					var hierMinuit = minuit - jour;
-					var dayStreak = newPlayer.dayBonusStreak+1; 
-					var bonusBest = newPlayer.dayBonusBest;
+					var dayStreak = dataReturned.dayBonusStreak+1; 
+					var bonusBest = dataReturned.dayBonusBest;
 
 					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
 					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
-					if(newPlayer.lastBonus < minuit) { 
-						io.to(newPlayer.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+					if(dataReturned.lastBonus < minuit) { 
+						io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
 					}
 
-					newPlayer.lastConnected = Date.now();		
+					dataReturned.lastConnected = Date.now();		
 
-					io.to(newPlayer.sid).emit('player-recieve-data',{
-						money: newPlayer.money,
-						gvt: newPlayer.gvt
+					io.to(dataReturned.sid).emit('player-recieve-data',{
+						money: dataReturned.money,
+						gvt: dataReturned.gvt
 					});
 
 					units.refreshUnits(data);
-					player.refreshPoints(newPlayer, function(userNewPoints) {
+					player.refreshPoints(dataReturned, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 							db.player.update(userNewResearch);
 							plCount++;
