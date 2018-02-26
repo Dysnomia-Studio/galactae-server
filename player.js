@@ -84,13 +84,13 @@ module.exports = class player {
 						gvt: playerData.gvt
 					});
 
-					console.info(playerData);
-
 					units.refreshUnits(data);
 					player.refreshPoints(playerData, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 							db.player.update(userNewResearch);
 							plCount++;
+
+							console.info(playerData);
 
 							// Send data to client
 							var researchOut = {};
