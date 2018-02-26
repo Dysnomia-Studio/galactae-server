@@ -84,6 +84,8 @@ module.exports = class player {
 						gvt: playerData.gvt
 					});
 
+					console.info(playerData);
+
 					units.refreshUnits(data);
 					player.refreshPoints(playerData, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
