@@ -87,13 +87,10 @@ module.exports = class player {
 					units.refreshUnits(data);
 					player.refreshPoints(playerData, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
+							userNewResearch.id = userNewResearch._id;
 							db.player.update(userNewResearch);
 							plCount++;
-
-							console.log(playerData == userNewResearch);
-							console.log(userNewResearch.sid);
-							console.log(userNewResearch.lastConnected);
-
+							
 							// Send data to client
 							var researchOut = {};
 
