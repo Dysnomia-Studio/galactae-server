@@ -90,7 +90,9 @@ module.exports = class player {
 							db.player.update(userNewResearch);
 							plCount++;
 
-							console.info(playerData);
+							console.log(playerData == userNewResearch);
+							console.log(userNewResearch.sid);
+							console.log(userNewResearch.lastConnected);
 
 							// Send data to client
 							var researchOut = {};
