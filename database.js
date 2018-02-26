@@ -63,7 +63,7 @@ var fleetsSchema = new Schema({
 	ownerId: Schema.Types.ObjectId,
 	motherPlanetId: Schema.Types.ObjectId,
 	position: String,
-	orbitPosition: Number,
+	orbitPosition: Number, // -1 = Moving to, 0 = Low Orbit - Defense or siege, 1 = Mid Orbit - Attacking, 2 = High orbit - Just around the planet
 	points: String,
 	endMoveTime: Number,
 	units: Array,
@@ -192,13 +192,16 @@ module.exports = {
 				callback(objReturned)
 			});
 		},
-		update: function(user) {
+		update: function(user, callback) {
 			var conditions = { _id: user.id }
 						  , update = { $set: user }
 						  , options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
+				if(callback !== undefined) {
+					callback();
+				}
 			});
 		},
 		clearList: function() {

@@ -88,21 +88,22 @@ module.exports = class player {
 					player.refreshPoints(playerData, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 							userNewResearch.id = userNewResearch._id;
-							db.player.update(userNewResearch);
-							plCount++;
-							
-							// Send data to client
-							var researchOut = {};
+								db.player.update(userNewResearch, function() {
+								plCount++;
+								
+								// Send data to client
+								var researchOut = {};
 
-							for(var i=0; i<userNewResearch.research.length; i++) {
-								researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
-							}
+								for(var i=0; i<userNewResearch.research.length; i++) {
+									researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
+								}
 
-							io.to(data.sid).emit('player-recieve-data',{
-								research: researchOut
+								io.to(data.sid).emit('player-recieve-data',{
+									research: researchOut
+								});
+
+								planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 							});
-
-							planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 						});
 					});
 				});
