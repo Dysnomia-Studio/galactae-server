@@ -53,37 +53,39 @@ module.exports = class player {
 					}
 
 					// Kick double accounts
-					if(dataReturned.sid != "-1") {
-						io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
+					let oldSid = dataReturned.sid;
+					if(oldSid != "-1") {
+						io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
 						log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
 						return;
 					}
 
-					dataReturned.sid = data.sid;
+					var playerData = dataReturned.toJSON();
+					playerData.sid = data.sid;
 					
 					var jour = 24*60*60*1000;
 					var minuit = Date.now() - (Date.now()%jour);
 					var hierMinuit = minuit - jour;
-					var dayStreak = dataReturned.dayBonusStreak+1; 
-					var bonusBest = dataReturned.dayBonusBest;
+					var dayStreak = playerData.dayBonusStreak+1; 
+					var bonusBest = playerData.dayBonusBest;
 
 					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
 					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
-					if(dataReturned.lastBonus < minuit) { 
-						io.to(dataReturned.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+					if(playerData.lastBonus < minuit) { 
+						io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
 					}
 
-					dataReturned.lastConnected = Date.now();		
+					playerData.lastConnected = Date.now();		
 
-					io.to(dataReturned.sid).emit('player-recieve-data',{
-						money: dataReturned.money,
-						gvt: dataReturned.gvt
+					io.to(data.sid).emit('player-recieve-data',{
+						money: playerData.money,
+						gvt: playerData.gvt
 					});
 
 					units.refreshUnits(data);
-					player.refreshPoints(dataReturned, function(userNewPoints) {
+					player.refreshPoints(playerData, function(userNewPoints) {
 						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 							db.player.update(userNewResearch);
 							plCount++;
