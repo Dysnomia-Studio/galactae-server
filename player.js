@@ -46,20 +46,20 @@ module.exports = class player {
 				}
 
 				db.player.searchByName(data.username,function(dataReturned) {
-					var newPlayer = dataReturned.toJSON();
-					if(data.id!=newPlayer.id) {
+					if(data.id!=dataReturned.id) {
 						// Kick that Hacker ...
 						io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 						return;
 					}
 
 					// Kick double accounts
-					if(newPlayer.sid != "-1") {
-						io.to(newPlayer.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-						log(newPlayer.name +' ('+ newPlayer.sid +') was kicked because of double sessions.');
+					if(dataReturned.sid != "-1") {
+						io.to(dataReturned.sid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
+						log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
 						return;
 					}
 
+					var newPlayer = dataReturned.toJSON();
 					newPlayer.sid = data.sid;
 					
 					var jour = 24*60*60*1000;
