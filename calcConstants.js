@@ -608,7 +608,7 @@ module.exports = function() {
 		plasma: 		[ 10, 15,  7,  8,0.15,0],
 		// Propulsions subluminiques
 		ion: 			[ 80, 60, 40,  5,0.25,0],
-		plasma: 		[130, 90, 60, 10,0.40,0],
+		pplasma: 		[130, 90, 60, 10,0.40,0],
 		vsolaire: 		[120, 45, 35, 15,0.35,0],
 		// Propulsions supraluminiques
 		vsl: 			[ 65,120, 60, 20,0.55,  80],
