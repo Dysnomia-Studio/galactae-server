@@ -103,6 +103,9 @@ module.exports = class units {
 		}
 
 		if(errors==0) {
+			var subprop = "";
+			var supprop = "";
+
 			for(var i in ship) {
 				if(i=="name" || i=="type" || i=="shape") { continue; }
 				// Check if that kind of part exists in that kind of ship
@@ -133,6 +136,23 @@ module.exports = class units {
 							valid = true;
 							break;
 						}
+					}
+				}
+
+				// Prevent different subengines
+				if(ship[i].type == "sub_propulsion") {
+					if(subprop == "") {
+						subprop = ship[i].value;
+					} else if(subprop != ship[i].value) {
+						valid = false;
+					}
+				}
+				// Prevent different supbengines
+				if(ship[i].type == "sup_propulsion") {
+					if(supprop == "") {
+						supprop = ship[i].value;
+					} else if(supprop != ship[i].value) {
+						valid = false;
 					}
 				}
 
@@ -410,7 +430,10 @@ module.exports = class units {
 						});
 					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
-						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { return; } // @ADD: message
+						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { 
+							websocket.SendMessageToClient({ sid: inputData.sid, message: "FLEET_ISNT_IN_ORBIT" });
+							return;
+						}
 						if(""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
@@ -471,5 +494,188 @@ module.exports = class units {
 			});
 				
 		});
-	}	
+	}
+
+	static hasEnoughCarrier(fleet, unitList) {
+		var fighterCount = 0;
+		var fighterCap   = 0;
+
+		for(var i in unitList) {
+			if(unitList[i].shipType == "SHIP_FIGHTER") {
+				fighterCount++;
+			} else if(unitList[i].shipType == "SHIP_CARRIER") {
+				//@ADD Count Capacity
+			}
+		}
+
+		return fighterCount <= fighterCap;
+	}
+
+	static calcUnitSubSpeed(parts) {
+		var speed = [];
+
+		for(var i in unit.parts) {
+			if(unit.parts[i].type == "sub_propulsion") {
+				if(speed[0] == -1) { // First sup propulsion part
+					if(shipPartsSpeed[unit.parts[i].tech] === undefined) { 
+						log("Speed is not defined for part " + unit.parts[i].tech,"error");
+						return [];
+					}
+					speed = shipPartsSpeed[unit.parts[i].tech];
+				} else {
+					for(var i=0; i<speed.length; i++) {
+						speed[i] *= 1.5;
+					}
+				}
+			}
+		}
+
+		return speed;
+	}
+
+	static getFleetMinSubSpeed(unitList) {
+		var speed = units.calcUnitSubSpeed(unitList[0]);
+
+		for(var i=1; i<unitList.length; i++) {
+			var currSpeed = units.calcUnitSubSpeed(unitList[0]);
+			if(currSpeed[0] === undefined) { return currSpeed; } // Just in case of bugs
+			var testDist = 1000; // Total galaxy
+			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
+				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
+				speed = currSpeed;
+			}
+		}
+
+		return speed;
+	}
+
+	static calcUnitSupraSpeed(unit) {
+		var speed = [];
+
+		for(var i in unit.parts) {
+			if(unit.parts[i].type == "sup_propulsion") {
+				if(speed[0] == -1) { // First sup propulsion part
+					if(shipPartsSpeed[unit.parts[i].tech] === undefined) { 
+						log("Speed is not defined for part " + unit.parts[i].tech,"error");
+						return [];
+					}
+					speed = shipPartsSpeed[unit.parts[i].tech];
+				} else {
+					for(var i=0; i<speed.length; i++) {
+						speed[i] *= 1.5;
+					}
+				}
+			}
+		}
+
+		return speed;
+	}
+
+	static getFleetMinSupraSpeed(unitList) {
+		var speed = units.calcUnitSupraSpeed(unitList[0]);
+
+		for(var i=1; i<unitList.length; i++) {
+			if(unitList[i].shipType == "SHIP_FIGHTER") { continue; } // Don't care about fighter they are carried
+
+			var currSpeed = units.calcUnitSupraSpeed(unitList[i]);
+			if(currSpeed[0] === undefined) { return currSpeed; } // If they can't move to another system, no need to calc it ...
+
+			var testDist = 1000; // Total galaxy size
+			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
+				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
+				speed = currSpeed;
+			}
+		}
+
+		return speed;
+	}
+
+	static getFleetUnits(unitIdList, callback, i=0, unitList=[]) {
+		if(i>=unitIdList.length) {
+			callback(unitList);
+			return;
+		}
+
+		// Find next unit
+		db.unit.find(unitIdList[i][0], function(unitReturned) {
+			if(isset(unitReturned)) {
+				unitList.push(unitReturned);
+			}
+			units.getFleetUnits(unitIdList, callback, i++, unitList);
+		});
+	}
+
+	static fleetMoveTo(user, fleetId, destination) {
+		var coordsArrivee = destination.split("-");
+			coordsArrivee = [parseInt(coordsArrivee[0]), parseInt(coordsArrivee[1])];
+
+		// Get Fleet data
+		db.fleet.find(fleetId, function(fleetReturned) {
+			if(!isset(fleetReturned)) { return; } // Does this fleet exists
+			if(fleetReturned.name == "SHIP_DEF") { return; } // Is this fleet movable ? (not defense fleet)
+			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
+				websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_MOVING_FLEET" }); 
+				return;
+			}
+
+			if(fleetReturned.position == destination) { // Subluminique
+				units.getFleetUnits(fleetReturned.units, function(unitList) {
+					var speed = units.getFleetMinSupraSpeed(unitList);
+
+					if(speed[0] === undefined) { return; }
+
+					var dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
+
+					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+
+					units.fleetCompleteMove(user, fleetReturned, destination, time);
+				});
+			} else { // Supraluminique
+				units.getFleetUnits(fleetReturned.units, function(unitList) {
+					if(!units.hasEnoughCarrier(fleetReturned, unitList)) {
+						websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_CARRIER" });
+						return;
+					}
+
+					var speed = units.getFleetMinSupraSpeed(unitList);
+					if(speed[0] === undefined) {
+						websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
+						return;
+					}
+
+					var coordsDepart = fleetReturned.position.split("-");
+						coordsDepart = [parseInt(coordsDepart[0]), parseInt(coordsDepart[1])];
+					
+					var dist = Math.sqrt(
+								Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
+								Math.pow(coordsDepart[1] - coordsArrivee[1],2)
+							);
+
+					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+
+					units.fleetCompleteMove(user, fleetReturned, destination, time);
+				});
+			}
+		});
+	}
+
+	static fleetCompleteMove(user, fleet, destination, time) {
+		/**
+		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
+		 * YOU NEED TO CHECK FLEET BEFORE !
+		 */
+		var instability = time * 0.001 * (Math.random() - 0.5);
+		if(research.isSearched(user,"prop_suprastability")) {
+			instability /= 2;
+		}
+
+		var newFleet = fleet.toJSON();
+		newFleet.endMoveTime = Date.now() + ((time + instability) * 3600000);
+		newFleet.position = destination
+		newFleet.orbitPosition = -1;
+
+		db.fleet.update(newFleet);
+
+		io.to(user.sid).emit("fleet-update", newFleet );
+	}
 }

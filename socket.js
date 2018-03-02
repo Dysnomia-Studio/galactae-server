@@ -178,6 +178,17 @@ module.exports = class websocket {
 				   	units.build(data);
 				});
 			});
+			socket.on('fleet-move', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.fleetId) || !isset(data.destination)) { return; }
+				// User
+				data.sid = socket.id;
+
+				player.isValid(data,function(data) { // Verify identity
+					// Execution du code
+				   	units.fleetMoveTo(data, data.fleetId, data.destination);
+				});
+			});
 
 			// Daily Bonus
 			socket.on('daily-bonus', function (data) {
@@ -247,10 +258,10 @@ module.exports = class websocket {
 							},1000)
 							break;
 						case "start":
-
+							// Can't do this now ... Waiting a way (@ADD)
 							break;
 						case "stop":
-
+							// Can't do this now ... Waiting a way (@ADD)
 							break;
 						default:
 							log("Command " + data.cmd + " not found !");
@@ -261,7 +272,7 @@ module.exports = class websocket {
 			})
 		});
 	}
-	/* websocket.SendMessageToClient
+	/* SendMessageToClient
 	INPUT: data
 	OUTPUT: io connection ( array ) */
 	static SendMessageToClient(data) {

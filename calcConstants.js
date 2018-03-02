@@ -216,7 +216,7 @@ module.exports = function() {
 		prop_plasma:		[6918,4196],
 		prop_vsl:			[7800,4150],
 		prop_wd:			[8700,4100],
-		prop_hyperespace:	[9600,4050],
+		prop_hyperespace:	[8750,3000],
 		prop_manoeuvre:		[4813,3433],
 		prop_advManoeuvre:	[5000,3000],
 		prop_suprastability:[7850,3850],
@@ -279,7 +279,7 @@ module.exports = function() {
 		prop_hyperespace: 	{ cost: 35000, parents: ["prop_wd"] },
 		prop_manoeuvre: 	{ cost: 450, parents: ["prop_main"] },
 		prop_advManoeuvre: 	{ cost: 700, parents: ["prop_manoeuvre"] },
-		prop_suprastability:{ cost: 5000, parents: ["prop_vsl","misc_phySolaire"] },
+		prop_suprastability:{ cost: 5000, parents: ["prop_vsl"] },
 		// Construction et production
 		cp_mecanisation: 	{ cost: 120, parents: ["industrialistion"] },
 		cp_tracteur: 	 	{ cost: 150, parents: ["industrialistion"] },
@@ -612,8 +612,20 @@ module.exports = function() {
 		vsolaire: 		[120, 45, 35, 15,0.35,0],
 		// Propulsions supraluminiques
 		vsl: 			[ 65,120, 60, 20,0.55,  80],
-		hyperespace: 	[ 80,150, 90, 25,0.75, 160],
-
+		wd: 			[ 80,145, 60, 25,0.65, 120],
+		hyperespace: 	[100,160,115, 30,0.75, 160],
+		
 		none: [0,0,0,0,0,0],
+	};
+
+	this.shipPartsSpeed = {
+		// Propulsions subluminiques
+		ion: 			[  0,  0,  0],
+		plasma: 		[  0,  0,  0],
+		vsolaire: 		[  0,  0,  0],
+		// Propulsions supraluminiques
+		vsl: 			[-0.027,7.23,0.001],
+		wd: 			[-0.016,5.13,0.001],
+		hyperespace: 	[-0.014,3.68,0.001],
 	};
 }

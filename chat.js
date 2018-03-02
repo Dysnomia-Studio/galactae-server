@@ -7,7 +7,7 @@ module.exports = class chat {
 					var now = Date.now();
 					for(var i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
-							// @ADD: Message
+							chat.sendSM(data.sid,'ERR_CHAT_BANNED');
 							return;
 						}
 					}
