@@ -264,7 +264,7 @@ module.exports = class units {
 							db.unit.create(shipToSave, function(newData) {
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
-								refreshUserUnits(data);
+								units.refreshUnits(data);
 							});
 						} else if(duplicate) {
 							message = "SHIP_TYPE_ALREADY_EXISTS";
