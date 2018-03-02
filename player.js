@@ -39,7 +39,7 @@ module.exports = class player {
 					var now = Date.now();
 					for(var i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
-							// @ADD: Message
+							// @ADD: Kick & Message
 							return;
 						}
 					}
@@ -200,7 +200,7 @@ module.exports = class player {
 						return;
 					}
 
-					var newPlanetData = UpdatePlanet(planetReturned);
+					var newPlanetData = planet.update(planetReturned);
 
 					newPlanetData.resources[1]+=helium;
 
