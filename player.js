@@ -195,7 +195,7 @@ module.exports = class player {
 			if(choice==2 && helium!=0) {
 				planet.find(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
-						websocket.SendMessageToClient({ id: data.id, message: "ERROR_NOT_BELONGING" })
+						websocket.SendMessageToClient({ sid: userData.sid, message: "ERROR_NOT_BELONGING" });
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");
 						return;
 					}
@@ -211,10 +211,8 @@ module.exports = class player {
 					newPlayerData.lastBonus = Date.now();
 
 					db.player.update(newPlayerData);
-					io.to(userData.sid).emit('player-recieve-data',{
-						money: newPlayerData.money,
-						gvt: newPlayerData.gvt
-					});
+
+					planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
 				}); 
 			} else {
 				newPlayerData.money += credits;
@@ -224,8 +222,7 @@ module.exports = class player {
 
 				db.player.update(newPlayerData);
 				io.to(userData.sid).emit('player-recieve-data',{
-					money: newPlayerData.money,
-					gvt: newPlayerData.gvt
+					money: newPlayerData.money
 				});
 			}
 		}
