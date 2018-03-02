@@ -303,9 +303,9 @@ module.exports = class units {
 			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","success");
 			websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
-			db.unit.delete(data.unit);
-
-			units.refreshUnits(data);
+			db.unit.delete(data.unit, function() {
+				units.refreshUnits(data);
+			});			
 		});
 	}
 

@@ -275,9 +275,10 @@ module.exports = {
 				if(err) { log(err);} 
 			});
 		},
-		delete: function(id) {
+		delete: function(id,callback) {
 			units.findByIdAndRemove(id,function(err) {
 				if(err) { log(err);} 
+				if(callback) { callback(); }
 			});
 		}
 
