@@ -33,7 +33,7 @@ module.exports = class units {
 	 * @param      {<type>}  data    The data
 	 * @return     {Array}   Unit total cost
 	 */
-	static calcUnitCosts(shipType,parts) {
+	static calcCost(shipType,parts) {
 		var totalCost = shipCosts[shipType];
 
 		for(var id in parts) {
@@ -87,12 +87,10 @@ module.exports = class units {
 					message = "SHIP_HAS_NO_NAME";
 					break;
 				} 
-			} else {
-				if(ship[i].value==undefined || ship[i].value.split(' ').join('')=="" || ship[i].type==undefined || ship[i].type.split(' ').join('')=="") {
-					errors ++;
-					message = "SHIP_HAS_EMPTY_FIELD";
-					break;
-				} 
+			} else if(ship[i].value==undefined || ship[i].value.split(' ').join('') == "" || ship[i].type==undefined || ship[i].type.split(' ').join('') == "") {
+				errors ++;
+				message = "SHIP_HAS_EMPTY_FIELD";
+				break;
 			}
 		}
 
@@ -204,7 +202,7 @@ module.exports = class units {
 						});
 					}
 
-					shipToSave.cost = calcUnitCosts(ship.shape,shipToSave.parts);
+					shipToSave.cost = units.calcCost(ship.shape,shipToSave.parts);
 
 					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
 				
