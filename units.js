@@ -494,6 +494,16 @@ module.exports = class units {
 		});
 	}
 
+	static calcFuelCost(engines) {
+		var cost = 0;
+
+		for(var i in engines) {
+			cost += fuelCost[i] * engines[i];
+		}
+
+		return cost;
+	}
+
 	static hasEnoughCarrier(fleet, unitList) {
 		var fighterCount = 0;
 		var fighterCap   = 0;
@@ -511,10 +521,15 @@ module.exports = class units {
 
 	static calcUnitSubSpeed(parts) {
 		var speed = [];
+		var tech = "";
+		var count = 0;
 
 		for(var i in unit.parts) {
 			if(unit.parts[i].type == "sub_propulsion") {
 				if(speed[0] == -1) { // First sup propulsion part
+					tech = unit.parts[i].tech;
+					count++;
+
 					if(shipPartsSpeed[unit.parts[i].tech] === undefined) { 
 						log("Speed is not defined for part " + unit.parts[i].tech,"error");
 						return [];
@@ -528,30 +543,46 @@ module.exports = class units {
 			}
 		}
 
-		return speed;
+		return {speed: speed, tech: tech, count: count};
 	}
 
 	static getFleetMinSubSpeed(unitList) {
-		var speed = units.calcUnitSubSpeed(unitList[0]);
+		var min = {
+			speed: 0,
+			engines: {}
+		};
 
-		for(var i=1; i<unitList.length; i++) {
-			var currSpeed = units.calcUnitSubSpeed(unitList[0]);
+		for(var i=0; i<unitList.length; i++) {
+			var curr = units.calcUnitSubSpeed(unitList[i]);
+			var currSpeed = curr.speed;
+			var speed = min.speed;
 			if(currSpeed[0] === undefined) { return currSpeed; } // Just in case of bugs
+
 			var testDist = 1000; // Total galaxy
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				speed = currSpeed;
+				min["speed"] = speed;
 			}
+
+			if(min["engines"][curr["tech"]] == undefined) {
+				min["engines"][curr["tech"]] = 0;
+			}
+			min["engines"][curr["tech"]] += curr["count"];
 		}
 
-		return speed;
+		return min;
 	}
 
 	static calcUnitSupraSpeed(unit) {
 		var speed = [];
+		var tech = "";
+		var count = 0;
 
 		for(var i in unit.parts) {
 			if(unit.parts[i].type == "sup_propulsion") {
+				tech = unit.parts[i].tech;
+				count++;
+				
 				if(speed[0] == -1) { // First sup propulsion part
 					if(shipPartsSpeed[unit.parts[i].tech] === undefined) { 
 						log("Speed is not defined for part " + unit.parts[i].tech,"error");
@@ -566,26 +597,36 @@ module.exports = class units {
 			}
 		}
 
-		return speed;
+		return {speed: speed, tech: tech, count: count};
 	}
 
 	static getFleetMinSupraSpeed(unitList) {
-		var speed = units.calcUnitSupraSpeed(unitList[0]);
+		var min = {
+			speed: 0,
+			engines: {}
+		};
 
-		for(var i=1; i<unitList.length; i++) {
+		for(var i=0; i<unitList.length; i++) {
 			if(unitList[i].shipType == "SHIP_FIGHTER") { continue; } // Don't care about fighter they are carried
 
-			var currSpeed = units.calcUnitSupraSpeed(unitList[i]);
+			var curr = units.calcUnitSupraSpeed(unitList[i]);
+			var currSpeed = curr.speed;
+			var speed = min.speed;
 			if(currSpeed[0] === undefined) { return currSpeed; } // If they can't move to another system, no need to calc it ...
 
 			var testDist = 1000; // Total galaxy size
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				speed = currSpeed;
+				min["speed"] = speed;
 			}
+
+			if(min["engines"][curr["tech"]] == undefined) {
+				min["engines"][curr["tech"]] = 0;
+			}
+			min["engines"][curr["tech"]] += curr["count"];
 		}
 
-		return speed;
+		return min;
 	}
 
 	static getFleetUnits(unitIdList, callback, i=0, unitList=[]) {
@@ -618,7 +659,9 @@ module.exports = class units {
 
 			if(fleetReturned.position == destination) { // Subluminique
 				units.getFleetUnits(fleetReturned.units, function(unitList) {
-					var speed = units.getFleetMinSupraSpeed(unitList);
+					var minSpeed = units.getFleetMinSubSpeed(unitList);
+					var speed = minSpeed.speed;
+					var fuel = units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) { return; }
 
@@ -635,7 +678,10 @@ module.exports = class units {
 						return;
 					}
 
-					var speed = units.getFleetMinSupraSpeed(unitList);
+					var minSpeed = units.getFleetMinSupraSpeed(unitList);
+					var speed = minSpeed.speed;
+					var fuel = units.calcFuelCost(minSpeed.engines);
+
 					if(speed[0] === undefined) {
 						websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
 						return;
@@ -645,9 +691,9 @@ module.exports = class units {
 						coordsDepart = [parseInt(coordsDepart[0]), parseInt(coordsDepart[1])];
 					
 					var dist = Math.sqrt(
-								Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
-								Math.pow(coordsDepart[1] - coordsArrivee[1],2)
-							);
+							Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
+							Math.pow(coordsDepart[1] - coordsArrivee[1],2)
+						);
 
 					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 

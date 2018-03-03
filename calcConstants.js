@@ -628,4 +628,15 @@ module.exports = function() {
 		wd: 			[-0.016,5.13,0.001],
 		hyperespace: 	[-0.014,3.68,0.001],
 	};
+
+	this.fuelCost = {
+		// Propulsions subluminiques
+		ion: 			 18312,
+		plasma: 		 15696,
+		vsolaire: 		     0,
+		// Propulsions supraluminiques
+		vsl: 			327615,
+		wd: 			290127,
+		hyperespace: 	254919,
+	}
 }
