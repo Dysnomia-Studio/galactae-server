@@ -301,10 +301,13 @@ module.exports = class planet {
 			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
 				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
 					var unitCount = 0;
+					var newFleet = fleetReturned.toJSON();
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
 						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
 						unitCount = restantDepuisSynchro;
+
+						newFleet.inBuilding = false;
 					} else { // Partial add
 					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
 					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
@@ -316,10 +319,8 @@ module.exports = class planet {
 					if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
 						unitCount = planetIn.unitBuildingCount;
 					}
-
-					var newFleet = fleetReturned.toJSON();
+					
 					var set = false;
-
 					for(var i=0; i<newFleet.units.length; i++) {
 						if(""+newFleet.units[i][0] == ""+planetIn.unitBuildingID) {
 							newFleet.units[i][1] += unitCount;
@@ -327,7 +328,6 @@ module.exports = class planet {
 							break;
 						}
 					}
-
 					if(!set) {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}

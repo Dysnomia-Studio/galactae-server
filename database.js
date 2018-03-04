@@ -68,6 +68,7 @@ var fleetsSchema = new Schema({
 	endMoveTime: Number,
 	units: Array,
 	population: Number,
+	inBuilding: Boolean,
 });
 
 var statsSchema = new Schema({

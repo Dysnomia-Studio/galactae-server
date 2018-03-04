@@ -406,6 +406,7 @@ module.exports = class units {
 
 						// Update fleet
 						fleetReturned.population += totalCost[5];
+						fleetReturned.inBuilding = true;
 
 						db.fleet.update(fleetReturned);
 
@@ -652,6 +653,10 @@ module.exports = class units {
 		db.fleet.find(fleetId, function(fleetReturned) {
 			if(!isset(fleetReturned)) { return; } // Does this fleet exists
 			if(fleetReturned.name == "SHIP_DEF") { return; } // Is this fleet movable ? (not defense fleet)
+			if(fleetReturned.inBuilding) { // Are units building in this fleet ?
+				websocket.SendMessageToClient({ sid: user.sid, message: "IN_BUILDING_FLEET" }); 
+				return; 
+			} 
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
 				websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_MOVING_FLEET" }); 
 				return;
