@@ -189,9 +189,15 @@ module.exports = class player {
 			else if(streak==3) { credits = 50; }
 			else if(streak==4) { credits = 80; }
 			else if(streak<10) { credits = 100; }
-			else if(streak<20) { credits = 150; helium = 500; }
-			else if(streak<30) { credits = 200; helium = 2000; }
-			else { credits = 500; } // @ADD: generate random special bonus
+			else if(streak<20) { 
+				credits = 10*(streak + 1); // 110 to 200
+				helium = 1750 * streak; // 15000 is about 45 min of ion propulsion for 1 vessel - 15000 to 33250
+			} else if(streak<30) { 
+				credits = 15*streak; // 300 to 435
+				helium = 2000 * streak; // 40000 to 58000
+			} else { 
+				credits = 1000;
+			} // @ADD: generate random special bonus
 
 			if(choice==2 && helium!=0) {
 				planet.find(userData,userData.pid,0,function(planetReturned) {

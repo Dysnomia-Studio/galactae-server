@@ -620,13 +620,13 @@ module.exports = function() {
 
 	this.shipPartsSpeed = {
 		// Propulsions subluminiques
-		ion: 			[  0,  0,  0],
-		plasma: 		[  0,  0,  0],
-		vsolaire: 		[  0,  0,  0],
+		ion: 			[ -0.000046, 0.0096, 0],
+		plasma: 		[ -0.000045, 0.0090, 0],
+		vsolaire: 		[ -0.000040, 0.0080, 0],
 		// Propulsions supraluminiques
-		vsl: 			[-0.027,7.23,0.001],
-		wd: 			[-0.016,5.13,0.001],
-		hyperespace: 	[-0.014,3.68,0.001],
+		vsl: 			[    -0.027,   7.23, 0.001],
+		wd: 			[    -0.016,   5.13, 0.001],
+		hyperespace: 	[    -0.014,   3.68, 0.001],
 	};
 
 	this.fuelCost = {
