@@ -73,7 +73,6 @@ module.exports = class player {
 					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
 					if(playerData.lastBonus < minuit) { 
-						log(dayStreak);
 						io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
 					}
 
