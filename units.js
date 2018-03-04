@@ -718,8 +718,8 @@ module.exports = class units {
 		newFleet.position = destination
 		newFleet.orbitPosition = -1;
 
-		db.fleet.update(newFleet);
-
-		io.to(user.sid).emit("fleet-update", newFleet );
+		db.fleet.update(newFleet, function() {
+			user.refreshFleets(newFleet.motherPlanetId, user.sid);
+		});
 	}
 }
