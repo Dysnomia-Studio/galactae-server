@@ -12,8 +12,6 @@ module.exports = {
 	 * Connect to discord server, and listen messages
 	 */
 	connect: function(callback) {
-		client.login(token);
-
 		client.on('ready', function() {
 			log('Connected to discord server bot');
 			client.user.setActivity('Galactae: Space Age Dawn');
@@ -38,6 +36,8 @@ module.exports = {
 				io.emit('chat-message',{ message: data.message, channel: data.channel });
 			}
 		});
+
+		client.login(token);
 	},
 	/**
 	 * Transmit a message to discord
