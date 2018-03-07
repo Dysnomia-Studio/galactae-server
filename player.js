@@ -131,7 +131,6 @@ module.exports = class player {
 				sector[sectorAddress] = 0;
 			}
 			sector[sectorAddress] += planetReturned.points;
-			console.info(sector);
 			
 			if(i<user.planetlist.length) {
 				player.calcTotalPlanetPoints(user,callback,i,points,sector);
