@@ -127,6 +127,7 @@ module.exports = class player {
 
 			var sectorAddress = planetReturned.address.split("-");
 			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
+			console.log(sectorAddress);
 			if(sector[sectorAddress] === undefined) {
 				sector[sectorAddress] = 0;
 			}
