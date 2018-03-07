@@ -34,7 +34,7 @@ var userSchema = new Schema({
 	gvt: Number,
 	money: Number,
 	points: Number,
-	sectorPoints: Schema.Types.Mixed,
+	sectorPoints: { type : Schema.Types.Mixed, default : {} },
 	lastConnected: Number,
 	dayBonusStreak: Number,
 	dayBonusBest: Number,
