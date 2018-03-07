@@ -34,7 +34,7 @@ var userSchema = new Schema({
 	gvt: Number,
 	money: Number,
 	points: Number,
-	sectorPoints: Array,
+	sectorPoints: Object,
 	lastConnected: Number,
 	dayBonusStreak: Number,
 	dayBonusBest: Number,
