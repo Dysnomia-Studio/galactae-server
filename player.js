@@ -127,11 +127,11 @@ module.exports = class player {
 
 			var sectorAddress = planetReturned.address.split("-");
 			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
-			console.log(sectorAddress);
 			if(sector[sectorAddress] === undefined) {
 				sector[sectorAddress] = 0;
 			}
 			sector[sectorAddress] += planetReturned.points;
+			console.info(sector);
 			
 			if(i<user.planetlist.length) {
 				player.calcTotalPlanetPoints(user,callback,i,points,sector);
@@ -141,6 +141,9 @@ module.exports = class player {
 				for(var i in sector) {
 					sector[i] *= pointsCoef['planet'];
 				}
+
+			console.info(sector);
+				
 
 				user.points = points;
 				user.sectorPoints = sector;
