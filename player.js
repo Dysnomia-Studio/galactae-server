@@ -142,9 +142,9 @@ module.exports = class player {
 					sector[i] *= pointsCoef['planet'];
 				}
 
-			console.info(sector);
+				console.info(sector);
+				console.log(typeof sector);
 				
-
 				user.points = points;
 				user.sectorPoints = sector;
 				callback(user);	
