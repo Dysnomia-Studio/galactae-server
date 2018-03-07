@@ -119,17 +119,30 @@ module.exports = class player {
 			plCount--;
 		});
 	}
-	static calcTotalPlanetPoints(user,callback,i,points) {
+	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
 			i++;
+
+			var sectorAddress = planetReturned.address.split("-");
+			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
+			if(sector[sectorAddress] === undefined) {
+				sector[sectorAddress] = 0;
+			}
+			sector[sectorAddress] += planetReturned.points;
 			
 			if(i<user.planetlist.length) {
-				player.calcTotalPlanetPoints(user,callback,i,points);
+				player.calcTotalPlanetPoints(user,callback,i,points,sector);
 			} else { 
 				points *= pointsCoef['planet'];
+
+				for(var i in sector) {
+					sector[i] *= pointsCoef['planet'];
+				}
+
 				user.points = points;
+				user.sectorPoints = sector;
 				callback(user);	
 			}
 		});		
@@ -158,7 +171,7 @@ module.exports = class player {
 
 			newUserData.points = Math.round(newUserData.points);
 			callback(newUserData);
-		},0,0);	
+		},0,0,[]);	
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {

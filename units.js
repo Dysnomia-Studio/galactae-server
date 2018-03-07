@@ -653,7 +653,7 @@ module.exports = class units {
 		db.fleet.find(fleetId, function(fleetReturned) {
 			if(!isset(fleetReturned)) { return; } // Does this fleet exists
 			if(fleetReturned.name == "SHIP_DEF") { return; } // Is this fleet movable ? (not defense fleet)
-			if(fleetReturned.inBuilding) { // Are units building in this fleet ?
+			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				websocket.SendMessageToClient({ sid: user.sid, message: "IN_BUILDING_FLEET" }); 
 				return; 
 			} 
