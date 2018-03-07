@@ -138,15 +138,15 @@ module.exports = class player {
 			} else { 
 				points *= pointsCoef['planet'];
 
+				var newSector = {};
 				for(var i in sector) {
-					sector[i] *= pointsCoef['planet'];
+					newSector.keys.push(i);
+					newSector.value.push(sector[i] *= pointsCoef['planet']);
 				}
 
-				console.info(sector);
-				console.log(typeof sector);
-				
 				user.points = points;
-				user.sectorPoints = sector;
+				user.sectorPointsKeys  = newSector.keys;
+				user.sectorPointsValue = newSector.value;
 				callback(user);	
 			}
 		});		
