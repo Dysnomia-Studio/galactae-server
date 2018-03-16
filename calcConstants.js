@@ -631,12 +631,28 @@ module.exports = function() {
 
 	this.fuelCost = {
 		// Propulsions subluminiques
-		ion: 			 18312,
-		plasma: 		 15696,
-		vsolaire: 		     0,
+		ion: 			10682,
+		plasma: 		 7244,
+		vsolaire: 		    0,
 		// Propulsions supraluminiques
-		vsl: 			327615,
-		wd: 			290127,
-		hyperespace: 	254919,
+		vsl: 			32761,
+		wd: 			29012,
+		hyperespace: 	25492,
+	}
+
+	this.fighterWeight = {
+		SHIP_FIGHTER_SMALL: 1,
+		SHIP_FIGHTER_MEDIUM: 2,
+		SHIP_FIGHTER_BOMBER: 2,
+	}
+
+	this.hangarSize = {
+		hangarSimple: 40,
+		hangarDouble: 75,
+	}
+
+	this.hangarMiss = {
+		hangarSimple:   0,
+		hangarDouble: -10,
 	}
 }

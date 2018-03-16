@@ -143,7 +143,7 @@ module.exports = class player {
 				};
 				for(var i in sector) {
 					newSector.keys.push(i);
-					newSector.value.push(sector[i] *= pointsCoef['planet']);
+					newSector.value.push(sector[i] * pointsCoef['planet']);
 				}
 
 				user.points = points;

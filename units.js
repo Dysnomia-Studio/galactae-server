@@ -331,6 +331,13 @@ module.exports = class units {
 			}
 
 			db.unit.find(inputData.unit, function(unitReturned) {
+				if(inputData.unit.substr(0,8) == "WEP_MINE" && this.shipCost[inputData.unit] !== undefined) {
+					unitReturned = {};
+					unitReturned._id = inputData.unit;
+					unitReturned.shipType = "SHIP_DEF";
+					unitReturned.cost = this.shipCost[inputData.unit];
+					unitReturned.ownerId = inputData.id;
+				}
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
 				// Check defence fleet
 				if(inputData.fleet == -2 && unitReturned.shipType != "SHIP_DEF") { return; }
@@ -353,7 +360,7 @@ module.exports = class units {
 					inputData.fleetName = "SHIP_DEF";
 				}
 
-
+				if(unit)
 				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
@@ -398,11 +405,13 @@ module.exports = class units {
 						// Update planet 
 						db.planet.update(newPlanet);
 
-						// Update unit
-						var newUnit = unitReturned.toJSON();
-						newUnit.owned += inputData.count;
+						if(inputData.unit.substr(0,8) != "WEP_MINE") {
+							// Update unit
+							var newUnit = unitReturned.toJSON();
+							newUnit.owned += inputData.count;
 
-						db.unit.update(newUnit);
+							db.unit.update(newUnit);
+						}
 
 						// Update fleet
 						fleetReturned.population += totalCost[5];
@@ -509,12 +518,21 @@ module.exports = class units {
 		var fighterCount = 0;
 		var fighterCap   = 0;
 
-		for(var i in unitList) {
-			if(unitList[i].shipType == "SHIP_FIGHTER") {
-				fighterCount++;
-			} else if(unitList[i].shipType == "SHIP_CARRIER") {
-				//@ADD Count Capacity
+		for(var u in unitList) {
+			for(var f in fleet.units) {
+				if(fleet.units[f][0] != unitList[u]._id) { continue; }
+
+				if(unitList[u].shipType == "SHIP_FIGHTER") {
+					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
+				} else if(unitList[u].shipType == "SHIP_CARRIER") {
+					for(var p in unitList[u].parts) {
+						if(unitList[u].parts[p].type.substr(0,6) == "hangar") {
+							fighterCap += hangarSize[unitList[u].parts[p].type] * fleet.units[f][1];
+						}
+					}
+				}
 			}
+
 		}
 
 		return fighterCount <= fighterCap;
