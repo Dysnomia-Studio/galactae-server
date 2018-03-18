@@ -123,6 +123,7 @@ module.exports = class player {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 			log(i + " " + points);
+			console.info(user);
 
 			i++;
 
