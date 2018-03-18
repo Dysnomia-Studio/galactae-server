@@ -122,7 +122,6 @@ module.exports = class player {
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
-			log(i + " " + points);
 			
 			i++;
 
@@ -169,17 +168,12 @@ module.exports = class player {
 	}
 	static refreshPoints(user,callback) {
 		player.calcTotalPlanetPoints(user,function(newUserData) {
-			log(newUserData.points);
 			// Recherches
 			newUserData.points += player.calcResearchPoints(newUserData);
-
-			log(newUserData.points);
 
 			// Money
 			if(newUserData.money === undefined || isNaN(newUserData.money)) { newUserData.money = 0; }
 			newUserData.points += (newUserData.money*pointsCoef['money']);
-
-			log(newUserData.points);
 
 			newUserData.points = Math.round(newUserData.points);
 			callback(newUserData);
