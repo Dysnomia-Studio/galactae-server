@@ -65,8 +65,8 @@ module.exports = class player {
 					var jour = 24*60*60*1000;
 					var minuit = Date.now() - (Date.now()%jour);
 					var hierMinuit = minuit - jour;
-					var dayStreak = playerData.dayBonusStreak+1; 
-					var bonusBest = playerData.dayBonusBest;
+					var dayStreak = 0 + playerData.dayBonusStreak +1; 
+					var bonusBest = 0 + playerData.dayBonusBest;
 
 					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
@@ -122,6 +122,7 @@ module.exports = class player {
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
+			log(i + " " + points);
 
 			i++;
 
