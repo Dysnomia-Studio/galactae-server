@@ -123,7 +123,7 @@ module.exports = class player {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 			log(i + " " + points);
-			console.info(user);
+			console.info(sector);
 
 			i++;
 
@@ -143,9 +143,9 @@ module.exports = class player {
 					keys: [],
 					value: [],
 				};
-				for(var i in sector) {
-					newSector.keys.push(i);
-					newSector.value.push(sector[i] * pointsCoef['planet']);
+				for(var j in sector) {
+					newSector.keys.push(j);
+					newSector.value.push(sector[j] * pointsCoef['planet']);
 				}
 
 				user.points = points;
