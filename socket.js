@@ -1,14 +1,14 @@
 module.exports = class websocket {
 	static init() {
-		io.on('connection', function (socket) {
+		io.on('connection', function(socket) {
 			/**
 			* Log de connexion et de déconnexion des utilisateurs
 			*/
-			socket.on('game-connect', function (user) {
+			socket.on('game-connect', function(user) {
 				// Vars
 				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
 
-				if(preventConnection==true) {
+				if(preventConnection) {
 					chat.sendSM(socket.id,preventConnectionMsg);
 					io.to(socket.id).emit('server-kick');
 					return;
@@ -22,7 +22,7 @@ module.exports = class websocket {
 				player.connect(user);
 			});
 
-			socket.on('game-disconnect', function (user) {
+			socket.on('game-disconnect', function(user) {
 				// Vars
 				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
 				// User
@@ -53,7 +53,7 @@ module.exports = class websocket {
 			/**
 			* Réception de l'événement 'chat-message' et réémission vers tous les utilisateurs
 			*/
-			socket.on('chat-send', function (data) {
+			socket.on('chat-send', function(data) {
 				// Vars
 				if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.message)) { return; }
 				// User
@@ -78,7 +78,7 @@ module.exports = class websocket {
 				});
 			});
 			// Next/Prev planet
-			socket.on('planet-ask-data-prev', function (data) {
+			socket.on('planet-ask-data-prev', function(data) {
 				// Vars
 				if(!isset(data)) { return; }
 				// User
@@ -88,7 +88,7 @@ module.exports = class websocket {
 				   	planet.refresh(data,-1);
 				}); 
 			});
-			socket.on('planet-ask-data-next', function (data) {
+			socket.on('planet-ask-data-next', function(data) {
 				// Vars
 				if(!isset(data)) { return; }
 				// User
@@ -191,7 +191,7 @@ module.exports = class websocket {
 			});
 
 			// Daily Bonus
-			socket.on('daily-bonus', function (data) {
+			socket.on('daily-bonus', function(data) {
 				// Vars
 				if(!isset(data) || !isset(data.user) || !isset(data.choice)) { return; }
 				// User
@@ -234,10 +234,10 @@ module.exports = class websocket {
 
 					switch(data.cmd) {
 						case "maintenanceOn":
-							maintenance = true;
+							websocket.beginMaintenance();
 							break;
 						case "maintenanceOff":
-							maintenance = false;
+							websocket.endMaintenance();
 							break;
 						case "restart":
 							preventConnection = true;
@@ -272,17 +272,48 @@ module.exports = class websocket {
 			})
 		});
 	}
-	/* SendMessageToClient
-	INPUT: data
-	OUTPUT: io connection ( array ) */
+	/**
+	 * Sends a message to client.
+	 *
+	 * @class      SendMessageToClient (name)
+	 * @param      {object}  data    The data
+	 */
 	static SendMessageToClient(data) {
 		io.to(data.sid).emit("server-alert",data.message);
 	}
-	/* SendGeneralMessage
-	INPUT: msg ( string )
-	OUTPUT: io connection ( array ) */
+	/**
+	 * Sends a general message.
+	 *
+	 * @class      SendGeneralMessage (name)
+	 * @param      {string}  msg     The message
+	 */
 	static SendGeneralMessage(msg) {
 		io.emit("server-general-alert",msg);
 		discord.alert(msg);
+	}
+
+	/**
+	 * Begins a server maintenance
+	 */
+	static beginMaintenance() {
+		io.emit('server-maintenance');
+		websocket.SendGeneralMessage("MAINTENANCE");
+		maintenance = true;
+
+		db.server.find(function(server) {
+			server.server_maintenance = true;
+			db.server.update(server);
+		});
+	}
+	/**
+	 * Ends a server maintenance
+	 */
+	static endMaintenance() {
+		maintenance = false;
+
+		db.server.find(function(server) {
+			server.server_maintenance = false;
+			db.server.update(server);
+		});
 	}
 };

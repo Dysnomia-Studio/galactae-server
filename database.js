@@ -377,6 +377,19 @@ module.exports = {
 				}
 			});
 		},
+		update: function(data, callback) {
+			var conditions = {server_name: globalCfg['serverGlobalName']}
+						  , update = { $set: data }
+						  , options = { multi: true };
+
+			servers.update(conditions, update, options,function(error) {
+				if(error) { log(error);} 
+
+				if(callback) {
+					callback();
+				}
+			});
+		},
 	},
 
 	ban: {

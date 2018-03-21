@@ -236,9 +236,7 @@ module.exports = class chat {
 				break;
 			case "!maintenance":
 				if(data.lvl<4) { return data; } // Admin only
-				io.emit('server-maintenance');
-				websocket.SendGeneralMessage("MAINTENANCE");
-				maintenance = true;
+				websocket.beginMaintenance();
 				data.send = true;
 			break;
 			case "!help":
