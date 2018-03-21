@@ -30,7 +30,6 @@ module.exports = class websocket {
 				player.isValid(user,function(user) { // Verify identity
 					// Log
 					log(user.username + ' ('+socket.id+') disconnected');
-					// Execution du code
 					player.disconnect(user);
 				}); 
 			});
@@ -45,7 +44,6 @@ module.exports = class websocket {
 					if(!isset(user) || !isset(user.name) || !isset(user.id)) { return; }
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
-					// Execution du code
 					player.disconnect(user);
 				}); 
 			});
@@ -59,7 +57,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 					player.getAlly(data, chat.analyse);	
 				}); 	
 			});
@@ -73,7 +70,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	planet.refresh(data,0);
 				});
 			});
@@ -84,7 +80,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	planet.refresh(data,-1);
 				}); 
 			});
@@ -94,7 +89,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	planet.refresh(data,1);
 				}); 
 			});
@@ -106,7 +100,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	planet.build(data);
 				}); 
 			});
@@ -118,7 +111,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	planet.rename(data);
 				}); 
 			});
@@ -131,7 +123,6 @@ module.exports = class websocket {
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
 				    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
-					// Execution du code
 				   	research.ChangePlanetResearch(data,data.pid,data.research);
 				});
 			});
@@ -141,7 +132,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	research.sync(data);
 				});
 			});
@@ -153,7 +143,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	units.createType(data);
 				});
 			});
@@ -163,7 +152,6 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	units.deleteType(data);
 				});
 			});
@@ -174,7 +162,6 @@ module.exports = class websocket {
 				data.sid = socket.id;
 
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	units.build(data);
 				});
 			});
@@ -185,7 +172,6 @@ module.exports = class websocket {
 				data.sid = socket.id;
 
 				player.isValid(data,function(data) { // Verify identity
-					// Execution du code
 				   	units.fleetMoveTo(data, data.fleetId, data.destination);
 				});
 			});
@@ -197,7 +183,6 @@ module.exports = class websocket {
 				// User
 				data.user.sid = socket.id;
 				player.isValid(data.user,function(user) { // Verify identity
-					// Execution du code
 				   	db.player.searchBySid(user.sid,function(dataReturned) {
 				   		player.dayBonus(dataReturned,user,data.choice);
 				   	});
