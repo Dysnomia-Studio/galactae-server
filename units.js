@@ -297,7 +297,7 @@ module.exports = class units {
 			unitReturned.name = data.shipNewName;
 
 			db.unit.update(unitReturned);
-		}
+		});
 	}
 
 	static deleteType(data) {
