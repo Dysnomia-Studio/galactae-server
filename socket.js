@@ -146,6 +146,15 @@ module.exports = class websocket {
 				   	units.createType(data);
 				});
 			});
+			socket.on('unit-type-rename', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.shipId) || !isset(data.shipNewName) || !isset(data.username)) { return; }
+				// User
+				data.sid = socket.id;
+				player.isValid(data,function(data) { // Verify identity
+				   	units.renameType(data);
+				});
+			});
 			socket.on('unit-type-delete', function(data) {
 				// Vars
 				if(!isset(data) || !isset(data.id) || !isset(data.unit) || !isset(data.username)) { return; }

@@ -290,6 +290,16 @@ module.exports = class units {
 		}
 	}
 
+	static renameType(data) {
+		db.unit.find(data.shipId, function(unitReturned) {
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
+
+			unitReturned.name = data.shipNewName;
+
+			db.unit.update(unitReturned);
+		}
+	}
+
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
