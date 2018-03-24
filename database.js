@@ -277,7 +277,7 @@ module.exports = {
 			units.update(conditions, update, options,function(err) {
 				if(err) { log(err); }
 				else if(callback) {
-					callback(obj);
+					callback();
 				} 
 			});
 		},
