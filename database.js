@@ -269,13 +269,16 @@ module.exports = {
 				callback(obj);
 			});
 		},
-		update: function(data) {
+		update: function(data, callback) {
 			var conditions = { _id: data._id }
 						  , update = { $set: data }
 						  , options = { multi: true };
 
 			units.update(conditions, update, options,function(err) {
-				if(err) { log(err);} 
+				if(err) { log(err); }
+				else if(callback) {
+					callback(obj);
+				} 
 			});
 		},
 		delete: function(id,callback) {
