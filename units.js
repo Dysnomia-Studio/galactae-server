@@ -296,7 +296,10 @@ module.exports = class units {
 
 			unitReturned.name = data.shipNewName;
 
-			db.unit.update(unitReturned);
+			db.unit.update(unitReturned, function() {
+				log(data.username + " has succed to rename unit type old:" + unitReturned.name + ", new: " + data.shipNewName,"success");
+				units.refreshUnits(data);
+			});
 		});
 	}
 
