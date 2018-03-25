@@ -344,7 +344,7 @@ module.exports = class units {
 			}
 
 			db.unit.find(inputData.unit, function(unitReturned) {
-				if(inputData.unit.substr(0,8) == "WEP_MINE" && this.shipCost[inputData.unit] !== undefined) {
+				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && this.shipCost[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
 					unitReturned.shipType = "SHIP_DEF";
@@ -418,7 +418,7 @@ module.exports = class units {
 						// Update planet 
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0,8) != "WEP_MINE") {
+						if(inputData.unit.substr(0,14) != "SHIP_WEP_MINES") {
 							// Update unit
 							var newUnit = unitReturned.toJSON();
 							newUnit.owned += inputData.count;
