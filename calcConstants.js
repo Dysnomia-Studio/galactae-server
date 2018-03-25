@@ -231,6 +231,8 @@ module.exports = function() {
 		wep_nuke:			[6500,6300],
 		wep_laser:			[6600,6000],
 		wep_plasma:			[7300,6400],
+		// Hangar
+		hangarDouble:		[5750,3300],
 		// Mines
 		wep_mines:			[5300,6600],
 		wep_mines_nuke:		[6250,6600],
@@ -291,6 +293,8 @@ module.exports = function() {
 		wep_nuke:			{ cost: 180, parents: ["wep_railgun"] },
 		wep_laser:			{ cost: 260, parents: ["wep_railgun","misc_phyQuantique"] },
 		wep_plasma:			{ cost: 480, parents: ["wep_laser"] },
+		// Hangars
+		hangarDouble: 		{ cost: 2200, parents: ["carrier_small"] },
 		// Mines spatiales
 		wep_mines: 			{ cost: 380, parents: ["misc_calcGravit","misc_telemetrie"] },
 		wep_mines_nuke:		{ cost: 750, parents: ["wep_mines","wep_nuke"] },
