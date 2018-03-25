@@ -555,7 +555,7 @@ module.exports = function() {
 					["sup_propulsion","rect"  , 40,225, 50, 50,"prop_2"],
 				],
 				content: {
-					hangar: ["none"],
+					hangar: ["none","hangarSimple","hangarDouble"],
 					sub_propulsion: ["ion","pplasma"],
 					sup_propulsion: ["vsl","wd","hyperespace"],
 					shield: ["none","magnetic","turret","projector"],
@@ -638,21 +638,21 @@ module.exports = function() {
 		vsl: 			32761,
 		wd: 			29012,
 		hyperespace: 	25492,
-	}
+	};
 
 	this.fighterWeight = {
 		SHIP_FIGHTER_SMALL: 1,
 		SHIP_FIGHTER_MEDIUM: 2,
 		SHIP_FIGHTER_BOMBER: 2,
-	}
+	};
 
 	this.hangarSize = {
 		hangarSimple: 40,
 		hangarDouble: 75,
-	}
+	};
 
 	this.hangarMiss = {
 		hangarSimple:   0,
 		hangarDouble: -10,
-	}
+	};
 }
