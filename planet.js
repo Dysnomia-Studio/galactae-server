@@ -306,7 +306,7 @@ module.exports = class planet {
 						unitReturned._id = planetIn.unitBuildingID;
 						unitReturned.shipType = "SHIP_DEF";
 						unitReturned.cost = shipCosts[planetIn.unitBuildingID];
-						unitReturned.ownerId = inputData.id;
+						unitReturned.ownerId = user.id;
 					}
 
 					var unitCount = 0;
