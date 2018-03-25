@@ -52,11 +52,11 @@ module.exports = class research {
 
 				if(researchData[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
 					researchData[planetReturned.currResearch] = -1;
+					newPlanet.currResearch = "";
+					db.planet.update(newPlanet);
 					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
 				}
 			}
-
-			db.planet.update(newPlanet);
 
 			// Next planet
 			if(i+1<user.planetlist.length) {
