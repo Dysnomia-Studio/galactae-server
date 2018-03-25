@@ -379,7 +379,7 @@ module.exports = class planet {
 
 			if(currTime>data.unitBuildingEndTime) {
 				data.unitBuildingEndTime = -1;
-				data.unitBuildingID = db.Schema.Types.ObjectId("-1");
+				data.unitBuildingID = "-1";
 				data.unitBuildingCount = -1;
 				data.unitBuildingFleetID = db.Schema.Types.ObjectId("-1");
 			}
