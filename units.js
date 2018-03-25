@@ -342,8 +342,8 @@ module.exports = class units {
 				websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
 			}
-
-			db.unit.find(inputData.unit, function(unitReturned) {
+			var id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
+			db.unit.find(id, function(unitReturned) {
 				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && this.shipCost[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
