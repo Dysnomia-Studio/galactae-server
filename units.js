@@ -344,11 +344,11 @@ module.exports = class units {
 			}
 			var id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && shipCost[inputData.unit] !== undefined) {
+				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
 					unitReturned.shipType = "SHIP_DEF";
-					unitReturned.cost = this.shipCost[inputData.unit];
+					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
