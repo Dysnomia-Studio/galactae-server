@@ -299,7 +299,16 @@ module.exports = class planet {
 		 */
 		static UpdateUnits(planetIn,user,currTime) {
 			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-				db.unit.find(planetIn.unitBuildingID, function(unitReturned) {
+				var id = (planetIn.unitBuildingID.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":planetIn.unitBuildingID;
+				db.unit.find(id, function(unitReturned) {
+					if(planetIn.unitBuildingID.substr(0,14) == "SHIP_WEP_MINES") {
+						unitReturned = {};
+						unitReturned._id = planetIn.unitBuildingID;
+						unitReturned.shipType = "SHIP_DEF";
+						unitReturned.cost = shipCosts[planetIn.unitBuildingID];
+						unitReturned.ownerId = inputData.id;
+					}
+
 					var unitCount = 0;
 					var newFleet = fleetReturned.toJSON();
 
