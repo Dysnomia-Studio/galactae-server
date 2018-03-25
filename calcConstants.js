@@ -249,7 +249,7 @@ module.exports = function() {
 		corvet_small: 		[6600,3800],
 		// Carrier
 		carrier_small: 		[5750,3600],
-		carrier_medium: 	[5700,3300],
+		carrier_medium: 	[5350,3350],
 		// Satellites
 		wep_sat_ag1:		[5300,7100],
 		wep_sat_ag2:		[6350,7500],
