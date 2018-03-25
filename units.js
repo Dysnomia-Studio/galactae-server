@@ -373,7 +373,6 @@ module.exports = class units {
 					inputData.fleetName = "SHIP_DEF";
 				}
 
-				if(unit)
 				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
