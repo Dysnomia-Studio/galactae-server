@@ -572,10 +572,10 @@ module.exports = function() {
 		 */
 
 		// Defenses
-		WEP_MINE: 					[  2, 15,  5,  4,0.08,   0],
-		WEP_MINE_NUKE: 				[  4, 20,  7,  6,0.10,   0],
-		WEP_MINE_IEM: 				[ 15, 25,  6, 15,0.20,   0],
-		WEP_MINE_AM: 				[  4, 25,  8,  7,0.12,   0],
+		SHIP_WEP_MINE: 					[  2, 15,  5,  4,0.08,   0],
+		SHIP_WEP_MINE_NUKE: 				[  4, 20,  7,  6,0.10,   0],
+		SHIP_WEP_MINE_IEM: 				[ 15, 25,  6, 15,0.20,   0],
+		SHIP_WEP_MINE_AM: 				[  4, 25,  8,  7,0.12,   0],
 		// Satellites
 		SHIP_SAT_AG1: 				[ 10, 15, 35, 15,0.25,   0],
 		SHIP_SAT_AG2: 				[ 15, 20, 50, 23,0.37,   0],
