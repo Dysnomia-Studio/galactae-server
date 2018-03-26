@@ -32,6 +32,7 @@ module.exports = class player {
 	}
 	/* Connect Player */
 	static connect(data) {
+		log("0");
 		db.userGameId.find(data.id, function(userGameIdObj) {
 			log("1");
 			data.user_id = userGameIdObj[0].user_id;
