@@ -25,7 +25,7 @@ module.exports = class player {
 	/* Get player ally */
 	static getAlly(data,callback) {
 		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj)) { log("Error: " + data.username + " not found.") return; }
+			if(!isset(obj)) { log("Error: " + data.username + " not found."); return; }
 			data.ally = obj.ally;
 			callback(data);
 		});
@@ -41,7 +41,7 @@ module.exports = class player {
 					var now = Date.now();
 					for(var i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
-							log("Error: " + data.username + " is banned.")
+							log("Error: " + data.username + " is banned.");
 							// @ADD: Kick & Message
 							return;
 						}
