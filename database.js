@@ -28,7 +28,6 @@ var userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	planetlist: Array,
-	lvl: Number,
 	ally: String,
 	sid: String,
 	gvt: Number,

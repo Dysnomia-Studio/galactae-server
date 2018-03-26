@@ -65,7 +65,7 @@ module.exports = class research {
 				user.research = [];
 
 				for(var index in researchData) {
-					user.research.push([index,researchData[index],]);
+					user.research.push([index,researchData[index]]);
 				}
 
 				callback(user);	
