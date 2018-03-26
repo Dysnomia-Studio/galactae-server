@@ -32,12 +32,9 @@ module.exports = class player {
 	}
 	/* Connect Player */
 	static connect(data) {
-		log("0");
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			log("1");
 			data.user_id = userGameIdObj[0].user_id;
 			db.ban.find(data.user_id, 2, function(banObj) {
-				log("2");
 				if(isset(banObj)) {
 					var now = Date.now();
 					for(var i=0; banObj.length; banObj++) {
@@ -50,13 +47,11 @@ module.exports = class player {
 				}
 
 				db.player.searchByName(data.username,function(dataReturned) {
-					log("3");
 					if(data.id!=dataReturned.id) {
 						// Kick that Hacker ...
 						io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 						return;
 					}
-					log("4");
 
 					// Kick double accounts
 					let oldSid = dataReturned.sid;
