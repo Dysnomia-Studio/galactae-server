@@ -121,6 +121,13 @@ module.exports = class player {
 		});
 	}
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
+		if(i==0) {
+			sector = {
+				"points": {},
+				"pcount": {},
+			};
+		}
+
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 			
@@ -128,10 +135,14 @@ module.exports = class player {
 
 			var sectorAddress = planetReturned.address.split("-");
 			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
-			if(sector[sectorAddress] === undefined) {
-				sector[sectorAddress] = 0;
+			if(sector["points"][sectorAddress] === undefined) {
+				sector["points"][sectorAddress] = 0;
 			}
-			sector[sectorAddress] += planetReturned.points;
+			if(sector["pcount"][sectorAddress] === undefined) {
+				sector["pcount"][sectorAddress] = 0;
+			}
+			sector["points"][sectorAddress] += planetReturned.points;
+			sector["pcount"][sectorAddress]++;
 			
 			if(i<user.planetlist.length) {
 				player.calcTotalPlanetPoints(user,callback,i,points,sector);
@@ -139,17 +150,20 @@ module.exports = class player {
 				points *= pointsCoef['planet'];
 
 				var newSector = {
-					keys: [],
-					value: [],
+					address: [],
+					points: [],
+					pcount: [],
 				};
-				for(var j in sector) {
-					newSector.keys.push(j);
-					newSector.value.push(sector[j] * pointsCoef['planet']);
+				for(var j in sector["points"]) {
+					newSector.address.push(j);
+					newSector.points.push(sector["points"][j] * pointsCoef['planet']);
+					newSector.pcount.push(sector["pcount"][j]);
 				}
 
 				user.points = points;
-				user.sectorPointsKeys  = newSector.keys;
-				user.sectorPointsValue = newSector.value;
+				user.sectorPointsAddresses  = newSector.address;
+				user.sectorPointsValue = newSector.points;
+				user.sectorPointsPcount = newSector.pcount;
 				callback(user);	
 			}
 		});		
@@ -177,8 +191,25 @@ module.exports = class player {
 			newUserData.points += (newUserData.money*pointsCoef['money']);
 
 			newUserData.points = Math.round(newUserData.points);
+
+			// MaJ de la BDD Global pour profil
+			db.globalRank.update({
+				user_id: user._id,
+				points: newUserData.points,
+				planets: newUserData.planetlist.length,
+			});
+
+			for(var sector in newUserData.sectorPointsAddress) {
+				db.sectorRank.update({
+					user_id: user._id,
+					sector: newUserData.sectorPointsAddress[sectorAddress],
+					points: newUserData.sectorPointsValue[sectorAddress],
+					planets: newUserData.sectorPointsPcount[sectorAddress],
+				});
+			}
+			
 			callback(newUserData);
-		},0,0,[]);	
+		},0,0);	
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {

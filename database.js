@@ -33,8 +33,9 @@ var userSchema = new Schema({
 	gvt: Number,
 	money: Number,
 	points: Number,
-	sectorPointsKeys: Array,
+	sectorPointsAddresses: Array,
 	sectorPointsValue: Array,
+	sectorPointsPcount: Array,
 	lastConnected: Number,
 	dayBonusStreak: Number,
 	dayBonusBest: Number,
@@ -118,6 +119,25 @@ var userBanSchema = new Schema({
 	admin: String
 });
 
+var globalRanksSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	user_id: Schema.Types.ObjectId,
+	server_name: String,
+	rank: Number,
+	points: Number,
+	planets: Number
+});
+
+var sectorRanksSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	user_id: Schema.Types.ObjectId,
+	server_name: String,
+	sector: String,
+	rank: Number,
+	points: Number,
+	planets: Number
+});
+
 var privileges;
 var servers;
 var userGameIds;
@@ -148,6 +168,8 @@ module.exports = {
 		servers = mongoGen.model('servers', serverSchema);
 		userGameIds = mongoGen.model('game_ids', userGameIdSchema);
 		bans = mongoGen.model('bans', userBanSchema);
+		globalRanks = mongoGen.model('globalRanks', globalRanksSchema);
+		sectorRanks = mongoGen.model('sectorRanks', sectorRanksSchema);
 
 		/**
 		 * Events
@@ -412,5 +434,65 @@ module.exports = {
 				if(error) { log(error); } 
 			});
 		},
-	}
+	},
+
+	globalRank: {
+		update: function(data) {
+			// Chercher si l'utilisateur existe
+			globalRanks.find({
+				_id: data.user_id
+			}, function(error, obj) {
+				if(error) { log(error); }
+				if(isset(obj)) { // Si oui update
+					data._id = new mongoose.Types.ObjectId();
+					data.server_name = globalCfg['serverGlobalName'];
+					
+					globalRanks.create(data, function(error) {
+						if(error) { log(error); } 
+					})
+				} else { // Sinon creer
+					var conditions = {
+						server_name: globalCfg['serverGlobalName'],
+						user_id: data.user_id
+						},
+						update = { $set: data },
+						options = { multi: false };
+
+					globalRanks.update(conditions, update, options,function(error) {
+						if(error) { log(error);} 
+					});
+				}
+			});
+		},
+	},
+
+	sectorRank: {
+		update: function(data) {
+			// Chercher si l'utilisateur existe
+			sectorRanks.find({
+				_id: data.user_id
+			}, function(error, obj) {
+				if(error) { log(error); }
+				if(isset(obj)) { // Si oui update
+					data._id = new mongoose.Types.ObjectId();
+					data.server_name = globalCfg['serverGlobalName'];
+					
+					sectorRanks.create(data, function(error) {
+						if(error) { log(error); } 
+					})
+				} else { // Sinon creer
+					var conditions = {
+						server_name: globalCfg['serverGlobalName'],
+						user_id: data.user_id
+						},
+						update = { $set: data },
+						options = { multi: false };
+
+					sectorRanks.update(conditions, update, options,function(error) {
+						if(error) { log(error);} 
+					});
+				}
+			});
+		},
+	},
 }
