@@ -199,7 +199,7 @@ module.exports = class player {
 				planets: newUserData.planetlist.length,
 			});
 
-			for(var sector in newUserData.sectorPointsAddress) {
+			for(var sector = 0; sector<newUserData.sectorPointsAddress; sector++) {
 				db.sectorRank.update({
 					user_id: user._id,
 					sector: newUserData.sectorPointsAddress[sector],

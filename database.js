@@ -440,7 +440,7 @@ module.exports = {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
 			globalRanks.find({
-				_id: data.user_id
+				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
@@ -470,7 +470,7 @@ module.exports = {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
 			sectorRanks.find({
-				_id: data.user_id
+				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
