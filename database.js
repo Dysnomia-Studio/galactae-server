@@ -121,7 +121,7 @@ var userBanSchema = new Schema({
 
 var globalRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
-	user_id: Schema.Types.ObjectId,
+	user_id: String,
 	server_name: String,
 	rank: Number,
 	points: Number,
@@ -130,7 +130,7 @@ var globalRanksSchema = new Schema({
 
 var sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
-	user_id: Schema.Types.ObjectId,
+	user_id: String,
 	server_name: String,
 	sector: String,
 	rank: Number,
@@ -469,6 +469,8 @@ module.exports = {
 
 	sectorRank: {
 		update: function(data) {
+			data.user_id = ""+data.user_id; // Used as string in php scripts
+
 			// Chercher si l'utilisateur existe
 			sectorRanks.find({
 				server_name: globalCfg['serverGlobalName'],
@@ -477,10 +479,9 @@ module.exports = {
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
-					log("update");
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg['serverGlobalName'];
-					
+
 					sectorRanks.create(data, function(error) {
 						if(error) { log(error); } 
 					})
