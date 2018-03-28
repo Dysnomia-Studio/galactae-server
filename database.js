@@ -442,8 +442,10 @@ module.exports = {
 			globalRanks.find({
 				_id: data.user_id
 			}, function(error, obj) {
+				console.log("find");
 				if(error) { log(error); }
 				if(isset(obj)) { // Si oui update
+					console.log("update");
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg['serverGlobalName'];
 					
@@ -451,12 +453,13 @@ module.exports = {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
+					console.log("create");
 					var conditions = {
 						server_name: globalCfg['serverGlobalName'],
 						user_id: data.user_id
 						},
 						update = { $set: data },
-						options = { multi: true };
+						options = { multi: false };
 
 					globalRanks.update(conditions, update, options,function(error) {
 						if(error) { log(error);} 
@@ -486,7 +489,7 @@ module.exports = {
 						user_id: data.user_id
 						},
 						update = { $set: data },
-						options = { multi: true };
+						options = { multi: false };
 
 					sectorRanks.update(conditions, update, options,function(error) {
 						if(error) { log(error);} 
