@@ -456,7 +456,7 @@ module.exports = {
 						user_id: data.user_id
 						},
 						update = { $set: data },
-						options = { multi: false };
+						options = { multi: true };
 
 					globalRanks.update(conditions, update, options,function(error) {
 						if(error) { log(error);} 
@@ -486,7 +486,7 @@ module.exports = {
 						user_id: data.user_id
 						},
 						update = { $set: data },
-						options = { multi: false };
+						options = { multi: true };
 
 					sectorRanks.update(conditions, update, options,function(error) {
 						if(error) { log(error);} 
