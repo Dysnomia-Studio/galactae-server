@@ -442,10 +442,8 @@ module.exports = {
 			globalRanks.find({
 				_id: data.user_id
 			}, function(error, obj) {
-				console.log("find");
 				if(error) { log(error); }
-				if(isset(obj)) { // Si oui update
-					console.log("update");
+				if(!isset(obj)) { // Si oui update
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg['serverGlobalName'];
 					
@@ -453,7 +451,6 @@ module.exports = {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
-					console.log("create");
 					var conditions = {
 						server_name: globalCfg['serverGlobalName'],
 						user_id: data.user_id
@@ -476,7 +473,7 @@ module.exports = {
 				_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(isset(obj)) { // Si oui update
+				if(!isset(obj)) { // Si oui update
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg['serverGlobalName'];
 					
