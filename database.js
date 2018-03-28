@@ -440,6 +440,7 @@ module.exports = {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
 			globalRanks.find({
+				server_name: globalCfg['serverGlobalName'],
 				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
@@ -470,10 +471,13 @@ module.exports = {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
 			sectorRanks.find({
-				user_id: data.user_id
+				server_name: globalCfg['serverGlobalName'],
+				user_id: data.user_id,
+				sector: data.sector
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
+					log("update");
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg['serverGlobalName'];
 					
@@ -482,8 +486,9 @@ module.exports = {
 					})
 				} else { // Sinon creer
 					var conditions = {
-						server_name: globalCfg['serverGlobalName'],
-						user_id: data.user_id
+							server_name: globalCfg['serverGlobalName'],
+							user_id: data.user_id,
+							sector: data.sector
 						},
 						update = { $set: data },
 						options = { multi: false };

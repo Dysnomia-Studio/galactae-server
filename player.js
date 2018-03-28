@@ -200,6 +200,7 @@ module.exports = class player {
 			});
 
 			for(var sector = 0; sector<newUserData.sectorPointsAddresses; sector++) {
+				log(sector);
 				db.sectorRank.update({
 					user_id: user._id,
 					sector: newUserData.sectorPointsAddresses[sector],
