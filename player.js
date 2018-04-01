@@ -33,7 +33,14 @@ module.exports = class player {
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
+			if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
+				// Kick that Hacker ...
+				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
+				return;
+			}
+
 			data.user_id = userGameIdObj[0].user_id;
+			
 			db.ban.find(data.user_id, 2, function(banObj) {
 				if(isset(banObj)) {
 					var now = Date.now();
