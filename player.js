@@ -33,11 +33,11 @@ module.exports = class player {
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
+			/*if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
 				// Kick that Hacker ...
 				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
 				return;
-			}
+			}*/
 
 			data.user_id = userGameIdObj[0].user_id;
 			
