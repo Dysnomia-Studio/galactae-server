@@ -64,17 +64,4 @@ module.exports = function() {
 	this.logdate = function() {
 		return yellowText(getDateTime());
 	};
-
-	this.listenCmd = function() {
-		const rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		});
-
-		rl.question('', (answer) => {
-			console.log('Command:' + answer);
-
-			listenCmd();
-		});
-	}
 };
