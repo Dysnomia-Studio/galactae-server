@@ -231,7 +231,12 @@ module.exports = function() {
 		wep_nuke:			[6500,6300],
 		wep_laser:			[6600,6000],
 		wep_plasma:			[7300,6400],
-		// Hangar
+		// Shields & Defenses
+		def_turret:			[7500,5750],
+		def_shield_magnetic:[7800,6100],
+		def_shield_projector:[8100,6450],
+		def_shield_singularity:[7800,7400],
+		// Hangars
 		hangarDouble:		[5750,3300],
 		// Mines
 		wep_mines:			[5300,6600],
@@ -293,6 +298,11 @@ module.exports = function() {
 		wep_nuke:			{ cost: 180, parents: ["wep_railgun"] },
 		wep_laser:			{ cost: 260, parents: ["wep_railgun","misc_phyQuantique"] },
 		wep_plasma:			{ cost: 480, parents: ["wep_laser"] },
+		// Shields & Defenses
+		def_turret:			{ cost: 450, parents: ["wep_railgun","misc_advTelemetrie"] },
+		def_shield_magnetic:{ cost: 750, parents: ["def_turret","misc_em"] },
+		def_shield_projector:{ cost: 1150, parents: ["def_shield_magnetic"] },
+		def_shield_singularity:{ cost: 1550, parents: ["def_shield_magnetic","misc_calcGravit"] },
 		// Hangars
 		hangarDouble: 		{ cost: 2200, parents: ["carrier_small"] },
 		// Mines spatiales
