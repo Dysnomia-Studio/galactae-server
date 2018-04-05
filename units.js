@@ -701,7 +701,6 @@ module.exports = class units {
 					if(speed[0] === undefined) { return; }
 
 					var dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
-
 					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 
 					units.fleetCompleteMove(user, fleetReturned, destination, time);

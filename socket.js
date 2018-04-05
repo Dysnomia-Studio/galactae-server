@@ -303,10 +303,12 @@ module.exports = class websocket {
 	 * Ends a server maintenance
 	 */
 	static endMaintenance() {
+		io.emit('server-maintenance-off');
 		maintenance = false;
 
 		db.server.find(function(server) {
 			server.server_maintenance = false;
+			console.info(server);
 			db.server.update(server);
 		});
 	}
