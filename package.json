@@ -1,19 +1,20 @@
 {
   "name": "galactae-server",
-  "version": "0.4.5",
+  "version": "0.5.5",
   "description": "NodeJs Server for Galactae",
   "author": "Elanis",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
+  "requires": true,
+  "lockfileVersion": 1,
   "dependencies": {
-    "mongoose": "",
-    "fs": "",
-    "express": "",
-    "https": "",
-    "socket.io": "",
-    "pm2": "",
-    "discord.js": ""
+    "discord.js": "^11.3.2",
+    "express": "^4.16.2",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "mongoose": "^5.0.9",
+    "socket.io": "^2.0.4"
   }
 }

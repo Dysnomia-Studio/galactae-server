@@ -1,1 +1,675 @@
-module.exports=function(){this.globalConst={buildingNumber:14,maxFleetSize:3e5};this.pointsCoef={planet:1,research:.08,units:3e-4,money:1e-4};this.planetRatios=[{ironRatio:.35,aluRatio:.5,copperRatio:.04,titanRatio:.1}];this.mineralProd=[2,-2,145];this.metalProd=[1.85,-3,139];this.heliumProd=[190,-424,500];this.storageRatio=[47.52,8.29];this.heliumStorageRatio=.2;this.electricity=[208e4,165e3,55e4];this.habGen=[25447,419910,-17e4];this.buildLvlUnitBuildingSpeedBonus=.005;this.buildingMaxLvl=[25,25,25,25,30,25,5,35,30,10,25,25,15,25];this.buildingPointCoef=[3,3,5,5,4,2,10,7,8,4,2,8,6,3];this.buildCost={aluminium:[[0,0,0],[0,0,0],[0,0,0],[.8,8,-5],[.6,3,0],[0,0,0],[.6,8,-6],[.6,3,0],[.25,8,0],[1.7,1,0],[.7,8,-3],[.5,4,5],[.6,3,5],[.9,9,-3]],iron:[[8,-20,17],[2,-2,0],[2.7,-6,8],[0,0,0],[.5,2,0],[1.75,-1.5,0],[.8,2,0],[6,-20,24],[1.25,-1,0],[0,0,0],[2.2,2,0],[2,2,8],[2.5,4,0],[1.5,3,0]],copper:[[0,0,0],[0,0,0],[.4,9,-5],[0,0,0],[.4,9,-5],[0,0,0],[0,0,0],[.85,3,3],[.25,4,0],[.35,9,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],titanium:[[.75,6.5,-2],[2.8,6,6],[0,0,0],[1.2,12,-3.8],[0,0,0],[2.5,6,6.5],[1.2,5,-6.5],[.5,6.5,-2],[.8,6.5,-2],[0,0,0],[0,0,0],[3,0,8],[0,0,0],[0,0,0]],time:[[.03,.05,-.2],[.06,-.15,.1],[.07,-.1,.05],[.065,-.1,0],[.05,-.1,.03],[.035,.05,-.2],[.05,.1,-.1],[.04,.08,-.1],[.02,.03,-.1],[.1,.1,0],[.025,.1,0],[.075,.15,.15],[.12,.5,0],[.017,.15,0]],energy:[[725,1e5,5e5],[1e3,-1e4,700],[400,-1100,700],[0,8e4,-1e4],[0,0,0],[35,-200,800],[150,200,1200],[300,-1300,800],[550,-2500,700],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]],habitants:[[700,90120,-6e4],[1300,72010,-32359],[0,0,0],[2035,24090,15464],[323,18721,-3092],[1640,12231,-6422],[0,1750,-1250],[1550,40504,0],[1e3,22439,30231],[0,267,-167],[800,14500,-1500],[2205,32e3,2e4],[7e3,18e3,2e4],[3029,10533,18e3]]};this.researchProduction=[-.05,12,-8];this.researchBonus={cp_mecanisation:-.05,cp_tracteur:-.05,cp_materielTp:-.1,cp_molecular_compression:1.1};this.researchPos={researchCenter:[5e3,5e3],industrialistion:[5563,5e3],phyContemporaine:[4813,5333],thermodynamique:[4900,4467],prop_main:[4313,3933],prop_vSolaire:[3600,4250],prop_ions:[5922,4114],prop_plasma:[6918,4196],prop_vsl:[7800,4150],prop_hyperespace:[8700,4100],prop_manoeuvre:[4813,3433],prop_advManoeuvre:[5e3,3e3],cp_mecanisation:[6e3,4600],cp_tracteur:[6300,4950],cp_materielTp:[6550,5250],cp_dbRaffinage:[6100,5400],cp_molecular_compression:[5450,5350],wep_railgun:[5900,5700],wep_nuke:[6500,6300],wep_laser:[6600,6e3],wep_plasma:[7300,6400],wep_mines:[5300,6600],wep_mines_nuke:[6250,6600],wep_mines_iem:[4600,6100],figther_light_interceptor:[6100,3700],figther_heavy_interceptor:[6150,3400],figther_bomber:[6250,3100],battlecruiser_small:[7800,4900],cuirasse_small:[7500,4500],corvet_small:[6600,3800],carrier_small:[5750,3600],carrier_medium:[5700,3300],wep_sat_ag1:[5300,7100],wep_sat_ag2:[6350,7500],wep_sat_ag3:[7329,7850],misc_astronomie:[5200,6200],misc_telemetrie:[6100,6200],misc_advTelemetrie:[6900,5600],misc_mecStellaire:[4e3,6100],misc_phySolaire:[3700,5850],misc_phyQuantique:[4800,5850],misc_calcGravit:[4500,6500],misc_em:[4300,5600]};this.researchList={researchCenter:{cost:0,parents:[]},industrialistion:{cost:8,parents:["researchCenter"]},phyContemporaine:{cost:20,parents:["researchCenter"]},thermodynamique:{cost:13,parents:["researchCenter"]},prop_main:{cost:380,parents:["thermodynamique","misc_mecStellaire"]},prop_vSolaire:{cost:2300,parents:["prop_main","misc_phySolaire"]},prop_ions:{cost:2e3,parents:["prop_main","misc_phyQuantique"]},prop_plasma:{cost:2500,parents:["prop_ions","misc_phyQuantique"]},prop_vsl:{cost:15e3,parents:["prop_ions","misc_advTelemetrie"]},prop_hyperespace:{cost:35e3,parents:["prop_vsl"]},prop_manoeuvre:{cost:450,parents:["prop_main"]},prop_advManoeuvre:{cost:700,parents:["prop_manoeuvre"]},cp_mecanisation:{cost:120,parents:["industrialistion"]},cp_tracteur:{cost:150,parents:["industrialistion"]},cp_materielTp:{cost:350,parents:["cp_tracteur","misc_advTelemetrie"]},cp_dbRaffinage:{cost:100,parents:["industrialistion"]},cp_molecular_compression:{cost:180,parents:["industrialistion","misc_phyQuantique"]},wep_railgun:{cost:50,parents:["phyContemporaine"]},wep_nuke:{cost:180,parents:["wep_railgun"]},wep_laser:{cost:260,parents:["wep_railgun","misc_phyQuantique"]},wep_plasma:{cost:480,parents:["wep_laser"]},wep_mines:{cost:380,parents:["misc_calcGravit","misc_telemetrie"]},wep_mines_nuke:{cost:750,parents:["wep_mines","wep_nuke"]},wep_mines_iem:{cost:550,parents:["wep_mines","misc_em"]},figther_light_interceptor:{cost:550,parents:["prop_main","misc_advTelemetrie"]},figther_heavy_interceptor:{cost:850,parents:["figther_light_interceptor"]},figther_bomber:{cost:1320,parents:["figther_heavy_interceptor","wep_nuke"]},battlecruiser_small:{cost:2550,parents:["prop_ions","misc_advTelemetrie"]},cuirasse_small:{cost:2580,parents:["prop_ions","misc_advTelemetrie"]},corvet_small:{cost:680,parents:["prop_main","misc_advTelemetrie"]},carrier_small:{cost:2580,parents:["figther_light_interceptor","prop_ions"]},carrier_medium:{cost:2850,parents:["carrier_small"]},wep_sat_ag1:{cost:360,parents:["misc_calcGravit","misc_telemetrie"]},wep_sat_ag2:{cost:650,parents:["wep_sat_ag1","misc_advTelemetrie"]},wep_sat_ag3:{cost:1500,parents:["wep_sat_ag2"]},misc_astronomie:{cost:45,parents:["phyContemporaine"]},misc_telemetrie:{cost:90,parents:["misc_astronomie"]},misc_advTelemetrie:{cost:320,parents:["misc_telemetrie"]},misc_mecStellaire:{cost:340,parents:["misc_calcGravit"]},misc_phyQuantique:{cost:120,parents:["phyContemporaine"]},misc_phySolaire:{cost:280,parents:["misc_phyQuantique"]},misc_calcGravit:{cost:240,parents:["misc_astronomie"]},misc_em:{cost:110,parents:["phyContemporaine"]}};this.hqFleetCount=[2,5,9,14,20,0];this.shipResearchDependencies={SHIP_SAT_AG1:"wep_sat_ag1",SHIP_SAT_AG2:"wep_sat_ag2",SHIP_SAT_AG3:"wep_sat_ag3",SHIP_WEP_MINES:"wep_mines",SHIP_WEP_MINES_IEM:"wep_mines_iem",SHIP_WEP_MINES_NUKE:"wep_mines_nuke",SHIP_FIGHTER_SMALL:"figther_light_interceptor",SHIP_FIGHTER_MEDIUM:"figther_heavy_interceptor",SHIP_BATTLECRUISER_SMALL:"battlecruiser_small",SHIP_CUIRASSE_SMALL:"cuirasse_small",SHIP_CORVET_SMALL:"corvet_small",SHIP_CARRIER_MEDIUM:"carrier_medium",explosive:"wep_mines",nuke:"wep_nuke",iem:"wep_iem",antimater:"wep_antimater",railgun:"wep_railgun",laser:"wep_laser",plasma:"wep_plasma",magnetic:"def_shield_magnetic",turret:"def_turret",singularity:"def_shield_singularity",projector:"def_shield_projector",vsl:"prop_vsl",hyperespace:"prop_hyperespace",ion:"prop_ions",pplasma:"prop_plasma",vsolaire:"prop_vSolaire"};this.shipShapesDetails={SHIP_DEF:{SHIP_SAT_AG1:{svg:[["struct","rect",75,175,250,150],["struct","line",125,185,125,315],["struct","line",175,185,175,315],["struct","line",225,185,225,315],["struct","line",275,185,275,315],["struct","rect",325,125,150,250],["struct","rect",475,175,250,150],["struct","line",525,185,525,315],["struct","line",575,185,575,315],["struct","line",625,185,625,315],["struct","line",675,185,675,315],["cannon","rect",375,150,50,50,"cannon_1"],["shield","rect",375,300,50,50,"shield_1"]],content:{cannon:["railgun","laser","plasma"],shield:["none","magnetic","projector"]},stats:{mass:0}}},SHIP_BATTLECRUISER:{SHIP_BATTLECRUISER_SMALL:{svg:[["struct","path","M200",130,"Q",300,165,200,200,"L100",200,"L100",130,"L200",130],["struct","path","M400",200,"Q",600,250,400,300,"L100",300,"Q",20,250,100,200,"L400",200],["struct","path","M200",300,"Q",300,335,200,370,"L100",370,"L100",300,"L200",300],["cannon","rect",410,225,50,50,"cannon_1"],["rocketLauncher","rect",325,225,50,50,"rocket_1"],["shield","rect",200,225,50,50,"shield_1"],["sup_propulsion","rect",80,225,50,50,"prop_1"],["sub_propulsion","rect",120,140,50,50,"prop_2"],["sub_propulsion","rect",120,310,50,50,"prop_3"]],content:{cannon:["railgun","laser","plasma"],rocketLauncher:["explosive","nuke","antimater"],sub_propulsion:["ion","pplasma"],sup_propulsion:["vsl","hyperespace"],shield:["none","magnetic","turret"]},stats:{mass:0}}},SHIP_CUIRASSE:{SHIP_CUIRASSE_SMALL:{svg:[["struct","poly",100,100,50,200,50,300,100,400,225,300,500,250,225,200],["struct","poly",50,200,50,300,300,275,375,250,300,225],["cannon","rect",130,225,50,50,"cannon_1"],["shield","rect",200,225,50,50,"shield_1"],["shield","rect",200,225,50,50,"shield_2"],["sup_propulsion","rect",60,225,50,50,"prop_1"],["sub_propulsion","rect",90,140,50,50,"prop_2"],["sub_propulsion","rect",90,310,50,50,"prop_3"]],content:{cannon:["railgun","laser","plasma"],sub_propulsion:["ion","pplasma"],sup_propulsion:["vsl","hyperespace"],shield:["none","magnetic","turret","singularity","projector"]},stats:{mass:0}}},SHIP_FIGHTER:{SHIP_FIGHTER_SMALL:{svg:[["struct","poly",100,100,70,250,100,400,170,400,250,250,170,100],["struct","poly",60,205,50,250,60,295,510,280,520,250,510,220],["cannon","rect",455,225,50,50,"cannon_1"],["sub_propulsion","rect",70,225,50,50,"prop_1"]],content:{cannon:["railgun","laser","plasma"],sub_propulsion:["vsolaire","ion"]},stats:{mass:0}},SHIP_FIGHTER_MEDIUM:{svg:[["struct","path","M50",300,"Q",300,-100,550,300],["struct","path","M260",228,"Q",300,130,340,228],["struct","path","M50",300,"Q",300,150,550,300],["cannon","rect",150,180,50,50,"cannon_1"],["cannon","rect",400,180,50,50,"cannon_2"],["sub_propulsion","rect",275,115,50,50,"prop_1"]],content:{cannon:["railgun","laser","plasma"],sub_propulsion:["vsolaire","ion"]},stats:{mass:0}}},SHIP_CORVET:{SHIP_CORVET_SMALL:{svg:[["struct","rect",50,150,120,60],["struct","rect",50,290,120,60],["struct","circle",250,250,150],["struct","path","M385",185,"Q",300,250,385,315],["cloak","rect",250,120,50,50,"cloak_1"],["scanner","rect",250,330,50,50,"scanner_1"],["sub_propulsion","rect",55,295,50,50,"prop_1"],["sub_propulsion","rect",55,155,50,50,"prop_2"],["sup_propulsion","rect",110,225,50,50,"prop_3"]],content:{cloak:["none"],scanner:["none"],sub_propulsion:["vsolaire","ion","pplasma"],sup_propulsion:["vsl","hyperespace"]},stats:{mass:0}}},SHIP_CARRIER:{SHIP_CARRIER_MEDIUM:{svg:[["struct","path","M400",200,"Q",500,250,400,300,"L50",300,"Q",0,250,50,200,"L400",200],["struct","poly",60,200,60,130,220,130,240,200],["struct","poly",60,200,60,90,130,90,150,200],["struct","poly",60,300,60,370,220,370,240,300],["struct","poly",60,300,60,410,130,410,150,300],["hangar","rect",70,110,50,50,"hangar_1"],["hangar","rect",160,140,50,50,"hangar_2"],["hangar","rect",70,340,50,50,"hangar_3"],["hangar","rect",160,310,50,50,"hangar_4"],["shield","rect",250,225,50,50,"shield_1"],["sub_propulsion","rect",100,225,50,50,"prop_1"],["sup_propulsion","rect",40,225,50,50,"prop_2"]],content:{hangar:["none"],sub_propulsion:["ion","pplasma"],sup_propulsion:["vsl","hyperespace"],shield:["none","magnetic","turret","projector"]},stats:{mass:0}}}};this.shipCosts={WEP_MINE:[2,15,5,4,.08,0],WEP_MINE_NUKE:[4,20,7,6,.1,0],WEP_MINE_IEM:[15,25,6,15,.2,0],WEP_MINE_AM:[4,25,8,7,.12,0],SHIP_SAT_AG1:[10,15,35,15,.25,0],SHIP_SAT_AG2:[15,20,50,23,.37,0],SHIP_SAT_AG3:[30,35,60,36,.7,0],SHIP_BATTLECRUISER_SMALL:[250,250,120,70,1.12,160],SHIP_CUIRASSE_SMALL:[320,350,180,110,1.45,220],SHIP_FIGHTER_SMALL:[45,25,40,20,.35,5],SHIP_FIGHTER_MEDIUM:[65,35,60,30,.52,10],SHIP_FIGHTER_BOMBER:[90,60,100,50,.78,20],SHIP_CORVET_SMALL:[115,20,90,40,.62,40],SHIP_CARRIER_SMALL:[400,300,140,80,1.25,920],SHIP_CARRIER_SMALL:[500,420,190,105,1.65,1200],explosive:[1,10,3,3,.05,0],nuke:[3,12,5,4,.08,0],iem:[10,15,4,10,.19,0],antimater:[3,15,6,5,.1,0],railgun:[2,0,8,5,.1,0],laser:[4,5,3,6,.12,0],plasma:[10,15,7,8,.15,0],ion:[80,60,40,5,.25,0],plasma:[130,90,60,10,.4,0],vsolaire:[120,45,35,15,.35,0],vsl:[65,120,60,20,.55,80],hyperespace:[80,150,90,25,.75,160],none:[0,0,0,0,0,0]}};
+module.exports = function() {
+	this.globalConst = {
+		buildingNumber: 	14,
+		maxFleetSize:   300000, // Number of people
+	};
+	this.pointsCoef = {
+		planet:				1,
+		research: 			0.08,
+		units: 				0.0003,
+		money: 			    0.0001,
+	};
+	/** 
+	 * Production
+	 */
+	this.planetRatios = [
+		{ironRatio: 0.35, aluRatio: 0.50, copperRatio: 0.04, titanRatio: 0.10}, // Earth type
+	];
+
+	this.mineralProd = 	[2,-2,145];
+	this.metalProd = 	[1.85,-3,139];
+	this.heliumProd = 	[190,-424,500];
+
+	this.storageRatio = [47.52,8.29];
+	this.heliumStorageRatio = 0.2;
+
+	this.electricity = [2080000,165000,550000];
+	this.habGen = [25447,419910,-170000];
+
+	this.buildLvlUnitBuildingSpeedBonus = 0.005;
+
+	/**
+	 * Buildings
+	 */
+	this.buildingMaxLvl = [
+		25,	// Carriere
+		25,	// Metallurgie
+		25,	// Habitations
+		25,	// Serres
+		30,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		35,	// Centre de lancement
+		30,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25	// Mine He3
+	];
+	this.buildingPointCoef = [
+		3, 	// Carriere
+		3,	// Metallurgie
+		5,	// Habitations
+		5,	// Serres
+		4,	// Centrales Solaires
+		2,	// Entrepôts
+		10,	// Etat Major
+		7,	// Centre de lancement
+		8,	// Centre de recherches
+		4,	// Radar
+		2,	// Reservoir
+		8,	// Chantier naval
+		6,	// Commerce
+		3,	// Mine He3
+	];
+	this.buildCost = {
+		aluminium: [
+			// Ground building
+			[0,0,0], // Quarry
+			[0,0,0], // Metallurgie
+			[0,0,0], // Living
+			[0.8,8,-5], // Serres
+			[0.6,3,0], // Solar panel
+			[0,0,0], // Warehouse
+			[0.6,8,-6], // Hedquarters
+			[0.6,3,0], // Launching Center
+			[0.25,8,0], // Research Center
+			// Space stations
+			[1.7,1,0], // Radar
+			[0.7,8,-3], // Tank
+			[0.5,4,5], // Shipyard
+			[0.6,3,5], // Trade
+			[0.9,9,-3], // He3exp
+		],
+		iron: [
+			// Ground building
+			[8,-20,17], // Quarry
+			[2,-2,0], // Metallurgie
+			[2.7,-6,8], // Living
+			[0,0,0], // Serres
+			[0.5,2,0], // Solar panel
+			[1.75,-1.5,0], // Warehouse
+			[0.8,2,0], // Hedquarters
+			[6,-20,24], // Launching Center
+			[1.25,-1,0], // Research Center
+			// Space stations
+			[0,0,0], // Radar
+			[2.2,2,0], // Tank
+			[2,2,8], // Shipyard
+			[2.5,4,0], // Trade
+			[1.5,3,0], // He3exp
+		],
+		copper: [
+			// Ground building
+			[0,0,0], // Quarry
+			[0,0,0], // Metallurgie
+			[0.4,9,-5], // Living
+			[0,0,0], // Serres
+			[0.4,9,-5], // Solar panel
+			[0,0,0], // Warehouse
+			[0,0,0], // Hedquarters
+			[0.85,3,3], // Launching Center
+			[0.25,4,0], // Research Center
+			// Space stations
+			[0.35,9,0], // Radar
+			[0,0,0], // Tank
+			[0,0,0], // Shipyard
+			[0,0,0], // Trade
+			[0,0,0], // He3exp
+		],
+		titanium: [
+			// Ground building
+			[0.75,6.5,-2], // Quarry
+			[2.8,6,6], // Metallurgie
+			[0,0,0], // Living
+			[1.2,12,-3.8], // Serres
+			[0,0,0], // Solar panel
+			[2.5,6,6.5], // Warehouse
+			[1.2,5,-6.5], // Hedquarters
+			[0.5,6.5,-2], // Launching Center
+			[0.8,6.5,-2], // Research Center
+			// Space stations
+			[0,0,0], // Radar
+			[0,0,0], // Tank
+			[3,0,8], // Shipyard
+			[0,0,0], // Trade
+			[0,0,0], // He3exp
+		],
+		time: [
+			// Ground building
+			[0.03,0.05,-0.2], // Quarry
+			[0.06,-0.15,0.1], // Metallurgie
+			[0.07,-0.1,0.05], // Living
+			[0.065,-0.1,0], // Serres
+			[0.05,-0.1,0.03], // Solar panel
+			[0.035,0.05,-0.2], // Warehouse
+			[0.05,0.1,-0.1], // Hedquarters
+			[0.04,0.08,-0.1], // Launching Center
+			[0.02,0.03,-0.1], // Research Center
+			// Space stations
+			[0.1,0.1,0], // Radar
+			[0.025,0.1,0], // Tank
+			[0.075,0.15,0.15], // Shipyard
+			[0.12,0.5,0], // Trade
+			[0.017,0.15,0], // He3exp
+		],
+		energy: [
+			// Ground building
+			[725,100000,500000], // Quarry
+			[1000,-10000,700], // Metallurgie
+			[400,-1100,700], // Living
+			[0,80000,-10000], // Serres
+			[0,0,0], // Solar panel
+			[35,-200,800], // Warehouse
+			[150,200,1200], // Hedquarters
+			[300,-1300,800], // Launching Center
+			[550,-2500,700], // Research Center
+			// Space stations
+			[0,0,0], // Radar
+			[0,0,0], // Tank
+			[0,0,0], // Shipyard
+			[0,0,0], // Trade
+			[0,0,0], // He3exp
+		],
+		habitants: [
+			// Ground building
+			[700,90120,-60000], // Quarry
+			[1300,72010,-32359], // Metallurgie
+			[0,0,0], // Living
+			[2035,24090,15464], // Serres
+			[323,18721,-3092], // Solar panel
+			[1640,12231,-6422], // Warehouse
+			[0,1750,-1250], // Hedquarters
+			[1550,40504,0], // Launching Center
+			[1000,22439,30231], // Research Center
+			// Space stations
+			[0,267,-167], // Radar
+			[800,14500,-1500], // Tank
+			[2205,32000,20000], // Shipyard
+			[7000,18000,20000], // Trade
+			[3029,10533,18000], // He3exp
+		],
+	};
+	/**
+	 * Research
+	 */
+	this.researchProduction = [-0.05,12,-8];
+	this.researchBonus = {
+		// Bonus construction
+		cp_mecanisation: -0.05,
+		cp_tracteur: 	 -0.05,
+		cp_materielTp: 	 -0.1,
+		cp_molecular_compression: 1.1,
+	};
+
+	this.researchPos = {
+		// Noeud Central
+		researchCenter:		[5000,5000],
+		industrialistion:	[5563,5000],
+		phyContemporaine:	[4813,5333],
+		thermodynamique:	[4900,4467],
+		// Mise en orbite et propulsion
+		prop_main:			[4313,3933],
+		prop_vSolaire:		[3600,4250],
+		prop_ions:			[5922,4114],
+		prop_plasma:		[6918,4196],
+		prop_vsl:			[7800,4150],
+		prop_wd:			[8700,4100],
+		prop_hyperespace:	[8750,3000],
+		prop_manoeuvre:		[4813,3433],
+		prop_advManoeuvre:	[5000,3000],
+		prop_suprastability:[7850,3850],
+		// Construction et production
+		cp_mecanisation:	[6000,4600],
+		cp_tracteur:		[6300,4950],
+		cp_materielTp:		[6550,5250],
+		cp_dbRaffinage:		[6100,5400],
+		cp_molecular_compression: [5450,5350],
+		// Armes
+		wep_railgun:		[5900,5700],
+		wep_nuke:			[6500,6300],
+		wep_laser:			[6600,6000],
+		wep_plasma:			[7300,6400],
+		// Shields & Defenses
+		def_turret:			[7500,5750],
+		def_shield_magnetic:[7800,6100],
+		def_shield_projector:[8100,6450],
+		def_shield_singularity:[7800,7400],
+		// Hangars
+		hangarDouble:		[5750,3300],
+		// Mines
+		wep_mines:			[5300,6600],
+		wep_mines_nuke:		[6250,6600],
+		wep_mines_iem:		[4600,6100],
+		// Figther
+		figther_light_interceptor: [6100,3700],
+		figther_heavy_interceptor: [6150,3400],
+		figther_bomber: 	[6250,3100],
+		// Battlecruiser
+		battlecruiser_small: [7800,4900],
+		// Cuirasse
+		cuirasse_small: 	[7500,4500],
+		// Corvet
+		corvet_small: 		[6600,3800],
+		// Carrier
+		carrier_small: 		[5750,3600],
+		carrier_medium: 	[5350,3350],
+		// Satellites
+		wep_sat_ag1:		[5300,7100],
+		wep_sat_ag2:		[6350,7500],
+		wep_sat_ag3:		[7329,7850],
+		// Autres recherches spatiales
+		misc_astronomie:	[5200,6200],
+		misc_telemetrie:	[6100,6200],
+		misc_advTelemetrie:	[6900,5600],
+		misc_mecStellaire:	[4000,6100],
+		misc_phySolaire:	[3700,5850],
+		misc_phyQuantique:	[4800,5850],
+		misc_calcGravit:	[4500,6500],
+		misc_em:			[4300,5600],
+	};
+
+	this.researchList = {
+		// Noeud Central
+		researchCenter: 	{ cost: 0, parents: [] },
+		industrialistion: 	{ cost: 8, parents: ["researchCenter"] },		
+		phyContemporaine: 	{ cost: 20, parents: ["researchCenter"] },	
+		thermodynamique: 	{ cost: 13, parents: ["researchCenter"] },
+		// Mise en orbite et propulsion
+		prop_main: 			{ cost: 380, parents: ["thermodynamique","misc_mecStellaire"] },
+		prop_vSolaire: 		{ cost: 2300, parents: ["prop_main","misc_phySolaire"] },
+		prop_ions: 			{ cost: 2000, parents: ["prop_main","misc_phyQuantique"] },
+		prop_plasma:		{ cost: 2500, parents: ["prop_ions","misc_phyQuantique"] },
+		prop_vsl: 			{ cost: 15000, parents: ["prop_ions","misc_advTelemetrie"] },
+		prop_wd: 			{ cost: 24000, parents: ["prop_vsl"] },
+		prop_hyperespace: 	{ cost: 35000, parents: ["prop_wd"] },
+		prop_manoeuvre: 	{ cost: 450, parents: ["prop_main"] },
+		prop_advManoeuvre: 	{ cost: 700, parents: ["prop_manoeuvre"] },
+		prop_suprastability:{ cost: 5000, parents: ["prop_vsl"] },
+		// Construction et production
+		cp_mecanisation: 	{ cost: 120, parents: ["industrialistion"] },
+		cp_tracteur: 	 	{ cost: 150, parents: ["industrialistion"] },
+		cp_materielTp: 		{ cost: 350, parents: ["cp_tracteur","misc_advTelemetrie"] },
+		cp_dbRaffinage: 	{ cost: 100, parents: ["industrialistion"] },
+		cp_molecular_compression: 	{ cost: 180, parents: ["industrialistion","misc_phyQuantique"] },
+		// Armes
+		wep_railgun:		{ cost: 50, parents: ["phyContemporaine"] },
+		wep_nuke:			{ cost: 180, parents: ["wep_railgun"] },
+		wep_laser:			{ cost: 260, parents: ["wep_railgun","misc_phyQuantique"] },
+		wep_plasma:			{ cost: 480, parents: ["wep_laser"] },
+		// Shields & Defenses
+		def_turret:			{ cost: 450, parents: ["wep_railgun","misc_advTelemetrie"] },
+		def_shield_magnetic:{ cost: 750, parents: ["def_turret","misc_em"] },
+		def_shield_projector:{ cost: 1150, parents: ["def_shield_magnetic"] },
+		def_shield_singularity:{ cost: 1550, parents: ["def_shield_magnetic","misc_calcGravit"] },
+		// Hangars
+		hangarDouble: 		{ cost: 2200, parents: ["carrier_small"] },
+		// Mines spatiales
+		wep_mines: 			{ cost: 380, parents: ["misc_calcGravit","misc_telemetrie"] },
+		wep_mines_nuke:		{ cost: 750, parents: ["wep_mines","wep_nuke"] },
+		wep_mines_iem:		{ cost: 550, parents: ["wep_mines","misc_em"] },
+		// Figther
+		figther_light_interceptor: { cost: 550, parents: ["prop_main", "misc_advTelemetrie"] },
+		figther_heavy_interceptor: { cost: 850, parents: ["figther_light_interceptor"] },
+		figther_bomber: 	{ cost: 1320, parents: ["figther_heavy_interceptor", "wep_nuke"] },
+		// Battlecruiser
+		battlecruiser_small: { cost: 2550, parents: ["prop_ions","misc_advTelemetrie"] },
+		// Cuirasse
+		cuirasse_small: 	{ cost: 2580, parents: ["prop_ions","misc_advTelemetrie"] },
+		// Corvet
+		corvet_small: 		{ cost: 680, parents: ["prop_main", "misc_advTelemetrie"] },
+		// Carrier
+		carrier_small: 		{ cost: 2580, parents: ["figther_light_interceptor","prop_ions"] },
+		carrier_medium: 	{ cost: 2850, parents: ["carrier_small"] },
+		// Satellites
+		wep_sat_ag1:		{ cost: 360, parents: ["misc_calcGravit","misc_telemetrie"] },
+		wep_sat_ag2:		{ cost: 650, parents: ["wep_sat_ag1","misc_advTelemetrie"] },
+		wep_sat_ag3:		{ cost: 1500, parents: ["wep_sat_ag2"] },
+		// Autres recherches
+		misc_astronomie:	{ cost: 45, parents: ["phyContemporaine"] },
+		misc_telemetrie: 	{ cost: 90, parents: ["misc_astronomie"] },
+		misc_advTelemetrie: { cost: 320, parents: ["misc_telemetrie"] },
+		misc_mecStellaire: 	{ cost: 340, parents: ["misc_calcGravit"] },
+		misc_phyQuantique: 	{ cost: 120, parents: ["phyContemporaine"] },
+		misc_phySolaire: 	{ cost: 280, parents: ["misc_phyQuantique"] },
+		misc_calcGravit: 	{ cost: 240, parents: ["misc_astronomie"] },
+		misc_em: 			{ cost: 110, parents: ["phyContemporaine"] },
+	};
+	/**
+	 * Units
+	 */
+	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
+	this.shipResearchDependencies = {
+		// Satelites shapes
+		SHIP_SAT_AG1: "wep_sat_ag1",
+		SHIP_SAT_AG2: "wep_sat_ag2",
+		SHIP_SAT_AG3: "wep_sat_ag3",
+
+		// Mines
+		SHIP_WEP_MINES: "wep_mines",
+		SHIP_WEP_MINES_IEM: "wep_mines_iem",
+		SHIP_WEP_MINES_NUKE: "wep_mines_nuke",
+
+		// Fighter
+		SHIP_FIGHTER_SMALL: "figther_light_interceptor",
+		SHIP_FIGHTER_MEDIUM: "figther_heavy_interceptor",
+
+		// Battlecruiser
+		SHIP_BATTLECRUISER_SMALL: "battlecruiser_small",
+
+		// Cuirasse
+		SHIP_CUIRASSE_SMALL: "cuirasse_small",
+
+		// Corvet
+		SHIP_CORVET_SMALL: "corvet_small",
+
+		// Carrier
+		SHIP_CARRIER_MEDIUM: "carrier_medium",
+
+		// Explosives
+		explosive: "wep_mines",
+		nuke: "wep_nuke",
+		iem: "wep_iem",
+		antimater: "wep_antimater",
+
+		// Cannon
+		railgun: "wep_railgun",
+		laser: "wep_laser",
+		plasma: "wep_plasma",
+
+		// Shields & Defences
+		magnetic: "def_shield_magnetic",
+		turret: "def_turret",
+		singularity: "def_shield_singularity",
+		projector: "def_shield_projector",
+
+		// Cloak
+		
+		// Scanners
+
+		// Hangar
+		hangarDouble: "hangar_double",
+		
+		// Propulsion
+		vsl: "prop_vsl",
+		wd: "prop_wd",
+		hyperespace: "prop_hyperespace",
+
+		ion: "prop_ions",
+		pplasma: "prop_plasma",
+		vsolaire: "prop_vSolaire",
+	};
+	this.shipShapesDetails = {
+		SHIP_DEF: {
+			SHIP_SAT_AG1: {
+				svg: [
+					// Aile Gauche
+					["struct","rect", 75,175,250,150],
+					["struct","line",125,185,125,315],
+					["struct","line",175,185,175,315],
+					["struct","line",225,185,225,315],
+					["struct","line",275,185,275,315],
+					// Centre
+					["struct","rect",325,125,150,250],
+					// Aile droite
+					["struct","rect",475,175,250,150],
+					["struct","line",525,185,525,315],
+					["struct","line",575,185,575,315],
+					["struct","line",625,185,625,315],
+					["struct","line",675,185,675,315],
+					// Contenu
+					["cannon","rect",375,150, 50, 50, "cannon_1"],
+					["shield","rect",375,300, 50, 50, "shield_1"],
+				],
+				content: {
+					cannon: ["railgun","laser","plasma"],
+					shield: ["none","magnetic","projector"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+		SHIP_BATTLECRUISER: {
+			SHIP_BATTLECRUISER_SMALL: {
+				svg: [
+					// Structure
+					["struct","path","M200",130,"Q",300,165,200,200,"L100",200,"L100",130,"L200",130], // Moteur gauche
+					["struct","path","M400",200,"Q",600,250,400,300,"L100",300,"Q",20,250,100,200,"L400",200], // Centre
+					["struct","path","M200",300,"Q",300,335,200,370,"L100",370,"L100",300,"L200",300], // Moteur droit
+					// Armes
+					["cannon","rect",410,225, 50, 50, "cannon_1"],
+					["rocketLauncher","rect"  ,325,225, 50, 50, "rocket_1"],
+					// Boucliers
+					["shield","rect",200,225, 50, 50, "shield_1"],
+					// Propulseurs
+					["sup_propulsion","rect"  , 80,225, 50, 50, "prop_1"],
+					["sub_propulsion","rect"  ,120,140, 50, 50, "prop_2"],
+					["sub_propulsion","rect"  ,120,310, 50, 50, "prop_3"],
+				],
+				content: {
+					cannon: ["railgun","laser","plasma"],
+					rocketLauncher: ["explosive","nuke","antimater"],
+					sub_propulsion: ["ion","pplasma"],
+					sup_propulsion: ["vsl","wd"],
+					shield: ["none","magnetic","turret"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+		SHIP_CUIRASSE: {
+			SHIP_CUIRASSE_SMALL: {
+				svg: [
+					["struct","poly",100,100,50,200,50,300,100,400,225,300,500,250,225,200],
+					["struct","poly",50,200,50,300,300,275,375,250,300,225],
+					// Armes
+					["cannon","rect",130,225, 50, 50,"cannon_1"],
+					// Boucliers
+					["shield","rect",200,225, 50, 50, "shield_1"],
+					["shield","rect",200,225, 50, 50, "shield_2"],
+					// Propulseurs
+					["sup_propulsion","rect", 60,225, 50, 50, "prop_1"],
+					["sub_propulsion","rect", 90,140, 50, 50, "prop_2"],
+					["sub_propulsion","rect", 90,310, 50, 50, "prop_3"],
+				],
+				content: {
+					cannon: ["railgun","laser","plasma"],
+					sub_propulsion: ["ion","pplasma"],
+					sup_propulsion: ["vsl","wd"],
+					shield: ["none","magnetic","turret","singularity","projector"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+		SHIP_FIGHTER: {
+			SHIP_FIGHTER_SMALL: {
+				svg: [
+					["struct","poly",100,100,70,250,100,400,170,400,250,250,170,100], // Ailes
+					["struct","poly",60,205,50,250,60,295,510,280,520,250,510,220], // Corps
+					//["struct","poly",50,50,50,50,50,50,50,50], // Cockpit
+					// Armes
+					["cannon","rect"  ,455,225, 50, 50,"cannon_1"],
+					// Propulseur
+					["sub_propulsion","rect"  ,70,225, 50, 50,"prop_1"],
+				],
+				content: {
+					cannon: ["railgun","laser","plasma"],
+					sub_propulsion: ["vsolaire","ion"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+			SHIP_FIGHTER_MEDIUM: {
+				svg: [
+					["struct","path","M50",300,"Q",300,-100,550,300], // Arriere
+					["struct","path","M260",228,"Q",300,130,340,228], // Avant
+					["struct","path","M50",300,"Q",300,150,550,300], // Cockpit
+					// Armes
+					["cannon","rect"  ,150,180, 50, 50,"cannon_1"],
+					["cannon","rect"  ,400,180, 50, 50,"cannon_2"],
+					// Propulseur
+					["sub_propulsion","rect"  ,275,115, 50, 50,"prop_1"],
+				],
+				content: {
+					cannon: ["railgun","laser","plasma"],
+					sub_propulsion: ["vsolaire","ion"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+		SHIP_CORVET: {
+			SHIP_CORVET_SMALL: {
+				svg: [			
+					["struct","rect"  , 50,150,120, 60], // Moteur 1
+					["struct","rect"  , 50,290,120, 60], // Moteur 2
+					["struct","circle",250,250,150], // Corps
+					["struct","path"  ,"M385",185,"Q",300,250,385,315], // Cockpit
+					// Cloak
+					["cloak","rect",250,120,50,50,"cloak_1"],
+					// Scanner
+					["scanner","rect",250,330,50,50,"scanner_1"],
+					// Propulseurs
+					["sub_propulsion","rect"  , 55,295, 50, 50,"prop_1"],
+					["sub_propulsion","rect"  , 55,155, 50, 50,"prop_2"],
+					["sup_propulsion","rect"  ,110,225, 50, 50,"prop_3"],
+				],
+				content: {
+					cloak: ["none"],
+					scanner: ["none"],
+					sub_propulsion: ["vsolaire","ion","pplasma"],
+					sup_propulsion: ["vsl","wd"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+		SHIP_CARRIER: {
+			SHIP_CARRIER_MEDIUM: {
+				svg: [
+					["struct","path","M400",200,"Q",500,250,400,300,"L50",300,"Q",0,250,50,200,"L400",200], // Centre	
+					["struct","poly",60,200,60,130,220,130,240,200], // Aile gauche avant 
+					["struct","poly",60,200,60,90,130,90,150,200], // Aile gauche arriere
+					["struct","poly",60,300,60,370,220,370,240,300], // Aile droite avant
+					["struct","poly",60,300,60,410,130,410,150,300], // Aile droite arriere
+					// Hangars
+					["hangar","rect", 70,110,50,50,"hangar_1"], // Aile gauche arriere 
+					["hangar","rect",160,140,50,50,"hangar_2"], // Aile gauche avant 
+					["hangar","rect", 70,340,50,50,"hangar_3"], // Aile droite arriere
+					["hangar","rect",160,310,50,50,"hangar_4"], // Aile droite avant
+					// Boucliers
+					["shield","rect",250,225, 50, 50,"shield_1"],
+					// Propulseurs
+					["sub_propulsion","rect"  , 100,225, 50, 50,"prop_1"],
+					["sup_propulsion","rect"  , 40,225, 50, 50,"prop_2"],
+				],
+				content: {
+					hangar: ["none","hangarSimple","hangarDouble"],
+					sub_propulsion: ["ion","pplasma"],
+					sup_propulsion: ["vsl","wd","hyperespace"],
+					shield: ["none","magnetic","turret","projector"],
+				},
+				stats: {
+					mass: 0,
+				},
+			},
+		},
+	};
+	this.shipCosts =  { // [Al,Fe,Ti,Cu,Time,Population]
+		/**
+		 * Ship shapes
+		 */
+
+		// Defenses
+		SHIP_WEP_MINES: 			[  2, 15,  5,  4,0.08,   0],
+		SHIP_WEP_MINES_NUKE: 		[  4, 20,  7,  6,0.10,   0],
+		SHIP_WEP_MINES_IEM: 		[ 15, 25,  6, 15,0.20,   0],
+		SHIP_WEP_MINES_AM: 			[  4, 25,  8,  7,0.12,   0],
+		// Satellites
+		SHIP_SAT_AG1: 				[ 10, 15, 35, 15,0.25,   0],
+		SHIP_SAT_AG2: 				[ 15, 20, 50, 23,0.37,   0],
+		SHIP_SAT_AG3: 				[ 30, 35, 60, 36,0.70,   0],
+		// Battlecruisers
+		SHIP_BATTLECRUISER_SMALL: 	[250,250,120, 70,1.12, 160],
+		// Cruisaders
+		SHIP_CUIRASSE_SMALL: 		[320,350,180,110,1.45, 220],
+		// Fighters
+		SHIP_FIGHTER_SMALL: 		[ 45, 25, 40, 20, 0.35,   5],
+		SHIP_FIGHTER_MEDIUM: 		[ 65, 35, 60, 30, 0.52,  10],
+		SHIP_FIGHTER_BOMBER: 		[ 90, 60,100, 50, 0.78,  20],
+		// Corvets
+		SHIP_CORVET_SMALL: 			[115, 20, 90, 40,0.62,  40],
+		// Carriers
+		SHIP_CARRIER_SMALL: 		[400,300,140, 80,1.25, 920],
+		SHIP_CARRIER_SMALL: 		[500,420,190,105,1.65,1200],
+
+		/**
+		 * Ship parts
+		 */
+		// Boom
+		explosive: 		[  1, 10,  3,  3,0.05,0],
+		nuke: 			[  3, 12,  5,  4,0.08,0],
+		iem: 			[ 10, 15,  4, 10,0.19,0],
+		antimater: 		[  3, 15,  6,  5,0.10,0],
+		// Cannons
+		railgun: 		[  2,  0,  8,  5,0.10,0],
+		laser: 			[  4,  5,  3,  6,0.12,0],
+		plasma: 		[ 10, 15,  7,  8,0.15,0],
+		// Propulsions subluminiques
+		ion: 			[ 80, 60, 40,  5,0.25,0],
+		pplasma: 		[130, 90, 60, 10,0.40,0],
+		vsolaire: 		[120, 45, 35, 15,0.35,0],
+		// Propulsions supraluminiques
+		vsl: 			[ 65,120, 60, 20,0.55,  80],
+		wd: 			[ 80,145, 60, 25,0.65, 120],
+		hyperespace: 	[100,160,115, 30,0.75, 160],
+		
+		none: [0,0,0,0,0,0],
+	};
+
+	this.shipPartsSpeed = {
+		// Propulsions subluminiques
+		ion: 			[ -0.000046, 0.0096, 0],
+		plasma: 		[ -0.000045, 0.0090, 0],
+		vsolaire: 		[ -0.000040, 0.0080, 0],
+		// Propulsions supraluminiques
+		vsl: 			[    -0.027,   7.23, 0.001],
+		wd: 			[    -0.016,   5.13, 0.001],
+		hyperespace: 	[    -0.014,   3.68, 0.001],
+	};
+
+	this.fuelCost = {
+		// Propulsions subluminiques
+		ion: 			10682,
+		plasma: 		 7244,
+		vsolaire: 		    0,
+		// Propulsions supraluminiques
+		vsl: 			32761,
+		wd: 			29012,
+		hyperespace: 	25492,
+	};
+
+	this.fighterWeight = {
+		SHIP_FIGHTER_SMALL: 1,
+		SHIP_FIGHTER_MEDIUM: 2,
+		SHIP_FIGHTER_BOMBER: 2,
+	};
+
+	this.hangarSize = {
+		hangarSimple: 40,
+		hangarDouble: 75,
+	};
+
+	this.hangarMiss = {
+		hangarSimple:  -2,
+		hangarDouble: -10,
+	};
+}
