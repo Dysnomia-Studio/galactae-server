@@ -402,7 +402,7 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			var conditions = {server_name: globalCfg['serverGlobalName']}
+			var conditions = {_id: data._id}
 						  , update = { $set: data }
 						  , options = { multi: true };
 
