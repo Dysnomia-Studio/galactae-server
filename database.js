@@ -98,7 +98,7 @@ var userPrivilegesSchema = new Schema({
 var serverSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	server_name: String,
-	server_maintenance: Number
+	server_maintenance: Boolean
 });
 
 var userGameIdSchema = new Schema({
@@ -396,13 +396,15 @@ module.exports = {
 		find: function(callback) {
 			servers.find({server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
-				if(isset(obj)) {
+				if(isset(obj) && isset(obj[0])) {
+					callback(obj[0]);
+				} else if(isset(obj)) {
 					callback(obj);
 				}
 			});
 		},
 		update: function(data, callback) {
-			var conditions = {_id: data._id}
+			var conditions = {server_name: globalCfg['serverGlobalName']}
 						  , update = { $set: data }
 						  , options = { multi: true };
 
