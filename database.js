@@ -406,6 +406,9 @@ module.exports = {
 						  , update = { $set: data }
 						  , options = { multi: true };
 
+			console.info(conditions);
+			console.info(data);
+
 			servers.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
 

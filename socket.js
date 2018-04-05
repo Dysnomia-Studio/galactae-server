@@ -308,7 +308,6 @@ module.exports = class websocket {
 
 		db.server.find(function(server) {
 			server.server_maintenance = false;
-			console.info(server);
 			db.server.update(server);
 		});
 	}
