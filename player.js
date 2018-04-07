@@ -59,9 +59,9 @@ module.exports = class player {
 						console.log(!isset(userPrivileges));
 						console.log(!isset(userPrivileges[0]));
 						console.log(!isset(userPrivileges[0].user_whitelist));
-						console.log(userPrivileges.user_whitelist != 1);
+						console.log(userPrivileges[0].user_whitelist != 1);
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
-							!isset(userPrivileges[0].user_whitelist) || userPrivileges.user_whitelist != 1) {
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist != 1) {
 							
 							log("Error: " + data.username + " isn't whitelisted.");
 							// @ADD: Kick & Message
