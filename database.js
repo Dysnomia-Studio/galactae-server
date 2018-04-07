@@ -1,3 +1,4 @@
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 /**
@@ -373,6 +374,11 @@ module.exports = {
 
 	privilege: {
 		find: function(id,callback) {
+			if(typeof id === "string") {
+				id = new mongoose.Types.ObjectId(id);
+			}
+			console.info(id);
+
 			privileges.find({user_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE

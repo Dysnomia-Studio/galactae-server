@@ -34,7 +34,6 @@ require('./console')();
  * Libs
  */
 // Include that before, instead, that could pose some problems
-global.mongoose  = require('mongoose');
 global.db        = require('./database');
 global.discord   = require('./discord');
 // Then include other classes

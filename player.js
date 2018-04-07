@@ -56,7 +56,7 @@ module.exports = class player {
 				console.info(data);
 
 				if(maintenance) { // Check whitelist
-					db.privilege.find(new mongoose.Types.ObjectId(data.user_id), function(userPrivileges) {
+					db.privilege.find(data.user_id, function(userPrivileges) {
 						console.info(userPrivileges);
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges.whitelist != 1) {
