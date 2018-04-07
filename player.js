@@ -55,13 +55,8 @@ module.exports = class player {
 
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
-						console.info(userPrivileges);
-						console.log(!isset(userPrivileges));
-						console.log(!isset(userPrivileges[0]));
-						console.log(!isset(userPrivileges[0].user_whitelist));
-						console.log(userPrivileges.whitelist != 1);
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
-							!isset(userPrivileges[0].user_whitelist) || userPrivileges.whitelist != 1) {
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges.user_whitelist != 1) {
 							
 							log("Error: " + data.username + " isn't whitelisted.");
 							// @ADD: Kick & Message
