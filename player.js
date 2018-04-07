@@ -55,11 +55,6 @@ module.exports = class player {
 
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
-						console.info(userPrivileges);
-						console.log(!isset(userPrivileges));
-						console.log(!isset(userPrivileges[0]));
-						console.log(!isset(userPrivileges[0].user_whitelist));
-						console.log(userPrivileges[0].user_whitelist != 1);
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist != 1) {
 							
@@ -69,12 +64,12 @@ module.exports = class player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							traitementsConnexion(data, dataReturned);
+							player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						traitementsConnexion(data, dataReturned);
+						player.traitementsConnexion(data, dataReturned);
 					});
 				}
 
