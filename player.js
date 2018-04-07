@@ -53,6 +53,8 @@ module.exports = class player {
 					}
 				}
 
+				console.info(data);
+
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
 						console.info(userPrivileges);
