@@ -376,6 +376,7 @@ module.exports = {
 		find: function(id,callback) {
 			if(typeof id === "string") {
 				id = new mongoose.Types.ObjectId(id);
+				console.log("string");
 			}
 			console.info(id);
 
