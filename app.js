@@ -60,6 +60,12 @@ db.connect(function(success,general=false) {
 		db.player.clearList();
 	}
 
+	if(general) {
+		db.server.find(function(server) {
+			maintenance = server.server_maintenance;
+		});
+	}
+
 	/**
 	 * Stats Auto Submit to db
 	 */

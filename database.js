@@ -90,6 +90,7 @@ var stats;
  */
 var userPrivilegesSchema = new Schema({
 	_id: Schema.Types.ObjectId,
+	user_id: String,
 	server_name: String,
 	user_privilege_lvl: Number,
 	user_whitelist: Number
@@ -373,7 +374,7 @@ module.exports = {
 
 	privilege: {
 		find: function(id,callback) {
-			privileges.find({_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
+			privileges.find({user_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
 				callback(obj);

@@ -53,70 +53,92 @@ module.exports = class player {
 					}
 				}
 
-				db.player.searchByName(data.username,function(dataReturned) {
-					if(data.id!=dataReturned.id) {
-						// Kick that Hacker ...
-						io.to(data.sid).emit('server-kick',"INVALID_SESSION");
-						return;
-					}
+				if(maintenance) { // Check whitelist
+					db.privilege.find(data.user_id, function(userPrivileges) {
+						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges.whitelist != 1) {
+							
+							log("Error: " + data.username + " isn't whitelisted.");
+							// @ADD: Kick & Message
+							return;
+						}
 
-					// Kick double accounts
-					let oldSid = dataReturned.sid;
-					if(oldSid != "-1") {
-						io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-						log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
-					}
+						db.player.searchByName(data.username,function(dataReturned) {
+							traitementsConnexion(data, dataReturned);
+						});
+					}); // Privileges db query
+				} else { // Normal behavior
+					db.player.searchByName(data.username,function(dataReturned) {
+						traitementsConnexion(data, dataReturned);
+					});
+				}
 
-					var playerData = dataReturned.toJSON();
-					playerData.sid = data.sid;
+			}); // Ban db query
+		}); // Gamedata db query
+	}
+
+	static traitementsConnexion(data, dataReturned) {
+		if(data.id!=dataReturned.id) {
+			// Kick that Hacker ...
+			io.to(data.sid).emit('server-kick',"INVALID_SESSION");
+			return;
+		}
+
+		// Kick double accounts
+		let oldSid = dataReturned.sid;
+		if(oldSid != "-1") {
+			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
+			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
+		}
+
+		var playerData = dataReturned.toJSON();
+		playerData.sid = data.sid;
+		
+		var jour = 24*60*60*1000;
+		var minuit = Date.now() - (Date.now()%jour);
+		var hierMinuit = minuit - jour;
+		var dayStreak = 0 + playerData.dayBonusStreak +1; 
+		var bonusBest = 0 + playerData.dayBonusBest;
+
+		if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
+
+		if(dayStreak > bonusBest) { bonusBest = dayStreak; }
+
+		if(playerData.lastBonus < minuit) { 
+			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+		}
+
+		playerData.lastConnected = Date.now();		
+
+		io.to(data.sid).emit('player-recieve-data',{
+			money: playerData.money,
+			gvt: playerData.gvt
+		});
+
+		units.refreshUnits(data);
+		player.refreshPoints(playerData, function(userNewPoints) {
+			research.refreshUserResearch(userNewPoints, function(userNewResearch) {
+				userNewResearch.id = userNewResearch._id;
+					db.player.update(userNewResearch, function() {
+					plCount++;
 					
-					var jour = 24*60*60*1000;
-					var minuit = Date.now() - (Date.now()%jour);
-					var hierMinuit = minuit - jour;
-					var dayStreak = 0 + playerData.dayBonusStreak +1; 
-					var bonusBest = 0 + playerData.dayBonusBest;
+					// Send data to client
+					var researchOut = {};
 
-					if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
-
-					if(dayStreak > bonusBest) { bonusBest = dayStreak; }
-
-					if(playerData.lastBonus < minuit) { 
-						io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+					for(var i=0; i<userNewResearch.research.length; i++) {
+						researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 					}
-
-					playerData.lastConnected = Date.now();		
 
 					io.to(data.sid).emit('player-recieve-data',{
-						money: playerData.money,
-						gvt: playerData.gvt
+						research: researchOut
 					});
 
-					units.refreshUnits(data);
-					player.refreshPoints(playerData, function(userNewPoints) {
-						research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-							userNewResearch.id = userNewResearch._id;
-								db.player.update(userNewResearch, function() {
-								plCount++;
-								
-								// Send data to client
-								var researchOut = {};
-
-								for(var i=0; i<userNewResearch.research.length; i++) {
-									researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
-								}
-
-								io.to(data.sid).emit('player-recieve-data',{
-									research: researchOut
-								});
-
-								planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
-							});
-						});
-					});
+					planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 				});
 			});
 		});
 	}
+
 	/* Disconnect Player */
 	static disconnect(data) {
 		if(!isset(data.sid)) { return; }

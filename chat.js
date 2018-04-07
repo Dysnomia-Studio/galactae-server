@@ -23,7 +23,7 @@ module.exports = class chat {
 					/* Controles de securité */
 					data.send = true;
 
-					if(isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
+					if(isset(userPrivileges) && isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
 						data.lvl = userPrivileges[0].user_privilege_lvl;
 					} else {
 						data.lvl = 1;
