@@ -90,7 +90,7 @@ var stats;
  */
 var userPrivilegesSchema = new Schema({
 	_id: Schema.Types.ObjectId,
-	user_id: String,
+	user_id: Schema.Types.ObjectId,
 	server_name: String,
 	user_privilege_lvl: Number,
 	user_whitelist: Number
@@ -131,7 +131,7 @@ var globalRanksSchema = new Schema({
 
 var sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
-	user_id: Schema.Types.ObjectId,
+	user_id: String,
 	server_name: String,
 	sector: String,
 	rank: Number,
@@ -375,7 +375,7 @@ module.exports = {
 	privilege: {
 		find: function(id,callback) {
 			if(typeof id === "string") {
-				id = new mongoose.Types.ObjectId(id);
+				id = mongoose.Types.ObjectId(id);
 				console.log("string");
 			}
 			console.info(id);
