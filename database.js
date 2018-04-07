@@ -376,9 +376,7 @@ module.exports = {
 		find: function(id,callback) {
 			if(typeof id === "string") {
 				id = mongoose.Types.ObjectId(id);
-				console.log("string");
 			}
-			console.info(id);
 
 			privileges.find({user_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
 				if(err) { log(err); }
