@@ -12,7 +12,7 @@ module.exports = class chat {
 						}
 					}
 				}
-				db.privilege.find(data.user_id, function(userPrivileges) {
+				db.privilege.find(new mongoose.Types.ObjectId(data.user_id), function(userPrivileges) {
 					var reg=new RegExp("[ ,;]+", "g");
 					var args=data.message.split(reg);
 					data.message = textToSmileys(data.message);

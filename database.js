@@ -131,7 +131,7 @@ var globalRanksSchema = new Schema({
 
 var sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
-	user_id: String,
+	user_id: Schema.Types.ObjectId,
 	server_name: String,
 	sector: String,
 	rank: Number,
