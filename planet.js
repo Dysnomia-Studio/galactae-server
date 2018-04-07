@@ -313,13 +313,13 @@ module.exports = class planet {
 					var newFleet = fleetReturned.toJSON();
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
-						var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
+						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
 						unitCount = restantDepuisSynchro;
 
 						newFleet.inBuilding = false;
 					} else { // Partial add
-					 	var restant = Math.floor((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
-					 	var restantDepuisSynchro = Math.floor((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
+					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
+					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
 					 	unitCount = restantDepuisSynchro - restant;				 	
 					}
 
