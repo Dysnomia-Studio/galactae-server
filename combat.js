@@ -5,10 +5,10 @@ module.exports = class combat {
 	 * @param      {<type>}  atk     Attack fleet
 	 * @param      {<type>}  def     Defence Fleet
 	 */
-	constructor(atk, def) {
+	constructor() {
 		// Flottes
-		this.atkFleets = [atk];
-		this.defFleets = [def];
+		this.atkFleets = [];
+		this.defFleets = [];
 
 		// Roles IA
 		this.atkAI = [];
@@ -29,9 +29,11 @@ module.exports = class combat {
 	 */
 	joinTeam(team, fleet) {
 		if(team == "atk") {
-			atkFleets.push(fleet);
+			this.atkFleets.push(fleet);
+		} else if (team == "def") {
+			this.defFleets.push(fleet);
 		} else {
-			defFleets.push(fleet);
+			log('Team "' + team + '" not found !','error');
 		}
 	}
 
@@ -74,7 +76,7 @@ module.exports = class combat {
 	 * Simulate the whole fight
 	 */
 	fight() {
-		// @ADD: check beginners protection
+		if(this.atkFleets.length == 0 || this.defFleets.length == 0) { return; }
 
 		// Get all db data & Fight
 		this.getAllAI(function() {
@@ -96,4 +98,24 @@ module.exports = class combat {
 
 		// @ADD: Send report to client
 	}
-}
+
+	static beginFight(data, pid) {
+		// @ADD: check beginners protection
+
+		// @ADD: Get all in-orbit fleets
+		var fleets = {};
+
+		var battle = new combat();
+
+		// Add all fleets to fight
+		for(var i in fleets) {
+			if(fleets[i].orbitPosition == 0) {
+				battle.joinTeam("def", fleets[i]);
+			} else if(fleets[i].orbitPosition == 1) {
+				battle.joinTeam("atk", fleets[i]);
+			} 
+		}
+
+		combat.fight();
+	}
+};

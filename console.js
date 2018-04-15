@@ -1,7 +1,7 @@
 module.exports = function() {
-	//this.errorFile = fs.createWriteStream('/galactae.error.log', { flags: 'a' });
-	//process.stderr.pipe(this.errorFile);
-	this.logFile = fs.createWriteStream('/galactae.log', { flags: 'a' });
+	this.errorFile = fs.createWriteStream('galactae.error.log', { flags: 'a' });
+	process.stderr.pipe(this.errorFile);
+	this.logFile = fs.createWriteStream('galactae.log', { flags: 'a' });
 
 	/**
 	 * Color a text

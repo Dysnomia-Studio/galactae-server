@@ -609,29 +609,37 @@ module.exports = function() {
 		SHIP_CORVET_SMALL: 			[115, 20, 90, 40,0.62,  40],
 		// Carriers
 		SHIP_CARRIER_SMALL: 		[400,300,140, 80,1.25, 920],
-		SHIP_CARRIER_SMALL: 		[500,420,190,105,1.65,1200],
+		SHIP_CARRIER_MEDIUM: 		[500,420,190,105,1.65,1200],
 
 		/**
 		 * Ship parts
 		 */
 		// Boom
-		explosive: 		[  1, 10,  3,  3,0.05,0],
-		nuke: 			[  3, 12,  5,  4,0.08,0],
-		iem: 			[ 10, 15,  4, 10,0.19,0],
-		antimater: 		[  3, 15,  6,  5,0.10,0],
+		explosive: 		[  1, 10,  3,  3,0.05   ,0],
+		nuke: 			[  3, 12,  5,  4,0.08,   0],
+		iem: 			[ 10, 15,  4, 10,0.19,   0],
+		antimater: 		[  3, 15,  6,  5,0.10,   0],
 		// Cannons
-		railgun: 		[  2,  0,  8,  5,0.10,0],
-		laser: 			[  4,  5,  3,  6,0.12,0],
-		plasma: 		[ 10, 15,  7,  8,0.15,0],
+		railgun: 		[  4,  1,  8,  5,0.10,   1],
+		laser: 			[  8,  7,  3,  6,0.12,   1],
+		plasma: 		[ 15, 20,  7,  8,0.15,   1],
 		// Propulsions subluminiques
-		ion: 			[ 80, 60, 40,  5,0.25,0],
-		pplasma: 		[130, 90, 60, 10,0.40,0],
-		vsolaire: 		[120, 45, 35, 15,0.35,0],
+		ion: 			[ 80, 60, 40,  5,0.25,   0],
+		pplasma: 		[130, 90, 60, 10,0.40,   0],
+		vsolaire: 		[120, 45, 35, 15,0.30,   0],
 		// Propulsions supraluminiques
 		vsl: 			[ 65,120, 60, 20,0.55,  80],
 		wd: 			[ 80,145, 60, 25,0.65, 120],
 		hyperespace: 	[100,160,115, 30,0.75, 160],
-		
+		// Defences
+		magnetic: 		[ 20, 50,  5, 15,0.20,   1],
+		turret: 		[ 15, 30,  3,  5,0.15,   1],
+		singularity: 	[ 20, 45,  8, 20,0.45,   1],
+		projector: 		[ 22, 65,  7, 20,0.30,   1],
+		// Hangars
+		hangarSimple: 	[  5, 30, 18,  5,0.50,   5],
+		hangarDouble: 	[ 12, 45, 25,  7,0.80,  10],
+			
 		none: [0,0,0,0,0,0],
 	};
 
@@ -672,4 +680,4 @@ module.exports = function() {
 		hangarSimple:  -2,
 		hangarDouble: -10,
 	};
-}
+};

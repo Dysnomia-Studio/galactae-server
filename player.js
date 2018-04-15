@@ -1,6 +1,7 @@
 module.exports = class player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
+		console.log(test);
 		db.player.searchBySid(user.sid,function(searchSid) {
 			if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
 				if(player.canAct(searchSid)) { // Don't spam
@@ -164,29 +165,29 @@ module.exports = class player {
 
 			var sectorAddress = planetReturned.address.split("-");
 			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
-			if(sector["points"][sectorAddress] === undefined) {
-				sector["points"][sectorAddress] = 0;
+			if(sector.points[sectorAddress] === undefined) {
+				sector.points[sectorAddress] = 0;
 			}
-			if(sector["pcount"][sectorAddress] === undefined) {
-				sector["pcount"][sectorAddress] = 0;
+			if(sector.pcount[sectorAddress] === undefined) {
+				sector.pcount[sectorAddress] = 0;
 			}
-			sector["points"][sectorAddress] += planetReturned.points;
-			sector["pcount"][sectorAddress]++;
+			sector.points[sectorAddress] += planetReturned.points;
+			sector.pcount[sectorAddress]++;
 			
 			if(i<user.planetlist.length) {
 				player.calcTotalPlanetPoints(user,callback,i,points,sector);
 			} else { 
-				points *= pointsCoef['planet'];
+				points *= pointsCoef.planet;
 
 				var newSector = {
 					address: [],
 					points: [],
 					pcount: [],
 				};
-				for(var j in sector["points"]) {
+				for(var j in sector.points) {
 					newSector.address.push(j);
-					newSector.points.push(sector["points"][j] * pointsCoef['planet']);
-					newSector.pcount.push(sector["pcount"][j]);
+					newSector.points.push(sector.points[j] * pointsCoef.planet);
+					newSector.pcount.push(sector.pcount[j]);
 				}
 
 				user.points = points;
@@ -206,7 +207,7 @@ module.exports = class player {
 			}	
 		}
 
-		points*=pointsCoef['research'];
+		points*=pointsCoef.research;
 
 		return points;
 	}
@@ -217,7 +218,7 @@ module.exports = class player {
 
 			// Money
 			if(newUserData.money === undefined || isNaN(newUserData.money)) { newUserData.money = 0; }
-			newUserData.points += (newUserData.money*pointsCoef['money']);
+			newUserData.points += (newUserData.money*pointsCoef.money);
 
 			newUserData.points = Math.round(newUserData.points);
 
@@ -314,4 +315,4 @@ module.exports = class player {
 			}
 		}
 	}
-}
+};
