@@ -1,7 +1,6 @@
 module.exports = class player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		console.log(test);
 		db.player.searchBySid(user.sid,function(searchSid) {
 			if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
 				if(player.canAct(searchSid)) { // Don't spam
