@@ -310,7 +310,7 @@ module.exports = class planet {
 					var newFleet = fleetReturned.toJSON();
 
 					var timeCost = unitReturned.cost[4]*3600*1000;
-					timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
+					timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
 						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
