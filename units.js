@@ -365,7 +365,7 @@ module.exports = class units {
 					if(inputData.fleet == -2 && fleet.name == "SHIP_DEF") {
 						choosenFleet = fleet;
 					}
-				})
+				});
 				
 				// Auto create def fleet if not existing
 				if(choosenFleet === undefined && inputData.fleet == -2) { 

@@ -103,8 +103,6 @@ module.exports = class planet {
 		 */
 		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
-			
-			var oldResources = resources;
 
 			var ratio = planet.GetMineralsRatio(planetType);
 			var ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
@@ -118,17 +116,16 @@ module.exports = class planet {
 			var mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
 			var metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
 
+			var storageHelium = 0;
 			if(buildings[10]!=0) {
-				var storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
-			} else {
-				var storageHelium = 0;
+				storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
 			}
 
 			// Molecular compression, enhance max storage
 			if(research.getResearch(user,"cp_molecular_compression")==-1) {
-				mineralStorageBase *= researchBonus["cp_molecular_compression"];
-				metalsStorageBase *= researchBonus["cp_molecular_compression"];
-				storageHelium *= researchBonus["cp_molecular_compression"];
+				mineralStorageBase *= researchBonus.cp_molecular_compression;
+				metalsStorageBase *= researchBonus.cp_molecular_compression;
+				storageHelium *= researchBonus.cp_molecular_compression;
 			}
 
 			//Minerals
@@ -169,7 +166,7 @@ module.exports = class planet {
 						min = temp;
 					}
 				}
-				resources[0]+=min
+				resources[0]+=min;
 			    for(var i=2; i<6; i++) {
 			    	resources[i] -= min*ratios[i-2];
 			    }
@@ -188,7 +185,7 @@ module.exports = class planet {
 				}
 		    }
 
-			return resources
+			return resources;
 		}
 		/**
 		 * Do we can upgrade a building ? And if yes build it !
@@ -201,7 +198,7 @@ module.exports = class planet {
 			if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
 			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
+					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
 					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
 					return;
 				} 
@@ -268,10 +265,10 @@ module.exports = class planet {
 							}
 
 						// We consume resources
-						newData.resources[2] -= eval(cost.iron);
-						newData.resources[3] -= eval(cost.aluminium);
-						newData.resources[4] -= eval(cost.copper);
-						newData.resources[5] -= eval(cost.titanium);
+						newData.resources[2] -= cost.iron;
+						newData.resources[3] -= cost.aluminium;
+						newData.resources[4] -= cost.copper;
+						newData.resources[5] -= cost.titanium;
 
 						newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
 						newData.nextBuilding = data.building;
@@ -280,7 +277,7 @@ module.exports = class planet {
 						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
 
 					} else { // We just update ressources
-						websocket.SendMessageToClient({ sid: data.sid, message: errormsg })
+						websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
 						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
 					}
 
@@ -312,14 +309,17 @@ module.exports = class planet {
 					var unitCount = 0;
 					var newFleet = fleetReturned.toJSON();
 
+					var timeCost = unitReturned.cost[4]*3600*1000;
+					timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
+
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
-						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
+						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
 						unitCount = restantDepuisSynchro;
 
 						newFleet.inBuilding = false;
 					} else { // Partial add
-					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/(unitReturned.cost[4]*3600*1000));
-					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/(unitReturned.cost[4]*3600*1000));
+					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
+					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
 					 	unitCount = restantDepuisSynchro - restant;				 	
 					}
 
@@ -342,7 +342,7 @@ module.exports = class planet {
 					}
 
 					var popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
-					newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef['units'];
+					newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
 					newFleet.points = "" + newFleet.points;
 
 					db.fleet.update(newFleet, function() {
@@ -466,9 +466,9 @@ module.exports = class planet {
 		 * @param      {<type>}  data    data
 		 */
 		static rename(data) {
-			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
+			planet.find(data,data.planet,0,function(planetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" })
+					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
 					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
 					return;
 				}
@@ -477,7 +477,7 @@ module.exports = class planet {
 				var empty = true;
 				for(var i=0; i<data.name.length; i++) {
 					if(data.name[i]!=" ") {
-						empty = false
+						empty = false;
 					 	break;
 					}
 				}	
@@ -495,10 +495,7 @@ module.exports = class planet {
 
 				log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.planet+'), new name: '+data.name);
 
-				var newPlanetData = {};
-				newPlanetData.name = data.name;
-
-				planet.sendPlanetDataToUser({data: newPlanetData, planet: data.planet, id: data.id, sid: data.sid });
+				planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
 
 				var newPlanetData = planetReturned.toJSON();
 				newPlanetData.name = data.name;
@@ -525,18 +522,18 @@ module.exports = class planet {
 				resources = planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
 			}
 
-			return resources
+			return resources;
 		}
 
 		static calcPlanetPoints(dataIn) {
 			var points = 0;
 
 			// Building points count
-			for(var i=0; i<globalConst["buildingNumber"]; i++) {
+			for(var i=0; i<globalConst.buildingNumber; i++) {
 				points += (dataIn.Buildings[i] * buildingPointCoef[i]);
 			}
 
-			return points
+			return points;
 		}
 
 		static calcFleetPoints(fleets) {
@@ -602,4 +599,4 @@ module.exports = class planet {
 
 			return retour;
 		}
-}
+};
