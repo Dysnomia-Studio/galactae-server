@@ -243,13 +243,13 @@ module.exports = class websocket {
 							
 							setInterval(function() {
 								if(decompte>0) {
-									log('Restarting server in ' + decompte-- + ' seconds')
+									log('Restarting server in ' + decompte-- + ' seconds');
 								} else {
-									log('Restarting now !')
+									log('Restarting now !');
 									process.exit(); // Well, the pm2 auto restart will do its work
 								}
 								
-							},1000)
+							},1000);
 							break;
 						case "start":
 							// Can't do this now ... Waiting a way (@ADD)
@@ -263,7 +263,7 @@ module.exports = class websocket {
 				} else {
 					log("Failed to execute admin command from " + clientIpAddress + ": ERR_NOT_LOGGED");
 				}
-			})
+			});
 		});
 	}
 	/**

@@ -60,7 +60,6 @@ module.exports = class units {
 	 */
 	static createType(data) {
 		var errors = 0;
-		var errorMessage = "";
 		var ship = data.ship;
 
 		// That block 90% of tries to crash :p
@@ -75,7 +74,7 @@ module.exports = class units {
 		];
 
 		for(var i=0; i<replace.length; i++) {
-			ship.name = ship.name.split(replace[i][0]).join(replace[i][1])
+			ship.name = ship.name.split(replace[i][0]).join(replace[i][1]);
 		}
 
 		// Check entries valdity
@@ -108,7 +107,7 @@ module.exports = class units {
 				if(i=="name" || i=="type" || i=="shape") { continue; }
 				// Check if that kind of part exists in that kind of ship
 				var valid = false;
-				for(var type in shipShapesDetails[ship.type][ship.shape]['content']) {
+				for(var type in shipShapesDetails[ship.type][ship.shape].content) {
 					if(type==ship[i].type) {
 						valid = true;
 						break;
@@ -261,7 +260,7 @@ module.exports = class units {
 
 
 						if(!duplicate && !duplicateName) {
-							db.unit.create(shipToSave, function(newData) {
+							db.unit.create(shipToSave, function() {
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
 								units.refreshUnits(data);
@@ -356,7 +355,7 @@ module.exports = class units {
 				if(inputData.fleet == -2 && unitReturned.shipType != "SHIP_DEF") { return; }
 				if(unitReturned.shipType == "SHIP_DEF") { inputData.fleet = -2; }
 
-				var choosenFleet = undefined;
+				var choosenFleet;
 				fleetList.forEach(function(fleet) {
 					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
 						choosenFleet = fleet;
@@ -749,11 +748,11 @@ module.exports = class units {
 
 		var newFleet = fleet.toJSON();
 		newFleet.endMoveTime = Date.now() + ((time + instability) * 3600000);
-		newFleet.position = destination
+		newFleet.position = destination;
 		newFleet.orbitPosition = -1;
 
 		db.fleet.update(newFleet, function() {
 			user.refreshFleets(newFleet.motherPlanetId, user.sid);
 		});
 	}
-}
+};
