@@ -2,12 +2,12 @@
  * Npm libs
  */
 global.fs = require('fs');
-var options = {
+let options = {
 	key: fs.readFileSync(process.cwd() + '/keys/privkey.pem'),
 	cert: fs.readFileSync(process.cwd() + '/keys/cert.pem')
 };
-var express = require('express');
-var app = express();
+let express = require('express');
+let app = express();
 global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
 io.set("transports", ["websocket","xhr-polling","polling"]);
@@ -69,7 +69,7 @@ db.connect(function(success,general=false) {
 	/**
 	 * Stats Auto Submit to db
 	 */
-	var statsInterval = 5 * 60 * 1000;
+	let statsInterval = 5 * 60 * 1000;
 
 	setTimeout(function() {
 		db.stat.submit(Date.now() - Date.now()%statsInterval);

@@ -1,4 +1,4 @@
-var charList = [
+let charList = [
     // a    
     ["à","&agrave;"],
     ["á","&aacute;"],
@@ -62,7 +62,7 @@ var charList = [
     ['>','&rsaquo;'],
 ];
 
-var smileys = [
+let smileys = [
     [":D","😃"],
     [":-D","😃"],
 
@@ -101,23 +101,23 @@ module.exports = function() {
      * @return     {string}  The date time.
      */
     this.getDateTime = function() {
-	    var date = new Date();
+	    let date = new Date();
 
-	    var hour = date.getHours();
+	    let hour = date.getHours();
 	    hour = (hour < 10 ? "0" : "") + hour;
 
-	    var min  = date.getMinutes();
+	    let min  = date.getMinutes();
 	    min = (min < 10 ? "0" : "") + min;
 
-	    var sec  = date.getSeconds();
+	    let sec  = date.getSeconds();
 	    sec = (sec < 10 ? "0" : "") + sec;
 
-	    var year = date.getFullYear();
+	    let year = date.getFullYear();
 
-	    var month = date.getMonth() + 1;
+	    let month = date.getMonth() + 1;
 	    month = (month < 10 ? "0" : "") + month;
 
-	    var day  = date.getDate();
+	    let day  = date.getDate();
 	    day = (day < 10 ? "0" : "") + day;
 
 		return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
@@ -143,7 +143,7 @@ module.exports = function() {
 	 * @return     {string}  normalized text
 	 */
 	this.normalizeText = function(str) {
-	    for(var i=0; i<charList.length; i++) {
+	    for(let i=0; i<charList.length; i++) {
 	    	str = str.split(charList[i][0]).join(charList[i][1]);
 	    }
 
@@ -156,7 +156,7 @@ module.exports = function() {
      * @return     {string}  normalized text
      */
 	this.unNormalizeText = function(str) {
-	    for(var i=0; i<charList.length; i++) {
+	    for(let i=0; i<charList.length; i++) {
 	        str = str.split(charList[i][1]).join(charList[i][0]);
 	    }
 
@@ -169,7 +169,7 @@ module.exports = function() {
      * @return     {string}  parsed text
      */
     this.textToSmileys = function(str) {
-        for(var i=0; i<smileys.length; i++) {
+        for(let i=0; i<smileys.length; i++) {
             str = str.split(smileys[i][0]).join(smileys[i][1]);
         }
 
@@ -183,8 +183,8 @@ module.exports = function() {
      * @return     {number}  Time parsed in seconds
      */
     this.parseChatTime = function(str) {
-        var unit = str.charAt(str.length-1).toLowerCase();
-        var count = parseInt(str.substr[0,str.length-1]);
+        let unit = str.charAt(str.length-1).toLowerCase();
+        let count = parseInt(str.substr[0,str.length-1]);
 
         if(typeof count != "number" || isNaN(count)) {
             return -1; // Send error code

@@ -1,10 +1,10 @@
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+let mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
 /**
  * Server schemas
  */
-var planetSchema = new Schema({
+let planetSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	address: String,
@@ -24,7 +24,7 @@ var planetSchema = new Schema({
 	unitBuildingFleetID: Schema.Types.ObjectId,
 });
 
-var userSchema = new Schema({
+let userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	planetlist: Array,
@@ -46,7 +46,7 @@ var userSchema = new Schema({
 	research: Array
 });
 
-var unitsSchema = new Schema({
+let unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
@@ -59,7 +59,7 @@ var unitsSchema = new Schema({
 	note: Number,
 });
 
-var fleetsSchema = new Schema({
+let fleetsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
@@ -73,22 +73,22 @@ var fleetsSchema = new Schema({
 	inBuilding: Boolean,
 });
 
-var statsSchema = new Schema({
+let statsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	plCount: Number,
 	time: Number,
 });
 
-var planets;
-var users;
-var units;
-var fleets;
-var stats;
+let planets;
+let users;
+let units;
+let fleets;
+let stats;
 
 /**
  * General schemas
  */
-var userPrivilegesSchema = new Schema({
+let userPrivilegesSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: Schema.Types.ObjectId,
 	server_name: String,
@@ -96,20 +96,20 @@ var userPrivilegesSchema = new Schema({
 	user_whitelist: Number
 });
 
-var serverSchema = new Schema({
+let serverSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	server_name: String,
 	server_maintenance: Boolean
 });
 
-var userGameIdSchema = new Schema({
+let userGameIdSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	game_id: String,
 	server_name: String
 });
 
-var userBanSchema = new Schema({
+let userBanSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	server_name: String,
@@ -120,7 +120,7 @@ var userBanSchema = new Schema({
 	admin: String
 });
 
-var globalRanksSchema = new Schema({
+let globalRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	server_name: String,
@@ -129,7 +129,7 @@ var globalRanksSchema = new Schema({
 	planets: Number
 });
 
-var sectorRanksSchema = new Schema({
+let sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	server_name: String,
@@ -139,10 +139,10 @@ var sectorRanksSchema = new Schema({
 	planets: Number
 });
 
-var privileges;
-var servers;
-var userGameIds;
-var bans;
+let privileges;
+let servers;
+let userGameIds;
+let bans;
 
 module.exports = {
 	Schema: Schema,
@@ -150,8 +150,8 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		var mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
-		var mongoGen = mongoose.createConnection('***REMOVED***');
+		let mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		let mongoGen = mongoose.createConnection('***REMOVED***');
 
 		/**
 		 * Server schemas
@@ -218,7 +218,7 @@ module.exports = {
 			});
 		},
 		update: function(user, callback) {
-			var conditions = { _id: user.id }
+			let conditions = { _id: user.id }
 						  , update = { $set: user }
 						  , options = { multi: true };
 
@@ -231,7 +231,7 @@ module.exports = {
 		},
 		clearList: function() {
 			log("Clearing player list ...");
-			var conditions = { }
+			let conditions = { }
 						  , update = { $set: { sid: "-1" } }
 						  , options = { multi: true };
 
@@ -255,7 +255,7 @@ module.exports = {
 			});
 		},
 		update: function(data) {
-			var conditions = { _id: data._id }
+			let conditions = { _id: data._id }
 						  , update = { $set: data }
 						  , options = { multi: true };
 
@@ -292,7 +292,7 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			var conditions = { _id: data._id }
+			let conditions = { _id: data._id }
 						  , update = { $set: data }
 						  , options = { multi: true };
 
@@ -337,7 +337,7 @@ module.exports = {
 			});
 		},
 		update: function(data,callback) {
-			var conditions = { _id: data._id }
+			let conditions = { _id: data._id }
 						  , update = { $set: data }
 						  , options = { multi: true };
 
@@ -409,7 +409,7 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			var conditions = {server_name: globalCfg['serverGlobalName']}
+			let conditions = {server_name: globalCfg['serverGlobalName']}
 						  , update = { $set: data }
 						  , options = { multi: true };
 
@@ -462,7 +462,7 @@ module.exports = {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
-					var conditions = {
+					let conditions = {
 						server_name: globalCfg['serverGlobalName'],
 						user_id: data.user_id
 						},
@@ -496,7 +496,7 @@ module.exports = {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
-					var conditions = {
+					let conditions = {
 							server_name: globalCfg['serverGlobalName'],
 							user_id: data.user_id,
 							sector: data.sector

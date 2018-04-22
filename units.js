@@ -34,17 +34,17 @@ module.exports = class units {
 	 * @return     {Array}   Unit total cost
 	 */
 	static calcCost(shipType,parts) {
-		var totalCost = shipCosts[shipType];
+		let totalCost = shipCosts[shipType];
 
-		for(var id in parts) {
+		for(let id in parts) {
 			if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
 				log("Cost is not defined for part " + parts[id].tech + " in ship " + shipType,"error");
 				return [-1];
 			}
 
-			var addCost = shipCosts[parts[id].tech];
+			let addCost = shipCosts[parts[id].tech];
 
-			for(var i=0; i<6; i++) {
+			for(let i=0; i<6; i++) {
 				totalCost[i] += addCost[i];
 			}
 		}
@@ -59,26 +59,26 @@ module.exports = class units {
 	 * @param      {<type>}  data    Data given by client
 	 */
 	static createType(data) {
-		var errors = 0;
-		var ship = data.ship;
+		let errors = 0;
+		let ship = data.ship;
 
 		// That block 90% of tries to crash
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
 
 		// Filter name
-		var replace = [
+		let replace = [
 			['<',''],
 			['>',''],
 			['( . ) ( . )',''],
 			['(.)(.)',''],
 		];
 
-		for(var i=0; i<replace.length; i++) {
+		for(let i=0; i<replace.length; i++) {
 			ship.name = ship.name.split(replace[i][0]).join(replace[i][1]);
 		}
 
 		// Check entries valdity
-		for(var i in ship) {
+		for(let i in ship) {
 			// Empty fields
 			if(i=="name" || i=="type" || i=="shape") { // In facts, the two last verifications won't display error, but they're here to simplify the else
 				if(ship[i].split(' ').join('')=="") {
@@ -100,14 +100,14 @@ module.exports = class units {
 		}
 
 		if(errors==0) {
-			var subprop = "";
-			var supprop = "";
+			let subprop = "";
+			let supprop = "";
 
-			for(var i in ship) {
+			for(let i in ship) {
 				if(i=="name" || i=="type" || i=="shape") { continue; }
 				// Check if that kind of part exists in that kind of ship
-				var valid = false;
-				for(var type in shipShapesDetails[ship.type][ship.shape].content) {
+				let valid = false;
+				for(let type in shipShapesDetails[ship.type][ship.shape].content) {
 					if(type==ship[i].type) {
 						valid = true;
 						break;
@@ -117,7 +117,7 @@ module.exports = class units {
 				// Check if that part exists in that kind of ship
 				if(valid) {
 					valid = false;
-					for(var j=0; shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
+					for(let j=0; shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
 						if(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
 							valid = true;
 							break;
@@ -128,7 +128,7 @@ module.exports = class units {
 				// Check if technology exists in that kind of ship
 				if(valid) {
 					valid = false;
-					for(var j=0; shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
+					for(let j=0; shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
 						if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
 							valid = true;
 							break;
@@ -165,7 +165,7 @@ module.exports = class units {
 		if(errors==0) {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
-				for(var i in ship) {
+				for(let i in ship) {
 					if(i=="name" || i=="type" || i=="shape") { continue; }
 
 					if(shipResearchDependencies[ship[i].value]!=undefined && research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
@@ -178,7 +178,7 @@ module.exports = class units {
 				// Saving
 				if(errors==0) {
 					// Save to database
-					var shipToSave = {
+					let shipToSave = {
 						name: ship.name,
 						shipType: ship.type,
 						shipShape: ship.shape,
@@ -191,7 +191,7 @@ module.exports = class units {
 						owned: 0,
 					};
 
-					for(var i in ship) {
+					for(let i in ship) {
 						if(i=="name" || i=="type" || i=="shape") { continue; }
 						
 						shipToSave.parts.push({
@@ -206,10 +206,10 @@ module.exports = class units {
 					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
 				
 					db.unit.findByOwner(data.id,function(unitList) {
-						var duplicate = false;
-						var duplicateName = false;
+						let duplicate = false;
+						let duplicateName = false;
 
-						for(var currObj in unitList) {
+						for(let currObj in unitList) {
 							if(unitList[currObj].name == shipToSave.name) {
 								duplicateName = true;
 								break;
@@ -243,8 +243,8 @@ module.exports = class units {
 								});
 
 								// Compare
-								for(var i=0; i<shipToSave.parts.length; i++) {
-									for(var id in shipToSave.parts[i]) {
+								for(let i=0; i<shipToSave.parts.length; i++) {
+									for(let id in shipToSave.parts[i]) {
 										if(shipToSave.parts[i][id] !== unitList[currObj].parts[i][id]) {
 											duplicate = true;
 											break;
@@ -333,7 +333,7 @@ module.exports = class units {
 		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
-			var newPlanet = planet.update(planetReturned,userReturned,fleetList);
+			let newPlanet = planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
@@ -341,7 +341,7 @@ module.exports = class units {
 				websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
 			}
-			var id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
+			let id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
 			db.unit.find(id, function(unitReturned) {
 				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
@@ -355,7 +355,7 @@ module.exports = class units {
 				if(inputData.fleet == -2 && unitReturned.shipType != "SHIP_DEF") { return; }
 				if(unitReturned.shipType == "SHIP_DEF") { inputData.fleet = -2; }
 
-				var choosenFleet;
+				let choosenFleet;
 				fleetList.forEach(function(fleet) {
 					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
 						choosenFleet = fleet;
@@ -372,10 +372,10 @@ module.exports = class units {
 					inputData.fleetName = "SHIP_DEF";
 				}
 
-				var totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
+				let totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
-				for(var i=0; i<unitReturned.cost.length; i++) {
+				for(let i=0; i<unitReturned.cost.length; i++) {
 					totalCost[i] = parseFloat(unitReturned.cost[i])*inputData.count;
 				}
 
@@ -418,7 +418,7 @@ module.exports = class units {
 
 						if(inputData.unit.substr(0,14) != "SHIP_WEP_MINES") {
 							// Update unit
-							var newUnit = unitReturned.toJSON();
+							let newUnit = unitReturned.toJSON();
 							newUnit.owned += inputData.count;
 
 							db.unit.update(newUnit);
@@ -485,7 +485,7 @@ module.exports = class units {
 			}
 
 			// Check name
-			for(var i=0; i<fleetReturned.length; i++) {
+			for(let i=0; i<fleetReturned.length; i++) {
 				if(fleetReturned[i].name == data.fleetName) {
 					websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
@@ -493,7 +493,7 @@ module.exports = class units {
 			}
 
 			// Add it to db
-			var newFleet = {
+			let newFleet = {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: data.planet,
@@ -516,9 +516,9 @@ module.exports = class units {
 	}
 
 	static calcFuelCost(engines) {
-		var cost = 0;
+		let cost = 0;
 
-		for(var i in engines) {
+		for(let i in engines) {
 			cost += fuelCost[i] * engines[i];
 		}
 
@@ -526,17 +526,17 @@ module.exports = class units {
 	}
 
 	static hasEnoughCarrier(fleet, unitList) {
-		var fighterCount = 0;
-		var fighterCap   = 0;
+		let fighterCount = 0;
+		let fighterCap   = 0;
 
-		for(var u in unitList) {
-			for(var f in fleet.units) {
+		for(let u in unitList) {
+			for(let f in fleet.units) {
 				if(fleet.units[f][0] != unitList[u]._id) { continue; }
 
 				if(unitList[u].shipType == "SHIP_FIGHTER") {
 					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
 				} else if(unitList[u].shipType == "SHIP_CARRIER") {
-					for(var p in unitList[u].parts) {
+					for(let p in unitList[u].parts) {
 						if(unitList[u].parts[p].type.substr(0,6) == "hangar") {
 							fighterCap += hangarSize[unitList[u].parts[p].type] * fleet.units[f][1];
 						}
@@ -550,11 +550,11 @@ module.exports = class units {
 	}
 
 	static calcUnitSubSpeed(parts) {
-		var speed = [];
-		var tech = "";
-		var count = 0;
+		let speed = [];
+		let tech = "";
+		let count = 0;
 
-		for(var i in unit.parts) {
+		for(let i in unit.parts) {
 			if(unit.parts[i].type == "sub_propulsion") {
 				if(speed[0] == -1) { // First sup propulsion part
 					tech = unit.parts[i].tech;
@@ -566,7 +566,7 @@ module.exports = class units {
 					}
 					speed = shipPartsSpeed[unit.parts[i].tech];
 				} else {
-					for(var i=0; i<speed.length; i++) {
+					for(let i=0; i<speed.length; i++) {
 						speed[i] *= 1.5;
 					}
 				}
@@ -577,18 +577,18 @@ module.exports = class units {
 	}
 
 	static getFleetMinSubSpeed(unitList) {
-		var min = {
+		let min = {
 			speed: 0,
 			engines: {}
 		};
 
-		for(var i=0; i<unitList.length; i++) {
-			var curr = units.calcUnitSubSpeed(unitList[i]);
-			var currSpeed = curr.speed;
-			var speed = min.speed;
+		for(let i=0; i<unitList.length; i++) {
+			let curr = units.calcUnitSubSpeed(unitList[i]);
+			let currSpeed = curr.speed;
+			let speed = min.speed;
 			if(currSpeed[0] === undefined) { return currSpeed; } // Just in case of bugs
 
-			var testDist = 1000; // Total galaxy
+			let testDist = 1000; // Total galaxy
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
 				min["speed"] = speed;
@@ -604,11 +604,11 @@ module.exports = class units {
 	}
 
 	static calcUnitSupraSpeed(unit) {
-		var speed = [];
-		var tech = "";
-		var count = 0;
+		let speed = [];
+		let tech = "";
+		let count = 0;
 
-		for(var i in unit.parts) {
+		for(let i in unit.parts) {
 			if(unit.parts[i].type == "sup_propulsion") {
 				tech = unit.parts[i].tech;
 				count++;
@@ -620,7 +620,7 @@ module.exports = class units {
 					}
 					speed = shipPartsSpeed[unit.parts[i].tech];
 				} else {
-					for(var i=0; i<speed.length; i++) {
+					for(let i=0; i<speed.length; i++) {
 						speed[i] *= 1.5;
 					}
 				}
@@ -631,20 +631,20 @@ module.exports = class units {
 	}
 
 	static getFleetMinSupraSpeed(unitList) {
-		var min = {
+		let min = {
 			speed: 0,
 			engines: {}
 		};
 
-		for(var i=0; i<unitList.length; i++) {
+		for(let i=0; i<unitList.length; i++) {
 			if(unitList[i].shipType == "SHIP_FIGHTER") { continue; } // Don't care about fighter they are carried
 
-			var curr = units.calcUnitSupraSpeed(unitList[i]);
-			var currSpeed = curr.speed;
-			var speed = min.speed;
+			let curr = units.calcUnitSupraSpeed(unitList[i]);
+			let currSpeed = curr.speed;
+			let speed = min.speed;
 			if(currSpeed[0] === undefined) { return currSpeed; } // If they can't move to another system, no need to calc it ...
 
-			var testDist = 1000; // Total galaxy size
+			let testDist = 1000; // Total galaxy size
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
 				min["speed"] = speed;
@@ -675,7 +675,7 @@ module.exports = class units {
 	}
 
 	static fleetMoveTo(user, fleetId, destination) {
-		var coordsArrivee = destination.split("-");
+		let coordsArrivee = destination.split("-");
 			coordsArrivee = [parseInt(coordsArrivee[0]), parseInt(coordsArrivee[1])];
 
 		// Get Fleet data
@@ -693,14 +693,14 @@ module.exports = class units {
 
 			if(fleetReturned.position == destination) { // Subluminique
 				units.getFleetUnits(fleetReturned.units, function(unitList) {
-					var minSpeed = units.getFleetMinSubSpeed(unitList);
-					var speed = minSpeed.speed;
-					var fuel = units.calcFuelCost(minSpeed.engines);
+					let minSpeed = units.getFleetMinSubSpeed(unitList);
+					let speed = minSpeed.speed;
+					let fuel = units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) { return; }
 
-					var dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
-					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+					let dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
+					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 
 					units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
@@ -711,24 +711,24 @@ module.exports = class units {
 						return;
 					}
 
-					var minSpeed = units.getFleetMinSupraSpeed(unitList);
-					var speed = minSpeed.speed;
-					var fuel = units.calcFuelCost(minSpeed.engines);
+					let minSpeed = units.getFleetMinSupraSpeed(unitList);
+					let speed = minSpeed.speed;
+					let fuel = units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) {
 						websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
 						return;
 					}
 
-					var coordsDepart = fleetReturned.position.split("-");
+					let coordsDepart = fleetReturned.position.split("-");
 						coordsDepart = [parseInt(coordsDepart[0]), parseInt(coordsDepart[1])];
 					
-					var dist = Math.sqrt(
+					let dist = Math.sqrt(
 							Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
 							Math.pow(coordsDepart[1] - coordsArrivee[1],2)
 						);
 
-					var time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 
 					units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
@@ -741,12 +741,12 @@ module.exports = class units {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO CHECK FLEET BEFORE !
 		 */
-		var instability = time * 0.001 * (Math.random() - 0.5);
+		let instability = time * 0.001 * (Math.random() - 0.5);
 		if(research.isSearched(user,"prop_suprastability")) {
 			instability /= 2;
 		}
 
-		var newFleet = fleet.toJSON();
+		let newFleet = fleet.toJSON();
 		newFleet.endMoveTime = Date.now() + ((time + instability) * 3600000);
 		newFleet.position = destination;
 		newFleet.orbitPosition = -1;

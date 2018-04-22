@@ -38,7 +38,7 @@ module.exports = class websocket {
 			 * Security auto-disconnect
 			 */
 			socket.on('disconnect', function() {
-				var data = {};
+				let data = {};
 				data.sid = socket.id;
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user) || !isset(user.name) || !isset(user.id)) { return; }
@@ -202,7 +202,7 @@ module.exports = class websocket {
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
 
-				var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 				
 				if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
 					adminSid = socket.id;
@@ -217,7 +217,7 @@ module.exports = class websocket {
 					return;
 				}
 				
-				var clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 				if(socket.id==adminSid) {
 					if(typeof(data.cmd) !== "string") {
@@ -239,7 +239,7 @@ module.exports = class websocket {
 							io.emit('server-reboot');
 							discord.alert('Restarting game server ...');
 
-							var decompte = 15;
+							let decompte = 15;
 							
 							setInterval(function() {
 								if(decompte>0) {

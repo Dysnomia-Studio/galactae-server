@@ -30,7 +30,7 @@ module.exports = function() {
 	 * @param      {boolean}            nodate  Activate the date log ?
 	 */
 	this.log = function (msg,type,nodate) {
-		var text = msg;
+		let text = msg;
 		switch(type) {
 			case "warn":
 				text = redText('WARNING:') + yellowText(text);

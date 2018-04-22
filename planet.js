@@ -10,10 +10,10 @@ module.exports = class planet {
 		static find(user,pid,decalage,callback) {
 			db.player.searchById(user.id, function(userReturned) {
 				if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
-					var longueur = userReturned.planetlist.length;
-					var valid = false;
+					let longueur = userReturned.planetlist.length;
+					let valid = false;
 
-					for(var i=0; i<longueur; i++) {
+					for(let i=0; i<longueur; i++) {
 						if(pid==userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
 						    if(i==0 && decalage < 0) {
 						    	pid = userReturned.planetlist[longueur+decalage];
@@ -41,7 +41,7 @@ module.exports = class planet {
 						if(!isset(planetReturned)) { return; }
 						db.player.searchById(planetReturned.owner, function(userReturned) {
 							if(!isset(userReturned)) { return; }
-							var planetData = filterOtherPlayerData(planetReturned, userReturned);
+							let planetData = filterOtherPlayerData(planetReturned, userReturned);
 
 							io.to(user.sid).emit("planet-recieve-other-data", planetData );
 						});
@@ -58,7 +58,7 @@ module.exports = class planet {
 		 */
 		static refresh(data,decalage=0) {
 			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-				var newData = planet.update(planetReturned,userReturned,fleetReturned);
+				let newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				db.planet.update(newData);
 
@@ -104,19 +104,19 @@ module.exports = class planet {
 		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
 
-			var ratio = planet.GetMineralsRatio(planetType);
-			var ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
+			let ratio = planet.GetMineralsRatio(planetType);
+			let ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
-			var mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
-			var metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
-			var heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
+			let mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
+			let metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
+			let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
-			var warehouseBase = storageRatio[0]*Math.log(buildings[5]) + storageRatio[1];
+			let warehouseBase = storageRatio[0]*Math.log(buildings[5]) + storageRatio[1];
 
-			var mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
-			var metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
+			let mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
+			let metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
 
-			var storageHelium = 0;
+			let storageHelium = 0;
 			if(buildings[10]!=0) {
 				storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
 			}
@@ -138,13 +138,13 @@ module.exports = class planet {
 
 			//Metals
 			if(resources[0]-(metalProdBase*time)>0 && currentBuilding!=1) { //Verify if you can use basic ressources
-			    for(var i=2; i<6; i++) {
+			    for(let i=2; i<6; i++) {
 			    	resources[i] += (metalProdBase*time)*ratios[i-2];
 			    }
 
 				resources[0] -= (metalProdBase*time); //Consomation Algorithm
 			} else if(currentBuilding!=1) { // Do the max we can
-			    for(var i=2; i<6; i++) {
+			    for(let i=2; i<6; i++) {
 			    	resources[i] += resources[0]*ratios[i-2];
 			    }
 
@@ -157,17 +157,17 @@ module.exports = class planet {
 				(resources[3]>metalsStorageBase*ratio.aluRatio) && 
 				(resources[2]>metalsStorageBase*ratio.ironRatio)) {
 
-				var min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
+				let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
 
-				for(var i=3; i<6; i++) {
-					var temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
+				for(let i=3; i<6; i++) {
+					let temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
 
 					if(temp<min) {
 						min = temp;
 					}
 				}
 				resources[0]+=min;
-			    for(var i=2; i<6; i++) {
+			    for(let i=2; i<6; i++) {
 			    	resources[i] -= min*ratios[i-2];
 			    }
 			}
@@ -179,7 +179,7 @@ module.exports = class planet {
 			if(resources[1]>storageHelium) {
 				resources[1] = storageHelium;
 			}
-		    for(var i=2; i<6; i++) {
+		    for(let i=2; i<6; i++) {
 		    	if(resources[i]>metalsStorageBase*ratios[i-2]) { // You can't have more iron than your storage capacity
 					resources[i] = metalsStorageBase*ratios[i-2];
 				}
@@ -203,17 +203,17 @@ module.exports = class planet {
 					return;
 				} 
 
-				var timeSpeed = 1;
+				let timeSpeed = 1;
 
-				var currTime = Date.now();
+				let currTime = Date.now();
 
 				// Calc new planet data
-				var newData = planet.update(planetReturned,userReturned,fleetReturned);
+				let newData = planet.update(planetReturned,userReturned,fleetReturned);
 
 				// Vars for this building test
-				var cost = planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
-				var BlockBuild = false;
-				var errormsg = "BUILD_ERROR"; // Message d'erreur par defaut
+				let cost = planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
+				let BlockBuild = false;
+				let errormsg = "BUILD_ERROR"; // Message d'erreur par defaut
 					// Cost verif
 					if(cost.iron>newData.resources[2] || cost.aluminium>newData.resources[3] || cost.copper>newData.resources[4] || cost.titanium>newData.resources[5] ) {
 						BlockBuild = true;
@@ -296,7 +296,7 @@ module.exports = class planet {
 		 */
 		static UpdateUnits(planetIn,user,currTime) {
 			db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-				var id = (planetIn.unitBuildingID.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":planetIn.unitBuildingID;
+				let id = (planetIn.unitBuildingID.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":planetIn.unitBuildingID;
 				db.unit.find(id, function(unitReturned) {
 					if(planetIn.unitBuildingID.substr(0,14) == "SHIP_WEP_MINES") {
 						unitReturned = {};
@@ -306,20 +306,20 @@ module.exports = class planet {
 						unitReturned.ownerId = user.id;
 					}
 
-					var unitCount = 0;
-					var newFleet = fleetReturned.toJSON();
+					let unitCount = 0;
+					let newFleet = fleetReturned.toJSON();
 
-					var timeCost = unitReturned.cost[4]*3600*1000;
+					let timeCost = unitReturned.cost[4]*3600*1000;
 					timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
 
 					if(currTime>planetIn.unitBuildingEndTime) { // total add
-						var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+						let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
 						unitCount = restantDepuisSynchro;
 
 						newFleet.inBuilding = false;
 					} else { // Partial add
-					 	var restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
-					 	var restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+					 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
+					 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
 					 	unitCount = restantDepuisSynchro - restant;				 	
 					}
 
@@ -329,8 +329,8 @@ module.exports = class planet {
 						unitCount = planetIn.unitBuildingCount;
 					}
 					
-					var set = false;
-					for(var i=0; i<newFleet.units.length; i++) {
+					let set = false;
+					for(let i=0; i<newFleet.units.length; i++) {
 						if(""+newFleet.units[i][0] == ""+planetIn.unitBuildingID) {
 							newFleet.units[i][1] += unitCount;
 							set=true;
@@ -341,7 +341,7 @@ module.exports = class planet {
 						newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 					}
 
-					var popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
+					let popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
 					newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
 					newFleet.points = "" + newFleet.points;
 
@@ -362,8 +362,8 @@ module.exports = class planet {
 		 * @return     {<type>}  the updated data
 		 */
 		static update(planetIn,user,fleetList) {
-			var data = planetIn.toJSON();
-			var currTime = Date.now();
+			let data = planetIn.toJSON();
+			let currTime = Date.now();
 
 			data.lastResourcesUpdate = currTime;
 
@@ -403,10 +403,10 @@ module.exports = class planet {
 		 * @param      {Object}  groundBuildings  The ground buildings list
 		 */
 		static enoughtEnergy(groundBuildings) {
-			var prod = Math.round(electricity[0]*Math.pow(groundBuildings[4],2) + electricity[1]*groundBuildings[4] + electricity[2]);
-			var cons = 0;
+			let prod = Math.round(electricity[0]*Math.pow(groundBuildings[4],2) + electricity[1]*groundBuildings[4] + electricity[2]);
+			let cons = 0;
 
-			for(var i=0; i<9; i++) {
+			for(let i=0; i<9; i++) {
 				cons += parseInt(planet.GetBuildingCost(i,groundBuildings[i]).energy);
 			}
 
@@ -423,12 +423,12 @@ module.exports = class planet {
 		 * @param      {Function}  callback  Function needed to called back
 		 */
 		static getPeople(planetData, fleets, callback) {
-			var buildings = planetData.Buildings;
-			var prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
-			var cons = 0;
+			let buildings = planetData.Buildings;
+			let prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
+			let cons = 0;
 
 			// Buildings
-			for(var i=0; i<14; i++) {
+			for(let i=0; i<14; i++) {
 				if(buildings[i]==0) { continue; }
 				if(i==planetData.nextBuilding) {
 					// Current in-build building
@@ -439,7 +439,7 @@ module.exports = class planet {
 			}
 
 			// Units builded and in-build
-			for(var i=0; i<fleets.length; i++) {
+			for(let i=0; i<fleets.length; i++) {
 				cons += fleets[i].population;
 			}
 
@@ -474,8 +474,8 @@ module.exports = class planet {
 				}
 
 				// Planetes sans nom ...
-				var empty = true;
-				for(var i=0; i<data.name.length; i++) {
+				let empty = true;
+				for(let i=0; i<data.name.length; i++) {
 					if(data.name[i]!=" ") {
 						empty = false;
 					 	break;
@@ -483,13 +483,13 @@ module.exports = class planet {
 				}	
 				if(empty) { return; }
 
-				var replace = [
+				let replace = [
 					['<',''],
 					['>',''],
 					['/',''],
 				];
 
-				for(var i=0; i<replace.length; i++) {
+				for(let i=0; i<replace.length; i++) {
 					data.name = data.name.split(replace[i][0]).join(replace[i][1])
 				}
 
@@ -497,7 +497,7 @@ module.exports = class planet {
 
 				planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
 
-				var newPlanetData = planetReturned.toJSON();
+				let newPlanetData = planetReturned.toJSON();
 				newPlanetData.name = data.name;
 
 				db.planet.update(newPlanetData);
@@ -510,8 +510,8 @@ module.exports = class planet {
 		 * @param      {<type>}  dataIn  Input planet data
 		 */
 		static UpdateResources(dataIn,user) {
-			var Dtime = Date.now()-dataIn.nextBuildingTime;
-			var resources = dataIn.resources;
+			let Dtime = Date.now()-dataIn.nextBuildingTime;
+			let resources = dataIn.resources;
 
 			if(Dtime<0 || dataIn.nextBuildingTime==-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
 				resources = planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
@@ -526,10 +526,10 @@ module.exports = class planet {
 		}
 
 		static calcPlanetPoints(dataIn) {
-			var points = 0;
+			let points = 0;
 
 			// Building points count
-			for(var i=0; i<globalConst.buildingNumber; i++) {
+			for(let i=0; i<globalConst.buildingNumber; i++) {
 				points += (dataIn.Buildings[i] * buildingPointCoef[i]);
 			}
 
@@ -537,10 +537,10 @@ module.exports = class planet {
 		}
 
 		static calcFleetPoints(fleets) {
-			var points = 0;
+			let points = 0;
 
 			// Building points count
-			for(var i=0; i<fleets.length; i++) {
+			for(let i=0; i<fleets.length; i++) {
 				points += parseFloat(fleets[i].points);
 			}
 
@@ -555,7 +555,7 @@ module.exports = class planet {
 		 * @return     {object}  filtered data
 		 */
 		static filterOtherPlayerData(planet,user) {
-			var returnData = {
+			let returnData = {
 				name: planet.name,
 				address: planet.address,
 				ownerName: user.name,
@@ -578,7 +578,7 @@ module.exports = class planet {
 		static GetBuildingCost(build,level) {
 			if(build < 0 || build > globalConst["buildingNumber"]) { return; }
 
-			var retour = {
+			let retour = {
 				aluminium: 	Math.round(buildCost["aluminium"][build][0]*Math.pow(level,2) +		buildCost["aluminium"][build][1]*level + 	buildCost["aluminium"][build][2]),
 				iron: 		Math.round(buildCost["iron"][build][0]*Math.pow(level,2) +			buildCost["iron"][build][1]*level + 		buildCost["iron"][build][2]),
 				copper: 	Math.round(buildCost["copper"][build][0]*Math.pow(level,2) + 		buildCost["copper"][build][1]*level + 		buildCost["copper"][build][2]),

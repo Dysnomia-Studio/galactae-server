@@ -103,12 +103,12 @@ module.exports = class combat {
 		// @ADD: check beginners protection
 
 		// @ADD: Get all in-orbit fleets
-		var fleets = {};
+		let fleets = {};
 
-		var battle = new combat();
+		let battle = new combat();
 
 		// Add all fleets to fight
-		for(var i in fleets) {
+		for(let i in fleets) {
 			if(fleets[i].orbitPosition == 0) {
 				battle.joinTeam("def", fleets[i]);
 			} else if(fleets[i].orbitPosition == 1) {

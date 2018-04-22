@@ -4,8 +4,8 @@ module.exports = class chat {
 			data.user_id = userGameIdObj[0].user_id;
 			db.ban.find(data.user_id, 1, function(banObj) {
 				if(isset(banObj)) {
-					var now = Date.now();
-					for(var i=0; banObj.length; banObj++) {
+					let now = Date.now();
+					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
 							chat.sendSM(data.sid,'ERR_CHAT_BANNED');
 							return;
@@ -13,12 +13,12 @@ module.exports = class chat {
 					}
 				}
 				db.privilege.find(data.user_id, function(userPrivileges) {
-					var reg=new RegExp("[ ,;]+", "g");
-					var args=data.message.split(reg);
+					let reg=new RegExp("[ ,;]+", "g");
+					let args=data.message.split(reg);
 					data.message = textToSmileys(data.message);
 
-					var logname = data.username;
-					var logmsg = data.message;
+					let logname = data.username;
+					let logmsg = data.message;
 
 					/* Controles de securité */
 					data.send = true;
@@ -42,7 +42,7 @@ module.exports = class chat {
 					 * 3: operator
 					 * 4: administrator
 					 */
-					var rank = "";
+					let rank = "";
 					switch(data.lvl) {
 						case 2:
 						case 3:
@@ -54,7 +54,7 @@ module.exports = class chat {
 						default:
 					}
 
-					var discordmsg = rank + data.username + ": " + data.message;
+					let discordmsg = rank + data.username + ": " + data.message;
 					data.username = "<span class=\"username\">" + data.username + "</span>";
 
 					if(data.message.charAt(0)=="!" && data.lvl > 1) {
@@ -62,7 +62,7 @@ module.exports = class chat {
 					} else if(data.message.charAt(0)=="@") { // Messages privés
 						db.player.searchByName(args[0].substr(1).toLowerCase(), function(dataReturned) {
 							if(dataReturned==undefined) { return; }
-							var sid = dataReturned.sid;
+							let sid = dataReturned.sid;
 
 							/* Recuperer le vrai message */
 							data.newmessage = data.message.substr(args[0].length+1);
@@ -108,23 +108,23 @@ module.exports = class chat {
 		});
 	}
 	static protect(data) {
-		var str = data.message;
+		let str = data.message;
 
-		var replace = [
+		let replace = [
 			['( . )( . )',''],
 			['( . ) ( . )',''],
 			['(.) (.)',''],
 			['(.)(.)',''],
 		];
 
-		for(var i=0; i<replace.length; i++) {
+		for(let i=0; i<replace.length; i++) {
 			str = str.split(replace[i][0]).join(replace[i][1])
 		}
 		str = normalizeText(str);
 
 		// Si message vide
-		var empty = true;
-		for(var i=0; i<str.length; i++) {
+		let empty = true;
+		for(let i=0; i<str.length; i++) {
 			if(str[i]!=" ") {
 				empty = false
 			 	break;
@@ -151,7 +151,7 @@ module.exports = class chat {
 			} else {
 				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
 					db.privilege.find(targetGameIdObj[0].user_id, function(targetPrivileges) {
-						var targetLvl = 1;
+						let targetLvl = 1;
 						if(isset(targetPrivileges[0]) && isset(targetPrivileges[0].user_privilege_lvl)) {
 							targetLvl = targetPrivileges[0].user_privilege_lvl;
 						}
@@ -168,10 +168,10 @@ module.exports = class chat {
 		});
 	}
 	static sendCommand(data) {
-		var str = data.message;
-		var reg=new RegExp("[ ,;]+", "g");
-		var args=str.split(reg);
-		var msg = "";
+		let str = data.message;
+		let reg=new RegExp("[ ,;]+", "g");
+		let args=str.split(reg);
+		let msg = "";
 		data.noname = false;
 		data.send = false;
 
@@ -184,10 +184,10 @@ module.exports = class chat {
 				if(args.length<4) { return data; }
 
 				chat.searchTarget(data, args[1], function(target) {
-					var banMessage = args.splice(3,args.length).join(" ");
-					var banTime = parseChatTime(args[2]);
+					let banMessage = args.splice(3,args.length).join(" ");
+					let banTime = parseChatTime(args[2]);
 					if(banTime < 1) { log("Invalid Time"); return data; }
-					var now = Date.now();
+					let now = Date.now();
 
 					log("Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 					chat.sendSM(data.sid,"Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
@@ -213,10 +213,10 @@ module.exports = class chat {
 				if(args.length<4) { return data; }
 
 				chat.searchTarget(data, args[1], function(target) {
-					var muteMessage = args.splice(3,args.length).join(" ");
-					var muteTime = parseChatTime(args[2]);
+					let muteMessage = args.splice(3,args.length).join(" ");
+					let muteTime = parseChatTime(args[2]);
 					if(muteTime < 1) { log("Invalid Time"); return data; }
-					var now = Date.now();
+					let now = Date.now();
 
 					log("Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
 					chat.sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);

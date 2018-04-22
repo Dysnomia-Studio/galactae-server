@@ -2,9 +2,9 @@ module.exports = class research {
 	static refreshUserResearch(data,callback) {	
 		// Checks if new research
 		if(researchList.length!=data.research.length) {
-			for(var name in researchList) {
-				var key = -1;
-				for(var j=0; j<data.research.length; j++) {
+			for(let name in researchList) {
+				let key = -1;
+				for(let j=0; j<data.research.length; j++) {
 					if(name==data.research[j][0]) {
 						key = j;
 						break;
@@ -16,9 +16,9 @@ module.exports = class research {
 			}
 		}
 
-		var researchOut = {};
+		let researchOut = {};
 
-		for(var i=0; i<data.research.length; i++) {
+		for(let i=0; i<data.research.length; i++) {
 			researchOut[data.research[i][0]] = data.research[i][1];
 		}
 
@@ -29,7 +29,7 @@ module.exports = class research {
 		});
 	}
 	static getResearch(data,research) {
-		for(var i=0; i<data.research.length; i++) {
+		for(let i=0; i<data.research.length; i++) {
 			if(data.research[i][0]==research) {
 				return data.research[i][1];
 			}
@@ -42,10 +42,10 @@ module.exports = class research {
 	}
 
 	static recalc(user,researchData,callback,i=0) {
-		var time = (Date.now() - user.lastResearchUpdate)/3600/1000;
+		let time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
-			var newPlanet = planetReturned.toJSON();
+			let newPlanet = planetReturned.toJSON();
 
 			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] != -1) {
 				researchData[planetReturned.currResearch] += (research.getResearchProduction(planetReturned.Buildings[8])*time);
@@ -64,7 +64,7 @@ module.exports = class research {
 			} else {
 				user.research = [];
 
-				for(var index in researchData) {
+				for(let index in researchData) {
 					user.research.push([index,researchData[index]]);
 				}
 
@@ -82,8 +82,8 @@ module.exports = class research {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
-				var researchedParent = true;
-				for(var i in researchList[researchData].parents) {
+				let researchedParent = true;
+				for(let i in researchList[researchData].parents) {
 					if((!isset(researchList[researchData].parents[i]) ||
 						research.getResearch(userNewResearch,researchList[researchData].parents[i])!=-1) &&
 						researchList[researchData].parents[i] != "researchCenter") {
@@ -93,13 +93,13 @@ module.exports = class research {
 				}
 				
 				// Send data to client
-				var researchOut = {};
+				let researchOut = {};
 
-				for(var i=0; i<userNewResearch.research.length; i++) {
+				for(let i=0; i<userNewResearch.research.length; i++) {
 					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 				}
 
-				var newData = planet.update(planetReturned,userReturned,fleetReturned);
+				let newData = planet.update(planetReturned,userReturned,fleetReturned);
 				
 				if(researchedParent && researchList[researchData] != undefined) { // Just check if it exists ...
 					newData.currResearch = researchData;
@@ -126,9 +126,9 @@ module.exports = class research {
 				db.player.update(userNewResearch);
 
 				// Send data to client
-				var researchOut = {};
+				let researchOut = {};
 
-				for(var i=0; i<userNewResearch.research.length; i++) {
+				for(let i=0; i<userNewResearch.research.length; i++) {
 					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 				}
 

@@ -6,7 +6,7 @@ module.exports = class player {
 				if(player.canAct(searchSid)) { // Don't spam
 					callback(user);
 
-					var newData = searchSid;
+					let newData = searchSid;
 					newData.lastAction = Date.now();
 					db.player.update(newData);	
 				}
@@ -18,7 +18,7 @@ module.exports = class player {
 	}
 	/* Does the player can act ? */
 	static canAct(user) {
-		var minTime = 100; //time in ms
+		let minTime = 100; //time in ms
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
@@ -43,8 +43,8 @@ module.exports = class player {
 			
 			db.ban.find(data.user_id, 2, function(banObj) {
 				if(isset(banObj)) {
-					var now = Date.now();
-					for(var i=0; banObj.length; banObj++) {
+					let now = Date.now();
+					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
 							log("Error: " + data.username + " is banned.");
 							// @ADD: Kick & Message
@@ -91,14 +91,14 @@ module.exports = class player {
 			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
 		}
 
-		var playerData = dataReturned.toJSON();
+		let playerData = dataReturned.toJSON();
 		playerData.sid = data.sid;
 		
-		var jour = 24*60*60*1000;
-		var minuit = Date.now() - (Date.now()%jour);
-		var hierMinuit = minuit - jour;
-		var dayStreak = 0 + playerData.dayBonusStreak +1; 
-		var bonusBest = 0 + playerData.dayBonusBest;
+		let jour = 24*60*60*1000;
+		let minuit = Date.now() - (Date.now()%jour);
+		let hierMinuit = minuit - jour;
+		let dayStreak = 0 + playerData.dayBonusStreak +1; 
+		let bonusBest = 0 + playerData.dayBonusBest;
 
 		if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
@@ -123,9 +123,9 @@ module.exports = class player {
 					plCount++;
 					
 					// Send data to client
-					var researchOut = {};
+					let researchOut = {};
 
-					for(var i=0; i<userNewResearch.research.length; i++) {
+					for(let i=0; i<userNewResearch.research.length; i++) {
 						researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
 					}
 
@@ -162,7 +162,7 @@ module.exports = class player {
 			
 			i++;
 
-			var sectorAddress = planetReturned.address.split("-");
+			let sectorAddress = planetReturned.address.split("-");
 			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
 			if(sector.points[sectorAddress] === undefined) {
 				sector.points[sectorAddress] = 0;
@@ -178,12 +178,12 @@ module.exports = class player {
 			} else { 
 				points *= pointsCoef.planet;
 
-				var newSector = {
+				let newSector = {
 					address: [],
 					points: [],
 					pcount: [],
 				};
-				for(var j in sector.points) {
+				for(let j in sector.points) {
 					newSector.address.push(j);
 					newSector.points.push(sector.points[j] * pointsCoef.planet);
 					newSector.pcount.push(sector.pcount[j]);
@@ -198,9 +198,9 @@ module.exports = class player {
 		});		
 	}
 	static calcResearchPoints(user) {
-		var points = 0;
+		let points = 0;
 
-		for(var i=0; i<user.research.length; i++) {
+		for(let i=0; i<user.research.length; i++) {
 			if(user.research[i][1]==-1 && isset(researchList[user.research[i][0]].cost)) {
 				points+=researchList[user.research[i][0]].cost;
 			}	
@@ -228,7 +228,7 @@ module.exports = class player {
 				planets: newUserData.planetlist.length,
 			});
 
-			for(var sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
+			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
 				db.sectorRank.update({
 					user_id: user._id,
 					sector: newUserData.sectorPointsAddresses[sector],
@@ -242,13 +242,13 @@ module.exports = class player {
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {
-		var jour = 24*60*60*1000;
-		var minuit = Date.now() - (Date.now()%jour);
-		var hierMinuit = minuit - jour;
+		let jour = 24*60*60*1000;
+		let minuit = Date.now() - (Date.now()%jour);
+		let hierMinuit = minuit - jour;
 
 		if(data.lastBonus < minuit) {
 			// Update player
-			var newPlayerData = data;
+			let newPlayerData = data;
 			newPlayerData.dayBonusStreak = data.dayBonusStreak+1;
 
 			if(data.lastBonus < hierMinuit) { // Si pas hier
@@ -260,9 +260,9 @@ module.exports = class player {
 				newPlayerData.dayBonusBest = newPlayerData.dayBonusStreak;
 			}
 
-			var credits = 15;
-			var helium = 0;
-			var streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
+			let credits = 15;
+			let helium = 0;
+			let streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
 			if(streak==1) { credits = 15; }
 			else if(streak==2) { credits = 25; }
@@ -287,7 +287,7 @@ module.exports = class player {
 						return;
 					}
 
-					var newPlanetData = planet.update(planetReturned);
+					let newPlanetData = planet.update(planetReturned);
 
 					newPlanetData.resources[1]+=helium;
 
