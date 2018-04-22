@@ -62,7 +62,7 @@ module.exports = class units {
 		var errors = 0;
 		var ship = data.ship;
 
-		// That block 90% of tries to crash :p
+		// That block 90% of tries to crash
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
 
 		// Filter name
@@ -144,7 +144,7 @@ module.exports = class units {
 						valid = false;
 					}
 				}
-				// Prevent different supbengines
+				// Prevent different supengines
 				if(ship[i].type == "sup_propulsion") {
 					if(supprop == "") {
 						supprop = ship[i].value;
