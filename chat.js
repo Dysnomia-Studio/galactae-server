@@ -1,8 +1,9 @@
 module.exports = class chat {
 	static analyse(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
+			data.game_id = userGameIdObj[0].game_id;
 			data.user_id = userGameIdObj[0].user_id;
-			db.ban.find(data.user_id, 1, function(banObj) {
+			db.ban.find(data.game_id, 1, function(banObj) {
 				if(isset(banObj)) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
