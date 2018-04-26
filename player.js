@@ -42,6 +42,8 @@ module.exports = class player {
 			data.user_id = userGameIdObj[0].user_id;
 			
 			db.ban.find(data.user_id, 2, function(banObj) {
+				console.info(banObj);
+				
 				if(isset(banObj)) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {

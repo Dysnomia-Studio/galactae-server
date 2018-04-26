@@ -145,7 +145,6 @@ module.exports = class chat {
 
 	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
-			console.log(dataReturned.id);
 			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
 				chat.sendSM(currUser.sid,"PLY_NOT_FOUND");
 				log("Player not found");

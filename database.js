@@ -378,7 +378,7 @@ module.exports = {
 				id = mongoose.Types.ObjectId(id);
 			}
 
-			privileges.find({user_id: id, server_name: globalCfg['serverGlobalName']}, function (err, obj) {
+			privileges.find({user_id: id, server_name: globalCfg.serverGlobalName}, function (err, obj) {
 				if(err) { log(err); }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
 				callback(obj);
@@ -399,7 +399,7 @@ module.exports = {
 
 	server: {
 		find: function(callback) {
-			servers.find({server_name: globalCfg['serverGlobalName']}, function (err, obj) {
+			servers.find({server_name: globalCfg.serverGlobalName}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj) && isset(obj[0])) {
 					callback(obj[0]);
@@ -409,7 +409,7 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			let conditions = {server_name: globalCfg['serverGlobalName']}
+			let conditions = {server_name: globalCfg.serverGlobalName}
 						  , update = { $set: data }
 						  , options = { multi: true };
 
@@ -430,7 +430,7 @@ module.exports = {
 		find: function(uid,type,callback) {
 			bans.find({
 				user_id: uid,
-				server_name: globalCfg['serverGlobalName'],
+				server_name: globalCfg.serverGlobalName,
 				ban_type: type
 			}, function (err, obj) {
 				if(err) { log(err); }
@@ -450,20 +450,20 @@ module.exports = {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
 			globalRanks.find({
-				server_name: globalCfg['serverGlobalName'],
+				server_name: globalCfg.serverGlobalName,
 				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
 					data._id = new mongoose.Types.ObjectId();
-					data.server_name = globalCfg['serverGlobalName'];
+					data.server_name = globalCfg.serverGlobalName;
 					
 					globalRanks.create(data, function(error) {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
 					let conditions = {
-						server_name: globalCfg['serverGlobalName'],
+						server_name: globalCfg.serverGlobalName,
 						user_id: data.user_id
 						},
 						update = { $set: data },
@@ -483,21 +483,21 @@ module.exports = {
 
 			// Chercher si l'utilisateur existe
 			sectorRanks.find({
-				server_name: globalCfg['serverGlobalName'],
+				server_name: globalCfg.serverGlobalName,
 				user_id: data.user_id,
 				sector: data.sector
 			}, function(error, obj) {
 				if(error) { log(error); }
 				if(!isset(obj)) { // Si oui update
 					data._id = new mongoose.Types.ObjectId();
-					data.server_name = globalCfg['serverGlobalName'];
+					data.server_name = globalCfg.serverGlobalName;
 
 					sectorRanks.create(data, function(error) {
 						if(error) { log(error); } 
 					})
 				} else { // Sinon creer
 					let conditions = {
-							server_name: globalCfg['serverGlobalName'],
+							server_name: globalCfg.serverGlobalName,
 							user_id: data.user_id,
 							sector: data.sector
 						},
