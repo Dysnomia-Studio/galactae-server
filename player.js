@@ -43,14 +43,10 @@ module.exports = class player {
 			data.user_id = userGameIdObj[0].user_id;
 			
 			db.ban.find(data.game_id, 2, function(banObj) {
-				console.info(banObj);
-							
 				if(isset(banObj)) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
-						console.log(banObj[i].ban_end);
-						console.log(now);
-						if(banObj[i].ban_end < now) {
+						if(banObj[i].ban_end > now) {
 							log("Error: " + data.username + " is banned.");
 							// @ADD: Kick & Message
 							return;
