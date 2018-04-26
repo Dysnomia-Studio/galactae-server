@@ -135,7 +135,7 @@ module.exports = function() {
 		} else {
 			return false;
 		}
-	}
+	};
 	/**
 	 * Normalize a text to be compatible with sockets
 	 *
@@ -148,7 +148,7 @@ module.exports = function() {
 	    }
 
 		return str;
-	}
+	};
     /**
      * Unnormalize a text
      *
@@ -161,7 +161,7 @@ module.exports = function() {
 	    }
 
 	    return str;
-	}
+	};
     /**
      * Parse smileys in text
      *
@@ -174,7 +174,7 @@ module.exports = function() {
         }
 
         return str;
-    }
+    };
 
     /**
      * Parse text given in a chat command
@@ -184,7 +184,7 @@ module.exports = function() {
      */
     this.parseChatTime = function(str) {
         let unit = str.charAt(str.length-1).toLowerCase();
-        let count = parseInt(str.substr[0,str.length-1]);
+        let count = parseInt(str.substr(0,str.length-1));
 
         if(typeof count != "number" || isNaN(count)) {
             return -1; // Send error code
@@ -203,5 +203,5 @@ module.exports = function() {
             default: // Seconds
                 return 1000*count;
         }
-    }
+    };
 };
