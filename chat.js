@@ -146,6 +146,7 @@ module.exports = class chat {
 	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
 			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
+				console.log(dataReturned.id);
 				chat.sendSM(currUser.sid,"PLY_NOT_FOUND");
 				log("Player not found");
 			} else {
@@ -189,12 +190,12 @@ module.exports = class chat {
 					if(banTime < 1) { log("Invalid Time"); return data; }
 					let now = Date.now();
 
-					log("Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
-					chat.sendSM(data.sid,"Banned " + banTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					log("Banned " + banTime/1000 + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					chat.sendSM(data.sid,"Banned " + banTime/1000 + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 
 					db.ban.create({
 						user_id: target.id,
-						server_name: globalCfg["serverGlobalName"],
+						server_name: globalCfg.serverGlobalName,
 						ban_type: 2,
 						ban_begin: now,
 						ban_end: now + banTime,
