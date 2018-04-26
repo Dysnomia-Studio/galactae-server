@@ -40,10 +40,10 @@ module.exports = class player {
 			}*/
 
 			data.game_id = userGameIdObj[0].game_id;
+			data.user_id = userGameIdObj[0].user_id;
 			
 			db.ban.find(data.game_id, 2, function(banObj) {
-				console.info(banObj);
-				
+			
 				if(isset(banObj)) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
@@ -56,7 +56,7 @@ module.exports = class player {
 				}
 
 				if(maintenance) { // Check whitelist
-					db.privilege.find(data.game_id, function(userPrivileges) {
+					db.privilege.find(data.user_id, function(userPrivileges) {
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist != 1) {
 							
