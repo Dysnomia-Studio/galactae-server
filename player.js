@@ -48,6 +48,7 @@ module.exports = class player {
 				if(isset(banObj)) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
+						console.info(banObj[i]);
 						if(banObj[i].ban_end < now) {
 							log("Error: " + data.username + " is banned.");
 							// @ADD: Kick & Message
