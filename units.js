@@ -334,7 +334,6 @@ module.exports = class units {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
 			let newPlanet = planet.update(planetReturned,userReturned,fleetList);
-			log(Date.now() + ": 2");
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
