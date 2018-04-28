@@ -324,10 +324,6 @@ module.exports = class planet {
 					}
 
 					if(unitCount == 0) { return; } // Prevent some bugs
-
-					if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
-						unitCount = planetIn.unitBuildingCount;
-					}
 					
 					let set = false;
 					for(let i=0; i<newFleet.units.length; i++) {
@@ -389,7 +385,6 @@ module.exports = class planet {
 			if(currTime>data.unitBuildingEndTime) {
 				data.unitBuildingEndTime = -1;
 				data.unitBuildingID = "-1";
-				data.unitBuildingCount = -1;
 				data.unitBuildingFleetID = db.Schema.Types.ObjectId("-1");
 			}
 

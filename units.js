@@ -403,7 +403,6 @@ module.exports = class units {
 					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
-						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingEndTime = Date.now() + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * 3600 * 1000);
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
