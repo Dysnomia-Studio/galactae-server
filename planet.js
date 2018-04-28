@@ -390,6 +390,8 @@ module.exports = class planet {
 
 			data.lastUnitUpdate = currTime;
 
+			log(Date.now() + ": 1");
+			
 			return data;
 		}
 		/**
