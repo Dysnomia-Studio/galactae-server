@@ -404,6 +404,7 @@ module.exports = class units {
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingEndTime = Date.now() + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * 3600 * 1000);
+						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingFleetID = fleetReturned._id;
 
 						// Withdraw costs
@@ -437,7 +438,7 @@ module.exports = class units {
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
-						if(totalCost[5] > globalConst["maxFleetSize"]) { 
+						if(totalCost[5] > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
 							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
@@ -455,7 +456,7 @@ module.exports = class units {
 						if(""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
-						if((choosenFleet.population + totalCost[5]) > globalConst["maxFleetSize"]) { 
+						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
 							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
@@ -548,7 +549,7 @@ module.exports = class units {
 		return fighterCount <= fighterCap;
 	}
 
-	static calcUnitSubSpeed(parts) {
+	static calcUnitSubSpeed(unit) {
 		let speed = [];
 		let tech = "";
 		let count = 0;
@@ -590,13 +591,13 @@ module.exports = class units {
 			let testDist = 1000; // Total galaxy
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				min["speed"] = speed;
+				min.speed = speed;
 			}
 
-			if(min["engines"][curr["tech"]] == undefined) {
-				min["engines"][curr["tech"]] = 0;
+			if(min.engines[curr.tech] == undefined) {
+				min.engines[curr.tech] = 0;
 			}
-			min["engines"][curr["tech"]] += curr["count"];
+			min.engines[curr.tech] += curr.count;
 		}
 
 		return min;
@@ -646,13 +647,13 @@ module.exports = class units {
 			let testDist = 1000; // Total galaxy size
 			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
 				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				min["speed"] = speed;
+				min.speed = speed;
 			}
 
-			if(min["engines"][curr["tech"]] == undefined) {
-				min["engines"][curr["tech"]] = 0;
+			if(min.engines[curr.tech] == undefined) {
+				min.engines[curr.tech] = 0;
 			}
-			min["engines"][curr["tech"]] += curr["count"];
+			min.engines[curr.tech] += curr.count;
 		}
 
 		return min;
