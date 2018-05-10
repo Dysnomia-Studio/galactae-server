@@ -217,7 +217,7 @@ module.exports = class player {
 			newUserData.points += player.calcResearchPoints(newUserData);
 
 			// Money
-			if(newUserData.money === undefined || isNaN(newUserData.money)) { newUserData.money = 0; }
+			if(newUserData.money === undefined || Number.isNaN(newUserData.money)) { newUserData.money = 0; }
 			newUserData.points += (newUserData.money*pointsCoef.money);
 
 			newUserData.points = Math.round(newUserData.points);
