@@ -142,6 +142,7 @@ module.exports = class research {
 
 		log("userResearch: " + userResearch.length);
 		log("researchOut: " + researchOut.length);
+		console.info(researchOut);
 
 		io.to(data.sid).emit('player-recieve-data', {
 			research: researchOut
