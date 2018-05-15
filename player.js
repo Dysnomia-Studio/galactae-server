@@ -122,17 +122,8 @@ module.exports = class player {
 				userNewResearch.id = userNewResearch._id;
 					db.player.update(userNewResearch, function() {
 					plCount++;
-					
-					// Send data to client
-					let researchOut = {};
 
-					for(let i=0; i<userNewResearch.research.length; i++) {
-						researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
-					}
-
-					io.to(data.sid).emit('player-recieve-data',{
-						research: researchOut
-					});
+					research.sendResearchDataToUser(data, userNewResearch.research);
 
 					planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 				});
