@@ -122,7 +122,7 @@ module.exports = class research {
 
 	static sendResearchDataToUser(data, userResearch) {
 		// Send data to client
-		let researchOut = {};
+		var researchOut = {};
 
 		for(let i=0; i<userResearch.length; i++) {
 			// Check if you have parent research
@@ -140,8 +140,8 @@ module.exports = class research {
 			}
 		}
 
-		log(userResearch.length);
-		log(researchOut.length);
+		log("userResearch: " + userResearch.length);
+		log("researchOut: " + researchOut.length);
 
 		io.to(data.sid).emit('player-recieve-data', {
 			research: researchOut
