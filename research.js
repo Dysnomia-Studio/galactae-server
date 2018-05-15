@@ -140,6 +140,9 @@ module.exports = class research {
 			}
 		}
 
+		log(userResearch.length);
+		log(researchOut.length);
+
 		io.to(data.sid).emit('player-recieve-data', {
 			research: researchOut
 		});
