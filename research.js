@@ -129,7 +129,7 @@ module.exports = class research {
 			let researchedParent = true;
 			let parentsList = researchList[userResearch[i]].parents;
 			for(let j in parentsList) {
-				if(research.getResearch(userResearch,parentsList[j]) !=-1) {
+				if(research.getResearch(userResearch,parentsList[j]) ==-1) {
 					researchedParent = true;
 					break;
 				}	
