@@ -127,7 +127,7 @@ module.exports = class research {
 		for(let i=0; i<userResearch.length; i++) {
 			// Check if you have parent research
 			let researchedParent = true;
-			let parentsList = researchList[userResearch[i]].parents;
+			let parentsList = researchList[userResearch[i][0]].parents;
 			for(let j in parentsList) {
 				if(research.getResearch(userResearch,parentsList[j]) ==-1) {
 					researchedParent = true;
