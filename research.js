@@ -90,13 +90,6 @@ module.exports = class research {
 						break;
 					}
 				}
-				
-				// Send data to client
-				let researchOut = {};
-
-				for(let i=0; i<userNewResearch.research.length; i++) {
-					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
-				}
 
 				let newData = planet.update(planetReturned,userReturned,fleetReturned);
 				
@@ -112,9 +105,7 @@ module.exports = class research {
 
 				planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 
-				io.to(data.sid).emit('player-recieve-data',{
-					research: researchOut,
-				});
+				research.sendResearchDataToUser(data, userNewResearch.research);
 			});
 		});
 	}
@@ -124,17 +115,33 @@ module.exports = class research {
 			research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);
 
-				// Send data to client
-				let researchOut = {};
-
-				for(let i=0; i<userNewResearch.research.length; i++) {
-					researchOut[userNewResearch.research[i][0]] = userNewResearch.research[i][1];
-				}
-
-				io.to(data.sid).emit('player-recieve-data',{
-					research: researchOut
-				});
+				research.sendResearchDataToUser(data, userNewResearch.research);
 			});
+		});
+	}
+
+	static sendResearchDataToUser(data, userResearch) {
+		// Send data to client
+		let researchOut = {};
+
+		for(let i=0; i<userResearch.length; i++) {
+			// Check if you have parent research
+			let researchedParent = true;
+			let parentsList = researchList[userResearch[i]].parents;
+			for(let j in parentsList) {
+				if(research.getResearch(userResearch,parentsList[j]) !=-1) {
+					researchedParent = true;
+					break;
+				}	
+			}
+
+			if(parentsList.length == 0 || researchedParent) {
+				researchOut[userResearch[i][0]] = userResearch[i][1];
+			}
+		}
+
+		io.to(data.sid).emit('player-recieve-data', {
+			research: researchOut
 		});
 	}
 }
