@@ -112,8 +112,8 @@ module.exports = class player {
 		playerData.lastConnected = Date.now();		
 
 		// Tutorials
-		if(!isset(user.currTutorial)) {
-			user.currTutorial = 0;
+		if(!isset(playerData.currTutorial)) {
+			playerData.currTutorial = 0;
 		}
 		if(!tutorials.hasFinishedTutorials(playerData)) {
 			// @ADD: Do stuff
