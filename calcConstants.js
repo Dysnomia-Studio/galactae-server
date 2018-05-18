@@ -684,7 +684,7 @@ module.exports = function() {
 	/**
 	 * Tutorials
 	 */
-	this.tutorialsList = {
+	this.tutorialsList = [
 		"welcome",
 		"energy",
 		"inhabitants",
@@ -699,5 +699,5 @@ module.exports = function() {
 		// "joinAlly",
 		// "quests",
 		// "secondPlanet",
-	};
+	];
 };
