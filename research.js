@@ -135,8 +135,6 @@ module.exports = class research {
 				}	
 			}
 
-			log(userResearch[i][0] + ": " + researchedParent);
-
 			if(parentsList.length == 0 || researchedParent) {
 				researchOut[userResearch[i][0]] = userResearch[i][1];
 			}
