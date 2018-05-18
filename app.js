@@ -42,6 +42,7 @@ global.combat    = require('./combat');
 global.planet    = require('./planet');
 global.player    = require('./player');
 global.research  = require('./research');
+global.tutorials = require('./tutorials');
 global.units     = require('./units');
 // And that's in last
 global.websocket = require('./socket');

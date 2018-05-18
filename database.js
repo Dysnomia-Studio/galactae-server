@@ -43,7 +43,8 @@ let userSchema = new Schema({
 	lastBonus: Number,
 	lastAction: Number,
 	lastResearchUpdate: Number,
-	research: Array
+	research: Array,
+	currTutorial: Number,
 });
 
 let unitsSchema = new Schema({

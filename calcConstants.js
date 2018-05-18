@@ -680,4 +680,24 @@ module.exports = function() {
 		hangarSimple:  -2,
 		hangarDouble: -10,
 	};
+
+	/**
+	 * Tutorials
+	 */
+	this.tutorialsList = {
+		"welcome",
+		"energy",
+		"inhabitants",
+		"resources",
+		"research",
+		"units",
+		// "buyAndSell",
+		"interplanetaryFlight",
+		"interstellarFlight",
+		"spy",
+		"battle",
+		// "joinAlly",
+		// "quests",
+		// "secondPlanet",
+	};
 };

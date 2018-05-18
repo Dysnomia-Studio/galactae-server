@@ -111,9 +111,18 @@ module.exports = class player {
 
 		playerData.lastConnected = Date.now();		
 
+		// Tutorials
+		if(!isset(user.currTutorial)) {
+			user.currTutorial = 0;
+		}
+		if(!tutorials.hasFinishedTutorials(playerData)) {
+			// @ADD: Do stuff
+		}
+
 		io.to(data.sid).emit('player-recieve-data',{
 			money: playerData.money,
-			gvt: playerData.gvt
+			gvt: playerData.gvt,
+			currTutorial: playerData.currTutorial,
 		});
 
 		units.refreshUnits(data);
