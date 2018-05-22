@@ -252,10 +252,10 @@ module.exports = class units {
 											break;
 										}
 									}
+								}
 
-									if(duplicate) {
-										break;
-									}
+								if(duplicate) {
+									break;
 								}
 							} // End check parts
 						}
