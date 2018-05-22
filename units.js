@@ -277,7 +277,9 @@ module.exports = class units {
 						} else if(duplicate) {
 							log("7b");
 							message = "SHIP_TYPE_ALREADY_EXISTS";
+							log("8b");
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+							log("9b");
 							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
 							log("7c");
