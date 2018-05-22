@@ -62,8 +62,12 @@ module.exports = class units {
 		let errors = 0;
 		let ship = data.ship;
 
+		log("1");
+
 		// That block 90% of tries to crash
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
+
+		log("2");
 
 		// Filter name
 		let replace = [
@@ -203,8 +207,10 @@ module.exports = class units {
 
 					shipToSave.cost = units.calcCost(ship.shape,shipToSave.parts);
 
+					log("3");
 					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
-				
+					log("4");
+					
 					db.unit.findByOwner(data.id,function(unitList) {
 						let duplicate = false;
 						let duplicateName = false;
