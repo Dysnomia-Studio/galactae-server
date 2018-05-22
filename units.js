@@ -244,10 +244,11 @@ module.exports = class units {
 								});
 
 								// Compare
+								duplicate = true;
 								for(let i=0; i<shipToSave.parts.length; i++) {
 									for(let id in shipToSave.parts[i]) {
-										if(shipToSave.parts[i][id] === unitList[currObj].parts[i][id]) {
-											duplicate = true;
+										if(shipToSave.parts[i][id] !== unitList[currObj].parts[i][id]) {
+											duplicate = false;
 											break;
 										}
 									}
