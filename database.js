@@ -290,9 +290,9 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			let conditions = { _id: data._id }
-						  , update = { $set: data }
-						  , options = { multi: true };
+			let conditions = { _id: data._id },
+					update = { $set: data },
+				   options = { multi: true };
 
 			units.update(conditions, update, options,function(err) {
 				if(err) { log(err); }

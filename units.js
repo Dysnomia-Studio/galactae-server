@@ -212,6 +212,7 @@ module.exports = class units {
 					log("4");
 					
 					db.unit.findByOwner(data.id,function(unitList) {
+						log("5");
 						let duplicate = false;
 						let duplicateName = false;
 
@@ -266,7 +267,9 @@ module.exports = class units {
 
 
 						if(!duplicate && !duplicateName) {
+							log("6");
 							db.unit.create(shipToSave, function() {
+								log("7");
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
 								units.refreshUnits(data);
