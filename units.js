@@ -275,14 +275,17 @@ module.exports = class units {
 								units.refreshUnits(data);
 							});
 						} else if(duplicate) {
+							log("7b");
 							message = "SHIP_TYPE_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
 							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
+							log("7c");
 							message = "SHIP_NAME_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
 							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						}
+						log("9999");
 					});
 
 				} else {
