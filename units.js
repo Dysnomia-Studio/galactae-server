@@ -63,12 +63,8 @@ module.exports = class units {
 		let message = "";
 		let ship = data.ship;
 
-		log("1");
-
 		// That block 90% of tries to crash
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
-
-		log("2");
 
 		// Filter name
 		let replace = [
@@ -208,12 +204,9 @@ module.exports = class units {
 
 					shipToSave.cost = units.calcCost(ship.shape,shipToSave.parts);
 
-					log("3");
 					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
-					log("4");
-					
+
 					db.unit.findByOwner(data.id,function(unitList) {
-						log("5");
 						let duplicate = false;
 						let duplicateName = false;
 
@@ -266,29 +259,21 @@ module.exports = class units {
 							} // End check parts
 						}
 
-						log("6");
 						if(!duplicate && !duplicateName) {
-							log("7");
 							db.unit.create(shipToSave, function() {
-								log("8");
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
 								units.refreshUnits(data);
 							});
 						} else if(duplicate) {
-							log("7b");
 							message = "SHIP_TYPE_ALREADY_EXISTS";
-							log("8b");
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-							log("9b");
 							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
-							log("7c");
 							message = "SHIP_NAME_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
 							websocket.SendMessageToClient({sid: data.sid, message: message});	
 						}
-						log("9999");
 					});
 
 				} else {
