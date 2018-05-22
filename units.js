@@ -265,11 +265,11 @@ module.exports = class units {
 							} // End check parts
 						}
 
-
+						log("6");
 						if(!duplicate && !duplicateName) {
-							log("6");
+							log("7");
 							db.unit.create(shipToSave, function() {
-								log("7");
+								log("8");
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
 								units.refreshUnits(data);
