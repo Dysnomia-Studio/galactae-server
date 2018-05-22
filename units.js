@@ -60,6 +60,7 @@ module.exports = class units {
 	 */
 	static createType(data) {
 		let errors = 0;
+		let message = "";
 		let ship = data.ship;
 
 		log("1");
