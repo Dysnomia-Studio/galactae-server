@@ -287,6 +287,13 @@ module.exports = class websocket {
 	}
 
 	/**
+	 * Send notif to client
+	 */
+	static sendNotification(type, args) {
+		io.emit("notification", { type, args });
+	}
+
+	/**
 	 * Begins a server maintenance
 	 */
 	static beginMaintenance() {

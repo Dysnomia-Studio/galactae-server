@@ -317,6 +317,8 @@ module.exports = class planet {
 						unitCount = restantDepuisSynchro;
 
 						newFleet.inBuilding = false;
+
+						websocket.sendNotification('unit', { fleetName: fleetReturned.name, unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
 					} else { // Partial add
 					 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
 					 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
@@ -377,6 +379,9 @@ module.exports = class planet {
 			// Update buildings
 			if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
 				data.Buildings[data.nextBuilding]++;
+
+				websocket.sendNotification('building', { building: data.nextBuilding, lvl: data.Buildings[data.nextBuilding] });
+
 				data.nextBuildingTime = -1;
 				data.nextBuilding = -1;
 			}
