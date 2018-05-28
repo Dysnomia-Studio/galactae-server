@@ -54,7 +54,7 @@ module.exports = class research {
 					researchData[planetReturned.currResearch] = -1;
 					db.planet.update(newPlanet);
 					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
-					websocket.sendNotification('research', { research: planetReturned.currResearch });
+					websocket.sendNotification(user.sid, 'research', { research: planetReturned.currResearch });
 				}
 			}
 

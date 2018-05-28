@@ -289,8 +289,8 @@ module.exports = class websocket {
 	/**
 	 * Send notif to client
 	 */
-	static sendNotification(type, args) {
-		io.emit("notification", { type, args });
+	static sendNotification(sid, type, args) {
+		io.to(sid).emit("notification", { type, args });
 	}
 
 	/**
