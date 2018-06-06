@@ -457,7 +457,7 @@ module.exports = {
 					
 					globalRanks.create(data, function(error) {
 						if(error) { log(error); } 
-					})
+					});
 				} else { // Sinon creer
 					let conditions = {
 						server_name: globalCfg.serverGlobalName,
@@ -482,30 +482,19 @@ module.exports = {
 			});
 		},
 		findBetweenPointsAndRanks: function(points, rank, callback) {
-			if(isset(rank)) {
-				globalRanks.find({
-					points: { $lt: points },
-					rank: { $lt: rank },
-					server_name: globalCfg.serverGlobalName,
-				}, function (err, obj) {
-					if(err) { log(err); }
-					callback(obj);
-				});
-			} else {
-				globalRanks.find({
-					points: { $lt: points },
-					server_name: globalCfg.serverGlobalName,
-				}, function (err, obj) {
-					if(err) { log(err); }
-					callback(obj);
-				});
-			}
+			globalRanks.find({
+				$lt: { points, rank },
+				server_name: globalCfg.serverGlobalName,
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
 		},
 		incrementInRange: function(min, max) {
 			let conditions = {
 				server_name: globalCfg.serverGlobalName,
-				rank: { $gt: (min - 1) },
-				rank: { $lt: (max + 1) },
+				$gt: { rank: (min - 1) },
+				$lt: { rank: (max + 1) },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -516,9 +505,10 @@ module.exports = {
 		},
 		reSortRanks: function(uid, points) {
 			db.globalRank.findByUserId(uid, function(user) {
-				if(!isset(user)|| !isset(user.rank)) { return; }
+				if(!isset(user)) { return; }
 
 				let rank = user.rank;
+				if(!isset(rank)) { rank = 2147483648; }
 				db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
 					if(!isset(userList) || !isset(userList[0])) {
 						return;
@@ -561,7 +551,7 @@ module.exports = {
 
 					sectorRanks.create(data, function(error) {
 						if(error) { log(error); } 
-					})
+					});
 				} else { // Sinon creer
 					let conditions = {
 							server_name: globalCfg.serverGlobalName,
@@ -588,33 +578,21 @@ module.exports = {
 			});
 		},
 		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
-			if(isset(rank)) {
-				sectorRanks.find({
-					sector: sector,
-					points: { $lt: points },
-					rank: { $lt: rank },
-					server_name: globalCfg.serverGlobalName,
-				}, function (err, obj) {
-					if(err) { log(err); }
-					callback(obj);
-				});
-			} else {
-				sectorRanks.find({
-					sector: sector,
-					points: { $lt: points },
-					server_name: globalCfg.serverGlobalName,
-				}, function (err, obj) {
-					if(err) { log(err); }
-					callback(obj);
-				});
-			}
+			sectorRanks.find({
+				sector: sector,
+				$lt: { points, rank },
+				server_name: globalCfg.serverGlobalName,
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
 		},
 		incrementInRange: function(sector, min, max) {
 			let conditions = {
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
-				rank: { $gt: (min - 1) },
-				rank: { $lt: (max + 1) },
+				$gt: { rank: (min - 1) },
+				$lt: { rank: (max + 1) },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -625,9 +603,10 @@ module.exports = {
 		},
 		reSortRanks: function(uid, sector, points) {
 			db.sectorRank.findByUserId(sector, uid, function(user) {
-				if(!isset(user)|| !isset(user.rank)) { return; }
+				if(!isset(user)) { return; }
 
 				let rank = user.rank;
+				if(!isset(rank)) { rank = 2147483648; }
 				db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
 					if(!isset(userList) || !isset(userList[0])) {
 						return;
