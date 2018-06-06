@@ -472,6 +472,15 @@ module.exports = {
 				}
 			});
 		},
+		findByUserId: function(uid, callback) {
+			globalRanks.find({
+				server_name: globalCfg.serverGlobalName,
+				user_id: uid
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
 		findBetweenPointsAndRanks: function(points, rank, callback) {
 			globalRanks.find({
 				points: { $lt: points },
@@ -495,24 +504,29 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
-		reSortRanks: function(uid, points, rank, callback) {
-			db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
-				if(!isset(userList) || !isset(userList[0])) {
-					callback(rank);
-					return;
-				}
+		reSortRanks: function(uid, points) {
+			db.globalRank.findByUserId(uid, function(user) {
+				if(!isset(user)|| !isset(user.rank)) { return; }
 
-				let min = userList[0].rank;
-				for(let i=1; i<userList.length; i++) {
-					if(min > userList[i].rank) {
-						min = userList[i].rank;
+				let rank = user.rank;
+				db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
+					if(!isset(userList) || !isset(userList[0])) {
+						callback(rank);
+						return;
 					}
-				}
 
-				if(min < rank) {
-					db.globalRank.incrementInRange(min, rank-1);
-				}
-				callback(min);
+					let min = userList[0].rank;
+					for(let i=1; i<userList.length; i++) {
+						if(min > userList[i].rank) {
+							min = userList[i].rank;
+						}
+					}
+
+					if(min < rank) {
+						db.globalRank.incrementInRange(min, rank-1);
+					}
+					callback(min);
+				});
 			});
 		}
 	},
@@ -550,6 +564,16 @@ module.exports = {
 				}
 			});
 		},
+		findByUserId: function(uid, callback) {
+			globalRanks.find({
+				sector: sector,
+				server_name: globalCfg.serverGlobalName,
+				user_id: uid
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
 		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
 			sectorRanks.find({
 				sector: sector,
@@ -575,25 +599,30 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
-		reSortRanks: function(uid, sector, points, rank, callback) {
-			db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
-				if(!isset(userList) || !isset(userList[0])) {
-					callback(rank);
-					return;
-				}
+		reSortRanks: function(uid, sector, points) {
+			db.sectorRank.findByUserId(sector, uid, function(user) {
+				if(!isset(user)|| !isset(user.rank)) { return; }
 
-				let min = userList[0].rank;
-				for(let i=1; i<userList.length; i++) {
-					if(min > userList[i].rank) {
-						min = userList[i].rank;
+				let rank = user.rank;
+				db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
+					if(!isset(userList) || !isset(userList[0])) {
+						callback(rank);
+						return;
 					}
-				}
 
-				if(min < rank) {
-					db.sectorRank.incrementInRange(sector, min, rank-1);
-				}
-				callback(min);
+					let min = userList[0].rank;
+					for(let i=1; i<userList.length; i++) {
+						if(min > userList[i].rank) {
+							min = userList[i].rank;
+						}
+					}
+
+					if(min < rank) {
+						db.sectorRank.incrementInRange(sector, min, rank-1);
+					}
+					callback(min);
+				});
 			});
 		}
 	},
-}
+};

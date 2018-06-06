@@ -222,12 +222,13 @@ module.exports = class player {
 
 			newUserData.points = Math.round(newUserData.points);
 
-			// MaJ de la BDD Global pour profil
+			// MaJ des BDD Globales
 			db.globalRank.update({
 				user_id: user._id,
 				points: newUserData.points,
 				planets: newUserData.planetlist.length,
 			});
+			db.globalRank.reSortRanks(user._id, newUserData.points);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
 				db.sectorRank.update({
@@ -236,8 +237,13 @@ module.exports = class player {
 					points: newUserData.sectorPointsValue[sector],
 					planets: newUserData.sectorPointsPcount[sector],
 				});
+				db.sectorRank.reSortRanks(
+					user._id,
+					newUserData.sectorPointsAddresses[sector],
+					newUserData.sectorPointsValue[sector]
+				);
 			}
-			
+
 			callback(newUserData);
 		},0,0);	
 	}
