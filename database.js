@@ -521,7 +521,6 @@ module.exports = {
 				let rank = user.rank;
 				db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
 					if(!isset(userList) || !isset(userList[0])) {
-						callback(rank);
 						return;
 					}
 
@@ -535,7 +534,11 @@ module.exports = {
 					if(min < rank) {
 						db.globalRank.incrementInRange(min, rank-1);
 					}
-					callback(min);
+					
+					db.globalRank.update({
+						user_id: uid,
+						rank: min
+					});
 				});
 			});
 		}
@@ -627,7 +630,6 @@ module.exports = {
 				let rank = user.rank;
 				db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
 					if(!isset(userList) || !isset(userList[0])) {
-						callback(rank);
 						return;
 					}
 
@@ -641,7 +643,12 @@ module.exports = {
 					if(min < rank) {
 						db.sectorRank.incrementInRange(sector, min, rank-1);
 					}
-					callback(min);
+
+					db.sectorRank.update({
+						user_id: uid,
+						sector: sector,
+						rank: min,
+					});
 				});
 			});
 		}
