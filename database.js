@@ -482,14 +482,24 @@ module.exports = {
 			});
 		},
 		findBetweenPointsAndRanks: function(points, rank, callback) {
-			globalRanks.find({
-				points: { $lt: points },
-				rank: { $lt: rank },
-				server_name: globalCfg.serverGlobalName,
-			}, function (err, obj) {
-				if(err) { log(err); }
-				callback(obj);
-			});
+			if(isset(rank)) {
+				globalRanks.find({
+					points: { $lt: points },
+					rank: { $lt: rank },
+					server_name: globalCfg.serverGlobalName,
+				}, function (err, obj) {
+					if(err) { log(err); }
+					callback(obj);
+				});
+			} else {
+				globalRanks.find({
+					points: { $lt: points },
+					server_name: globalCfg.serverGlobalName,
+				}, function (err, obj) {
+					if(err) { log(err); }
+					callback(obj);
+				});
+			}
 		},
 		incrementInRange: function(min, max) {
 			let conditions = {
@@ -575,15 +585,26 @@ module.exports = {
 			});
 		},
 		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
-			sectorRanks.find({
-				sector: sector,
-				points: { $lt: points },
-				rank: { $lt: rank },
-				server_name: globalCfg.serverGlobalName,
-			}, function (err, obj) {
-				if(err) { log(err); }
-				callback(obj);
-			});
+			if(isset(rank)) {
+				sectorRanks.find({
+					sector: sector,
+					points: { $lt: points },
+					rank: { $lt: rank },
+					server_name: globalCfg.serverGlobalName,
+				}, function (err, obj) {
+					if(err) { log(err); }
+					callback(obj);
+				});
+			} else {
+				sectorRanks.find({
+					sector: sector,
+					points: { $lt: points },
+					server_name: globalCfg.serverGlobalName,
+				}, function (err, obj) {
+					if(err) { log(err); }
+					callback(obj);
+				});
+			}
 		},
 		incrementInRange: function(sector, min, max) {
 			let conditions = {
