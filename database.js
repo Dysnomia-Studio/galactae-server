@@ -443,7 +443,6 @@ module.exports = {
 			});
 		},
 	},
-
 	globalRank: {
 		update: function(data) {
 			// Chercher si l'utilisateur existe
@@ -473,6 +472,49 @@ module.exports = {
 				}
 			});
 		},
+		findBetweenPointsAndRanks: function(points, rank, callback) {
+			globalRanks.find({
+				points: { $lt: points },
+				rank: { $lt: rank },
+				server_name: globalCfg.serverGlobalName,
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
+		incrementInRange: function(min, max) {
+			let conditions = {
+				server_name: globalCfg.serverGlobalName,
+				rank: { $gt: (min - 1) },
+				rank: { $lt: (max + 1) },
+				},
+				update = { $inc: {'rank': 1 } },
+				options = { multi: true };
+
+			globalRanks.update(conditions, update, options,function(error) {
+				if(error) { log(error);} 
+			});
+		},
+		reSortRanks: function(uid, points, rank, callback) {
+			db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
+				if(!isset(userList) || !isset(userList[0])) {
+					callback(rank);
+					return;
+				}
+
+				let min = userList[0].rank;
+				for(let i=1; i<userList.length; i++) {
+					if(min > userList[i].rank) {
+						min = userList[i].rank;
+					}
+				}
+
+				if(min < rank) {
+					db.globalRank.incrementInRange(min, rank-1);
+				}
+				callback(min);
+			});
+		}
 	},
 
 	sectorRank: {
@@ -508,5 +550,50 @@ module.exports = {
 				}
 			});
 		},
+		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
+			sectorRanks.find({
+				sector: sector,
+				points: { $lt: points },
+				rank: { $lt: rank },
+				server_name: globalCfg.serverGlobalName,
+			}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
+		incrementInRange: function(sector, min, max) {
+			let conditions = {
+				sector: sector,
+				server_name: globalCfg.serverGlobalName,
+				rank: { $gt: (min - 1) },
+				rank: { $lt: (max + 1) },
+				},
+				update = { $inc: {'rank': 1 } },
+				options = { multi: true };
+
+			sectorRanks.update(conditions, update, options,function(error) {
+				if(error) { log(error);} 
+			});
+		},
+		reSortRanks: function(uid, sector, points, rank, callback) {
+			db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
+				if(!isset(userList) || !isset(userList[0])) {
+					callback(rank);
+					return;
+				}
+
+				let min = userList[0].rank;
+				for(let i=1; i<userList.length; i++) {
+					if(min > userList[i].rank) {
+						min = userList[i].rank;
+					}
+				}
+
+				if(min < rank) {
+					db.sectorRank.incrementInRange(sector, min, rank-1);
+				}
+				callback(min);
+			});
+		}
 	},
 }
