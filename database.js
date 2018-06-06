@@ -564,7 +564,7 @@ module.exports = {
 				}
 			});
 		},
-		findByUserId: function(uid, callback) {
+		findByUserId: function(uid, sector, callback) {
 			globalRanks.find({
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
