@@ -267,7 +267,7 @@ module.exports = class player {
 				newPlayerData.dayBonusBest = newPlayerData.dayBonusStreak;
 			}
 
-			let credits = 15;
+			let credits;
 			let helium = 0;
 			let streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
 

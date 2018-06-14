@@ -554,6 +554,16 @@ module.exports = class units {
 		return fighterCount <= fighterCap;
 	}
 
+	static slowerSpeed(curr, other) {
+		let testDist = 1000; // Total galaxy
+		if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) > 
+			(Math.pow(testDist, 2)*other[0] + testDist*other[1] + other[2])) { // Compare polynoms, more time = slower
+			return other;
+		} else {
+			return curr;
+		}
+	}
+
 	static calcUnitSubSpeed(unit) {
 		let speed = [];
 		let tech = "";
@@ -589,15 +599,10 @@ module.exports = class units {
 
 		for(let i=0; i<unitList.length; i++) {
 			let curr = units.calcUnitSubSpeed(unitList[i]);
-			let currSpeed = curr.speed;
-			let speed = min.speed;
-			if(currSpeed[0] === undefined) { return currSpeed; } // Just in case of bugs
 
-			let testDist = 1000; // Total galaxy
-			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
-				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				min.speed = speed;
-			}
+			if(curr.speed[0] === undefined) { return curr.speed; } // Just in case of bugs
+
+			min.speed = slowerSpeed(curr.speed, min.speed);
 
 			if(min.engines[curr.tech] == undefined) {
 				min.engines[curr.tech] = 0;
@@ -644,16 +649,9 @@ module.exports = class units {
 		for(let i=0; i<unitList.length; i++) {
 			if(unitList[i].shipType == "SHIP_FIGHTER") { continue; } // Don't care about fighter they are carried
 
-			let curr = units.calcUnitSupraSpeed(unitList[i]);
-			let currSpeed = curr.speed;
-			let speed = min.speed;
-			if(currSpeed[0] === undefined) { return currSpeed; } // If they can't move to another system, no need to calc it ...
+			if(curr.speed[0] === undefined) { return curr.speed; } // Just in case of bugs
 
-			let testDist = 1000; // Total galaxy size
-			if((Math.pow(testDist, 2)*currSpeed[0] + testDist*currSpeed[1] + currSpeed[2]) > 
-				(Math.pow(testDist, 2)*speed[0] + testDist*speed[1] + speed[2])) { // Compare polynoms, more time = slower
-				min.speed = speed;
-			}
+			min.speed = slowerSpeed(curr.speed, min.speed);
 
 			if(min.engines[curr.tech] == undefined) {
 				min.engines[curr.tech] = 0;
