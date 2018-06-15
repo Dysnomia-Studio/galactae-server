@@ -10,11 +10,11 @@ require('../../server-dev/calcConstants')();
 require('../../server-dev/misc')();
 let tutorials = require('../../server-dev/tutorials');
 
-/**
- * Has finished tutorials ?
- */
-describe('tutorials', function() {
-	describe('#hasFinishedTutorials()', function() {
+describe('• tutorials', function() {
+	/**
+	 * Has finished tutorials ?
+ 	 */
+	describe('# hasFinishedTutorials()', function() {
 		it('No tutorials done (undefined)', function() {
 			assert.equal(
 				tutorials.hasFinishedTutorials({}),

@@ -464,12 +464,12 @@ module.exports = function() {
 			SHIP_CUIRASSE_SMALL: {
 				svg: [
 					["struct","poly",100,100,50,200,50,300,100,400,225,300,500,250,225,200],
-					["struct","poly",50,200,50,300,300,275,375,250,300,225],
+					["struct","poly",50,200,50,300,340,275,400,250,340,225],
 					// Armes
 					["cannon","rect",130,225, 50, 50,"cannon_1"],
 					// Boucliers
 					["shield","rect",200,225, 50, 50, "shield_1"],
-					["shield","rect",200,225, 50, 50, "shield_2"],
+					["shield","rect",270,225, 50, 50, "shield_2"],
 					// Propulseurs
 					["sup_propulsion","rect", 60,225, 50, 50, "prop_1"],
 					["sub_propulsion","rect", 90,140, 50, 50, "prop_2"],
@@ -575,7 +575,7 @@ module.exports = function() {
 					hangar: ["none","hangarSimple","hangarDouble"],
 					sub_propulsion: ["ion","pplasma"],
 					sup_propulsion: ["vsl","wd","hyperespace"],
-					shield: ["none","magnetic","turret","projector"],
+					shield: ["none","magnetic","turret"],
 				},
 				stats: {
 					mass: 0,
