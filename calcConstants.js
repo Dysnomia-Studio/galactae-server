@@ -466,9 +466,9 @@ module.exports = function() {
 					["struct","poly",100,100,50,200,50,300,100,400,225,300,500,250,225,200],
 					["struct","poly",50,200,50,300,340,275,400,250,340,225],
 					// Armes
-					["cannon","rect",130,225, 50, 50,"cannon_1"],
+					["cannon","rect",200,225, 50, 50,"cannon_1"],
 					// Boucliers
-					["shield","rect",200,225, 50, 50, "shield_1"],
+					["shield","rect",130,225, 50, 50, "shield_1"],
 					["shield","rect",270,225, 50, 50, "shield_2"],
 					// Propulseurs
 					["sup_propulsion","rect", 60,225, 50, 50, "prop_1"],
