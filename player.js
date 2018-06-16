@@ -126,7 +126,7 @@ module.exports = class Player {
 		});
 
 		Units.refreshUnits(data);
-		player.refreshPoints(playerData, function(userNewPoints) {
+		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				userNewResearch.id = userNewResearch._id;
 					db.player.update(userNewResearch, function() {
