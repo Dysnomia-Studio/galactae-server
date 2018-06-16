@@ -1,4 +1,4 @@
-module.exports = class websocket {
+module.exports = class Websocket {
 	static init() {
 		io.on('connection', function(socket) {
 			/**
@@ -9,7 +9,7 @@ module.exports = class websocket {
 				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
 
 				if(preventConnection) {
-					chat.sendSM(socket.id,preventConnectionMsg);
+					Chat.sendSM(socket.id,preventConnectionMsg);
 					io.to(socket.id).emit('server-kick');
 					return;
 				}
@@ -19,7 +19,7 @@ module.exports = class websocket {
 				// Log
 				log(user.username + ' ('+socket.id+') connected');
 				// Execution du code
-				player.connect(user);
+				Player.connect(user);
 			});
 
 			socket.on('game-disconnect', function(user) {
@@ -27,10 +27,10 @@ module.exports = class websocket {
 				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
 				// User
 				user.sid = socket.id;
-				player.isValid(user,function(user) { // Verify identity
+				Player.isValid(user,function(user) { // Verify identity
 					// Log
 					log(user.username + ' ('+socket.id+') disconnected');
-					player.disconnect(user);
+					Player.disconnect(user);
 				}); 
 			});
 
@@ -44,7 +44,7 @@ module.exports = class websocket {
 					if(!isset(user) || !isset(user.name) || !isset(user.id)) { return; }
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
-					player.disconnect(user);
+					Player.disconnect(user);
 				}); 
 			});
 
@@ -56,8 +56,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.message)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-					player.getAlly(data, chat.analyse);	
+				Player.isValid(data,function(data) { // Verify identity
+					Player.getAlly(data, Chat.analyse);	
 				}); 	
 			});
 
@@ -69,8 +69,8 @@ module.exports = class websocket {
 				if(!isset(data)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	planet.refresh(data,0);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.refresh(data,0);
 				});
 			});
 			// Next/Prev planet
@@ -79,8 +79,8 @@ module.exports = class websocket {
 				if(!isset(data)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	planet.refresh(data,-1);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.refresh(data,-1);
 				}); 
 			});
 			socket.on('planet-ask-data-next', function(data) {
@@ -88,8 +88,8 @@ module.exports = class websocket {
 				if(!isset(data)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	planet.refresh(data,1);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.refresh(data,1);
 				}); 
 			});
 
@@ -99,8 +99,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.building)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	planet.build(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.build(data);
 				}); 
 			});
 
@@ -110,8 +110,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.planet) || !isset(data.name) || data.name=="") { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	planet.rename(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.rename(data);
 				}); 
 			});
 
@@ -121,9 +121,9 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.id) || !isset(data.pid) || !isset(data.username) || !isset(data.research)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(data) { // Verify identity
 				    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
-				   	research.ChangePlanetResearch(data,data.pid,data.research);
+				   	Research.ChangePlanetResearch(data,data.pid,data.research);
 				});
 			});
 			socket.on('research-sync', function(data) {
@@ -131,8 +131,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.id) || !isset(data.pid) || !isset(data.username)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	research.sync(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Research.sync(data);
 				});
 			});
 
@@ -142,8 +142,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.id) || !isset(data.ship) || !isset(data.username)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	units.createType(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.createType(data);
 				});
 			});
 			socket.on('unit-type-rename', function(data) {
@@ -151,8 +151,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.id) || !isset(data.shipId) || !isset(data.shipNewName) || !isset(data.username)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	units.renameType(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.renameType(data);
 				});
 			});
 			socket.on('unit-type-delete', function(data) {
@@ -160,8 +160,8 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.id) || !isset(data.unit) || !isset(data.username)) { return; }
 				// User
 				data.sid = socket.id;
-				player.isValid(data,function(data) { // Verify identity
-				   	units.deleteType(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.deleteType(data);
 				});
 			});
 			socket.on('unit-build', function(data) {
@@ -170,8 +170,8 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 
-				player.isValid(data,function(data) { // Verify identity
-				   	units.build(data);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.build(data);
 				});
 			});
 			socket.on('fleet-move', function(data) {
@@ -180,8 +180,8 @@ module.exports = class websocket {
 				// User
 				data.sid = socket.id;
 
-				player.isValid(data,function(data) { // Verify identity
-				   	units.fleetMoveTo(data, data.fleetId, data.destination);
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.fleetMoveTo(data, data.fleetId, data.destination);
 				});
 			});
 
@@ -191,9 +191,9 @@ module.exports = class websocket {
 				if(!isset(data) || !isset(data.user) || !isset(data.choice)) { return; }
 				// User
 				data.user.sid = socket.id;
-				player.isValid(data.user,function(user) { // Verify identity
+				Player.isValid(data.user,function(user) { // Verify identity
 				   	db.player.searchBySid(user.sid,function(dataReturned) {
-				   		player.dayBonus(dataReturned,user,data.choice);
+				   		Player.dayBonus(dataReturned,user,data.choice);
 				   	});
 				}); 
 			});
@@ -228,16 +228,16 @@ module.exports = class websocket {
 
 					switch(data.cmd) {
 						case "maintenanceOn":
-							websocket.beginMaintenance();
+							Websocket.beginMaintenance();
 							break;
 						case "maintenanceOff":
-							websocket.endMaintenance();
+							Websocket.endMaintenance();
 							break;
 						case "restart":
 							preventConnection = true;
 							preventConnection = 'RESTARTING_SERVER';
 							io.emit('server-reboot');
-							discord.alert('Restarting game server ...');
+							Discord.alert('Restarting game server ...');
 
 							let decompte = 15;
 							
@@ -283,7 +283,7 @@ module.exports = class websocket {
 	 */
 	static SendGeneralMessage(msg) {
 		io.emit("server-general-alert",msg);
-		discord.alert(msg);
+		Discord.alert(msg);
 	}
 
 	/**
@@ -298,7 +298,7 @@ module.exports = class websocket {
 	 */
 	static beginMaintenance() {
 		io.emit('server-maintenance');
-		websocket.SendGeneralMessage("MAINTENANCE");
+		Websocket.SendGeneralMessage("MAINTENANCE");
 		maintenance = true;
 
 		db.server.find(function(server) {

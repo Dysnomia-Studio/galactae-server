@@ -1,4 +1,4 @@
-module.exports = class combat {
+module.exports = class Combat {
 	/**
 	 * Constructs the object.
 	 *
@@ -105,7 +105,7 @@ module.exports = class combat {
 		// @ADD: Get all in-orbit fleets
 		let fleets = {};
 
-		let battle = new combat();
+		let battle = new Combat();
 
 		// Add all fleets to fight
 		for(let i in fleets) {
@@ -116,6 +116,6 @@ module.exports = class combat {
 			} 
 		}
 
-		combat.fight();
+		battle.fight();
 	}
 };

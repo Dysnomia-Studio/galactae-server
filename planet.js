@@ -1,4 +1,4 @@
-module.exports = class planet {
+module.exports = class Planet {
 		/**
 		 * Gets the planet information.
 		 *
@@ -57,14 +57,14 @@ module.exports = class planet {
 		 * @param      {number}  decalage  le decalage de planete
 		 */
 		static refresh(data,decalage=0) {
-			planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-				let newData = planet.update(planetReturned,userReturned,fleetReturned);
+			Planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
+				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
 				db.planet.update(newData);
 
-				units.refreshFleets(newData._id,data.sid);
+				Units.refreshFleets(newData._id,data.sid);
 
-				planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
+				Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
 		}
 		/**
@@ -104,7 +104,7 @@ module.exports = class planet {
 		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 			time = time/3600/1000; // Passage en heures
 
-			let ratio = planet.GetMineralsRatio(planetType);
+			let ratio = Planet.GetMineralsRatio(planetType);
 			let ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
 			let mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
@@ -122,7 +122,7 @@ module.exports = class planet {
 			}
 
 			// Molecular compression, enhance max storage
-			if(research.getResearch(user,"cp_molecular_compression")==-1) {
+			if(Research.getResearch(user,"cp_molecular_compression")==-1) {
 				mineralStorageBase *= researchBonus.cp_molecular_compression;
 				metalsStorageBase *= researchBonus.cp_molecular_compression;
 				storageHelium *= researchBonus.cp_molecular_compression;
@@ -196,9 +196,9 @@ module.exports = class planet {
 		static build(data) {
 			// Mauvais n° de batiment
 			if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
-			planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
+			Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
+					Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
 					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
 					return;
 				} 
@@ -208,10 +208,10 @@ module.exports = class planet {
 				let currTime = Date.now();
 
 				// Calc new planet data
-				let newData = planet.update(planetReturned,userReturned,fleetReturned);
+				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
 				// Vars for this building test
-				let cost = planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
+				let cost = Planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
 				let BlockBuild = false;
 				let errormsg = "BUILD_ERROR"; // Message d'erreur par defaut
 					// Cost verif
@@ -234,13 +234,13 @@ module.exports = class planet {
 
 					// Energie ? Habitants ?
 					if(!BlockBuild) {	
-						if(!planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
+						if(!Planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
 							BlockBuild = true;
 							errormsg = "BUILDING_ERROR_ENERGY";
 						}
 					}
 
-				planet.enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
+				Planet.enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
 					if(!enoughtPeople) {
 						BlockBuild = true;
 						errormsg = "BUILDING_ERROR_PEOPLE";
@@ -249,14 +249,14 @@ module.exports = class planet {
 
 					if(!BlockBuild) {
 						// Research bonus
-							if(research.getResearch(userReturned,"cp_mecanisation") == -1) {
+							if(Research.getResearch(userReturned,"cp_mecanisation") == -1) {
 								timeSpeed += researchBonus.cp_mecanisation;
 							}
 							if(data.building>8) {
-								if(research.getResearch(userReturned,"cp_tracteur") == -1) {
+								if(Research.getResearch(userReturned,"cp_tracteur") == -1) {
 									timeSpeed += researchBonus.cp_tracteur;
 								}
-								if(research.getResearch(userReturned,"cp_materielTp") == -1) {
+								if(Research.getResearch(userReturned,"cp_materielTp") == -1) {
 									timeSpeed += researchBonus.cp_materielTp;
 								}
 							}
@@ -273,17 +273,17 @@ module.exports = class planet {
 						newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
 						newData.nextBuilding = data.building;
 
-						websocket.SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
+						Websocket.SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
 						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
 
 					} else { // We just update ressources
-						websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
+						Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
 						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
 					}
 
 					db.planet.update(newData);
 
-					planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
+					Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
 				});
 			});
 		}
@@ -318,7 +318,7 @@ module.exports = class planet {
 
 						newFleet.inBuilding = false;
 
-						websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
+						Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
 					} else { // Partial add
 					 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
 					 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
@@ -348,8 +348,8 @@ module.exports = class planet {
 					newFleet.points = "" + newFleet.points;
 
 					db.fleet.update(newFleet, function() {
-						units.refreshUnits(user);
-						units.refreshFleets(planetIn._id,user.sid);
+						Units.refreshUnits(user);
+						Units.refreshFleets(planetIn._id,user.sid);
 					});	
 				});
 			});
@@ -370,17 +370,17 @@ module.exports = class planet {
 			data.lastResourcesUpdate = currTime;
 
 			// Update resources
-			data.resources = planet.UpdateResources(planetIn,user);
+			data.resources = Planet.UpdateResources(planetIn,user);
 			// Update points
-			data.points = planet.calcPlanetPoints(planetIn);
-			data.points += parseFloat(planet.calcFleetPoints(fleetList));
+			data.points = Planet.calcPlanetPoints(planetIn);
+			data.points += parseFloat(Planet.calcFleetPoints(fleetList));
 			data.points = Math.round(data.points);
 
 			// Update buildings
 			if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
 				data.Buildings[data.nextBuilding]++;
 
-				websocket.sendNotification(user.sid, 'building', { building: data.nextBuilding, lvl: data.Buildings[data.nextBuilding] });
+				Websocket.sendNotification(user.sid, 'building', { building: data.nextBuilding, lvl: data.Buildings[data.nextBuilding] });
 
 				data.nextBuildingTime = -1;
 				data.nextBuilding = -1;
@@ -388,7 +388,7 @@ module.exports = class planet {
 
 			// Update units
 			if(data.unitBuildingEndTime != -1) {
-				planet.UpdateUnits(planetIn,user,currTime);
+				Planet.UpdateUnits(planetIn,user,currTime);
 			}
 
 			if(currTime>data.unitBuildingEndTime) {
@@ -412,7 +412,7 @@ module.exports = class planet {
 			let cons = 0;
 
 			for(let i=0; i<9; i++) {
-				cons += parseInt(planet.GetBuildingCost(i,groundBuildings[i]).energy);
+				cons += parseInt(Planet.GetBuildingCost(i,groundBuildings[i]).energy);
 			}
 
 			if(prod<cons) {
@@ -437,10 +437,10 @@ module.exports = class planet {
 				if(buildings[i]==0) { continue; }
 				if(i==planetData.nextBuilding) {
 					// Current in-build building
-					cons += parseInt(planet.GetBuildingCost(i,buildings[i] + 1).habitants);
+					cons += parseInt(Planet.GetBuildingCost(i,buildings[i] + 1).habitants);
 					continue; 
 				}
-				cons += parseInt(planet.GetBuildingCost(i,buildings[i]).habitants);
+				cons += parseInt(Planet.GetBuildingCost(i,buildings[i]).habitants);
 			}
 
 			// Units builded and in-build
@@ -457,7 +457,7 @@ module.exports = class planet {
 		 * @param      {Object}  buildings  The buildings list
 		 */
 		static enoughtPeople(planetData, fleets, callback) {
-			planet.getPeople(planetData, fleets, function(planet, prod, cons) {
+			Planet.getPeople(planetData, fleets, function(planet, prod, cons) {
 				if(prod<cons) {
 					callback(planetData,false);
 				}
@@ -471,9 +471,9 @@ module.exports = class planet {
 		 * @param      {<type>}  data    data
 		 */
 		static rename(data) {
-			planet.find(data,data.planet,0,function(planetReturned) {
+			Planet.find(data,data.planet,0,function(planetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
-					websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
+					Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
 					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
 					return;
 				}
@@ -500,7 +500,7 @@ module.exports = class planet {
 
 				log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.planet+'), new name: '+data.name);
 
-				planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
+				Planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
 
 				let newPlanetData = planetReturned.toJSON();
 				newPlanetData.name = data.name;
@@ -519,12 +519,12 @@ module.exports = class planet {
 			let resources = dataIn.resources;
 
 			if(Dtime<0 || dataIn.nextBuildingTime==-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-				resources = planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+				resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 			} else {
 				// Calcul avec les anciens bâtiments jusqu'a l'update
-				resources = planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+				resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 				// Calcul avec les nouveaux bâtiments
-				resources = planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
+				resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
 			}
 
 			return resources;
@@ -559,13 +559,13 @@ module.exports = class planet {
 		 * @param      {object}  user    The user
 		 * @return     {object}  filtered data
 		 */
-		static filterOtherPlayerData(planet,user) {
+		static filterOtherPlayerData(planetData,user) {
 			let returnData = {
-				name: planet.name,
-				address: planet.address,
+				name: planetData.name,
+				address: planetData.address,
 				ownerName: user.name,
-				planetType: planet.planetType,
-				points: planet.points,
+				planetType: planetData.planetType,
+				points: planetData.points,
 				ally: user.ally,
 			};
 

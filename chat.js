@@ -1,4 +1,4 @@
-module.exports = class chat {
+module.exports = class Chat {
 	static analyse(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
 			data.game_id = userGameIdObj[0].game_id;
@@ -8,7 +8,7 @@ module.exports = class chat {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
-							chat.sendSM(data.sid,'ERR_CHAT_BANNED');
+							Chat.sendSM(data.sid,'ERR_CHAT_BANNED');
 							return;
 						}
 					}
@@ -29,7 +29,7 @@ module.exports = class chat {
 					} else {
 						data.lvl = 1;
 					}
-					data = chat.protect(data);
+					data = Chat.protect(data);
 
 					if(!data.send) { 
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
@@ -59,7 +59,7 @@ module.exports = class chat {
 					data.username = "<span class=\"username\">" + data.username + "</span>";
 
 					if(data.message.charAt(0)=="!" && data.lvl > 1) {
-						data = chat.sendCommand(data);
+						data = Chat.sendCommand(data);
 					} else if(data.message.charAt(0)=="@") { // Messages privés
 						db.player.searchByName(args[0].substr(1).toLowerCase(), function(dataReturned) {
 							if(dataReturned==undefined) { return; }
@@ -71,12 +71,12 @@ module.exports = class chat {
 
 							/* Envoyer le PM */
 							if(sid!=undefined && sid!="-1" && data.newmessage!="" && sid!=data.sid) {
-								chat.sendPM(data.sid,data.message,false);
-								chat.sendPM(sid,data.username + ": " + data.newmessage,true);
+								Chat.sendPM(data.sid,data.message,false);
+								Chat.sendPM(sid,data.username + ": " + data.newmessage,true);
 							} else if(args[0].substr(1).toLowerCase()==data.username) {
-								chat.sendSM(data.sid,"NO_PM_YOU");
+								Chat.sendSM(data.sid,"NO_PM_YOU");
 							} else if(sid==undefined || sid!="-1") {
-								chat.sendSM(data.sid,"PLY_NOT_FOUND");
+								Chat.sendSM(data.sid,"PLY_NOT_FOUND");
 							}
 						});
 
@@ -98,7 +98,7 @@ module.exports = class chat {
 				    if(data.channel !="hud-chat-ally") { // Normal chat
 				    	log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
 			        	io.emit('chat-message', { message: data.message, channel: data.channel });
-			        	discord.sendChatMessage(data.channel,discordmsg);
+			        	Discord.sendChatMessage(data.channel,discordmsg);
 			    	} else if(data.ally!=undefined) { // Allies messages
 			    		log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
 			    		// @ADD : Ally messages
@@ -136,7 +136,7 @@ module.exports = class chat {
         /* Disable links */
         if(str!=str.replace('://','') || str!=str.replace('www.','')) {
         	data.send = false;
-        	chat.sendSM(data.sid,"NO_LINKS");
+        	Chat.sendSM(data.sid,"NO_LINKS");
         }
 
         data.message = str;
@@ -147,7 +147,7 @@ module.exports = class chat {
 	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
 			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
-				chat.sendSM(currUser.sid,"PLY_NOT_FOUND");
+				Chat.sendSM(currUser.sid,"PLY_NOT_FOUND");
 				log("Player not found");
 			} else {
 				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
@@ -160,7 +160,7 @@ module.exports = class chat {
 						if(currUser.lvl > targetLvl) {
 							callback(dataReturned);
 						} else {
-							chat.sendSM(currUser.sid,"PERMISSION_DENIED");
+							Chat.sendSM(currUser.sid,"PERMISSION_DENIED");
 							log("Permission denied");
 						}
 					});
@@ -184,14 +184,14 @@ module.exports = class chat {
 				if(data.lvl<3) { return data; } // Admin & Operators only	
 				if(args.length<4) { return data; }
 
-				chat.searchTarget(data, args[1], function(target) {
+				Chat.searchTarget(data, args[1], function(target) {
 					let banMessage = args.splice(3,args.length).join(" ");
 					let banTime = parseChatTime(args[2]);
 					if(banTime < 1) { log("Invalid Time"); return data; }
 					let now = Date.now();
 
 					log("Banned " + banTime/1000 + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
-					chat.sendSM(data.sid,"Banned " + banTime/1000 + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
+					Chat.sendSM(data.sid,"Banned " + banTime/1000 + " seconds (" + args[2] + ") " + target.name + " for reason: " + banMessage);
 
 					db.ban.create({
 						user_id: target.id,
@@ -213,14 +213,14 @@ module.exports = class chat {
 			case "!mute":
 				if(args.length<4) { return data; }
 
-				chat.searchTarget(data, args[1], function(target) {
+				Chat.searchTarget(data, args[1], function(target) {
 					let muteMessage = args.splice(3,args.length).join(" ");
 					let muteTime = parseChatTime(args[2]);
 					if(muteTime < 1) { log("Invalid Time"); return data; }
 					let now = Date.now();
 
 					log("Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
-					chat.sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
+					Chat.sendSM(data.sid,"Banned " + muteTime + " seconds (" + args[2] + ") " + target.name + " for reason: " + muteMessage);
 
 					db.ban.create({
 						user_id: target.id,
@@ -241,10 +241,10 @@ module.exports = class chat {
 				data.send = true;
 			break;
 			case "!help":
-				chat.sendSM(data.sid,"HELP");
+				Chat.sendSM(data.sid,"HELP");
 			break;
 			default:
-				chat.sendSM(data.sid,"COMMAND_NOT_FOUND");
+				Chat.sendSM(data.sid,"COMMAND_NOT_FOUND");
 		}
 
 		data.message = msg;
@@ -259,4 +259,4 @@ module.exports = class chat {
 	static sendSM(sid,msg) {
 		io.to(sid).emit("chat-message-system", msg);
 	}
-}
+};

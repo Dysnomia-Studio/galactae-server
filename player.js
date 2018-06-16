@@ -1,9 +1,9 @@
-module.exports = class player {
+module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
 		db.player.searchBySid(user.sid,function(searchSid) {
 			if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
-				if(player.canAct(searchSid)) { // Don't spam
+				if(Player.canAct(searchSid)) { // Don't spam
 					callback(user);
 
 					let newData = searchSid;
@@ -65,12 +65,12 @@ module.exports = class player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							player.traitementsConnexion(data, dataReturned);
+							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						player.traitementsConnexion(data, dataReturned);
+						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
 
@@ -115,7 +115,7 @@ module.exports = class player {
 		if(!isset(playerData.currTutorial)) {
 			playerData.currTutorial = 0;
 		}
-		if(!tutorials.hasFinishedTutorials(playerData)) {
+		if(!Tutorials.hasFinishedTutorials(playerData)) {
 			// @ADD: Do stuff
 		}
 
@@ -125,16 +125,16 @@ module.exports = class player {
 			currTutorial: playerData.currTutorial,
 		});
 
-		units.refreshUnits(data);
+		Units.refreshUnits(data);
 		player.refreshPoints(playerData, function(userNewPoints) {
-			research.refreshUserResearch(userNewPoints, function(userNewResearch) {
+			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				userNewResearch.id = userNewResearch._id;
 					db.player.update(userNewResearch, function() {
 					plCount++;
 
-					research.sendResearchDataToUser(data, userNewResearch.research);
+					Research.sendResearchDataToUser(data, userNewResearch.research);
 
-					planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
+					Planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
 				});
 			});
 		});
@@ -175,7 +175,7 @@ module.exports = class player {
 			sector.pcount[sectorAddress]++;
 			
 			if(i<user.planetlist.length) {
-				player.calcTotalPlanetPoints(user,callback,i,points,sector);
+				Player.calcTotalPlanetPoints(user,callback,i,points,sector);
 			} else { 
 				points *= pointsCoef.planet;
 
@@ -212,9 +212,9 @@ module.exports = class player {
 		return points;
 	}
 	static refreshPoints(user,callback) {
-		player.calcTotalPlanetPoints(user,function(newUserData) {
+		Player.calcTotalPlanetPoints(user,function(newUserData) {
 			// Recherches
-			newUserData.points += player.calcResearchPoints(newUserData);
+			newUserData.points += Player.calcResearchPoints(newUserData);
 
 			// Money
 			if(newUserData.money === undefined || Number.isNaN(newUserData.money)) { newUserData.money = 0; }
@@ -287,14 +287,14 @@ module.exports = class player {
 			} // @ADD: generate random special bonus
 
 			if(choice==2 && helium!=0) {
-				planet.find(userData,userData.pid,0,function(planetReturned) {
+				Planet.find(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
-						websocket.SendMessageToClient({ sid: userData.sid, message: "ERROR_NOT_BELONGING" });
+						Websocket.SendMessageToClient({ sid: userData.sid, message: "ERROR_NOT_BELONGING" });
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");
 						return;
 					}
 
-					let newPlanetData = planet.update(planetReturned);
+					let newPlanetData = Planet.update(planetReturned);
 
 					newPlanetData.resources[1]+=helium;
 
@@ -306,7 +306,7 @@ module.exports = class player {
 
 					db.player.update(newPlayerData);
 
-					planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
+					Planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
 				}); 
 			} else {
 				newPlayerData.money += credits;

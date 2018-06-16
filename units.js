@@ -1,4 +1,4 @@
-module.exports = class units {
+module.exports = class Units {
 	/**
 	 * Get and send unit data to user
 	 *
@@ -10,9 +10,9 @@ module.exports = class units {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER BEFORE !
 		 */
-		db.unit.findByOwner(data.id,function(units) {
-			if(units==undefined) { units = []; }
-			io.to(data.sid).emit("units-recieve-data", units);
+		db.unit.findByOwner(data.id,function(unitList) {
+			if(unitList==undefined) { unitList = []; }
+			io.to(data.sid).emit("units-recieve-data", unitList);
 		});
 	}
 	
@@ -169,7 +169,7 @@ module.exports = class units {
 				for(let i in ship) {
 					if(i=="name" || i=="type" || i=="shape") { continue; }
 
-					if(shipResearchDependencies[ship[i].value]!=undefined && research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+					if(shipResearchDependencies[ship[i].value]!=undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
 						errors++;
 						message = "NEEDED_RESEARCH_MISSING";
 						break;
@@ -202,7 +202,7 @@ module.exports = class units {
 						});
 					}
 
-					shipToSave.cost = units.calcCost(ship.shape,shipToSave.parts);
+					shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
 
 					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
 
@@ -264,29 +264,29 @@ module.exports = class units {
 							db.unit.create(shipToSave, function() {
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
-								units.refreshUnits(data);
+								Units.refreshUnits(data);
 							});
 						} else if(duplicate) {
 							message = "SHIP_TYPE_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-							websocket.SendMessageToClient({sid: data.sid, message: message});	
+							Websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
 							message = "SHIP_NAME_ALREADY_EXISTS";
 							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-							websocket.SendMessageToClient({sid: data.sid, message: message});	
+							Websocket.SendMessageToClient({sid: data.sid, message: message});	
 						}
 					});
 
 				} else {
 					// Notify client
 					log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-					websocket.SendMessageToClient({sid: data.sid, message: message});
+					Websocket.SendMessageToClient({sid: data.sid, message: message});
 				}
 			});
 		} else {
 			// Notify client
 			log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
-			websocket.SendMessageToClient({sid: data.sid, message: message});
+			Websocket.SendMessageToClient({sid: data.sid, message: message});
 		}
 	}
 
@@ -298,7 +298,7 @@ module.exports = class units {
 
 			db.unit.update(unitReturned, function() {
 				log(data.username + " has succed to rename unit type old:" + unitReturned.name + ", new: " + data.shipNewName,"success");
-				units.refreshUnits(data);
+				Units.refreshUnits(data);
 			});
 		});
 	}
@@ -309,15 +309,15 @@ module.exports = class units {
 
 			if(unitReturned.owned != 0) {
 				log(data.username + " has failed to delete unit model named " + unitReturned.name + " because it's used by some units.","fail");
-				websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
+				Websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
 				return;
 			}
 
 			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","success");
-			websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
+			Websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
 
 			db.unit.delete(data.unit, function() {
-				units.refreshUnits(data);
+				Units.refreshUnits(data);
 			});			
 		});
 	}
@@ -331,15 +331,15 @@ module.exports = class units {
 	 */
 	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
-		planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
+		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
 
-			let newPlanet = planet.update(planetReturned,userReturned,fleetList);
+			let newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
 				log(inputData.username +' failed to build units because another is already building.');
-				websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
+				Websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
 				return;
 			}
 			let id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
@@ -386,15 +386,15 @@ module.exports = class units {
 					totalCost[2] > newPlanet.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
 					log(inputData.username +' failed to build units because of no enough resources.');
-					websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
+					Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
 					return;
 				}
 
-				planet.getPeople(newPlanet,fleetList, function(newPlanet, prod, cons) {
+				Planet.getPeople(newPlanet,fleetList, function(newPlanet, prod, cons) {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
 						log(inputData.username +' failed to build units because of no enough people.');
-						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
 						return;
 					}
 
@@ -435,27 +435,27 @@ module.exports = class units {
 
 						db.fleet.update(fleetReturned);
 
-						planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
 						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')',"success");
-						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
-							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
-						units.CreateFleet(inputData,newPlanet,function(fleetReturned) {
+						Units.CreateFleet(inputData,newPlanet,function(fleetReturned) {
 							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
 						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { 
-							websocket.SendMessageToClient({ sid: inputData.sid, message: "FLEET_ISNT_IN_ORBIT" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: "FLEET_ISNT_IN_ORBIT" });
 							return;
 						}
 						if(""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
@@ -463,36 +463,36 @@ module.exports = class units {
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
-							websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
 							return;
 						}
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
 					}  else {
 						log(inputData.username +' failed to build units because fleet isn\'t valid.');
-						websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
 					}
 				});	
 			});			
 		});
 	}
 
-	static CreateFleet(data,planet,callback) {
+	static CreateFleet(data,planetData,callback) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
 			// Check max count
-			if(fleetReturned.length >= hqFleetCount[planet.Buildings[6] - 1]) {
-				websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
+			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
+				Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
 				return;
 			}
 
 			// Check name
 			for(let i=0; i<fleetReturned.length; i++) {
 				if(fleetReturned[i].name == data.fleetName) {
-					websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
+					Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
 			}
@@ -502,7 +502,7 @@ module.exports = class units {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: data.planet,
-				position: planet.address,
+				position: planetData.address,
 				orbitPosition: 0,
 				points: 0,
 				endMoveTime: -1,
@@ -512,7 +512,7 @@ module.exports = class units {
 
 			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
-				units.refreshFleets(data.planet,data.sid);
+				Units.refreshFleets(data.planet,data.sid);
 
 				if(callback) { callback(newFleet); }
 			});
@@ -598,7 +598,7 @@ module.exports = class units {
 		};
 
 		for(let i=0; i<unitList.length; i++) {
-			let curr = units.calcUnitSubSpeed(unitList[i]);
+			let curr = Units.calcUnitSubSpeed(unitList[i]);
 
 			if(curr.speed[0] === undefined) { return curr.speed; } // Just in case of bugs
 
@@ -673,7 +673,7 @@ module.exports = class units {
 			if(isset(unitReturned)) {
 				unitList.push(unitReturned);
 			}
-			units.getFleetUnits(unitIdList, callback, i++, unitList);
+			Units.getFleetUnits(unitIdList, callback, i++, unitList);
 		});
 	}
 
@@ -686,40 +686,40 @@ module.exports = class units {
 			if(!isset(fleetReturned)) { return; } // Does this fleet exists
 			if(fleetReturned.name == "SHIP_DEF") { return; } // Is this fleet movable ? (not defense fleet)
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
-				websocket.SendMessageToClient({ sid: user.sid, message: "IN_BUILDING_FLEET" }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: "IN_BUILDING_FLEET" }); 
 				return; 
 			} 
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
-				websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_MOVING_FLEET" }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_MOVING_FLEET" }); 
 				return;
 			}
 
 			if(fleetReturned.position == destination) { // Subluminique
-				units.getFleetUnits(fleetReturned.units, function(unitList) {
-					let minSpeed = units.getFleetMinSubSpeed(unitList);
+				Units.getFleetUnits(fleetReturned.units, function(unitList) {
+					let minSpeed = Units.getFleetMinSubSpeed(unitList);
 					let speed = minSpeed.speed;
-					let fuel = units.calcFuelCost(minSpeed.engines);
+					let fuel = Units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) { return; }
 
 					let dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
 					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 
-					units.fleetCompleteMove(user, fleetReturned, destination, time);
+					Units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
 			} else { // Supraluminique
-				units.getFleetUnits(fleetReturned.units, function(unitList) {
-					if(!units.hasEnoughCarrier(fleetReturned, unitList)) {
-						websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_CARRIER" });
+				Units.getFleetUnits(fleetReturned.units, function(unitList) {
+					if(!Units.hasEnoughCarrier(fleetReturned, unitList)) {
+						Websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_CARRIER" });
 						return;
 					}
 
-					let minSpeed = units.getFleetMinSupraSpeed(unitList);
+					let minSpeed = Units.getFleetMinSupraSpeed(unitList);
 					let speed = minSpeed.speed;
-					let fuel = units.calcFuelCost(minSpeed.engines);
+					let fuel = Units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) {
-						websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
+						Websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
 						return;
 					}
 
@@ -733,7 +733,7 @@ module.exports = class units {
 
 					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 
-					units.fleetCompleteMove(user, fleetReturned, destination, time);
+					Units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
 			}
 		});
@@ -745,7 +745,7 @@ module.exports = class units {
 		 * YOU NEED TO CHECK FLEET BEFORE !
 		 */
 		let instability = time * 0.001 * (Math.random() - 0.5);
-		if(research.isSearched(user,"prop_suprastability")) {
+		if(Research.isSearched(user,"prop_suprastability")) {
 			instability /= 2;
 		}
 

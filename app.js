@@ -35,17 +35,17 @@ require('./console')();
  */
 // Include that before, instead, that could pose some problems
 global.db        = require('./database');
-global.discord   = require('./discord');
+global.Discord   = require('./discord');
 // Then include other classes
-global.chat      = require('./chat');
-global.combat    = require('./combat');
-global.planet    = require('./planet');
-global.player    = require('./player');
-global.research  = require('./research');
-global.tutorials = require('./tutorials');
-global.units     = require('./units');
+global.Chat      = require('./chat');
+global.Combat    = require('./combat');
+global.Planet    = require('./planet');
+global.Player    = require('./player');
+global.Research  = require('./research');
+global.Tutorials = require('./tutorials');
+global.Units     = require('./units');
 // And that's in last
-global.websocket = require('./socket');
+global.Websocket = require('./socket');
 
 /**
  * Launch server !
@@ -85,8 +85,8 @@ db.connect(function(success,general=false) {
 		 * Lancement du serveur en écoute
 		 */
 		https.listen(globalCfg["serverPort"], function () {
-			websocket.init(io);
-			discord.connect();
+			Websocket.init(io);
+			Discord.connect();
 			log('Server is listening on *:' + globalCfg["serverPort"]);
 		});
 	}

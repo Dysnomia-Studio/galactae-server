@@ -1,4 +1,4 @@
-module.exports = class tutorials {
+module.exports = class Tutorials {
 	/**
 	 * Determines if the user has finished tutorials.
 	 *
