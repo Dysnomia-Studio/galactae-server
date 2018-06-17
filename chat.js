@@ -23,12 +23,12 @@ module.exports = class Chat {
 
 					/* Controles de securité */
 					data.send = true;
+					data.lvl = 1;
 
 					if(isset(userPrivileges) && isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
 						data.lvl = userPrivileges[0].user_privilege_lvl;
-					} else {
-						data.lvl = 1;
 					}
+					
 					data = Chat.protect(data);
 
 					if(!data.send) { 
@@ -108,6 +108,10 @@ module.exports = class Chat {
 			});
 		});
 	}
+
+	/**
+	 * Protect message content => No security issue, no links, no out-of-rules messages, etc
+	 */
 	static protect(data) {
 		let str = data.message;
 
@@ -119,19 +123,12 @@ module.exports = class Chat {
 		];
 
 		for(let i=0; i<replace.length; i++) {
-			str = str.split(replace[i][0]).join(replace[i][1])
+			str = str.split(replace[i][0]).join(replace[i][1]);
 		}
 		str = normalizeText(str);
 
-		// Si message vide
-		let empty = true;
-		for(let i=0; i<str.length; i++) {
-			if(str[i]!=" ") {
-				empty = false
-			 	break;
-			}
-		}	
-		if(empty) { data.send = false; }
+		// Empty message
+		if(str.split(" ").join("") == "") { data.send = false; }
 
         /* Disable links */
         if(str!=str.replace('://','') || str!=str.replace('www.','')) {
@@ -144,6 +141,13 @@ module.exports = class Chat {
         return data;
 	}
 
+	/**
+	 * Search target to be use in a chat command
+	 *
+	 * @param      {object}    currUser  The current user
+	 * @param      {string}    name      The target name
+	 * @param      {Function}  callback  Callback function
+	 */
 	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
 			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
@@ -168,6 +172,10 @@ module.exports = class Chat {
 			}
 		});
 	}
+
+	/**
+	 * Chat commands calls
+	 */
 	static sendCommand(data) {
 		let str = data.message;
 		let reg=new RegExp("[ ,;]+", "g");

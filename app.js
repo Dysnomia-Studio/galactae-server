@@ -85,7 +85,7 @@ db.connect(function(success,general=false) {
 		 * Lancement du serveur en écoute
 		 */
 		https.listen(globalCfg["serverPort"], function () {
-			Websocket.init(io);
+			Websocket.init();
 			Discord.connect();
 			log('Server is listening on *:' + globalCfg["serverPort"]);
 		});

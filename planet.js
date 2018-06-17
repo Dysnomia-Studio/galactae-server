@@ -74,6 +74,9 @@ module.exports = class Planet {
 		 */
 		static sendPlanetDataToUser(data) {
 			data.sNow = Date.now();
+
+			delete data.id;
+
 			io.to(data.sid).emit("planet-recieve-data", data );
 		}
 		/**

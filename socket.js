@@ -29,7 +29,7 @@ module.exports = class Websocket {
 				user.sid = socket.id;
 				Player.isValid(user,function(user) { // Verify identity
 					// Log
-					log(user.username + ' ('+socket.id+') disconnected');
+					log(user.username + ' (' + socket.id + ') disconnected');
 					Player.disconnect(user);
 				}); 
 			});

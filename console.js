@@ -9,21 +9,21 @@ module.exports = function() {
 	 * @param      {string}  string  The text to log
 	 * @return     {string}  text		The colored text
 	 */
-	this.redText = function(string) {
-		return '\u001b[31m'+string+'\u001b[39m';
+	this.redText = function(str) {
+		return '\u001b[31m' + str + '\u001b[39m';
 	};
-	this.greenText = function(string) {
-		return '\u001b[32m'+string+'\u001b[39m';
+	this.greenText = function(str) {
+		return '\u001b[32m' + str + '\u001b[39m';
 	};
-	this.yellowText = function(string) {
-		return '\u001b[33m'+string+'\u001b[39m';
+	this.yellowText = function(str) {
+		return '\u001b[33m' + str + '\u001b[39m';
 	};
-	this.blueText = function(string) {
-		return '\u001b[36m'+string+'\u001b[39m';
+	this.blueText = function(str) {
+		return '\u001b[36m' + str + '\u001b[39m';
 	};
 
 	/**
-	 * Write a thing in console
+	 * Write something in console
 	 *
 	 * @param      {string}  msg     	The text to log
 	 * @param      {string}             type    The type of text (for color)

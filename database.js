@@ -244,8 +244,8 @@ module.exports = {
 	 * PLANET
 	 */
 	planet: {
-		find: function(pid,callback) {
-			planets.findById(pid, function (err, planetReturned) {
+		find: function(addr,callback) {
+			planets.findOne({address: addr}, function (err, planetReturned) {
 				if(err) { log(err); }
 				if(isset(planetReturned)) {
 					callback(planetReturned);
