@@ -671,6 +671,12 @@ module.exports = function() {
 		SHIP_FIGHTER_BOMBER: 2,
 	};
 
+	this.fighterMult = {
+		SHIP_FIGHTER_SMALL: 0.15,
+		SHIP_FIGHTER_MEDIUM: 0.3,
+		SHIP_FIGHTER_BOMBER: 0.3,
+	};
+
 	this.hangarSize = {
 		hangarSimple: 40,
 		hangarDouble: 75,
