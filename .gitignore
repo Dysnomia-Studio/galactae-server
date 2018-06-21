@@ -1,5 +1,6 @@
-# NEVER ADD THIS FILE - This is the configuration of each server
+# NEVER ADD THIS FILES
 config.js
 keys/*
 *.bat
 .scannerwork/*
+reports/*
