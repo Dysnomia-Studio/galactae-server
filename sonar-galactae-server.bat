@@ -1,1 +1,0 @@
-L:\Softwares\sonarScanner\bin\sonar-scanner.bat -Dsonar.projectKey=galactae-server -Dsonar.sources=. -Dsonar.host.url=***REMOVED*** -Dsonar.login=01fae2f89686df5146753c7005fcc378196d1577
