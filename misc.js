@@ -193,15 +193,12 @@ module.exports = function() {
         switch(unit) {
             case "d": // Days
                 return 86400000*count;
-                break;
             case "h": // Hour
                 return 3600000*count;
-                break;
             case "m": // Minutes
                 return 60000*count;
-                break;
-            default: // Seconds
-                return 1000*count;
+            default: // Wrong unit
+                return -1;
         }
     };
 };

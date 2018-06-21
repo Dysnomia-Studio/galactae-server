@@ -110,5 +110,11 @@ describe('• misc', function() {
 				180000
 			);
 		});
+		it('parseChatTime (4 odd unit)', function() {
+			assert.equal(
+				parseChatTime("4g"),
+				-1
+			);
+		});
 	});
 });

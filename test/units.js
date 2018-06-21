@@ -6,11 +6,11 @@ let assert = require('assert');
 /**
  * My libs
  */
-require('../../server-dev/calcConstants')();
-require('../../server-dev/misc')();
-let units = require('../../server-dev/units');
+require('../calcConstants')();
+require('../misc')();
+let Units = require('../units');
 
-describe('• units', function() {
+describe('• Units', function() {
 	/**
 	 * Has finished tutorials ?
  	 */
@@ -20,7 +20,7 @@ describe('• units', function() {
 			let b = [3,2,1];
 
 			assert.equal(
-				units.slowerSpeed(a, b),
+				Units.slowerSpeed(a, b),
 				a
 			);
 		});
@@ -30,7 +30,7 @@ describe('• units', function() {
 			let b = [1,2,3];
 
 			assert.equal(
-				units.slowerSpeed(a, b),
+				Units.slowerSpeed(a, b),
 				a
 			);
 		});
@@ -40,7 +40,7 @@ describe('• units', function() {
 			let b = [1,2,3];
 			
 			assert.equal(
-				units.slowerSpeed(a, b),
+				Units.slowerSpeed(a, b),
 				b
 			);
 		});

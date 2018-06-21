@@ -289,6 +289,12 @@ module.exports = {
 				callback(obj);
 			});
 		},
+		findAll: function(callback) {
+			units.find({ }, function (err, objReturned) {
+				if(err) { log(err); }
+				callback(objReturned);
+			});
+		},
 		update: function(data, callback) {
 			let conditions = { _id: data._id },
 					update = { $set: data },

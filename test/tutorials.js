@@ -6,25 +6,25 @@ let assert = require('assert');
 /**
  * My libs
  */
-require('../../server-dev/calcConstants')();
-require('../../server-dev/misc')();
-let tutorials = require('../../server-dev/tutorials');
+require('../calcConstants')();
+require('../misc')();
+let Tutorials = require('../tutorials');
 
-describe('• tutorials', function() {
+describe('• Tutorials', function() {
 	/**
 	 * Has finished tutorials ?
  	 */
 	describe('# hasFinishedTutorials()', function() {
 		it('No tutorials done (undefined)', function() {
 			assert.equal(
-				tutorials.hasFinishedTutorials({}),
+				Tutorials.hasFinishedTutorials({}),
 				false
 			);
 		});
 		
 		it('0 tutorials done', function() {
 			assert.equal(
-				tutorials.hasFinishedTutorials(
+				Tutorials.hasFinishedTutorials(
 					{ currTutorial: 0                       }
 				), false
 			);
@@ -32,7 +32,7 @@ describe('• tutorials', function() {
 
 		it('N-1 tutorials done', function() {
 			assert.equal(
-				tutorials.hasFinishedTutorials(
+				Tutorials.hasFinishedTutorials(
 					{ currTutorial: tutorialsList.length - 1 }
 				), false
 			);
@@ -40,7 +40,7 @@ describe('• tutorials', function() {
 
 		it('N tutorials done', function() {
 			assert.equal(
-				tutorials.hasFinishedTutorials(
+				Tutorials.hasFinishedTutorials(
 					{ currTutorial: tutorialsList.length     }
 				), true
 			);
