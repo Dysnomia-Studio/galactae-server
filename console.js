@@ -52,7 +52,9 @@ module.exports = function() {
 		if(nodate==false||nodate==undefined) { text = logdate() + " " + text;}
 
 		console.log(text);
-		io.to(adminSid).emit('server-log', getDateTime() + " " + msg);
+		if(adminSid != "") {
+			io.to(adminSid).emit('server-log', getDateTime() + " " + msg);
+		}
 		logFile.write(getDateTime() + " " + msg + "\n");
 	};
 

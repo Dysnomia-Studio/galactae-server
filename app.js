@@ -12,6 +12,8 @@ global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
 io.set("transports", ["websocket","xhr-polling","polling"]);
 
+global.DOMParser = require('xmldom').DOMParser;
+
 /**
  * Global vars
  */
@@ -19,7 +21,7 @@ global.preventConnection = false;
 global.preventConnectionMsg = "";
 global.maintenance = false;
 global.plCount = 0;
-global.adminSid = "-1";
+global.adminSid = "";
 
 /**
  * Configs & Constants
