@@ -12,7 +12,7 @@ global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
 io.set("transports", ["websocket","xhr-polling","polling"]);
 
-
+global.DOMParser = require('xmldom').DOMParser;
 
 /**
  * Global vars
@@ -41,6 +41,7 @@ global.Discord   = require('./discord');
 // Then include other classes
 global.Chat      = require('./chat');
 global.Combat    = require('./combat');
+global.Map       = require('./map');
 global.Planet    = require('./planet');
 global.Player    = require('./player');
 global.Research  = require('./research');
@@ -52,6 +53,8 @@ global.Websocket = require('./socket');
 /**
  * Launch server !
  */
+Map.loadXML();
+
 db.connect(function(success,general=false) {
 	if(!success) {
 		log('Failed to connect to db ! Blocking user connections ...',"warn");

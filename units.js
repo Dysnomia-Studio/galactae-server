@@ -690,9 +690,15 @@ module.exports = class Units {
 		});
 	}
 
+	static calcMoveTime(dist, speed) {
+		return Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+	}
+
 	static fleetMoveTo(user, fleetId, destination) {
 		let coordsArrivee = destination.split("-");
 			coordsArrivee = [parseInt(coordsArrivee[0]), parseInt(coordsArrivee[1])];
+
+		let now = Date.now();
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
@@ -707,17 +713,47 @@ module.exports = class Units {
 				return;
 			}
 
-			if(fleetReturned.position == destination) { // Subluminique
+			if(fleetReturned.position == destination) { // Current planet
+				Websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_AT_DESTINATION" }); 
+				return;
+			}
+
+			if(fleetReturned.position.substr(0,5) == destination.substr(0,5) ) { // Subluminique
 				Units.getFleetUnits(fleetReturned.units, function(unitList) {
 					let minSpeed = Units.getFleetMinSubSpeed(unitList);
 					let speed = minSpeed.speed;
 					let fuel = Units.calcFuelCost(minSpeed.engines);
 
 					if(speed[0] === undefined) { return; }
+					if(fuel < fleetReturned.fuel) {
+						Websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_FUEL" }); 
+						return;
+					}
 
-					let dist = 0; // @ADD Calc distance between current planet pos & previewed planet pos (Will be painful ...)
-					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+					let baseDist = Map.getPlanetDistance(
+						fleetReturned.position,
+						destination,
+						now);
+					if(baseDist < 0) { return; }
+					let baseTravelTime = Units.calcMoveTime(baseDist, speed);
 
+					let previewDist = Map.getPlanetDistance(
+						fleetReturned.position,
+						destination,
+						now + baseTravelTime);
+					if(previewDist < 0) { return; }
+					let previewTime = Units.calcMoveTime(previewDist, speed);
+
+					/* Final travel time:
+						Average of ...
+						 Time to travel to planet where it's now
+						and
+						 Time to travel to planet where it'll be when we arrive to this previous position
+				    */
+					let time = (baseTravelTime + previewTime)/2;
+
+
+					fleetReturned.fuel -= fuel;
 					Units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
 			} else { // Supraluminique
@@ -736,6 +772,11 @@ module.exports = class Units {
 						return;
 					}
 
+					if(fuel < fleetReturned.fuel) {
+						Websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_FUEL" }); 
+						return;
+					}
+
 					let coordsDepart = fleetReturned.position.split("-");
 						coordsDepart = [parseInt(coordsDepart[0]), parseInt(coordsDepart[1])];
 					
@@ -744,8 +785,9 @@ module.exports = class Units {
 							Math.pow(coordsDepart[1] - coordsArrivee[1],2)
 						);
 
-					let time = Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+					let time = Units.calcMoveTime(dist, speed);
 
+					fleetReturned.fuel -= fuel;
 					Units.fleetCompleteMove(user, fleetReturned, destination, time);
 				});
 			}
