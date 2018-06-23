@@ -28,6 +28,11 @@ module.exports = class Combat {
 	 * @param      {Fleet}   fleet   Fleet details
 	 */
 	joinTeam(team, fleet) {
+		if(fleet._id === undefined) {
+			log('Fleet object misbuilded !','error');
+			return;
+		}
+
 		if(team == "atk") {
 			this.atkFleets.push(fleet);
 		} else if (team == "def") {
@@ -81,11 +86,19 @@ module.exports = class Combat {
 		// Get all db data & Fight
 		this.getAllAI(function() {
 			this.getAllUnits(function() {
-				while(this.atkFleets.population != 0 && this.defFleets.population != 0) {
+				while(this.atkFleets.length != 0 && this.defFleets.length != 0) {
 					this.simulateTurn();
 				}
 
 				this.saveLogs();
+
+				if(this.atkFleets.length == 0) {
+					log('End of fight simulation - Planet: ' + pid + ' - Def wins', 'info');
+				} else {
+					log('End of fight simulation - Planet: ' + pid + ' - Atk wins', 'info');
+				}
+
+				preventRestarts--;
 			});
 		});
 	}
@@ -100,6 +113,8 @@ module.exports = class Combat {
 	}
 
 	static beginFight(data, pid) {
+		log('Begin of fight simulation - Planet: ' + pid, 'info');
+
 		// @ADD: check beginners protection
 
 		// @ADD: Get all in-orbit fleets
@@ -117,5 +132,7 @@ module.exports = class Combat {
 		}
 
 		battle.fight();
+
+		preventRestarts++;
 	}
 };
