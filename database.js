@@ -510,34 +510,44 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
+		count: function(callback) {
+			globalRanks.count({} , function(err, c) {
+				if(err) { log(err); } 
+				callback(c);
+			});
+		},
 		reSortRanks: function(uid, points, pcount) {
 			db.globalRank.findByUserId(uid, function(user) {
+				db.globalRank.count(function(rank) {
+					rank++;
 
-				let rank = 2147483648;
-				if(isset(user) && isset(user.rank)) { rank = user.rank; }
+					if(isset(user) && isset(user.rank)) { rank = user.rank; }
 
-				db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
-					let min = rank;
+					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
+						let min = rank;
 
-					if(isset(userList)) { // Changement(s) de rang à faire ?
-						min = userList[0].rank;
+						console.log(userList.length);
 
-						for(let i=1; i<userList.length; i++) {
-							if(min > userList[i].rank) {
-								min = userList[i].rank;
+						if(isset(userList)) { // Changement(s) de rang à faire ?
+							min = userList[0].rank;
+
+							for(let i=1; i<userList.length; i++) {
+								if(min > userList[i].rank) {
+									min = userList[i].rank;
+								}
 							}
 						}
-					}
 
-					if(min < rank) {
-						db.globalRank.incrementInRange(min, rank-1);
-					}
-					
-					db.globalRank.update({
-						user_id: uid,
-						rank: min,
-						points: points,
-						planets: pcount
+						if(min < rank) {
+							db.globalRank.incrementInRange(min, rank-1);
+						}
+						
+						db.globalRank.update({
+							user_id: uid,
+							rank: min,
+							points: points,
+							planets: pcount
+						});
 					});
 				});
 			});
