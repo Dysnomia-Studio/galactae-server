@@ -516,7 +516,7 @@ module.exports = {
 				let rank = 2147483648;
 				if(isset(user) && isset(user.rank)) { rank = user.rank; }
 
-				db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
+				db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
 					let min = rank;
 
 					if(isset(userList)) { // Changement(s) de rang à faire ?
@@ -617,7 +617,7 @@ module.exports = {
 				let rank = 2147483648;
 				if(isset(user) && isset(user.rank)) { rank = user.rank; }
 
-				db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
+				db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
 					let min = rank;
 
 					if(isset(userList)) { // Changement(s) de rang à faire ?
