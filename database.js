@@ -490,7 +490,8 @@ module.exports = {
 		},
 		findBetweenPointsAndRanks: function(points, rank, callback) {
 			globalRanks.find({
-				$lt: { points, rank },
+				points: { $lt: points },
+				rank: { $lt: rank },
 				server_name: globalCfg.serverGlobalName,
 			}, function (err, obj) {
 				if(err) { log(err); }
@@ -500,8 +501,7 @@ module.exports = {
 		incrementInRange: function(min, max) {
 			let conditions = {
 				server_name: globalCfg.serverGlobalName,
-				$gt: { rank: (min - 1) },
-				$lt: { rank: (max + 1) },
+				rank: { $gt: (min - 1),  $lt: (max + 1) },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -590,7 +590,8 @@ module.exports = {
 		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
 			sectorRanks.find({
 				sector: sector,
-				$lt: { points, rank },
+				points: { $lt: points },
+				rank: { $lt: rank },
 				server_name: globalCfg.serverGlobalName,
 			}, function (err, obj) {
 				if(err) { log(err); }
@@ -601,8 +602,7 @@ module.exports = {
 			let conditions = {
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
-				$gt: { rank: (min - 1) },
-				$lt: { rank: (max + 1) },
+				rank: { $gt: (min - 1),  $lt: (max + 1) },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
