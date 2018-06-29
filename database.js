@@ -632,7 +632,7 @@ module.exports = {
 		},
 		reSortRanks: function(uid, sector, points, pcount) {
 			db.sectorRank.findByUserId(sector, uid, function(user) {
-				db.globalRank.count(sector, function(MaxRank) {
+				db.sectorRank.count(sector, function(MaxRank) {
 					MaxRank++;
 
 					let rank = MaxRank;
