@@ -523,14 +523,7 @@ module.exports = {
 					MaxRank++;
 					let rank = MaxRank;
 
-					console.log(rank);
-					console.log(isset(user));
-					console.log(isset(user.rank));
-					console.log(user.rank);
-
 					if(isset(user) && isset(user.rank)) { rank = user.rank; }
-
-					console.log(rank);
 
 					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
 						let min = rank;
@@ -544,8 +537,6 @@ module.exports = {
 								}
 							}
 						}
-
-						console.log(min);
 
 						if(min < rank) {
 							db.globalRank.incrementInRange(min, rank-1);
@@ -603,6 +594,7 @@ module.exports = {
 				user_id: uid
 			}, function (err, obj) {
 				if(err) { log(err); }
+				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
 				callback(obj);
 			});
 		},
@@ -630,35 +622,46 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
+		count: function(sector, callback) {
+			globalRanks.count({
+				sector: sector
+				} , function(err, c) {
+				if(err) { log(err); } 
+				callback(c);
+			});
+		},
 		reSortRanks: function(uid, sector, points, pcount) {
 			db.sectorRank.findByUserId(sector, uid, function(user) {
+				db.globalRank.count(sector, function(MaxRank) {
+					MaxRank++;
 
-				let rank = 2147483648;
-				if(isset(user) && isset(user.rank)) { rank = user.rank; }
+					let rank = MaxRank;
 
-				db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
-					let min = rank;
+					if(isset(user) && isset(user.rank)) { rank = user.rank; }
+					db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
+						let min = rank;
 
-					if(isset(userList)) { // Changement(s) de rang à faire ?
-						min = userList[0].rank;
+						if(isset(userList)) { // Changement(s) de rang à faire ?
+							min = userList[0].rank;
 
-						for(let i=1; i<userList.length; i++) {
-							if(min > userList[i].rank) {
-								min = userList[i].rank;
+							for(let i=1; i<userList.length; i++) {
+								if(min > userList[i].rank) {
+									min = userList[i].rank;
+								}
 							}
 						}
-					}
 
-					if(min < rank) {
-						db.sectorRank.incrementInRange(sector, min, rank-1);
-					}
+						if(min < rank) {
+							db.sectorRank.incrementInRange(sector, min, rank-1);
+						}
 
-					db.sectorRank.update({
-						user_id: uid,
-						sector: sector,
-						rank: min,
-						points: points,
-						planets: pcount
+						db.sectorRank.update({
+							user_id: uid,
+							sector: sector,
+							rank: min,
+							points: points,
+							planets: pcount
+						});
 					});
 				});
 			});
