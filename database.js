@@ -485,6 +485,7 @@ module.exports = {
 				user_id: uid
 			}, function (err, obj) {
 				if(err) { log(err); }
+				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
 				callback(obj);
 			});
 		},
