@@ -100,9 +100,8 @@ module.exports = function() {
      *
      * @return     {string}  The date time.
      */
-    this.getDateTime = function() {
-	    let date = new Date();
-
+    this.getDateTime = function(date = new Date()) {
+        
 	    let hour = date.getHours();
 	    hour = (hour < 10 ? "0" : "") + hour;
 

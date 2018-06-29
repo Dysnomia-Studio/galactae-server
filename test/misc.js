@@ -28,6 +28,7 @@ describe('• misc', function() {
 			);
 		});
 	});
+
 	/**
 	 * normalizeText
 	 */
@@ -114,6 +115,25 @@ describe('• misc', function() {
 			assert.equal(
 				parseChatTime("4g"),
 				-1
+			);
+		});
+	});
+
+	/**
+	 * getDateTime
+	 * /!\ les mois vont de 0 a 11 dans le constructeur de Date()
+	 */
+	describe('# getDateTime()', function() {
+		it('getDateTime(01/01/2001 01:01:01)', function() {
+			assert.equal(
+				getDateTime(new Date(2001,0,1,1,1,1)),
+				"01/01/2001 01:01:01"
+			);
+		});
+		it('getDateTime(10/10/2010 10:10:10)', function() { 
+			assert.equal(
+				getDateTime(new Date(2010,9,10,10,10,10)),
+				"10/10/2010 10:10:10"
 			);
 		});
 	});

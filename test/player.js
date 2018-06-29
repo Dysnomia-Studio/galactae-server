@@ -12,7 +12,7 @@ let Player = require('../player');
 
 describe('• Player', function() {
 	/**
-	 * isset
+	 * canAct
 	 */
 	describe('# canAct()', function() {
 		it('canAct(now)', function() {

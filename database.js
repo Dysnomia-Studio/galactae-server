@@ -69,6 +69,7 @@ let fleetsSchema = new Schema({
 	units: Array,
 	population: Number,
 	inBuilding: Boolean,
+	fuel: Number,
 });
 
 let statsSchema = new Schema({
@@ -457,14 +458,14 @@ module.exports = {
 				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si oui update
+				if(!isset(obj)) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 					
 					globalRanks.create(data, function(error) {
 						if(error) { log(error); } 
 					});
-				} else { // Sinon creer
+				} else { // Sinon update
 					let conditions = {
 						server_name: globalCfg.serverGlobalName,
 						user_id: data.user_id
@@ -509,21 +510,22 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
-		reSortRanks: function(uid, points) {
+		reSortRanks: function(uid, points, pcount) {
 			db.globalRank.findByUserId(uid, function(user) {
-				if(!isset(user)) { return; }
 
-				let rank = user.rank;
-				if(!isset(rank)) { rank = 2147483648; }
+				let rank = 2147483648;
+				if(isset(user) && isset(user.rank)) { rank = user.rank; }
+
 				db.globalRank.findBetweenPointsAndRanks(points, ranks, function(userList) {
-					if(!isset(userList) || !isset(userList[0])) {
-						return;
-					}
+					let min = rank;
 
-					let min = userList[0].rank;
-					for(let i=1; i<userList.length; i++) {
-						if(min > userList[i].rank) {
-							min = userList[i].rank;
+					if(isset(userList)) { // Changement(s) de rang à faire ?
+						min = userList[0].rank;
+
+						for(let i=1; i<userList.length; i++) {
+							if(min > userList[i].rank) {
+								min = userList[i].rank;
+							}
 						}
 					}
 
@@ -533,7 +535,9 @@ module.exports = {
 					
 					db.globalRank.update({
 						user_id: uid,
-						rank: min
+						rank: min,
+						points: points,
+						planets: pcount
 					});
 				});
 			});
@@ -551,14 +555,14 @@ module.exports = {
 				sector: data.sector
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si oui update
+				if(!isset(obj)) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
 					sectorRanks.create(data, function(error) {
 						if(error) { log(error); } 
 					});
-				} else { // Sinon creer
+				} else { // Sinon update
 					let conditions = {
 							server_name: globalCfg.serverGlobalName,
 							user_id: data.user_id,
@@ -607,21 +611,22 @@ module.exports = {
 				if(error) { log(error);} 
 			});
 		},
-		reSortRanks: function(uid, sector, points) {
+		reSortRanks: function(uid, sector, points, pcount) {
 			db.sectorRank.findByUserId(sector, uid, function(user) {
-				if(!isset(user)) { return; }
 
-				let rank = user.rank;
-				if(!isset(rank)) { rank = 2147483648; }
+				let rank = 2147483648;
+				if(isset(user) && isset(user.rank)) { rank = user.rank; }
+
 				db.sectorRank.findBetweenPointsAndRanks(sector, points, ranks, function(userList) {
-					if(!isset(userList) || !isset(userList[0])) {
-						return;
-					}
+					let min = rank;
 
-					let min = userList[0].rank;
-					for(let i=1; i<userList.length; i++) {
-						if(min > userList[i].rank) {
-							min = userList[i].rank;
+					if(isset(userList)) { // Changement(s) de rang à faire ?
+						min = userList[0].rank;
+
+						for(let i=1; i<userList.length; i++) {
+							if(min > userList[i].rank) {
+								min = userList[i].rank;
+							}
 						}
 					}
 
@@ -633,6 +638,8 @@ module.exports = {
 						user_id: uid,
 						sector: sector,
 						rank: min,
+						points: points,
+						planets: pcount
 					});
 				});
 			});
