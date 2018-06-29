@@ -518,8 +518,9 @@ module.exports = {
 		},
 		reSortRanks: function(uid, points, pcount) {
 			db.globalRank.findByUserId(uid, function(user) {
-				db.globalRank.count(function(rank) {
-					rank++;
+				db.globalRank.count(function(MaxRank) {
+					MaxRank++;
+					let rank = MaxRank;
 
 					console.log(rank);
 
