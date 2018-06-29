@@ -501,7 +501,7 @@ module.exports = {
 		incrementInRange: function(min, max) {
 			let conditions = {
 				server_name: globalCfg.serverGlobalName,
-				rank: { $gt: (min - 1),  $lt: (max + 1) },
+				rank: { $gte: min,  $lte: max },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -523,6 +523,9 @@ module.exports = {
 					let rank = MaxRank;
 
 					console.log(rank);
+					console.log(isset(user));
+					console.log(isset(user.rank));
+					console.log(user.rank);
 
 					if(isset(user) && isset(user.rank)) { rank = user.rank; }
 
@@ -617,7 +620,7 @@ module.exports = {
 			let conditions = {
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
-				rank: { $gt: (min - 1),  $lt: (max + 1) },
+				rank: { $gte: min,  $lte: max },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
