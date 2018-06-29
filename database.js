@@ -521,12 +521,14 @@ module.exports = {
 				db.globalRank.count(function(rank) {
 					rank++;
 
+					console.log(rank);
+
 					if(isset(user) && isset(user.rank)) { rank = user.rank; }
+
+					console.log(rank);
 
 					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
 						let min = rank;
-
-						console.log(userList.length);
 
 						if(isset(userList)) { // Changement(s) de rang à faire ?
 							min = userList[0].rank;
@@ -537,6 +539,8 @@ module.exports = {
 								}
 							}
 						}
+
+						console.log(min);
 
 						if(min < rank) {
 							db.globalRank.incrementInRange(min, rank-1);
