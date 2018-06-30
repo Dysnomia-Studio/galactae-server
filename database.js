@@ -631,7 +631,7 @@ module.exports = {
 				callback(c);
 			});
 		},
-		reSortRanks: function(user_id, sector, points, pcount) {
+		reSortRanks: function(user_id, sector, points, pcount, name) {
 			db.sectorRank.findByUserId(sector, user_id, function(user) {
 				db.sectorRank.count(sector, function(MaxRank) {
 					MaxRank++;
