@@ -514,7 +514,9 @@ module.exports = {
 			});
 		},
 		count: function(callback) {
-			globalRanks.count({} , function(err, c) {
+			globalRanks.count({
+				server_name: globalCfg.serverGlobalName
+			} , function(err, c) {
 				if(err) { log(err); } 
 				callback(c);
 			});
@@ -559,8 +561,6 @@ module.exports = {
 
 	sectorRank: {
 		update: function(data) {
-			data.user_id = ""+data.user_id; // Used as string in php scripts
-
 			// Chercher si l'utilisateur existe
 			sectorRanks.find({
 				server_name: globalCfg.serverGlobalName,
@@ -591,7 +591,7 @@ module.exports = {
 			});
 		},
 		findByUserId: function(uid, sector, callback) {
-			globalRanks.find({
+			sectorRanks.find({
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
 				user_id: uid
@@ -626,7 +626,8 @@ module.exports = {
 			});
 		},
 		count: function(sector, callback) {
-			globalRanks.count({
+			sectorRanks.count({
+				server_name: globalCfg.serverGlobalName,
 				sector: sector
 				} , function(err, c) {
 				if(err) { log(err); } 
