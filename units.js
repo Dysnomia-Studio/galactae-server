@@ -21,6 +21,7 @@ module.exports = class Units {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
+		//@ADD: Recalc fleet positions
 		db.fleet.findByMotherPlanet(pid,function(fleet) {
 			if(fleet==undefined) { fleet = []; }
 			io.to(sid).emit("fleet-recieve-data", fleet);

@@ -174,6 +174,17 @@ module.exports = class Websocket {
 				   	Units.build(data);
 				});
 			});
+			socket.on('units-ask-data', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet)) { return; }
+				// User
+				data.sid = socket.id;
+
+				Player.isValid(data,function(data) { // Verify identity
+				   	Units.refreshUnits(data);
+					Units.refreshFleets(data.planet,data.sid);
+				});
+			});
 			socket.on('fleet-move', function(data) {
 				// Vars
 				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.fleetId) || !isset(data.destination)) { return; }
