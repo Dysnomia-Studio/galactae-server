@@ -122,6 +122,7 @@ let userBanSchema = new Schema({
 let globalRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
+	name: String,
 	server_name: String,
 	rank: Number,
 	points: Number,
@@ -131,6 +132,7 @@ let globalRanksSchema = new Schema({
 let sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
+	name: String,
 	server_name: String,
 	sector: String,
 	rank: Number,
