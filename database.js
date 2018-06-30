@@ -517,8 +517,8 @@ module.exports = {
 				callback(c);
 			});
 		},
-		reSortRanks: function(uid, points, pcount) {
-			db.globalRank.findByUserId(uid, function(user) {
+		reSortRanks: function(user_id, points, pcount, name) {
+			db.globalRank.findByUserId(user_id, function(user) {
 				db.globalRank.count(function(MaxRank) {
 					MaxRank++;
 					let rank = MaxRank;
@@ -543,10 +543,11 @@ module.exports = {
 						}
 						
 						db.globalRank.update({
-							user_id: uid,
+							user_id,
 							rank: min,
-							points: points,
-							planets: pcount
+							points,
+							planets: pcount,
+							name
 						});
 					});
 				});
@@ -630,8 +631,8 @@ module.exports = {
 				callback(c);
 			});
 		},
-		reSortRanks: function(uid, sector, points, pcount) {
-			db.sectorRank.findByUserId(sector, uid, function(user) {
+		reSortRanks: function(user_id, sector, points, pcount) {
+			db.sectorRank.findByUserId(sector, user_id, function(user) {
 				db.sectorRank.count(sector, function(MaxRank) {
 					MaxRank++;
 
@@ -656,11 +657,12 @@ module.exports = {
 						}
 
 						db.sectorRank.update({
-							user_id: uid,
+							user_id,
 							sector: sector,
 							rank: min,
-							points: points,
-							planets: pcount
+							points,
+							planets: pcount,
+							name
 						});
 					});
 				});
