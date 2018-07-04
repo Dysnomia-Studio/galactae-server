@@ -731,14 +731,14 @@ module.exports = class Units {
 						return;
 					}
 
-					let baseDist = Map.getPlanetDistance(
+					let baseDist = GameMap.getPlanetDistance(
 						fleetReturned.position,
 						destination,
 						now);
 					if(baseDist < 0) { return; }
 					let baseTravelTime = Units.calcMoveTime(baseDist, speed);
 
-					let previewDist = Map.getPlanetDistance(
+					let previewDist = GameMap.getPlanetDistance(
 						fleetReturned.position,
 						destination,
 						now + baseTravelTime);

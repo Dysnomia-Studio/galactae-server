@@ -42,7 +42,7 @@ global.Discord   = require('./discord');
 // Then include other classes
 global.Chat      = require('./chat');
 global.Combat    = require('./combat');
-global.Map       = require('./map');
+global.GameMap   = require('./map');
 global.Planet    = require('./planet');
 global.Player    = require('./player');
 global.Research  = require('./research');
@@ -54,7 +54,7 @@ global.Websocket = require('./socket');
 /**
  * Launch server !
  */
-Map.loadXML();
+GameMap.loadXML();
 
 db.connect(function(success,general=false) {
 	if(!success) {

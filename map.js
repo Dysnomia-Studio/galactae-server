@@ -17,7 +17,7 @@ let MAP_STAR_SIZE_RATIO = 0.08;
 
 let mapCache = [];
 
-module.exports = class Map {
+module.exports = class GameMap {
 	static loadXML() {
 		log("Loading map XML files ...");
 
@@ -115,7 +115,7 @@ module.exports = class Map {
 		planets = system.getElementsByTagName("p");
 
 		// Calc coordinates
-		planetOrbitDist = Map.getFirstPlanetPosByStars(stars);
+		planetOrbitDist = GameMap.getFirstPlanetPosByStars(stars);
 
 		for(let i=0; i<planets.length; i++) {
 			let size = PLANET_SIZE_BASE + parseFloat(planets[i].size)*PLANET_SIZE_COEF;
@@ -130,9 +130,9 @@ module.exports = class Map {
 			let angle = (when%periode / periode) * (2* Math.PI);
 
 			if(planets[i].id == from) {
-				coordsDepart = Map.getPlanetCoords(angle, planetDist);
+				coordsDepart = GameMap.getPlanetCoords(angle, planetDist);
 			} else if(planets[i].id == to) {
-				coordsArrivee = Map.getPlanetCoords(angle, planetDist);
+				coordsArrivee = GameMap.getPlanetCoords(angle, planetDist);
 			}
 		}
 		
