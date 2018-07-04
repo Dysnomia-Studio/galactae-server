@@ -83,7 +83,7 @@ db.connect(function(success,general=false) {
 
 		setInterval(function() {
 			db.stat.submit(Date.now() - Date.now()%statsInterval);
-		},statsInterval)
+		},statsInterval);
 	},statsInterval - Date.now()%statsInterval);
 
 	if(!general) {
