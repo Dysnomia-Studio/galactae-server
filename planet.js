@@ -202,7 +202,7 @@ module.exports = class Planet {
 			Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
-					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' +data.planet+') to next level because he doesn\'t own it !',"fail");
+					log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level because he doesn\'t own it !',"fail");
 					return;
 				} 
 
@@ -277,11 +277,11 @@ module.exports = class Planet {
 						newData.nextBuilding = data.building;
 
 						Websocket.SendMessageToClient({ sid: data.sid, message: "BUILD_OK"});
-						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level',"success");
+						log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level',"success");
 
 					} else { // We just update ressources
 						Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
-						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' +data.planet+') to next level ' + errormsg,"fail");
+						log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,"fail");
 					}
 
 					db.planet.update(newData);
@@ -477,7 +477,7 @@ module.exports = class Planet {
 			Planet.find(data,data.planet,0,function(planetReturned) {
 				if(data.planet!=planetReturned.id) { // Stop if not belonging
 					Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
-					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' +data.planet+') he doesn\'t own it !',"fail");
+					log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !',"fail");
 					return;
 				}
 
