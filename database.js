@@ -5,23 +5,36 @@ let Schema = mongoose.Schema;
  * Server schemas
  */
 let planetSchema = new Schema({
+	// General informations
 	_id: Schema.Types.ObjectId,
 	name: String,
 	address: String,
 	owner: Schema.Types.ObjectId,
-	resources: Array,
-	Buildings: Array,
+	points: Number,
+
+	// Geographic informations
+	orbitDist: Number,
+	orbitDuration: Number,
 	planetType: Number,
+
+	// Buildings
+	Buildings: Array,
 	nextBuilding: Number,
 	nextBuildingTime: Number,
+	
+	// Resources	
+	resources: Array,
 	lastResourcesUpdate: Number,
-	lastUnitUpdate: Number,
-	points: Number,
-	currResearch: String,
+
+	// Units
 	unitBuildingID: String,
 	unitBuildingCount: Number,
 	unitBuildingEndTime: Number,
 	unitBuildingFleetID: Schema.Types.ObjectId,
+	lastUnitUpdate: Number,
+
+	// Misc
+	currResearch: String,
 });
 
 let userSchema = new Schema({

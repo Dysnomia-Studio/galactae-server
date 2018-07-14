@@ -11,14 +11,15 @@ module.exports = class GameMap {
 		// @TODO: Check if exists
 		// @TODO: Calc coords
 
-		/* let periode = (2 + planetOrbitDist) * 100;
+		/*
 		let angle = (when%periode / periode) * (2* Math.PI);
 
 		if(planets[i].id == from) {
 			coordsDepart = GameMap.getPlanetCoords(angle, planetDist);
 		} else if(planets[i].id == to) {
 			coordsArrivee = GameMap.getPlanetCoords(angle, planetDist);
-		}*/
+		}
+		*/
 
 		return Math.sqrt(
 			Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
