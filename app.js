@@ -12,8 +12,6 @@ global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
 io.set("transports", ["websocket","xhr-polling","polling"]);
 
-global.DOMParser = require('xmldom').DOMParser;
-
 /**
  * Global vars
  */
@@ -88,10 +86,10 @@ db.connect(function(success,general=false) {
 		/**
 		 * Lancement du serveur en écoute
 		 */
-		https.listen(globalCfg["serverPort"], function () {
+		https.listen(globalCfg.serverPort, function () {
 			Websocket.init();
 			Discord.connect();
-			log('Server is listening on *:' + globalCfg["serverPort"]);
+			log('Server is listening on *:' + globalCfg.serverPort);
 		});
 	}
 });
