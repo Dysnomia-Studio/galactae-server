@@ -6,15 +6,15 @@ let assert = require('assert');
 /**
  * My libs
  */
-global.Map = require('../map');
+global.GameMap = require('../map');
 
-describe('• Map', function() {
+describe('• GameMap', function() {
 	/**
 	 * getPlanetCoords
 	 */
 	describe('# getPlanetCoords()', function() {
 		it('getPlanetCoords(90° (=1/2 Pi))', function() {
-			var coords = Map.getPlanetCoords(0.5*Math.PI, 1);
+			var coords = GameMap.getPlanetCoords(0.5*Math.PI, 1);
 
 			assert.equal(
 				coords[0],
