@@ -54,8 +54,6 @@ global.Websocket = require('./socket');
 /**
  * Launch server !
  */
-GameMap.loadXML();
-
 db.connect(function(success,general=false) {
 	if(!success) {
 		log('Failed to connect to db ! Blocking user connections ...',"warn");
