@@ -93,6 +93,18 @@ module.exports = class Websocket {
 				}); 
 			});
 
+			// Map
+			socket.on('system-ask-mapData', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.systemAddress)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+				   	Planet.getWholeSystem(data);
+				}); 
+			});
+
+
 			//Building
 			socket.on('planet-build', function(data) { 
 				// Vars

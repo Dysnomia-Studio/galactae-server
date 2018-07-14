@@ -36,16 +36,6 @@ module.exports = class Planet {
 							callback(planetReturned,userReturned,fleetReturned);
 						});
 					});
-				} else {
-					db.planet.find(pid,function(planetReturned) {
-						if(!isset(planetReturned)) { return; }
-						db.player.searchById(planetReturned.owner, function(userReturned) {
-							if(!isset(userReturned)) { return; }
-							let planetData = filterOtherPlayerData(planetReturned, userReturned);
-
-							io.to(user.sid).emit("planet-recieve-other-data", planetData );
-						});
-					});
 				}
 			});
 		}
@@ -67,6 +57,28 @@ module.exports = class Planet {
 				Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 			});
 		}
+
+		static getWholeSystem(data) {
+			db.planet.findBySystemWithOwners(data.systemAddress, function(planetList) {
+				let retour = {};
+
+				for(let i=0; i<planetList.length; i++) {
+					let p = planetList[i];
+
+					retour[p.address] = {
+						name: p.name,
+						ownerName: p.owner.name,
+						points: p.points,
+						ally: p.owner.ally,
+					};
+				}
+
+				retour.systemAddress = data.systemAddress;
+
+				io.to(data.sid).emit("map-recieve-data", retour);
+			});
+		}
+
 		/**
 		 * Send planet data to user
 		 *
@@ -553,26 +565,6 @@ module.exports = class Planet {
 			}
 
 			return points;
-		}
-
-		/**
-		 * Filter planet & user data to be returned to a player
-		 *
-		 * @param      {object}  planet  The planet
-		 * @param      {object}  user    The user
-		 * @return     {object}  filtered data
-		 */
-		static filterOtherPlayerData(planetData,user) {
-			let returnData = {
-				name: planetData.name,
-				address: planetData.address,
-				ownerName: user.name,
-				planetType: planetData.planetType,
-				points: planetData.points,
-				ally: user.ally,
-			};
-
-			return returnData;
 		}
 
 		/**

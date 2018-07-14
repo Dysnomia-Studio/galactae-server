@@ -276,6 +276,37 @@ module.exports = {
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); } 
 			});
+		},
+		findBySystemWithOwners: function(systemAddr, callback) {
+			planets.find({ "address": new RegExp("^" + systemAddr, "i") }, function(err, planetList) {
+				if(err) { log(err); return; }
+
+				let pList = [];
+
+				let ended = 0;
+				for(let i=0; i<planetList.length; i++) {
+					let id = i;
+
+					db.player.searchById(planetList[id].owner, function(user) {
+						pList[id] = planetList[id].toJSON();
+
+						pList[id].owner = {
+							name: user.name,
+							ally: user.ally
+						};
+
+						ended++;
+
+						if(ended == planetList.length) {
+							callback(pList);
+						}
+					});
+				}
+
+				if(planetList.length == 0) {
+					callback(planetList);
+				}
+			});
 		}
 	},
 
