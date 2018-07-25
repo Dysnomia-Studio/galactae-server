@@ -129,11 +129,7 @@ module.exports = function() {
       * @return     {boolean}   True if the variable is set, False otherwise
       */
     this.isset = function(variable) {
-		if(variable===0 || (typeof variable !== 'undefined' && variable != null && variable != {} && variable != "")) {
-			return true;
-		} else {
-			return false;
-		}
+		return (variable===0 || (typeof variable !== 'undefined' && variable != null && variable != {} && variable != ""));
 	};
 	/**
 	 * Normalize a text to be compatible with sockets
