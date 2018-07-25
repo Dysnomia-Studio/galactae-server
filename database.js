@@ -157,6 +157,8 @@ let privileges;
 let servers;
 let userGameIds;
 let bans;
+let globalRanks;
+let sectorRanks;
 
 module.exports = {
 	Schema: Schema,
@@ -412,7 +414,7 @@ module.exports = {
 
 	stat: {
 		submit: function(currTime) {
-			data = {};
+			let data = {};
 			data._id = new mongoose.Types.ObjectId();
 			data.plCount = plCount;
 			data.time = currTime;
