@@ -556,8 +556,8 @@ module.exports = class Units {
 					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
 				} else if(unitList[u].shipType == "SHIP_CARRIER") {
 					for(let p in unitList[u].parts) {
-						if(unitList[u].parts[p].type.substr(0,6) == "hangar") {
-							fighterCap += hangarSize[unitList[u].parts[p].type] * fleet.units[f][1];
+						if(unitList[u].parts[p].type == "hangar") {
+							fighterCap += hangarSize[unitList[u].parts[p].tech] * fleet.units[f][1];
 						}
 					}
 				}
