@@ -5,23 +5,37 @@ let Schema = mongoose.Schema;
  * Server schemas
  */
 let planetSchema = new Schema({
+	// General informations
 	_id: Schema.Types.ObjectId,
 	name: String,
 	address: String,
 	owner: Schema.Types.ObjectId,
-	resources: Array,
-	Buildings: Array,
+	points: Number,
+
+	// Geographic informations
+	orbitDist: Number,
+	orbitDuration: Number,
+	galacticPos: Array,
 	planetType: Number,
+
+	// Buildings
+	Buildings: Array,
 	nextBuilding: Number,
 	nextBuildingTime: Number,
+	
+	// Resources	
+	resources: Array,
 	lastResourcesUpdate: Number,
-	lastUnitUpdate: Number,
-	points: Number,
-	currResearch: String,
+
+	// Units
 	unitBuildingID: String,
 	unitBuildingCount: Number,
 	unitBuildingEndTime: Number,
 	unitBuildingFleetID: Schema.Types.ObjectId,
+	lastUnitUpdate: Number,
+
+	// Misc
+	currResearch: String,
 });
 
 let userSchema = new Schema({
@@ -144,6 +158,8 @@ let privileges;
 let servers;
 let userGameIds;
 let bans;
+let globalRanks;
+let sectorRanks;
 
 module.exports = {
 	Schema: Schema,
@@ -263,6 +279,37 @@ module.exports = {
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); } 
 			});
+		},
+		findBySystemWithOwners: function(systemAddr, callback) {
+			planets.find({ "address": new RegExp("^" + systemAddr, "i") }, function(err, planetList) {
+				if(err) { log(err); return; }
+
+				let pList = [];
+
+				let ended = 0;
+				for(let i=0; i<planetList.length; i++) {
+					let id = i;
+
+					db.player.searchById(planetList[id].owner, function(user) {
+						pList[id] = planetList[id].toJSON();
+
+						pList[id].owner = {
+							name: user.name,
+							ally: user.ally
+						};
+
+						ended++;
+
+						if(ended == planetList.length) {
+							callback(pList);
+						}
+					});
+				}
+
+				if(planetList.length == 0) {
+					callback(planetList);
+				}
+			});
 		}
 	},
 
@@ -368,7 +415,7 @@ module.exports = {
 
 	stat: {
 		submit: function(currTime) {
-			data = {};
+			let data = {};
 			data._id = new mongoose.Types.ObjectId();
 			data.plCount = plCount;
 			data.time = currTime;
