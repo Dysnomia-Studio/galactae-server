@@ -706,4 +706,14 @@ module.exports = function() {
 		// "quests",
 		// "secondPlanet",
 	];
+
+	/**
+	 * Char filters
+	 */
+	this.unwantedCharAndString = [
+		['<',''],
+		['>',''],
+		['( . ) ( . )',''],
+		['(.)(.)',''],
+	];
 };

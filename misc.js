@@ -129,7 +129,15 @@ module.exports = function() {
       * @return     {boolean}   True if the variable is set, False otherwise
       */
     this.isset = function(variable) {
-		return (variable===0 || (typeof variable !== 'undefined' && variable != null && variable != {} && variable != ""));
+		return (variable===0 || 
+            (typeof variable !== 'undefined' && 
+                variable != null && 
+                variable != {} && 
+                (typeof variable !== "string" || (
+                    variable != "" && 
+                    variable.split(" ").join("") != ""
+                ))
+            ));
 	};
 	/**
 	 * Normalize a text to be compatible with sockets
@@ -168,6 +176,13 @@ module.exports = function() {
             str = str.split(smileys[i][0]).join(smileys[i][1]);
         }
 
+        return str;
+    };
+
+    this.filterUnwantedChars = function(str) {
+        for(let i=0; i<unwantedCharAndString.length; i++) {
+            str = str.split(unwantedCharAndString[i][0]).join(unwantedCharAndString[i][1]);
+        }
         return str;
     };
 

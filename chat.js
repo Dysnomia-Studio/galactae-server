@@ -114,24 +114,16 @@ module.exports = class Chat {
 	 */
 	static protect(data) {
 		let str = data.message;
+		if(!str) { str = ""; }
 
-		let replace = [
-			['( . )( . )',''],
-			['( . ) ( . )',''],
-			['(.) (.)',''],
-			['(.)(.)',''],
-		];
-
-		for(let i=0; i<replace.length; i++) {
-			str = str.split(replace[i][0]).join(replace[i][1]);
-		}
+		str = filterUnwantedChars(str);
 		str = normalizeText(str);
 
 		// Empty message
 		if(str.split(" ").join("") == "") { data.send = false; }
 
         /* Disable links */
-        if(str!=str.replace('://','') || str!=str.replace('www.','')) {
+        if(str!=str.split('://').join('') || str!=str.split('www.').join('')) {
         	data.send = false;
         	Chat.sendSM(data.sid,"NO_LINKS");
         }

@@ -20,8 +20,32 @@ describe('• misc', function() {
 				false
 			);
 		});
-		it('isset(defined)', function() {
+		it('isset(defined number)', function() {
 			var test = 1;
+			assert.equal(
+				isset(test),
+				true
+			);
+		});
+
+		it('isset(empty string)', function() {
+			var test = "";
+			assert.equal(
+				isset(test),
+				false
+			);
+		});
+
+		it('isset(spaces string)', function() {
+			var test = " ";
+			assert.equal(
+				isset(test),
+				false
+			);
+		});
+
+		it('isset(defined string)', function() {
+			var test = "abcd";
 			assert.equal(
 				isset(test),
 				true
@@ -79,6 +103,21 @@ describe('• misc', function() {
 			assert.equal(
 				textToSmileys(":D test :)"),
 				"😃 test 🙂"
+			);
+		});
+	});
+
+	describe('# filterUnwantedChars()', function() {
+		it('Blacklisted ascii smileys: filterUnwantedChars("normal message")', function() {
+			assert.equal(
+				filterUnwantedChars("normal message"),
+				"normal message"
+			);
+		});
+		it('Blacklisted ascii smileys: filterUnwantedChars("normal message")', function() {
+			assert.equal(
+				filterUnwantedChars("< test"),
+				" test"
 			);
 		});
 	});

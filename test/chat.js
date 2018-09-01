@@ -6,6 +6,9 @@ let assert = require('assert');
 /**
  * My libs
  */
+require('../calcConstants')();
+require('../misc')();
+
 global.Chat = require('../chat');
 global.io = class { // Prevent bugs, it's temporary
 	static to() { return new io(); }
@@ -89,29 +92,6 @@ describe('• Chat', function() {
 			assert.equal(
 				data.send,
 				false
-			);
-		});
-
-		it('Blacklisted ascii smileys: protect("normal message")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="normal message";
-
-			let data = Chat.protect(inData);
-
-			assert.equal(
-				data.message,
-				"normal message"
-			);
-		});
-		it('Blacklisted ascii smileys: protect("normal message")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="( . )( . ) test";
-
-			let data = Chat.protect(inData);
-
-			assert.equal(
-				data.message,
-				" test"
 			);
 		});
 	});

@@ -66,6 +66,99 @@ module.exports = class Units {
 		return totalCost;
 	}
 
+	static checkShipParts(ship) {
+		let subprop = "";
+		let supprop = "";
+
+		for(let i in ship) {
+			if(i=="name" || i=="type" || i=="shape") { continue; }
+			// Check if that kind of part exists in that kind of ship
+			let valid = false;
+			for(let type in shipShapesDetails[ship.type][ship.shape].content) {
+				if(type==ship[i].type) {
+					valid = true;
+					break;
+				}
+			}
+
+			// Check if that part exists in that kind of ship
+			if(valid) {
+				valid = false;
+				for(let j=0; j<shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
+					if(isset(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]) && shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
+						valid = true;
+						break;
+					}
+				}
+			}
+
+			// Check if technology exists in that kind of ship
+			if(valid) {
+				valid = false;
+				for(let j=0; j<shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
+					if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
+						valid = true;
+						break;
+					}
+				}
+			}
+
+			// Prevent different subengines
+			if(valid && ship[i].type == "sub_propulsion") {
+				if(subprop == "") {
+					subprop = ship[i].value;
+				} else if(subprop != ship[i].value) {
+					valid = false;
+				}
+			}
+			// Prevent different supengines
+			if(valid && ship[i].type == "sup_propulsion") {
+				if(supprop == "") {
+					supprop = ship[i].value;
+				} else if(supprop != ship[i].value) {
+					valid = false;
+				}
+			}
+
+			// Stop check if not valid
+			if(!valid) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	static checkIfSameParts(ship1, ship2) {
+		// Sort
+		ship1.parts.sort(function(a,b) {
+			if(a.name < b.name) {
+				return -1;
+			}
+			return 1;
+		});
+
+		ship2.parts.sort(function(a,b) {
+			if(a.name < b.name) {
+				return -1;
+			}
+			return 1;
+		});
+
+		// Compare
+		let duplicate = true;
+		for(let i=0; i<ship2.parts.length; i++) {
+			for(let id in ship2.parts[i]) {
+				if(ship2.parts[i][id] !== ship1.parts[i][id]) {
+					duplicate = false;
+					break;
+				}
+			}
+		}
+
+		return duplicate;
+	}
+
 	/**
 	 * Creates an unit type.
 	 *
@@ -73,7 +166,6 @@ module.exports = class Units {
 	 * @param      {<type>}  data    Data given by client
 	 */
 	static createType(data) {
-		let errors = 0;
 		let message = "";
 		let ship = data.ship;
 
@@ -81,28 +173,17 @@ module.exports = class Units {
 		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
 
 		// Filter name
-		let replace = [
-			['<',''],
-			['>',''],
-			['( . ) ( . )',''],
-			['(.)(.)',''],
-		];
-
-		for(let i=0; i<replace.length; i++) {
-			ship.name = ship.name.split(replace[i][0]).join(replace[i][1]);
-		}
+		ship.name = filterUnwantedChars(ship.name );
 
 		// Check entries valdity
 		for(let i in ship) {
 			// Empty fields
 			if(i=="name" || i=="type" || i=="shape") { // In facts, the two last verifications won't display error, but they're here to simplify the else
 				if(ship[i].split(' ').join('')=="") {
-					errors ++;
 					message = "SHIP_HAS_NO_NAME";
 					break;
 				} 
-			} else if(ship[i].value==undefined || ship[i].value.split(' ').join('') == "" || ship[i].type==undefined || ship[i].type.split(' ').join('') == "") {
-				errors ++;
+			} else if(!isset(ship[i].value) || !isset(ship[i].type)) {
 				message = "SHIP_HAS_EMPTY_FIELD";
 				break;
 			}
@@ -110,88 +191,28 @@ module.exports = class Units {
 
 		// Wrong type/shape
 		if(shipShapesDetails[ship.type]==undefined || shipShapesDetails[ship.type][ship.shape]==undefined) {
-			errors ++;
 			message = "SHIP_HAS_WRONG_TYPE_OR_SHAPE";
 		}
 
-		if(errors==0) {
-			let subprop = "";
-			let supprop = "";
-
-			for(let i in ship) {
-				if(i=="name" || i=="type" || i=="shape") { continue; }
-				// Check if that kind of part exists in that kind of ship
-				let valid = false;
-				for(let type in shipShapesDetails[ship.type][ship.shape].content) {
-					if(type==ship[i].type) {
-						valid = true;
-						break;
-					}
-				}
-
-				// Check if that part exists in that kind of ship
-				if(valid) {
-					valid = false;
-					for(let j=0; shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
-						if(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
-							valid = true;
-							break;
-						}
-					}
-				}
-
-				// Check if technology exists in that kind of ship
-				if(valid) {
-					valid = false;
-					for(let j=0; shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
-						if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
-							valid = true;
-							break;
-						}
-					}
-				}
-
-				// Prevent different subengines
-				if(ship[i].type == "sub_propulsion") {
-					if(subprop == "") {
-						subprop = ship[i].value;
-					} else if(subprop != ship[i].value) {
-						valid = false;
-					}
-				}
-				// Prevent different supengines
-				if(ship[i].type == "sup_propulsion") {
-					if(supprop == "") {
-						supprop = ship[i].value;
-					} else if(supprop != ship[i].value) {
-						valid = false;
-					}
-				}
-
-				if(!valid) {
-					errors++;
-					message = "SHIP_HAS_INVALID_PARTS";
-					break;
-				}
-			}
+		if(!isset(message) && !checkShipParts(ship)) {
+			message = "SHIP_HAS_INVALID_PARTS";
 		}
 
 		// Last check
-		if(errors==0) {
+		if(!isset(message)) {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
 				for(let i in ship) {
 					if(i=="name" || i=="type" || i=="shape") { continue; }
 
 					if(shipResearchDependencies[ship[i].value]!=undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
-						errors++;
 						message = "NEEDED_RESEARCH_MISSING";
 						break;
 					}
 				}
 
 				// Saving
-				if(errors==0) {
+				if(!isset(message)) {
 					// Save to database
 					let shipToSave = {
 						name: ship.name,
@@ -234,40 +255,7 @@ module.exports = class Units {
 								unitList[currObj].shipShape == shipToSave.shipShape &&
 								unitList[currObj].parts.length == shipToSave.parts.length) {
 
-								// Sort
-								unitList[currObj].parts.sort(function(a,b) {
-									if(a.name < b.name) {
-										return -1;
-									}
-									if(a.name > b.name) {
-										return 1;
-									}
-
-									return 0;
-								});
-
-								shipToSave.parts.sort(function(a,b) {
-									if(a.name < b.name) {
-										return -1;
-									}
-									if(a.name > b.name) {
-										return 1;
-									}
-
-									return 0;
-								});
-
-								// Compare
-								duplicate = true;
-								for(let i=0; i<shipToSave.parts.length; i++) {
-									for(let id in shipToSave.parts[i]) {
-										if(shipToSave.parts[i][id] !== unitList[currObj].parts[i][id]) {
-											duplicate = false;
-											break;
-										}
-									}
-								}
-
+								duplicate = checkIfSameParts(unitList[currObj], shipToSave);
 								if(duplicate) {
 									break;
 								}
@@ -278,7 +266,7 @@ module.exports = class Units {
 							db.unit.create(shipToSave, function() {
 								// Notify client
 								log(data.username + " has succed to create new unit type named " + ship.name,"success");
-								Units.refreshUnits(data);
+								Units.refresh(data);
 							});
 						} else if(duplicate) {
 							message = "SHIP_TYPE_ALREADY_EXISTS";
