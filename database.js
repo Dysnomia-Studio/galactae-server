@@ -15,6 +15,7 @@ let planetSchema = new Schema({
 	// Geographic informations
 	orbitDist: Number,
 	orbitDuration: Number,
+	galacticPos: Array,
 	planetType: Number,
 
 	// Buildings
@@ -578,7 +579,7 @@ module.exports = {
 					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
 						let min = rank;
 
-						if(isset(userList)) { // Changement(s) de rang à faire ?
+						if(isset(userList) && isset(isset(userList[0]))) { // Changement(s) de rang à faire ?
 							min = userList[0].rank;
 
 							for(let i=1; i<userList.length; i++) {
@@ -691,7 +692,7 @@ module.exports = {
 					db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
 						let min = rank;
 
-						if(isset(userList)) { // Changement(s) de rang à faire ?
+						if(isset(userList) && isset(isset(userList[0]))) { // Changement(s) de rang à faire ?
 							min = userList[0].rank;
 
 							for(let i=1; i<userList.length; i++) {
