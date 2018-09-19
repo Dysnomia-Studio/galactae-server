@@ -61,6 +61,18 @@ describe('• Chat', function() {
 			);
 		});
 
+		it('Empty tests: protect(" ")', function() {
+			let inData = JSON.parse(JSON.stringify(dataModel));
+			inData.message=undefined;
+			
+			let data = Chat.protect(inData);
+
+			assert.equal(
+				data.send,
+				false
+			);
+		});
+
 		it('Link tests: protect("without link")', function() {
 			let inData = JSON.parse(JSON.stringify(dataModel));
 			inData.message="normal message";
