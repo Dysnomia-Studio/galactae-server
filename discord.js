@@ -37,7 +37,11 @@ module.exports = {
 			}
 		});
 
+		client.on('error', console.error);
+
 		client.login(token);
+
+		return client;
 	},
 	/**
 	 * Transmit a message to discord
