@@ -11,9 +11,26 @@ module.exports = class Fleet {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		//@TODO: Recalc fleet positions
-		db.fleet.findByMotherPlanet(pid,function(fleet) {
-			if(fleet==undefined) { fleet = []; }
+		db.fleet.findByMotherPlanet(pid, function(fleet) {
+			if(fleet === undefined) { fleet = []; }
+
+			let haveToDone = 0;
+			let done = 0;
+			for(let i=0; i<fleet.length; i++) {
+				let id = i;
+
+				if(fleet[id].endMoveTime != -1 && fleet[id].endMoveTime <= Date.now()) {
+					haveToDone++;
+					fleet[id].endMoveTime=-1;
+
+					db.fleet.update(fleet[id], function() {
+						if(++done == haveToDone) {
+							Fleet.refresh(fleet[id].motherPlanetId, sid);
+						}
+					});
+				}
+			}
+
 			io.to(sid).emit("fleet-recieve-data", fleet);
 		});
 	}
