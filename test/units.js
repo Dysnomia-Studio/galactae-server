@@ -8,7 +8,7 @@ let assert = require('assert');
  */
 require('../calcConstants')();
 require('../misc')();
-let Fleet = require('../fleet')
+let Fleet = require('../fleet');
 let Units = require('../units');
 
 describe('• Units', function() {
@@ -76,6 +76,26 @@ describe('• Units', function() {
 				true
 			);
 		});
+
+		it('Ship w/ invalid part type', function() {
+			let ship = { 
+				type: "SHIP_CARRIER", 
+				shape: "SHIP_CARRIER_MEDIUM", 
+				hangar_1: { value: "none", type: "hangar" },
+				hangar_2: { value: "hangarSimple", type: "hangar" },
+				hangar_3: { value: "hangarSimple", type: "hangar" },
+				hangar_4: { value: "hangarDouble", type: "trucbizzard" },
+				prop_1: { value: "ion", type: "sub_propulsion" },
+				prop_2: { value: "vsl", type: "sup_propulsion" },
+				shield_1: { value: "magnetic", type: "shield" },
+			};
+
+			assert.equal(
+				Units.checkShipParts(ship),
+				false
+			);
+		});
+			
 
 		it('Ship w/ invalid part', function() {
 			let ship = { 
@@ -186,7 +206,7 @@ describe('• Units', function() {
 		});*/
 	});
 
-	describe('# checkShipParts()', function() {
+	describe('# checkIfSameParts()', function() {
 		it('Same Ships', function() {
 			let ship1 = { 
 				parts:  [
@@ -198,6 +218,26 @@ describe('• Units', function() {
 				parts:  [
 					{ tech: "vsolaire", type: "sub_propulsion", name: "prop_1" }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: "railgun", type: "cannon", name: "cannon_1" }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
+				]
+			};
+
+			assert.deepEqual(
+				Units.checkIfSameParts(ship1, ship2),
+				true
+			);
+		});
+
+		it('Same Ships (reverse order)', function() {
+			let ship1 = { 
+				parts:  [
+					{ tech: "vsolaire", type: "sub_propulsion", name: "prop_1" }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
+					{ tech: "railgun", type: "cannon", name: "cannon_1" }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
+				]
+			};
+			let ship2 = { 
+				parts:  [
+					{ tech: "railgun", type: "cannon", name: "cannon_1" }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
+					{ tech: "vsolaire", type: "sub_propulsion", name: "prop_1" }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 				]
 			};
 

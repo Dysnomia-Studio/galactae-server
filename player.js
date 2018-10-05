@@ -125,7 +125,7 @@ module.exports = class Player {
 			currTutorial: playerData.currTutorial,
 		});
 
-		Units.refreshUnits(data);
+		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				userNewResearch.id = userNewResearch._id;

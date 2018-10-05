@@ -40,6 +40,7 @@ global.Discord   = require('./discord');
 // Then include other classes
 global.Chat      = require('./chat');
 global.Combat    = require('./combat');
+global.Fleet 	 = require('./fleet');
 global.GameMap   = require('./map');
 global.Planet    = require('./planet');
 global.Player    = require('./player');
@@ -60,7 +61,7 @@ db.connect(function(success,general=false) {
 	}
 
 	if(!general) {
-		db.player.clearList();
+		//db.player.clearList();
 	}
 
 	if(general) {

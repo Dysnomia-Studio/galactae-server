@@ -69,7 +69,7 @@ describe('• Fleet', function() {
 			let engines = {
 				"vsolaire": 1, // 0
 				"ion": 2, // 21364
-				"plasma": 3, // 21732
+				"pplasma": 3, // 21732
 			};
 
 			assert.equal(

@@ -1,25 +1,17 @@
 module.exports = class GameMap {
-	static getPlanetCoords(angle, radius) {
+	static getPlanetCoords(angle, diameter) {
 		return [
-			0.5 + 0.5*radius*Math.cos(angle),
-			0.5 + 0.5*radius*Math.sin(angle),
-		];
+			0.5*diameter*Math.cos(angle),
+			0.5*diameter*Math.sin(angle),
+		]; // Aucun besoin de constantes (50% + ... ) étant donné qu'on les soustrait
 	}
 
 	static getPlanetDistance(from, to, when) {
-		// @TODO: Get from db both planets
-		// @TODO: Check if exists
-		// @TODO: Calc coords
+		let angleDepart = (2* Math.PI) - (when%from.orbitDuration / from.orbitDuration) * (2* Math.PI);
+		let anglArrivee = (2* Math.PI) - (when%to.orbitDuration / to.orbitDuration) * (2* Math.PI);
 
-		/*
-		let angle = (when%periode / periode) * (2* Math.PI);
-
-		if(planets[i].id == from) {
-			coordsDepart = GameMap.getPlanetCoords(angle, planetDist);
-		} else if(planets[i].id == to) {
-			coordsArrivee = GameMap.getPlanetCoords(angle, planetDist);
-		}
-		*/
+		let coordsDepart = GameMap.getPlanetCoords(angleDepart, from.orbitDist);
+		let coordsArrivee = GameMap.getPlanetCoords(anglArrivee, to.orbitDist);
 
 		return Math.sqrt(
 			Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 

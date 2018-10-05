@@ -134,7 +134,6 @@ module.exports = function() {
                 variable != null && 
                 variable != {} && 
                 (typeof variable !== "string" || (
-                    variable != "" && 
                     variable.split(" ").join("") != ""
                 ))
             ));
@@ -207,6 +206,8 @@ module.exports = function() {
                 return 3600000*count;
             case "m": // Minutes
                 return 60000*count;
+            case "s": // Seconds
+                return 1000*count;
             default: // Wrong unit
                 return -1;
         }

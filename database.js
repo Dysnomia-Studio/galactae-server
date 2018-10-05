@@ -195,14 +195,14 @@ module.exports = {
 		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		mongoSrv.once('open', function() {
 			log('Successfuly connected to server database.');
-			callback(true);
+			callback(true,false,mongoSrv);
 		});	
 
 
 		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		mongoGen.once('open', function() {
 			log('Successfuly connected to general database.');
-			callback(true,true);
+			callback(true,true,mongoGen);
 		});	
 	},
 
@@ -248,9 +248,9 @@ module.exports = {
 		},
 		clearList: function() {
 			log("Clearing player list ...");
-			let conditions = { }
-						  , update = { $set: { sid: "-1" } }
-						  , options = { multi: true };
+			let conditions = { },
+				update = { $set: { sid: "-1" } },
+				options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
@@ -272,31 +272,35 @@ module.exports = {
 			});
 		},
 		update: function(data) {
-			let conditions = { _id: data._id }
-						  , update = { $set: data }
-						  , options = { multi: true };
+			let conditions = { _id: data._id },
+							update = { $set: data },
+							options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); } 
 			});
 		},
 		findBySystemWithOwners: function(systemAddr, callback) {
-			planets.find({ "address": new RegExp("^" + systemAddr, "i") }, function(err, planetList) {
+			planets.find({ "address": new RegExp("^" + systemAddr + "-", "i") }, function(err, planetList) {
 				if(err) { log(err); return; }
 
 				let pList = [];
 
 				let ended = 0;
+				let inId = 0;
 				for(let i=0; i<planetList.length; i++) {
 					let id = i;
 
-					db.player.searchById(planetList[id].owner, function(user) {
-						pList[id] = planetList[id].toJSON();
+					pList[id] = planetList[id].toJSON();
 
-						pList[id].owner = {
-							name: user.name,
-							ally: user.ally
-						};
+					db.player.searchById(planetList[id].owner, function(user) {
+						if(isset(user)) {
+							pList[id].ownerName = user.name;
+							pList[id].ally = user.ally;
+						} else {
+							pList[id].ownerName = null;
+							pList[id].ally = null;
+						}
 
 						ended++;
 
