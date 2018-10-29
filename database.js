@@ -517,7 +517,8 @@ module.exports = {
 				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si non creer
+				
+				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 					
@@ -625,7 +626,8 @@ module.exports = {
 				sector: data.sector
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si non creer
+
+				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
