@@ -82,7 +82,9 @@ module.exports = class Chat {
 
 						data.send = false;
 					} else { // Normal messages
-						data.username = "<span class=\"staff\">" + rank + " " + data.username + "</span>";
+						if(data.lvl > 1) {
+							data.username = "<span class=\"staff\">" + rank + " " + data.username + "</span>";
+						}
 
 						if(!data.noname) {
 							data.message = "<strong>"+ data.username +" :</strong> "+ data.message;

@@ -492,7 +492,7 @@ module.exports = class Planet {
 		Planet.find(data,data.planet,0,function(planetReturned) {
 			if(data.planet!=planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
-				log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !',"fail");
+				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !',"fail");
 				return;
 			}
 
@@ -513,7 +513,7 @@ module.exports = class Planet {
 			];
 
 			for(let i=0; i<replace.length; i++) {
-				data.name = data.name.split(replace[i][0]).join(replace[i][1])
+				data.name = data.name.split(replace[i][0]).join(replace[i][1]);
 			}
 
 			log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.planet+'), new name: '+data.name);
