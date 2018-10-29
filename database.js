@@ -41,21 +41,28 @@ let planetSchema = new Schema({
 let userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
-	planetlist: Array,
+	gvt: Number,
 	ally: String,
 	sid: String,
-	gvt: Number,
-	money: Number,
-	points: Number,
-	lastConnected: Number,
-	dayBonusStreak: Number,
-	dayBonusBest: Number,
+
+	planetlist: Array,
+
+	currTutorial: Number,
+
 	beginnerProtectEnd: Number,
-	lastBonus: Number,
+
+	lastConnected: Number,
 	lastAction: Number,
+
+	points: Number,
+	money: Number,
+	// Research
 	lastResearchUpdate: Number,
 	research: Array,
-	currTutorial: Number,
+	// Bonus journalier
+	lastBonus: Number,
+	dayBonusStreak: Number,	
+	dayBonusBest: Number,
 });
 
 let unitsSchema = new Schema({
@@ -287,7 +294,6 @@ module.exports = {
 				let pList = [];
 
 				let ended = 0;
-				let inId = 0;
 				for(let i=0; i<planetList.length; i++) {
 					let id = i;
 

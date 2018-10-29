@@ -490,7 +490,7 @@ module.exports = class Planet {
 	 */
 	static rename(data) {
 		Planet.find(data,data.planet,0,function(planetReturned) {
-			if(data.planet!=planetReturned.id) { // Stop if not belonging
+			if(data.planet!=planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: "ERROR_NOT_BELONGING" });
 				log(data.username+' failed to change name  on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !',"fail");
 				return;
