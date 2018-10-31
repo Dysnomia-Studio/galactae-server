@@ -106,7 +106,7 @@ module.exports = function() {
 			[0,0,0], // Metallurgie
 			[0.4,9,-5], // Living
 			[0,0,0], // Serres
-			[0.4,9,-5], // Solar panel
+			[0.7,3,-3], // Solar panel
 			[0,0,0], // Warehouse
 			[0,0,0], // Hedquarters
 			[0.85,3,3], // Launching Center
