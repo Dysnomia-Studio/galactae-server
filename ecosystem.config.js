@@ -1,0 +1,1 @@
+module.exports={apps:[{name:"galactae-server",script:"app.js",args:"",instances:1,autorestart:true,watch:true,kill_timeout:1e4}]};

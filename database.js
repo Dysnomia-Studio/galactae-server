@@ -41,21 +41,28 @@ let planetSchema = new Schema({
 let userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
-	planetlist: Array,
+	gvt: Number,
 	ally: String,
 	sid: String,
-	gvt: Number,
-	money: Number,
-	points: Number,
-	lastConnected: Number,
-	dayBonusStreak: Number,
-	dayBonusBest: Number,
+
+	planetlist: Array,
+
+	currTutorial: Number,
+
 	beginnerProtectEnd: Number,
-	lastBonus: Number,
+
+	lastConnected: Number,
 	lastAction: Number,
+
+	points: Number,
+	money: Number,
+	// Research
 	lastResearchUpdate: Number,
 	research: Array,
-	currTutorial: Number,
+	// Bonus journalier
+	lastBonus: Number,
+	dayBonusStreak: Number,	
+	dayBonusBest: Number,
 });
 
 let unitsSchema = new Schema({
@@ -161,14 +168,17 @@ let bans;
 let globalRanks;
 let sectorRanks;
 
+let mongoSrv;
+let mongoGen;
+
 module.exports = {
 	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		let mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
-		let mongoGen = mongoose.createConnection('***REMOVED***');
+		mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		mongoGen = mongoose.createConnection('***REMOVED***');
 
 		/**
 		 * Server schemas
@@ -195,15 +205,22 @@ module.exports = {
 		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		mongoSrv.once('open', function() {
 			log('Successfuly connected to server database.');
-			callback(true);
+			callback(true,false,mongoSrv);
 		});	
 
 
 		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
 		mongoGen.once('open', function() {
 			log('Successfuly connected to general database.');
-			callback(true,true);
+			callback(true,true,mongoGen);
 		});	
+	},
+
+	closeConnections: function(callback) {
+		mongoSrv.close();
+		mongoSrv.close();
+
+		callback();
 	},
 
 	/**
@@ -248,9 +265,9 @@ module.exports = {
 		},
 		clearList: function() {
 			log("Clearing player list ...");
-			let conditions = { }
-						  , update = { $set: { sid: "-1" } }
-						  , options = { multi: true };
+			let conditions = { },
+				update = { $set: { sid: "-1" } },
+				options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
@@ -272,16 +289,16 @@ module.exports = {
 			});
 		},
 		update: function(data) {
-			let conditions = { _id: data._id }
-						  , update = { $set: data }
-						  , options = { multi: true };
+			let conditions = { _id: data._id },
+							update = { $set: data },
+							options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); } 
 			});
 		},
 		findBySystemWithOwners: function(systemAddr, callback) {
-			planets.find({ "address": new RegExp("^" + systemAddr, "i") }, function(err, planetList) {
+			planets.find({ "address": new RegExp("^" + systemAddr + "-", "i") }, function(err, planetList) {
 				if(err) { log(err); return; }
 
 				let pList = [];
@@ -290,13 +307,16 @@ module.exports = {
 				for(let i=0; i<planetList.length; i++) {
 					let id = i;
 
-					db.player.searchById(planetList[id].owner, function(user) {
-						pList[id] = planetList[id].toJSON();
+					pList[id] = planetList[id].toJSON();
 
-						pList[id].owner = {
-							name: user.name,
-							ally: user.ally
-						};
+					db.player.searchById(planetList[id].owner, function(user) {
+						if(isset(user)) {
+							pList[id].ownerName = user.name;
+							pList[id].ally = user.ally;
+						} else {
+							pList[id].ownerName = null;
+							pList[id].ally = null;
+						}
 
 						ended++;
 
@@ -507,7 +527,8 @@ module.exports = {
 				user_id: data.user_id
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si non creer
+				
+				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 					
@@ -579,7 +600,7 @@ module.exports = {
 					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
 						let min = rank;
 
-						if(isset(userList)) { // Changement(s) de rang à faire ?
+						if(isset(userList) && isset(userList[0])) { // Changement(s) de rang à faire ?
 							min = userList[0].rank;
 
 							for(let i=1; i<userList.length; i++) {
@@ -615,7 +636,8 @@ module.exports = {
 				sector: data.sector
 			}, function(error, obj) {
 				if(error) { log(error); }
-				if(!isset(obj)) { // Si non creer
+
+				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data._id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
@@ -692,7 +714,7 @@ module.exports = {
 					db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
 						let min = rank;
 
-						if(isset(userList)) { // Changement(s) de rang à faire ?
+						if(isset(userList) && isset(userList[0])) { // Changement(s) de rang à faire ?
 							min = userList[0].rank;
 
 							for(let i=1; i<userList.length; i++) {
