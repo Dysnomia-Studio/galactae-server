@@ -1,4 +1,8 @@
 # NEVER ADD THIS FILES
 config.js
 keys/*
-test/*
+node_modules/*
+*.bat
+.scannerwork/*
+reports/*
+config.doxygen
