@@ -257,22 +257,7 @@ module.exports = class Websocket {
 							Websocket.endMaintenance();
 							break;
 						case "restart":
-							preventConnection = true;
-							preventConnection = 'RESTARTING_SERVER';
-							io.emit('server-reboot');
-							Discord.alert('Restarting game server ...');
-
-							let decompte = 15;
-							
-							setInterval(function() {
-								if(decompte>0) {
-									log('Restarting server in ' + decompte-- + ' seconds');
-								} else {
-									log('Restarting now !');
-									process.exit(); // Well, the pm2 auto restart will do its work
-								}
-								
-							},1000);
+							Websocket.restart();
 							break;
 						case "start":
 							// Can't do this now ... Waiting a way (@ADD)
@@ -340,5 +325,29 @@ module.exports = class Websocket {
 			server.server_maintenance = false;
 			db.server.update(server);
 		});
+	}
+
+	/**
+	 * Restart server
+	 */
+	static restart(callback) {
+		preventConnection = true;
+		preventConnectionMsg = 'RESTARTING_SERVER';
+		io.emit('server-reboot');
+		Discord.alert('Restarting game server ...');
+
+		let decompte = 5;
+		
+		setInterval(function() {
+			if(decompte>0) {
+				log('Restarting server in ' + decompte-- + ' seconds');
+			} else {
+				log('Restarting now !');
+				    db.closeConnections(function() {
+					process.exit(0);
+				});
+			}
+			
+		},1000);
 	}
 };

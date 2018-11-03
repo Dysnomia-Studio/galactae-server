@@ -168,14 +168,17 @@ let bans;
 let globalRanks;
 let sectorRanks;
 
+let mongoSrv;
+let mongoGen;
+
 module.exports = {
 	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		let mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
-		let mongoGen = mongoose.createConnection('***REMOVED***');
+		mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		mongoGen = mongoose.createConnection('***REMOVED***');
 
 		/**
 		 * Server schemas
@@ -211,6 +214,13 @@ module.exports = {
 			log('Successfuly connected to general database.');
 			callback(true,true,mongoGen);
 		});	
+	},
+
+	closeConnections: function(callback) {
+		mongoSrv.close();
+		mongoSrv.close();
+
+		callback();
 	},
 
 	/**
