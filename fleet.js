@@ -59,7 +59,7 @@ module.exports = class Fleet {
 			let newFleet = {
 				name: data.fleetName,
 				ownerId: data.id,
-				motherPlanetId: data.planet,
+				motherPlanetId: planetData.id,
 				position: planetData.address,
 				orbitPosition: 0,
 				points: 0,
