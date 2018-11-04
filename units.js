@@ -182,7 +182,7 @@ module.exports = class Units {
 			message = "SHIP_HAS_WRONG_TYPE_OR_SHAPE";
 		}
 
-		if(!isset(message) && !checkShipParts(ship)) {
+		if(!isset(message) && !Units.checkShipParts(ship)) {
 			message = "SHIP_HAS_INVALID_PARTS";
 		}
 
