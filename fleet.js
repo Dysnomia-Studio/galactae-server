@@ -40,7 +40,7 @@ module.exports = class Fleet {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(data.planet, function(fleetReturned) {
+		db.fleet.findByMotherPlanet(planetData.id, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
 				Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
@@ -70,7 +70,7 @@ module.exports = class Fleet {
 
 			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
-				Fleet.refresh(data.planet,data.sid);
+				Fleet.refresh(planetData.id,data.sid);
 
 				if(callback) { callback(newFleet); }
 			});
