@@ -73,6 +73,7 @@ module.exports = class Planet {
 					orbitDist: p.orbitDist,
 					orbitDuration: p.orbitDuration,
 					galacticPos: p.galacticPos,
+					planetType: p.planetType
 				};
 			}
 
