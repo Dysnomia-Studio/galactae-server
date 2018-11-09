@@ -40,16 +40,18 @@ module.exports = class Fleet {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(planetData.id, function(fleetReturned) {
+		db.fleet.findByMotherPlanet(planetData._id, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
+				log(data.username + " failed to create a new fleet on " + planetData.name + " because it has maximal fleet count.");
 				Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
 				return;
 			}
 
 			// Check name
 			for(let i=0; i<fleetReturned.length; i++) {
-				if(fleetReturned[i].name == data.fleetName) {
+				if(fleetReturned[i].name === data.fleetName) {
+					log(data.username + " failed to create a new fleet on " + planetData.name + " because a fleet with this name already exists.");
 					Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
 					return;
 				}
@@ -59,7 +61,7 @@ module.exports = class Fleet {
 			let newFleet = {
 				name: data.fleetName,
 				ownerId: data.id,
-				motherPlanetId: planetData.id,
+				motherPlanetId: planetData._id,
 				position: planetData.address,
 				orbitPosition: 0,
 				points: 0,
