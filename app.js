@@ -95,6 +95,9 @@ db.connect(function(success,general=false) {
 	}
 });
 
+/**
+ * Graceful stop
+ */
 process.on('SIGINT', function() {
     Websocket.restart();
 });
