@@ -123,20 +123,35 @@ module.exports = class Research {
 
 	static sendResearchDataToUser(data, userResearch) {
 		// Send data to client
-		var researchOut = {};
+		let researched = [];
 
 		for(let i=0; i<userResearch.length; i++) {
 			// Check if you have parent research
 			let researchedParent = false;
 			let parentsList = researchList[userResearch[i][0]].parents;
 			for(let j in parentsList) {
-				if(parentsList[j] == "researchCenter" || Research.getResearch({research: userResearch},parentsList[j]) ==-1) {
+				if(parentsList[j] === "researchCenter" || Research.getResearch({research: userResearch},parentsList[j]) === -1) {
 					researchedParent = true;
 					break;
 				}	
 			}
 
-			if(parentsList.length == 0 || researchedParent) {
+			if(userResearch[i][0] === "researchCenter" || researchedParent) {
+				for(let j in parentsList) {
+					if(researched.indexOf(parentsList[j]) === -1) {
+						researched.push(parentsList[j]);
+					}
+				}
+
+				if(researched.indexOf(userResearch[i][0]) === -1) {
+					researched.push(userResearch[i][0]);
+				}
+			}
+		}
+
+		let researchOut = {};
+		for(let i=0; i<userResearch.length; i++) {
+			if(researched.indexOf(userResearch[i][0]) !== -1) {
 				researchOut[userResearch[i][0]] = userResearch[i][1];
 			}
 		}
