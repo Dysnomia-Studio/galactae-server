@@ -191,6 +191,28 @@ module.exports = function() {
 			[3029,10533,18000], // He3exp
 		],
 	};
+	this.buildingParents = [];
+	this.buildingParents[9] = { // Radar
+		research: ['misc_telemetrie','misc_em'],
+		building: [ [7, 2] ], // Launching Center lvl 2
+	};
+	this.buildingParents[10] = { // Tank
+		research: [],
+		building: [ [7, 8] ], // Launching Center lvl 8
+	};
+	this.buildingParents[11] = { // Shipyard
+		research: ['prop_main'],
+		building: [ [7, 5] ], // Launching Center lvl 5
+	};
+	this.buildingParents[12] = { // Trade
+		research: [],
+		building: [ [11, 5], [9, 1] ], // Shipyard lvl 5 & Radar lvl 1
+	};
+	this.buildingParents[13] = { // He3exp
+		research: [],
+		building: [ [7, 8] ], // Launching Center lvl 8
+	};
+	
 	/**
 	 * Research
 	 */
@@ -272,70 +294,71 @@ module.exports = function() {
 
 	this.researchList = {
 		// Noeud Central
-		researchCenter: 	{ cost: 0, parents: [] },
-		industrialistion: 	{ cost: 8, parents: ['researchCenter'] },		
-		phyContemporaine: 	{ cost: 20, parents: ['researchCenter'] },	
-		thermodynamique: 	{ cost: 13, parents: ['researchCenter'] },
+		researchCenter: 			{ cost: 0, 		parents: [] },
+		industrialistion: 			{ cost: 8, 		parents: ['researchCenter'] },		
+		phyContemporaine: 			{ cost: 20, 	parents: ['researchCenter'] },	
+		thermodynamique: 			{ cost: 13, 	parents: ['researchCenter'] },
 		// Mise en orbite et propulsion
-		prop_main: 			{ cost: 380, parents: ['thermodynamique','misc_mecStellaire'] },
-		prop_vSolaire: 		{ cost: 2300, parents: ['prop_main','misc_phySolaire'] },
-		prop_ions: 			{ cost: 2000, parents: ['prop_main','misc_phyQuantique'] },
-		prop_plasma:		{ cost: 2500, parents: ['prop_ions','misc_phyQuantique'] },
-		prop_vsl: 			{ cost: 15000, parents: ['prop_ions','misc_advTelemetrie'] },
-		prop_wd: 			{ cost: 24000, parents: ['prop_vsl'] },
-		prop_hyperespace: 	{ cost: 35000, parents: ['prop_wd'] },
-		prop_manoeuvre: 	{ cost: 450, parents: ['prop_main'] },
-		prop_advManoeuvre: 	{ cost: 700, parents: ['prop_manoeuvre'] },
-		prop_suprastability:{ cost: 5000, parents: ['prop_vsl'] },
+		prop_main: 					{ cost: 380, 	parents: ['thermodynamique','misc_mecStellaire', [7,3] ] },
+		prop_vSolaire: 				{ cost: 2300, 	parents: ['prop_main','misc_phySolaire'] },
+		prop_ions: 					{ cost: 2000, 	parents: ['prop_main','misc_phyQuantique'] },
+		prop_plasma:				{ cost: 2500, 	parents: ['prop_ions','misc_phyQuantique'] },
+		prop_vsl: 					{ cost: 15000, 	parents: ['prop_ions','misc_advTelemetrie', [11, 5], [8, 10] ] },
+		prop_wd: 					{ cost: 24000, 	parents: ['prop_vsl', [11,10], ['planet', 2] ] },
+		prop_hyperespace: 			{ cost: 35000, 	parents: ['prop_wd', [11,20], ['planet', 5] ] },
+		prop_manoeuvre: 			{ cost: 450, 	parents: ['prop_main'] },
+		prop_advManoeuvre: 			{ cost: 700, 	parents: ['prop_manoeuvre'] },
+		prop_suprastability:		{ cost: 5000, 	parents: ['prop_vsl'] },
 		// Construction et production
-		cp_mecanisation: 	{ cost: 120, parents: ['industrialistion'] },
-		cp_tracteur: 	 	{ cost: 150, parents: ['industrialistion'] },
-		cp_materielTp: 		{ cost: 350, parents: ['cp_tracteur','misc_advTelemetrie'] },
-		cp_dbRaffinage: 	{ cost: 100, parents: ['industrialistion'] },
-		cp_molecular_compression: 	{ cost: 180, parents: ['industrialistion','misc_phyQuantique'] },
+		cp_mecanisation: 			{ cost: 120, 	parents: ['industrialistion'] },
+		cp_tracteur: 	 			{ cost: 150, 	parents: ['industrialistion', [9,1] ] },
+		cp_materielTp: 				{ cost: 350, 	parents: ['cp_tracteur','misc_advTelemetrie'] },
+		cp_dbRaffinage: 			{ cost: 100, 	parents: ['industrialistion'] },
+		cp_molecular_compression:	{ cost: 180, 	parents: ['industrialistion','misc_phyQuantique'] },
 		// Armes
-		wep_railgun:		{ cost: 50, parents: ['phyContemporaine'] },
-		wep_nuke:			{ cost: 180, parents: ['wep_railgun'] },
-		wep_laser:			{ cost: 260, parents: ['wep_railgun','misc_phyQuantique'] },
-		wep_plasma:			{ cost: 480, parents: ['wep_laser'] },
+		wep_railgun:				{ cost: 50, 	parents: ['phyContemporaine'] },
+		wep_nuke:					{ cost: 180, 	parents: ['wep_railgun'] },
+		wep_laser:					{ cost: 260, 	parents: ['wep_railgun','misc_phyQuantique'] },
+		wep_plasma:					{ cost: 480, 	parents: ['wep_laser'] },
 		// Shields & Defenses
-		def_turret:			{ cost: 450, parents: ['wep_railgun','misc_advTelemetrie'] },
-		def_shield_magnetic:{ cost: 750, parents: ['def_turret','misc_em'] },
-		def_shield_projector:{ cost: 1150, parents: ['def_shield_magnetic'] },
-		def_shield_singularity:{ cost: 1550, parents: ['def_shield_magnetic','misc_calcGravit'] },
+		def_turret:					{ cost: 450, 	parents: ['wep_railgun','misc_advTelemetrie'] },
+		def_shield_magnetic:		{ cost: 750, 	parents: ['def_turret','misc_em'] },
+		def_shield_projector:		{ cost: 1150, 	parents: ['def_shield_magnetic'] },
+		def_shield_singularity:		{ cost: 1550, 	parents: ['def_shield_magnetic','misc_calcGravit'] },
 		// Hangars
-		hangarDouble: 		{ cost: 2200, parents: ['carrier_small'] },
+		hangarDouble: 				{ cost: 2200, 	parents: ['carrier_small'] },
 		// Mines spatiales
-		wep_mines: 			{ cost: 380, parents: ['misc_calcGravit','misc_telemetrie'] },
-		wep_mines_nuke:		{ cost: 750, parents: ['wep_mines','wep_nuke'] },
-		wep_mines_iem:		{ cost: 550, parents: ['wep_mines','misc_em'] },
+		wep_mines: 					{ cost: 380, 	parents: ['misc_calcGravit','misc_telemetrie', [7,5] ] },
+		wep_mines_nuke:				{ cost: 750, 	parents: ['wep_mines','wep_nuke', [7,10]] },
+		wep_mines_iem:				{ cost: 550, 	parents: ['wep_mines','misc_em', [7,15]] },
 		// Figther
-		figther_light_interceptor: { cost: 550, parents: ['prop_main', 'misc_advTelemetrie'] },
-		figther_heavy_interceptor: { cost: 850, parents: ['figther_light_interceptor'] },
-		figther_bomber: 	{ cost: 1320, parents: ['figther_heavy_interceptor', 'wep_nuke'] },
+		figther_light_interceptor: 	{ cost: 550, 	parents: ['prop_main', 'misc_advTelemetrie'] },
+		figther_heavy_interceptor: 	{ cost: 850, 	parents: ['figther_light_interceptor'] },
+		figther_bomber: 			{ cost: 1320, 	parents: ['figther_heavy_interceptor', 'wep_nuke'] },
 		// Battlecruiser
-		battlecruiser_small: { cost: 2550, parents: ['prop_ions','misc_advTelemetrie'] },
+		battlecruiser_small: 		{ cost: 2550, 	parents: ['prop_ions','misc_advTelemetrie'] },
 		// Cuirasse
-		cuirasse_small: 	{ cost: 2580, parents: ['prop_ions','misc_advTelemetrie'] },
+		cuirasse_small: 			{ cost: 2580, 	parents: ['prop_ions','misc_advTelemetrie'] },
 		// Corvet
-		corvet_small: 		{ cost: 680, parents: ['prop_main', 'misc_advTelemetrie'] },
+		corvet_small: 				{ cost: 680, 	parents: ['prop_main', 'misc_advTelemetrie'] },
 		// Carrier
-		carrier_small: 		{ cost: 2580, parents: ['figther_light_interceptor','prop_ions'] },
-		carrier_medium: 	{ cost: 2850, parents: ['carrier_small'] },
+		carrier_small: 				{ cost: 2580, 	parents: ['figther_light_interceptor','prop_ions'] },
+		carrier_medium: 			{ cost: 2850, 	parents: ['carrier_small'] },
 		// Satellites
-		wep_sat_ag1:		{ cost: 360, parents: ['misc_calcGravit','misc_telemetrie'] },
-		wep_sat_ag2:		{ cost: 650, parents: ['wep_sat_ag1','misc_advTelemetrie'] },
-		wep_sat_ag3:		{ cost: 1500, parents: ['wep_sat_ag2'] },
+		wep_sat_ag1:				{ cost: 360, 	parents: ['misc_calcGravit','misc_telemetrie', [7,5] ] },
+		wep_sat_ag2:				{ cost: 650, 	parents: ['wep_sat_ag1','misc_advTelemetrie', [7,10]] },
+		wep_sat_ag3:				{ cost: 1500, 	parents: ['wep_sat_ag2', [7,15] ] },
 		// Autres recherches
-		misc_astronomie:	{ cost: 45, parents: ['phyContemporaine'] },
-		misc_telemetrie: 	{ cost: 90, parents: ['misc_astronomie'] },
-		misc_advTelemetrie: { cost: 320, parents: ['misc_telemetrie'] },
-		misc_mecStellaire: 	{ cost: 340, parents: ['misc_calcGravit'] },
-		misc_phyQuantique: 	{ cost: 120, parents: ['phyContemporaine'] },
-		misc_phySolaire: 	{ cost: 280, parents: ['misc_phyQuantique'] },
-		misc_calcGravit: 	{ cost: 240, parents: ['misc_astronomie'] },
-		misc_em: 			{ cost: 110, parents: ['phyContemporaine'] },
+		misc_astronomie:			{ cost: 45, 	parents: ['phyContemporaine'] },
+		misc_telemetrie: 			{ cost: 90, 	parents: ['misc_astronomie'] },
+		misc_advTelemetrie:			{ cost: 320, 	parents: ['misc_telemetrie'] },
+		misc_mecStellaire: 			{ cost: 600, 	parents: ['misc_calcGravit', 'misc_phySolaire'] },
+		misc_phyQuantique: 			{ cost: 120, 	parents: ['phyContemporaine', [8,3] ] },
+		misc_phySolaire: 			{ cost: 280, 	parents: ['misc_phyQuantique'] },
+		misc_calcGravit: 			{ cost: 240, 	parents: ['misc_astronomie'] },
+		misc_em: 					{ cost: 110, 	parents: ['phyContemporaine'] },
 	};
+	
 	/**
 	 * Units
 	 */

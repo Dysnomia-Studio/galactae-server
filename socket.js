@@ -6,7 +6,7 @@ module.exports = class Websocket {
 			*/
 			socket.on('game-connect', function(user) {
 				// Vars
-				if(!isset(user) || !isset(user.username) || !isset(user.id)) { return; }
+				if(!isset(user) || !isset(user.username) || !isset(user.id) || (!isset(user.pid) && user.pid !== '')) { return; }
 
 				if(preventConnection) {
 					Chat.sendSM(socket.id,preventConnectionMsg);

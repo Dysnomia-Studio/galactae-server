@@ -41,6 +41,39 @@ module.exports = class Research {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
 
+	static researchedParent(user, planet, researchName, allowBuildings=false) {
+		if(researchList[researchName] === undefined) { return; }
+
+		for(let i in researchList[researchName].parents) {
+			let currentParent = researchList[researchName].parents[i];
+
+			if(typeof currentParent === 'string') {
+				if((!isset(currentParent) ||
+					Research.getResearch(user,currentParent)!=-1) &&
+					currentParent != "researchCenter") { // Recherche
+
+					return false;
+				}
+			} else if(
+				typeof currentParent === 'object' &&
+				typeof currentParent[0] === 'number') { // Batiment
+
+				if(!allowBuildings && planet.Buildings[currentParent[0]] < currentParent[1]) {
+					return false;
+				}
+			} else if(
+				typeof currentParent === 'object' &&
+				typeof currentParent[0] === 'string') { // Planete
+
+				if(currentParent[0] === 'planet' && userReturned.planetlist.length < currentParent[1]) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	static recalc(user,researchData,callback,i=0) {
 		let time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
@@ -82,15 +115,7 @@ module.exports = class Research {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
-				let researchedParent = true;
-				for(let i in researchList[researchData].parents) {
-					if((!isset(researchList[researchData].parents[i]) ||
-						Research.getResearch(userNewResearch,researchList[researchData].parents[i])!=-1) &&
-						researchList[researchData].parents[i] != "researchCenter") {
-						researchedParent = false;
-						break;
-					}
-				}
+				let researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchData);
 
 				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 				
@@ -106,35 +131,33 @@ module.exports = class Research {
 
 				Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 
-				Research.sendResearchDataToUser(data, userNewResearch.research);
+				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 			});
-		});
+		}); 
 	}
 
 	static sync(data) {
+		console.info(data); // pid
 		db.player.searchByName(data.username,function(userReturned) {
 			Research.refreshUserResearch(userReturned, function(userNewResearch) {
-				db.player.update(userNewResearch);
+				db.planets.find(data.pid, function(planetReturned) {
+					db.player.update(userNewResearch);
 
-				Research.sendResearchDataToUser(data, userNewResearch.research);
+					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+				});
 			});
 		});
 	}
 
-	static sendResearchDataToUser(data, userResearch) {
+	static sendResearchDataToUser(data, planet, user) {
 		// Send data to client
 		let researched = [];
+		let userResearch = user.research;
 
 		for(let i=0; i<userResearch.length; i++) {
 			// Check if you have parent research
-			let researchedParent = false;
+			let researchedParent = Research.researchedParent(user, planet, userResearch[i][0], true);
 			let parentsList = researchList[userResearch[i][0]].parents;
-			for(let j in parentsList) {
-				if(parentsList[j] === "researchCenter" || Research.getResearch({research: userResearch},parentsList[j]) === -1) {
-					researchedParent = true;
-					break;
-				}	
-			}
 
 			if(userResearch[i][0] === "researchCenter" || researchedParent) {
 				for(let j in parentsList) {

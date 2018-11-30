@@ -91,6 +91,7 @@ let fleetsSchema = new Schema({
 	population: Number,
 	inBuilding: Boolean,
 	fuel: Number,
+	maxFuel: Number,
 });
 
 let statsSchema = new Schema({

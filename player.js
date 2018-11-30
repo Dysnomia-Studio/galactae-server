@@ -132,9 +132,15 @@ module.exports = class Player {
 					db.player.update(userNewResearch, function() {
 					plCount++;
 
-					Research.sendResearchDataToUser(data, userNewResearch.research);
+					if(data.pid == "" || userNewResearch.planetlist.indexOf(data.pid) === -1) {
+						data.pid = userNewResearch.planetlist[0];
+					}
 
-					Planet.refresh(data,0); // THIS HAVE TO BE AFTER RESEARCHS
+					db.planet.find(data.pid, function(planetReturned) {
+						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+
+						Planet.refresh(data, 0); // THIS HAVE TO BE AFTER RESEARCHS
+					});
 				});
 			});
 		});

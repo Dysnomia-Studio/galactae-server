@@ -68,6 +68,8 @@ module.exports = class Fleet {
 				endMoveTime: -1,
 				units: [],
 				population: 0,
+				fuel: 0,
+				maxFuel: 0
 			};
 
 			db.fleet.create(newFleet, function(newFleet) {
