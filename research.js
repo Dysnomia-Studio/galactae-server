@@ -41,8 +41,10 @@ module.exports = class Research {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
 
-	static researchedParent(user, planet, researchName, allowBuildings=false) {
+	static researchedParent(user, planet, researchName, atleastOne=false) {
 		if(researchList[researchName] === undefined) { return; }
+
+		let count = 0;
 
 		for(let i in researchList[researchName].parents) {
 			let currentParent = researchList[researchName].parents[i];
@@ -52,23 +54,35 @@ module.exports = class Research {
 					Research.getResearch(user,currentParent)!=-1) &&
 					currentParent != "researchCenter") { // Recherche
 
-					return false;
+					if(!atleastOne) {
+						return false;
+					}
+				} else {
+					count++;
 				}
 			} else if(
 				typeof currentParent === 'object' &&
 				typeof currentParent[0] === 'number') { // Batiment
 
-				if(!allowBuildings && planet.Buildings[currentParent[0]] < currentParent[1]) {
+				if(!atleastOne && planet.Buildings[currentParent[0]] < currentParent[1]) {
 					return false;
+				} else {
+					count++;
 				}
 			} else if(
 				typeof currentParent === 'object' &&
 				typeof currentParent[0] === 'string') { // Planete
 
-				if(!allowBuildings && currentParent[0] === 'planet' && user.planetlist.length < currentParent[1]) {
+				if(!atleastOne && currentParent[0] === 'planet' && user.planetlist.length < currentParent[1]) {
 					return false;
+				} else {
+					count++;
 				}
 			}
+		}
+
+		if(count==0 && researchList[researchName].parents.length > 0) {
+			return false;
 		}
 
 		return true;
