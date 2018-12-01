@@ -135,7 +135,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
-				   	Research.ChangePlanetResearch(data,data.pid,data.research);
+				   	Research.ChangePlanetResearch(data,data.research);
 				});
 			});
 			socket.on('research-sync', function(data) {

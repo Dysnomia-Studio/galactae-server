@@ -106,8 +106,9 @@ module.exports = class Research {
 		});
 	}
 
-	static ChangePlanetResearch(data,pid,researchData) {
-		if(!isset(researchList[researchData])) { return; }
+	static ChangePlanetResearch(data, researchName) {
+		if(!isset(researchList[researchName])) { return; }
+
 		Planet.find(data,data.pid,0,function(planetReturned,userReturned,fleetReturned) {
 			if(!isset(planetReturned) || !isset(userReturned)) { return; }
 
@@ -115,15 +116,16 @@ module.exports = class Research {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
-				let researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchData);
+				let researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
 
 				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 				
-				if(researchedParent && researchList[researchData] != undefined) { // Just check if it exists ...
-					newData.currResearch = researchData;
+				if(researchedParent && researchList[researchName] != undefined) { // Just check if it exists ...
+					newData.currResearch = researchName;
 				}
 
 				if(!researchedParent) {
+					log(data.username + " wants to change research on " + data.pid + " to " + data.research + " but don't have all needed parents.","error");
 					Websocket.SendMessageToClient({ sid: data.sid, message: "MISSING_PARENTS"});
 				}
 
@@ -140,7 +142,7 @@ module.exports = class Research {
 		console.info(data); // pid
 		db.player.searchByName(data.username,function(userReturned) {
 			Research.refreshUserResearch(userReturned, function(userNewResearch) {
-				db.planets.find(data.pid, function(planetReturned) {
+				db.planet.find(data.pid, function(planetReturned) {
 					db.player.update(userNewResearch);
 
 					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
