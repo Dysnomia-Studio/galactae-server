@@ -65,7 +65,7 @@ module.exports = class Research {
 				typeof currentParent === 'object' &&
 				typeof currentParent[0] === 'string') { // Planete
 
-				if(currentParent[0] === 'planet' && userReturned.planetlist.length < currentParent[1]) {
+				if(!allowBuildings && currentParent[0] === 'planet' && user.planetlist.length < currentParent[1]) {
 					return false;
 				}
 			}
