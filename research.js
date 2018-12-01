@@ -66,8 +66,6 @@ module.exports = class Research {
 
 				if(!atleastOne && planet.Buildings[currentParent[0]] < currentParent[1]) {
 					return false;
-				} else {
-					count++;
 				}
 			} else if(
 				typeof currentParent === 'object' &&
@@ -75,8 +73,6 @@ module.exports = class Research {
 
 				if(!atleastOne && currentParent[0] === 'planet' && user.planetlist.length < currentParent[1]) {
 					return false;
-				} else {
-					count++;
 				}
 			}
 		}
