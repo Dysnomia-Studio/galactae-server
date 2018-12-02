@@ -34,7 +34,7 @@ module.exports = class Units {
 			let addCost = shipCosts[parts[id].tech];
 
 			for(let i=0; i<6; i++) {
-				if(shipShape.substr(0,12) == 'SHIP_FIGHTER') {
+				if(shipShape.substr(0,12) === 'SHIP_FIGHTER') {
 					addCost[i] *= fighterMult[shipShape];
 				}
 				
@@ -44,7 +44,7 @@ module.exports = class Units {
 
 		// Round this
 		for(let i=0; i<6; i++) {
-			if(i != 4) {
+			if(i !== 4) {
 				totalCost[i] = Math.round(totalCost[i]);
 			} else {
 				totalCost[i] = Math.round(totalCost[i]*100)/100;
@@ -59,11 +59,11 @@ module.exports = class Units {
 		let supprop = '';
 
 		for(let i in ship) {
-			if(i=='name' || i=='type' || i=='shape') { continue; }
+			if(i==='name' || i==='type' || i==='shape') { continue; }
 			// Check if that kind of part exists in that kind of ship
 			let valid = false;
 			for(let type in shipShapesDetails[ship.type][ship.shape].content) {
-				if(type==ship[i].type) {
+				if(type===ship[i].type) {
 					valid = true;
 					break;
 				}
@@ -92,18 +92,18 @@ module.exports = class Units {
 			}
 
 			// Prevent different subengines
-			if(valid && ship[i].type == 'sub_propulsion') {
-				if(subprop == '') {
+			if(valid && ship[i].type === 'sub_propulsion') {
+				if(subprop === '') {
 					subprop = ship[i].value;
-				} else if(subprop != ship[i].value) {
+				} else if(subprop !== ship[i].value) {
 					valid = false;
 				}
 			}
 			// Prevent different supengines
-			if(valid && ship[i].type == 'sup_propulsion') {
-				if(supprop == '') {
+			if(valid && ship[i].type === 'sup_propulsion') {
+				if(supprop === '') {
 					supprop = ship[i].value;
-				} else if(supprop != ship[i].value) {
+				} else if(supprop !== ship[i].value) {
 					valid = false;
 				}
 			}
@@ -158,7 +158,7 @@ module.exports = class Units {
 		let ship = data.ship;
 
 		// That block 90% of tries to crash
-		if(ship.name==undefined || ship.shape==undefined || ship.type==undefined) { return; }
+		if(ship.name===undefined || ship.shape===undefined || ship.type===undefined) { return; }
 
 		// Filter name
 		ship.name = filterUnwantedChars(ship.name );
@@ -166,8 +166,8 @@ module.exports = class Units {
 		// Check entries valdity
 		for(let i in ship) {
 			// Empty fields
-			if(i=='name' || i=='type' || i=='shape') { // In facts, the two last verifications won't display error, but they're here to simplify the else
-				if(ship[i].split(' ').join('')=='') {
+			if(i==='name' || i==='type' || i==='shape') { // In facts, the two last verifications won't display error, but they're here to simplify the else
+				if(ship[i].split(' ').join('')==='') {
 					message = 'SHIP_HAS_NO_NAME';
 					break;
 				} 
@@ -178,7 +178,7 @@ module.exports = class Units {
 		}
 
 		// Wrong type/shape
-		if(shipShapesDetails[ship.type]==undefined || shipShapesDetails[ship.type][ship.shape]==undefined) {
+		if(shipShapesDetails[ship.type]===undefined || shipShapesDetails[ship.type][ship.shape]===undefined) {
 			message = 'SHIP_HAS_WRONG_TYPE_OR_SHAPE';
 		}
 
@@ -193,7 +193,7 @@ module.exports = class Units {
 				for(let i in ship) {
 					if(i=='name' || i=='type' || i=='shape') { continue; }
 
-					if(shipResearchDependencies[ship[i].value]!=undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+					if(shipResearchDependencies[ship[i].value] !== undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
 						message = 'NEEDED_RESEARCH_MISSING';
 						break;
 					}
@@ -216,7 +216,7 @@ module.exports = class Units {
 					};
 
 					for(let i in ship) {
-						if(i=='name' || i=='type' || i=='shape') { continue; }
+						if(i==='name' || i==='type' || i==='shape') { continue; }
 						
 						shipToSave.parts.push({
 							type: ship[i].type,
@@ -227,21 +227,21 @@ module.exports = class Units {
 
 					shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
 
-					if(shipToSave.cost[0] == -1) { return; } // There's something wrong ... Security measure
+					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure
 
 					db.unit.findByOwner(data.id,function(unitList) {
 						let duplicate = false;
 						let duplicateName = false;
 
 						for(let currObj in unitList) {
-							if(unitList[currObj].name == shipToSave.name) {
+							if(unitList[currObj].name === shipToSave.name) {
 								duplicateName = true;
 								break;
 							}
 
-							if(unitList[currObj].shipType == shipToSave.shipType && 
-								unitList[currObj].shipShape == shipToSave.shipShape &&
-								unitList[currObj].parts.length == shipToSave.parts.length) {
+							if(unitList[currObj].shipType === shipToSave.shipType && 
+								unitList[currObj].shipShape === shipToSave.shipShape &&
+								unitList[currObj].parts.length === shipToSave.parts.length) {
 
 								duplicate = checkIfSameParts(unitList[currObj], shipToSave);
 								if(duplicate) {
@@ -282,7 +282,7 @@ module.exports = class Units {
 
 	static renameType(data) {
 		db.unit.find(data.shipId, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId !== data.id) { return; }
 
 			unitReturned.name = data.shipNewName;
 
@@ -295,9 +295,9 @@ module.exports = class Units {
 
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId !== data.id) { return; }
 
-			if(unitReturned.owned != 0) {
+			if(unitReturned.owned !== 0) {
 				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
 				Websocket.SendMessageToClient({sid: data.sid, message: 'MODEL_DELETE_USED_BY_UNITS'});
 				return;
@@ -322,7 +322,7 @@ module.exports = class Units {
 	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
-			if(!isset(planetReturned.owner) || planetReturned.owner != inputData.id) { return; }
+			if(!isset(planetReturned.owner) || planetReturned.owner !== inputData.id) { return; }
 
 			let newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
@@ -332,33 +332,33 @@ module.exports = class Units {
 				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
-			let id = (inputData.unit.substr(0,14) == 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
+			let id = (inputData.unit.substr(0,14) === 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,14) == 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
+				if(inputData.unit.substr(0,14) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
 					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
-				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
+				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId !== inputData.id) { return; }
 				// Check defence fleet
-				if(inputData.fleet == -2 && unitReturned.shipType != 'SHIP_DEF') { return; }
-				if(unitReturned.shipType == 'SHIP_DEF') { inputData.fleet = -2; }
+				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') { return; }
+				if(unitReturned.shipType === 'SHIP_DEF') { inputData.fleet = -2; }
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
-					if(fleet._id == inputData.fleet || fleet.id == inputData.fleet) {
+					if(fleet._id === inputData.fleet || fleet.id === inputData.fleet) {
 						choosenFleet = fleet;
 					}
 
-					if(inputData.fleet == -2 && fleet.name == 'SHIP_DEF') {
+					if(inputData.fleet === -2 && fleet.name === 'SHIP_DEF') {
 						choosenFleet = fleet;
 					}
 				});
 				
 				// Auto create def fleet if not existing
-				if(choosenFleet === undefined && inputData.fleet == -2) { 
+				if(choosenFleet === undefined && inputData.fleet === -2) { 
 					inputData.fleet = -1;
 					inputData.fleetName = 'SHIP_DEF';
 				}
@@ -411,7 +411,7 @@ module.exports = class Units {
 						// Update planet 
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0,14) != 'SHIP_WEP_MINES') {
+						if(inputData.unit.substr(0,14) !== 'SHIP_WEP_MINES') {
 							// Update unit
 							let newUnit = unitReturned.toJSON();
 							newUnit.owned += inputData.count;
@@ -431,7 +431,7 @@ module.exports = class Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_UNIT_OK' });
 					}
 
-					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
+					if(inputData.fleet === -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
@@ -442,13 +442,13 @@ module.exports = class Units {
 						Fleet.create(inputData,newPlanet,function(fleetReturned) {
 							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
-					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
+					} else if(inputData.fleet !== -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
-						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { 
+						if(choosenFleet.position !== newPlanet.address || choosenFleet.orbitPosition !== 0) { 
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
-						if(''+choosenFleet.motherPlanetId != ''+newPlanet._id) { return; }
+						if(''+choosenFleet.motherPlanetId !== ''+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) { 
@@ -468,7 +468,7 @@ module.exports = class Units {
 	}
 
 	static getSpeed(speed, tech) {
-		if(speed[0] == -1) { // First sup propulsion part
+		if(speed[0] === -1) { // First sup propulsion part
 			if(shipPartsSpeed[tech] === undefined) { 
 				log('Speed is not defined for part ' + tech,'error');
 				return [];
@@ -489,7 +489,7 @@ module.exports = class Units {
 		let count = 0;
 
 		for(let i in unit.parts) {
-			if(unit.parts[i].type == 'sub_propulsion') {
+			if(unit.parts[i].type === 'sub_propulsion') {
 				tech = unit.parts[i].tech;
 				count++;
 
@@ -507,7 +507,7 @@ module.exports = class Units {
 		let count = 0;
 
 		for(let i in unit.parts) {
-			if(unit.parts[i].type == 'sup_propulsion') {
+			if(unit.parts[i].type === 'sup_propulsion') {
 				tech = unit.parts[i].tech;
 				count++;
 				

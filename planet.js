@@ -103,7 +103,7 @@ module.exports = class Planet {
 	 * @return     {Object}  The minerals ratio.
 	 */
 	static GetMineralsRatio(type) {
-		if(planetRatios[type]!=undefined) {
+		if(planetRatios[type] !== undefined) {
 			return planetRatios[type];	
 		} else {
 			return planetRatios[0];
@@ -268,14 +268,14 @@ module.exports = class Planet {
 
 				if(!BlockBuild) {
 					// Research bonus
-						if(Research.getResearch(userReturned,'cp_mecanisation') == -1) {
+						if(Research.getResearch(userReturned,'cp_mecanisation') === -1) {
 							timeSpeed += researchBonus.cp_mecanisation;
 						}
 						if(data.building>8) {
-							if(Research.getResearch(userReturned,'cp_tracteur') == -1) {
+							if(Research.getResearch(userReturned,'cp_tracteur') === -1) {
 								timeSpeed += researchBonus.cp_tracteur;
 							}
-							if(Research.getResearch(userReturned,'cp_materielTp') == -1) {
+							if(Research.getResearch(userReturned,'cp_materielTp') === -1) {
 								timeSpeed += researchBonus.cp_materielTp;
 							}
 						}
@@ -315,9 +315,9 @@ module.exports = class Planet {
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
 		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-			let id = (planetIn.unitBuildingID.substr(0,14) == 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
+			let id = (planetIn.unitBuildingID.substr(0,14) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
 			db.unit.find(id, function(unitReturned) {
-				if(planetIn.unitBuildingID.substr(0,14) == 'SHIP_WEP_MINES') {
+				if(planetIn.unitBuildingID.substr(0,14) === 'SHIP_WEP_MINES') {
 					unitReturned = {};
 					unitReturned._id = planetIn.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
@@ -344,7 +344,7 @@ module.exports = class Planet {
 				 	unitCount = restantDepuisSynchro - restant;				 	
 				}
 
-				if(unitCount == 0) { return; } // Prevent some bugs
+				if(unitCount === 0) { return; } // Prevent some bugs
 				
 				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
 					unitCount = planetIn.unitBuildingCount;
@@ -352,7 +352,7 @@ module.exports = class Planet {
 
 				let set = false;
 				for(let i=0; i<newFleet.units.length; i++) {
-					if(''+newFleet.units[i][0] == ''+planetIn.unitBuildingID) {
+					if(''+newFleet.units[i][0] === ''+planetIn.unitBuildingID) {
 						newFleet.units[i][1] += unitCount;
 						set=true;
 						break;
@@ -396,7 +396,7 @@ module.exports = class Planet {
 		data.points = Math.round(data.points);
 
 		// Update buildings
-		if(currTime>data.nextBuildingTime && data.nextBuilding != -1) {
+		if(currTime>data.nextBuildingTime && data.nextBuilding !== -1) {
 			data.Buildings[data.nextBuilding]++;
 
 			Websocket.sendNotification(user.sid, 'building', { building: data.nextBuilding, lvl: data.Buildings[data.nextBuilding] });
@@ -406,7 +406,7 @@ module.exports = class Planet {
 		}
 
 		// Update units
-		if(data.unitBuildingEndTime != -1) {
+		if(data.unitBuildingEndTime !== -1) {
 			Planet.UpdateUnits(planetIn,user,currTime);
 		}
 
@@ -453,8 +453,8 @@ module.exports = class Planet {
 
 		// Buildings
 		for(let i=0; i<14; i++) {
-			if(buildings[i]==0) { continue; }
-			if(i==planetData.nextBuilding) {
+			if(buildings[i]===0) { continue; }
+			if(i===planetData.nextBuilding) {
 				// Current in-build building
 				cons += parseInt(Planet.GetBuildingCost(i,buildings[i] + 1).habitants);
 				continue; 
@@ -491,7 +491,7 @@ module.exports = class Planet {
 	 */
 	static rename(data) {
 		Planet.find(data,data.planet,0,function(planetReturned) {
-			if(data.planet!=planetReturned.address) { // Stop if not belonging
+			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');
 				return;
@@ -500,7 +500,7 @@ module.exports = class Planet {
 			// Planetes sans nom ...
 			let empty = true;
 			for(let i=0; i<data.name.length; i++) {
-				if(data.name[i]!=' ') {
+				if(data.name[i]!==' ') {
 					empty = false;
 				 	break;
 				}
@@ -537,7 +537,7 @@ module.exports = class Planet {
 		let Dtime = Date.now()-dataIn.nextBuildingTime;
 		let resources = dataIn.resources;
 
-		if(Dtime<0 || dataIn.nextBuildingTime==-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+		if(Dtime<0 || dataIn.nextBuildingTime===-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
@@ -596,7 +596,7 @@ module.exports = class Planet {
 				                         - (buildCost['habitants'][build][0]*Math.pow((level-1),2) +	buildCost['habitants'][build][1]*(level-1) + buildCost['habitants'][build][2])),
 		};
 
-		if(level == 1) {
+		if(level === 1) {
 			retour.habitants_difference = retour.habitants;
 			retour.energy_difference = retour.energy;
 		}

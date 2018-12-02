@@ -2,7 +2,7 @@ module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
 		db.player.searchBySid(user.sid,function(searchSid) {
-			if(isset(searchSid) && searchSid.name==user.username && searchSid.id == user.id) {
+			if(isset(searchSid) && searchSid.name===user.username && searchSid.id === user.id) {
 				if(Player.canAct(searchSid)) { // Don't spam
 					callback(user);
 
@@ -57,7 +57,7 @@ module.exports = class Player {
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
-							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist != 1) {
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== 1) {
 							
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
 							// @ADD: Kick & Message
@@ -79,7 +79,7 @@ module.exports = class Player {
 	}
 
 	static traitementsConnexion(data, dataReturned) {
-		if(data.id!=dataReturned.id) {
+		if(data.id !== dataReturned.id) {
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
 			return;
@@ -87,7 +87,7 @@ module.exports = class Player {
 
 		// Kick double accounts
 		let oldSid = dataReturned.sid;
-		if(oldSid != '-1') {
+		if(oldSid !== '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
 			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
 		}
@@ -132,7 +132,7 @@ module.exports = class Player {
 					db.player.update(userNewResearch, function() {
 					plCount++;
 
-					if(data.pid == '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
+					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
 						data.pid = userNewResearch.planetlist[0];
 					}
 
@@ -208,7 +208,7 @@ module.exports = class Player {
 		let points = 0;
 
 		for(let i=0; i<user.research.length; i++) {
-			if(user.research[i][1]==-1 && isset(researchList[user.research[i][0]].cost)) {
+			if(user.research[i][1]===-1 && isset(researchList[user.research[i][0]].cost)) {
 				points+=researchList[user.research[i][0]].cost;
 			}	
 		}
@@ -268,10 +268,10 @@ module.exports = class Player {
 			let helium = 0;
 			let streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
-			if(streak==1) { credits = 15; }
-			else if(streak==2) { credits = 25; }
-			else if(streak==3) { credits = 50; }
-			else if(streak==4) { credits = 80; }
+			if(streak===1) { credits = 15; }
+			else if(streak===2) { credits = 25; }
+			else if(streak===3) { credits = 50; }
+			else if(streak===4) { credits = 80; }
 			else if(streak<10) { credits = 100; }
 			else if(streak<20) { 
 				credits = 10*(streak + 1); // 110 to 200
@@ -283,9 +283,9 @@ module.exports = class Player {
 				credits = 1000;
 			} // @ADD: generate random special bonus
 
-			if(choice==2 && helium!=0) {
+			if(choice===2 && helium!==0) {
 				Planet.find(userData,userData.pid,0,function(planetReturned) {
-					if(userData.pid!=planetReturned.id) { // Stop if not belonging
+					if(userData.pid!==planetReturned.id) { // Stop if not belonging
 						Websocket.SendMessageToClient({ sid: userData.sid, message: 'ERROR_NOT_BELONGING' });
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !','fail');
 						return;

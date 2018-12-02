@@ -19,12 +19,12 @@ module.exports = class Fleet {
 			for(let i=0; i<fleet.length; i++) {
 				let id = i;
 
-				if(fleet[id].endMoveTime != -1 && fleet[id].endMoveTime <= Date.now()) {
+				if(fleet[id].endMoveTime !== -1 && fleet[id].endMoveTime <= Date.now()) {
 					haveToDone++;
-					fleet[id].endMoveTime=-1;
+					fleet[id].endMoveTime = -1;
 
 					db.fleet.update(fleet[id], function() {
-						if(++done == haveToDone) {
+						if(++done === haveToDone) {
 							Fleet.refresh(fleet[id].motherPlanetId, sid);
 						}
 					});
@@ -98,13 +98,13 @@ module.exports = class Fleet {
 
 		for(let u in unitList) {
 			for(let f in fleet.units) {
-				if(fleet.units[f][0] != unitList[u]._id) { continue; }
+				if(fleet.units[f][0] !== unitList[u]._id) { continue; }
 
-				if(unitList[u].shipType == 'SHIP_FIGHTER') {
+				if(unitList[u].shipType === 'SHIP_FIGHTER') {
 					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
-				} else if(unitList[u].shipType == 'SHIP_CARRIER') {
+				} else if(unitList[u].shipType === 'SHIP_CARRIER') {
 					for(let p in unitList[u].parts) {
-						if(unitList[u].parts[p].type == 'hangar') {
+						if(unitList[u].parts[p].type === 'hangar') {
 							fighterCap += hangarSize[unitList[u].parts[p].tech] * fleet.units[f][1];
 						}
 					}
@@ -139,7 +139,7 @@ module.exports = class Fleet {
 
 			min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
 
-			if(min.engines[curr.tech] == undefined) {
+			if(min.engines[curr.tech] === undefined) {
 				min.engines[curr.tech] = 0;
 			}
 			min.engines[curr.tech] += curr.count;
@@ -155,7 +155,7 @@ module.exports = class Fleet {
 		};
 
 		for(let i=0; i<unitList.length; i++) {
-			if(unitList[i].shipType == 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
+			if(unitList[i].shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
 			let curr = Units.calcSupraSpeed(unitList[i]);
 
@@ -163,7 +163,7 @@ module.exports = class Fleet {
 
 			min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
 
-			if(min.engines[curr.tech] == undefined) {
+			if(min.engines[curr.tech] === undefined) {
 				min.engines[curr.tech] = 0;
 			}
 			min.engines[curr.tech] += curr.count;
@@ -197,8 +197,8 @@ module.exports = class Fleet {
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
 			if(!isset(fleetReturned)) { log('fleet not found'); return; } // Does this fleet exists
-			if(fleetReturned.ownerId != user.id) { log('user doesn\'t own ths fleet'); return; }
-			if(fleetReturned.name == 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
+			if(fleetReturned.ownerId !== user.id) { log('user doesn\'t own ths fleet'); return; }
+			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' }); 
@@ -210,7 +210,7 @@ module.exports = class Fleet {
 				return;
 			}
 
-			if(fleetReturned.position == destination) { // Current planet
+			if(fleetReturned.position === destination) { // Current planet
 				log(user.username + ' failed to move fleet because fleet is already at destination.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_AT_DESTINATION' }); 
 				return;
@@ -225,14 +225,14 @@ module.exports = class Fleet {
 			systemeArrivee = systemeArrivee.join('-');
 
 			Fleet.getUnitsList(fleetReturned.units, function(unitList) {
-				if(systemeDepart != systemeArrivee && !Fleet.hasEnoughCarrier(fleetReturned, unitList)) {
+				if(systemeDepart !== systemeArrivee && !Fleet.hasEnoughCarrier(fleetReturned, unitList)) {
 					log(user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.');
 					Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_CARRIER' });
 					return;
 				}
 
 				let minSpeed;
-				if(systemeDepart == systemeArrivee) {
+				if(systemeDepart === systemeArrivee) {
 					minSpeed = Fleet.getMinSubSpeed(unitList);
 				} else {
 					minSpeed = Fleet.getMinSupraSpeed(unitList);
@@ -253,7 +253,7 @@ module.exports = class Fleet {
 						}
 
 						let time;
-						if(systemeDepart == systemeArrivee) {
+						if(systemeDepart === systemeArrivee) {
 							let baseDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
@@ -296,7 +296,7 @@ module.exports = class Fleet {
 
 						db.player.searchById(user.id, function(foundUser) {
 							let instability = time * 0.001 * (Math.random() - 0.5);
-							if(Research.getResearch(foundUser, 'prop_suprastability') == -1) {
+							if(Research.getResearch(foundUser, 'prop_suprastability') === -1) {
 								instability /= 2;
 							}
 

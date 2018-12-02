@@ -51,10 +51,10 @@ module.exports = function() {
 				break;
 			default:
 		}
-		if(nodate==false||nodate==undefined) { text = logdate() + ' ' + text;}
+		if(nodate === false || nodate === undefined) { text = logdate() + ' ' + text;}
 
 		console.log(text);
-		if(adminSid != '') {
+		if(adminSid !== '') {
 			io.to(adminSid).emit('server-log', getDateTime() + ' ' + msg);
 		}
 		logFile.write(getDateTime() + ' ' + msg + '\n');

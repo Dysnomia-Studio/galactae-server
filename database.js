@@ -321,13 +321,13 @@ module.exports = {
 
 						ended++;
 
-						if(ended == planetList.length) {
+						if(ended === planetList.length) {
 							callback(pList);
 						}
 					});
 				}
 
-				if(planetList.length == 0) {
+				if(planetList.length === 0) {
 					callback(planetList);
 				}
 			});

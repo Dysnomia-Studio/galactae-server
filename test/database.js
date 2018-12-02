@@ -41,7 +41,7 @@ describe('• db', function() {
 			db.player.searchByName("Elanis", function(user) {
 				assert(user !== undefined && user !== null);
 				if(user !== undefined && user !== null) {
-					assert(user.name == "Elanis");
+					assert(user.name === "Elanis");
 				}
 
 				done();
@@ -57,7 +57,7 @@ describe('• db', function() {
 			db.player.searchById("58fa309a7acc0f4281af935d", function(user) {
 				assert(user !== undefined && user !== null);
 				if(user !== undefined && user !== null) {
-					assert(user.name == "Elanis");
+					assert(user.name === "Elanis");
 				}
 
 				done();
@@ -82,7 +82,7 @@ describe('• db', function() {
 			db.planet.find("5-5-3-P2", function(planet) {
 				assert(planet !== undefined && planet !== null);
 				if(planet !== undefined && planet !== null) {
-					assert(planet.address == "5-5-3-P2");
+					assert(planet.address === "5-5-3-P2");
 				}
 
 				done();
@@ -118,7 +118,7 @@ describe('• db', function() {
 			db.planet.findBySystemWithOwners("wrong-system-address", function(planets) {
 				assert(planets !== undefined && planets !== null);
 				if(planets !== undefined && planets !== null) {
-					assert(planets.length == 0);
+					assert(planets.length === 0);
 				}
 				done();
 			});

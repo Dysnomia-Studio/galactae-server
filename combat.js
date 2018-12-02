@@ -33,9 +33,9 @@ module.exports = class Combat {
 			return;
 		}
 
-		if(team == 'atk') {
+		if(team === 'atk') {
 			this.atkFleets.push(fleet);
-		} else if (team == 'def') {
+		} else if (team === 'def') {
 			this.defFleets.push(fleet);
 		} else {
 			log('Team "' + team + '" not found !','error');
@@ -81,18 +81,18 @@ module.exports = class Combat {
 	 * Simulate the whole fight
 	 */
 	fight() {
-		if(this.atkFleets.length == 0 || this.defFleets.length == 0) { return; }
+		if(this.atkFleets.length === 0 || this.defFleets.length === 0) { return; }
 
 		// Get all db data & Fight
 		this.getAllAI(function() {
 			this.getAllUnits(function() {
-				while(this.atkFleets.length != 0 && this.defFleets.length != 0) {
+				while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
 					this.simulateTurn();
 				}
 
 				this.saveLogs();
 
-				if(this.atkFleets.length == 0) {
+				if(this.atkFleets.length === 0) {
 					log('End of fight simulation - Planet: ' + pid + ' - Def wins', 'info');
 				} else {
 					log('End of fight simulation - Planet: ' + pid + ' - Atk wins', 'info');
@@ -124,9 +124,9 @@ module.exports = class Combat {
 
 		// Add all fleets to fight
 		for(let i in fleets) {
-			if(fleets[i].orbitPosition == 0) {
+			if(fleets[i].orbitPosition === 0) {
 				battle.joinTeam('def', fleets[i]);
-			} else if(fleets[i].orbitPosition == 1) {
+			} else if(fleets[i].orbitPosition === 1) {
 				battle.joinTeam('atk', fleets[i]);
 			} 
 		}

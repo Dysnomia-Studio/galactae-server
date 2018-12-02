@@ -1,16 +1,16 @@
 module.exports = class Research {
 	static refreshUserResearch(data,callback) {	
 		// Checks if new research
-		if(researchList.length!=data.research.length) {
+		if(researchList.length!==data.research.length) {
 			for(let name in researchList) {
 				let key = -1;
 				for(let j=0; j<data.research.length; j++) {
-					if(name==data.research[j][0]) {
+					if(name===data.research[j][0]) {
 						key = j;
 						break;
 					}
 				}
-				if(key == -1) {
+				if(key === -1) {
 					data.research.push([name,0]);
 				}
 			}
@@ -30,7 +30,7 @@ module.exports = class Research {
 	}
 	static getResearch(data,research) {
 		for(let i=0; i<data.research.length; i++) {
-			if(data.research[i][0]==research) {
+			if(data.research[i][0]===research) {
 				return data.research[i][1];
 			}
 		}
@@ -51,8 +51,8 @@ module.exports = class Research {
 
 			if(typeof currentParent === 'string') {
 				if((!isset(currentParent) ||
-					Research.getResearch(user,currentParent)!=-1) &&
-					currentParent != 'researchCenter') { // Recherche
+					Research.getResearch(user,currentParent) !== -1) &&
+					currentParent !== 'researchCenter') { // Recherche
 
 					if(!atleastOne) {
 						return false;
@@ -77,7 +77,7 @@ module.exports = class Research {
 			}
 		}
 
-		if(count==0 && researchList[researchName].parents.length > 0) {
+		if(count === 0 && researchList[researchName].parents.length > 0) {
 			return false;
 		}
 
@@ -90,7 +90,7 @@ module.exports = class Research {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			let newPlanet = planetReturned.toJSON();
 
-			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] != -1) {
+			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] !== -1) {
 				researchData[planetReturned.currResearch] += (Research.getResearchProduction(planetReturned.Buildings[8])*time);
 
 				if(researchData[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
@@ -130,7 +130,7 @@ module.exports = class Research {
 
 				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 				
-				if(researchedParent && researchList[researchName] != undefined) { // Just check if it exists ...
+				if(researchedParent && researchList[researchName] !== undefined) { // Just check if it exists ...
 					newData.currResearch = researchName;
 				}
 

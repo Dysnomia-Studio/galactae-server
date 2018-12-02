@@ -131,10 +131,10 @@ module.exports = function() {
     this.isset = function(variable) {
 		return (variable===0 || 
             (typeof variable !== 'undefined' && 
-                variable != null && 
-                variable != {} && 
+                variable !== null && 
+                variable !== {} && 
                 (typeof variable !== 'string' || (
-                    variable.split(' ').join('') != ''
+                    variable.split(' ').join('') !== ''
                 ))
             ));
 	};
@@ -195,7 +195,7 @@ module.exports = function() {
         let unit = str.charAt(str.length-1).toLowerCase();
         let count = parseInt(str.substr(0,str.length-1));
 
-        if(typeof count != 'number' || Number.isNaN(count)) {
+        if(typeof count !== 'number' || Number.isNaN(count)) {
             return -1; // Send error code
         }
 
