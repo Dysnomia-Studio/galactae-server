@@ -12,7 +12,7 @@ module.exports = class Player {
 				}
 			} else {
 				// Kick that Hacker ...
-				io.to(user.sid).emit('server-kick',"INVALID_SESSION");
+				io.to(user.sid).emit('server-kick','INVALID_SESSION');
 			}
 		});	
 	}
@@ -25,7 +25,7 @@ module.exports = class Player {
 	/* Get player ally */
 	static getAlly(data,callback) {
 		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj)) { log("Error: " + data.username + " not found."); return; }
+			if(!isset(obj)) { log('Error: ' + data.username + ' not found.'); return; }
 			data.ally = obj.ally;
 			callback(data);
 		});
@@ -35,7 +35,7 @@ module.exports = class Player {
 		db.userGameId.find(data.id, function(userGameIdObj) {
 			/*if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
 				// Kick that Hacker ...
-				io.to(data.sid).emit('server-kick',"INVALID_SESSION");
+				io.to(data.sid).emit('server-kick','INVALID_SESSION');
 				return;
 			}*/
 
@@ -47,7 +47,7 @@ module.exports = class Player {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end > now) {
-							log("Error: " + data.username + " is banned.");
+							log('Error: ' + data.username + ' is banned.');
 							// @ADD: Kick & Message
 							return;
 						}
@@ -59,7 +59,7 @@ module.exports = class Player {
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist != 1) {
 							
-							log("Error: " + data.username + " isn't whitelisted.");
+							log('Error: ' + data.username + ' isn\'t whitelisted.');
 							// @ADD: Kick & Message
 							return;
 						}
@@ -81,13 +81,13 @@ module.exports = class Player {
 	static traitementsConnexion(data, dataReturned) {
 		if(data.id!=dataReturned.id) {
 			// Kick that Hacker ...
-			io.to(data.sid).emit('server-kick',"INVALID_SESSION");
+			io.to(data.sid).emit('server-kick','INVALID_SESSION');
 			return;
 		}
 
 		// Kick double accounts
 		let oldSid = dataReturned.sid;
-		if(oldSid != "-1") {
+		if(oldSid != '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
 			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
 		}
@@ -132,7 +132,7 @@ module.exports = class Player {
 					db.player.update(userNewResearch, function() {
 					plCount++;
 
-					if(data.pid == "" || userNewResearch.planetlist.indexOf(data.pid) === -1) {
+					if(data.pid == '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
 						data.pid = userNewResearch.planetlist[0];
 					}
 
@@ -151,7 +151,7 @@ module.exports = class Player {
 		if(!isset(data.sid)) { return; }
 		db.player.searchBySid(data.sid,function(dataReturned) {
 			if(!isset(dataReturned)) { return; }
-			dataReturned.sid = "-1";
+			dataReturned.sid = '-1';
 			db.player.update(dataReturned);
 			plCount--;
 		});
@@ -159,8 +159,8 @@ module.exports = class Player {
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		if(i==0) {
 			sector = {
-				"points": {},
-				"pcount": {},
+				'points': {},
+				'pcount': {},
 			};
 		}
 
@@ -169,8 +169,8 @@ module.exports = class Player {
 			
 			i++;
 
-			let sectorAddress = planetReturned.address.split("-");
-			sectorAddress = [sectorAddress[0],sectorAddress[1]].join("-");
+			let sectorAddress = planetReturned.address.split('-');
+			sectorAddress = [sectorAddress[0],sectorAddress[1]].join('-');
 			if(sector.points[sectorAddress] === undefined) {
 				sector.points[sectorAddress] = 0;
 			}
@@ -286,8 +286,8 @@ module.exports = class Player {
 			if(choice==2 && helium!=0) {
 				Planet.find(userData,userData.pid,0,function(planetReturned) {
 					if(userData.pid!=planetReturned.id) { // Stop if not belonging
-						Websocket.SendMessageToClient({ sid: userData.sid, message: "ERROR_NOT_BELONGING" });
-						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !',"fail");
+						Websocket.SendMessageToClient({ sid: userData.sid, message: 'ERROR_NOT_BELONGING' });
+						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !','fail');
 						return;
 					}
 
@@ -297,7 +297,7 @@ module.exports = class Player {
 
 					db.planet.update(newPlanetData);
 
-					log(userData.username + " takes its Daily Bonus ! " + helium + "t of helium 3");
+					log(userData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
 					newPlayerData.lastBonus = Date.now();
 
@@ -307,7 +307,7 @@ module.exports = class Player {
 				}); 
 			} else {
 				newPlayerData.money += credits;
-				log(userData.username + " takes its Daily Bonus ! " + credits + " credits");
+				log(userData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
 
 				newPlayerData.lastBonus = Date.now();
 

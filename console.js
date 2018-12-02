@@ -34,30 +34,30 @@ module.exports = function() {
 	this.log = function (msg,type,nodate) {
 		let text = msg;
 		switch(type) {
-			case "warn":
+			case 'warn':
 				text = redText('WARNING:') + yellowText(text);
 				break;
-			case "error":
+			case 'error':
 				text = redText('ERROR:') + redText(text);
 				break;
-			case "fail":
+			case 'fail':
 				text = yellowText(text);
 				break;
-			case "success":
+			case 'success':
 				text = blueText(text);
 				break;
-			case "info":
+			case 'info':
 				text = greenText(text);
 				break;
 			default:
 		}
-		if(nodate==false||nodate==undefined) { text = logdate() + " " + text;}
+		if(nodate==false||nodate==undefined) { text = logdate() + ' ' + text;}
 
 		console.log(text);
-		if(adminSid != "") {
-			io.to(adminSid).emit('server-log', getDateTime() + " " + msg);
+		if(adminSid != '') {
+			io.to(adminSid).emit('server-log', getDateTime() + ' ' + msg);
 		}
-		logFile.write(getDateTime() + " " + msg + "\n");
+		logFile.write(getDateTime() + ' ' + msg + '\n');
 	};
 
 	/**

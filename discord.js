@@ -24,12 +24,12 @@ module.exports = {
 				if(msg!=msg.replace('http','')) { return; }
 				if(msg.length==0) { return; }
 
-				let channel = "hud-chat-" + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
+				let channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
 				let data = {};
 				data.channel = channel;
-				data.username = "[Discord] <span class=\"username no-pm\">" + message.author.username + ": </span>";
-				data.message = "<strong>"+ data.username +" :</strong> "+ msg;
+				data.username = '[Discord] <span class="username no-pm">' + message.author.username + ': </span>';
+				data.message = '<strong>'+ data.username +' :</strong> '+ msg;
 
 				log('(Discord) [' + channel.substr(9) + '] '+message.author.username+': ' +msg);
 				
@@ -50,7 +50,7 @@ module.exports = {
 	 * @param      {string}  message      The message
 	 */
 	sendChatMessage: function(channelName,message) {
-		channelName = globalCfg.serverName + "-" + channelName.substr(9);
+		channelName = globalCfg.serverName + '-' + channelName.substr(9);
 		let channel = client.channels.find('name',channelName);
 		channel.send(unNormalizeText(message));
 	},
@@ -60,8 +60,8 @@ module.exports = {
 	 * @param      {string}  message  The message
 	 */
 	alert: function(message) {
-		let channelName = globalCfg.serverName + "-global";
+		let channelName = globalCfg.serverName + '-global';
 		let channel = client.channels.find('name',channelName);
-		channel.send("[SYSTEM MESSAGE] " + unNormalizeText(message));
+		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
 	},
 };

@@ -52,7 +52,7 @@ module.exports = class Research {
 			if(typeof currentParent === 'string') {
 				if((!isset(currentParent) ||
 					Research.getResearch(user,currentParent)!=-1) &&
-					currentParent != "researchCenter") { // Recherche
+					currentParent != 'researchCenter') { // Recherche
 
 					if(!atleastOne) {
 						return false;
@@ -96,7 +96,7 @@ module.exports = class Research {
 				if(researchData[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
 					researchData[planetReturned.currResearch] = -1;
 					db.planet.update(newPlanet);
-					log(user.name + " has unlocked research " + planetReturned.currResearch,"success");
+					log(user.name + ' has unlocked research ' + planetReturned.currResearch,'success');
 					Websocket.sendNotification(user.sid, 'research', { research: planetReturned.currResearch });
 				}
 			}
@@ -135,8 +135,8 @@ module.exports = class Research {
 				}
 
 				if(!researchedParent) {
-					log(data.username + " wants to change research on " + data.pid + " to " + data.research + " but don't have all needed parents.","error");
-					Websocket.SendMessageToClient({ sid: data.sid, message: "MISSING_PARENTS"});
+					log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research + ' but doesn\'t have all needed parents.','error');
+					Websocket.SendMessageToClient({ sid: data.sid, message: 'MISSING_PARENTS'});
 				}
 
 				db.planet.update(newData);
@@ -171,7 +171,7 @@ module.exports = class Research {
 			let researchedParent = Research.researchedParent(user, planet, userResearch[i][0], true);
 			let parentsList = researchList[userResearch[i][0]].parents;
 
-			if(userResearch[i][0] === "researchCenter" || researchedParent) {
+			if(userResearch[i][0] === 'researchCenter' || researchedParent) {
 				for(let j in parentsList) {
 					if(researched.indexOf(parentsList[j]) === -1) {
 						researched.push(parentsList[j]);

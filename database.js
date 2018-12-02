@@ -178,7 +178,7 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		mongoSrv = mongoose.createConnection(globalCfg["dbAdress"]);
+		mongoSrv = mongoose.createConnection(globalCfg.dbAdress);
 		mongoGen = mongoose.createConnection('***REMOVED***');
 
 		/**
@@ -203,14 +203,14 @@ module.exports = {
 		/**
 		 * Events
 		 */
-		mongoSrv.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoSrv.on('error', function(err) { log(err.message,'warn'); callback(false); });
 		mongoSrv.once('open', function() {
 			log('Successfuly connected to server database.');
 			callback(true,false,mongoSrv);
 		});	
 
 
-		mongoGen.on('error', function(err) { log(err.message,"warn"); callback(false); });
+		mongoGen.on('error', function(err) { log(err.message,'warn'); callback(false); });
 		mongoGen.once('open', function() {
 			log('Successfuly connected to general database.');
 			callback(true,true,mongoGen);
@@ -235,7 +235,7 @@ module.exports = {
 			});
 		},
 		searchByName: function(name,callback) {
-			users.findOne({ name: { $regex: new RegExp("^" + name.toLowerCase(), "i") } }, function (err, objReturned) {
+			users.findOne({ name: { $regex: new RegExp('^' + name.toLowerCase(), 'i') } }, function (err, objReturned) {
 				if(err) { log(err); }
 				callback(objReturned)
 			});
@@ -265,14 +265,14 @@ module.exports = {
 			});
 		},
 		clearList: function() {
-			log("Clearing player list ...");
+			log('Clearing player list ...');
 			let conditions = { },
-				update = { $set: { sid: "-1" } },
+				update = { $set: { sid: '-1' } },
 				options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
-				log("List cleared !") ;
+				log('List cleared !') ;
 			});
 		}
 	},
@@ -299,7 +299,7 @@ module.exports = {
 			});
 		},
 		findBySystemWithOwners: function(systemAddr, callback) {
-			planets.find({ "address": new RegExp("^" + systemAddr + "-", "i") }, function(err, planetList) {
+			planets.find({ 'address': new RegExp('^' + systemAddr + '-', 'i') }, function(err, planetList) {
 				if(err) { log(err); return; }
 
 				let pList = [];
@@ -449,7 +449,7 @@ module.exports = {
 
 	privilege: {
 		find: function(id,callback) {
-			if(typeof id === "string") {
+			if(typeof id === 'string') {
 				id = mongoose.Types.ObjectId(id);
 			}
 

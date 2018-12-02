@@ -16,9 +16,9 @@ global.io = class { // Prevent bugs, it's temporary
 };
 
 const dataModel = {
-	message: "",
+	message: '',
 	send: true,
-	sid: ""
+	sid: '',
 };
 
 describe('• Chat', function() {

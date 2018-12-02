@@ -33,9 +33,9 @@ module.exports = class Combat {
 			return;
 		}
 
-		if(team == "atk") {
+		if(team == 'atk') {
 			this.atkFleets.push(fleet);
-		} else if (team == "def") {
+		} else if (team == 'def') {
 			this.defFleets.push(fleet);
 		} else {
 			log('Team "' + team + '" not found !','error');
@@ -125,9 +125,9 @@ module.exports = class Combat {
 		// Add all fleets to fight
 		for(let i in fleets) {
 			if(fleets[i].orbitPosition == 0) {
-				battle.joinTeam("def", fleets[i]);
+				battle.joinTeam('def', fleets[i]);
 			} else if(fleets[i].orbitPosition == 1) {
-				battle.joinTeam("atk", fleets[i]);
+				battle.joinTeam('atk', fleets[i]);
 			} 
 		}
 

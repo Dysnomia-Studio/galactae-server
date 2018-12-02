@@ -45,7 +45,7 @@ module.exports = function() {
 		25,	// Reservoir
 		25,	// Chantier naval
 		15,	// Commerce
-		25	// Mine He3
+		25,	// Mine He3
 	];
 	this.buildingPointCoef = [
 		3, 	// Carriere

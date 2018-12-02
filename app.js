@@ -4,23 +4,23 @@
 global.fs = require('fs');
 let options = {
 	key: fs.readFileSync(process.cwd() + '/keys/privkey.pem'),
-	cert: fs.readFileSync(process.cwd() + '/keys/cert.pem')
+	cert: fs.readFileSync(process.cwd() + '/keys/cert.pem'),
 };
 let express = require('express');
 let app = express();
 global.https = require('https').createServer(options, app);
 global.io = require('socket.io')(https);
-io.set("transports", ["websocket","xhr-polling","polling"]);
+io.set('transports', ['websocket','xhr-polling','polling']);
 
 /**
  * Global vars
  */
 global.preventConnection = false;
-global.preventConnectionMsg = "";
+global.preventConnectionMsg = '';
 global.maintenance = false;
 global.plCount = 0;
 global.preventRestarts = 0; //@ADD: Really prevent restarting server until this is set to 0
-global.adminSid = "";
+global.adminSid = '';
 
 /**
  * Configs & Constants
@@ -55,7 +55,7 @@ global.Websocket = require('./socket');
  */
 db.connect(function(success,general=false) {
 	if(!success) {
-		log('Failed to connect to db ! Blocking user connections ...',"warn");
+		log('Failed to connect to db ! Blocking user connections ...','warn');
 		preventConnection = true;
 		return;
 	}

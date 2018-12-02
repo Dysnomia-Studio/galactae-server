@@ -12,7 +12,7 @@ module.exports = class Units {
 		 */
 		db.unit.findByOwner(data.id,function(unitList) {
 			if(unitList==undefined) { unitList = []; }
-			io.to(data.sid).emit("units-recieve-data", unitList);
+			io.to(data.sid).emit('units-recieve-data', unitList);
 		});
 	}
 	
@@ -27,14 +27,14 @@ module.exports = class Units {
 
 		for(let id=0; id<parts.length; id++) {
 			if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
-				log("Cost is not defined for part " + parts[id].tech + " in ship " + shipShape,"error");
+				log('Cost is not defined for part ' + parts[id].tech + ' in ship ' + shipShape,'error');
 				return [-1];
 			}
 
 			let addCost = shipCosts[parts[id].tech];
 
 			for(let i=0; i<6; i++) {
-				if(shipShape.substr(0,12) == "SHIP_FIGHTER") {
+				if(shipShape.substr(0,12) == 'SHIP_FIGHTER') {
 					addCost[i] *= fighterMult[shipShape];
 				}
 				
@@ -55,11 +55,11 @@ module.exports = class Units {
 	}
 
 	static checkShipParts(ship) {
-		let subprop = "";
-		let supprop = "";
+		let subprop = '';
+		let supprop = '';
 
 		for(let i in ship) {
-			if(i=="name" || i=="type" || i=="shape") { continue; }
+			if(i=='name' || i=='type' || i=='shape') { continue; }
 			// Check if that kind of part exists in that kind of ship
 			let valid = false;
 			for(let type in shipShapesDetails[ship.type][ship.shape].content) {
@@ -92,16 +92,16 @@ module.exports = class Units {
 			}
 
 			// Prevent different subengines
-			if(valid && ship[i].type == "sub_propulsion") {
-				if(subprop == "") {
+			if(valid && ship[i].type == 'sub_propulsion') {
+				if(subprop == '') {
 					subprop = ship[i].value;
 				} else if(subprop != ship[i].value) {
 					valid = false;
 				}
 			}
 			// Prevent different supengines
-			if(valid && ship[i].type == "sup_propulsion") {
-				if(supprop == "") {
+			if(valid && ship[i].type == 'sup_propulsion') {
+				if(supprop == '') {
 					supprop = ship[i].value;
 				} else if(supprop != ship[i].value) {
 					valid = false;
@@ -154,7 +154,7 @@ module.exports = class Units {
 	 * @param      {<type>}  data    Data given by client
 	 */
 	static createType(data) {
-		let message = "";
+		let message = '';
 		let ship = data.ship;
 
 		// That block 90% of tries to crash
@@ -166,24 +166,24 @@ module.exports = class Units {
 		// Check entries valdity
 		for(let i in ship) {
 			// Empty fields
-			if(i=="name" || i=="type" || i=="shape") { // In facts, the two last verifications won't display error, but they're here to simplify the else
-				if(ship[i].split(' ').join('')=="") {
-					message = "SHIP_HAS_NO_NAME";
+			if(i=='name' || i=='type' || i=='shape') { // In facts, the two last verifications won't display error, but they're here to simplify the else
+				if(ship[i].split(' ').join('')=='') {
+					message = 'SHIP_HAS_NO_NAME';
 					break;
 				} 
 			} else if(!isset(ship[i].value) || !isset(ship[i].type)) {
-				message = "SHIP_HAS_EMPTY_FIELD";
+				message = 'SHIP_HAS_EMPTY_FIELD';
 				break;
 			}
 		}
 
 		// Wrong type/shape
 		if(shipShapesDetails[ship.type]==undefined || shipShapesDetails[ship.type][ship.shape]==undefined) {
-			message = "SHIP_HAS_WRONG_TYPE_OR_SHAPE";
+			message = 'SHIP_HAS_WRONG_TYPE_OR_SHAPE';
 		}
 
 		if(!isset(message) && !Units.checkShipParts(ship)) {
-			message = "SHIP_HAS_INVALID_PARTS";
+			message = 'SHIP_HAS_INVALID_PARTS';
 		}
 
 		// Last check
@@ -191,10 +191,10 @@ module.exports = class Units {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
 				for(let i in ship) {
-					if(i=="name" || i=="type" || i=="shape") { continue; }
+					if(i=='name' || i=='type' || i=='shape') { continue; }
 
 					if(shipResearchDependencies[ship[i].value]!=undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
-						message = "NEEDED_RESEARCH_MISSING";
+						message = 'NEEDED_RESEARCH_MISSING';
 						break;
 					}
 				}
@@ -216,7 +216,7 @@ module.exports = class Units {
 					};
 
 					for(let i in ship) {
-						if(i=="name" || i=="type" || i=="shape") { continue; }
+						if(i=='name' || i=='type' || i=='shape') { continue; }
 						
 						shipToSave.parts.push({
 							type: ship[i].type,
@@ -253,29 +253,29 @@ module.exports = class Units {
 						if(!duplicate && !duplicateName) {
 							db.unit.create(shipToSave, function() {
 								// Notify client
-								log(data.username + " has succed to create new unit type named " + ship.name,"success");
+								log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
 								Units.refresh(data);
 							});
 						} else if(duplicate) {
-							message = "SHIP_TYPE_ALREADY_EXISTS";
-							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+							message = 'SHIP_TYPE_ALREADY_EXISTS';
+							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
 							Websocket.SendMessageToClient({sid: data.sid, message: message});	
 						} else {
-							message = "SHIP_NAME_ALREADY_EXISTS";
-							log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+							message = 'SHIP_NAME_ALREADY_EXISTS';
+							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
 							Websocket.SendMessageToClient({sid: data.sid, message: message});	
 						}
 					});
 
 				} else {
 					// Notify client
-					log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+					log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
 					Websocket.SendMessageToClient({sid: data.sid, message: message});
 				}
 			});
 		} else {
 			// Notify client
-			log(data.username + " has failed to create unit type named " + ship.name + " because " + message,"fail");
+			log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
 			Websocket.SendMessageToClient({sid: data.sid, message: message});
 		}
 	}
@@ -287,7 +287,7 @@ module.exports = class Units {
 			unitReturned.name = data.shipNewName;
 
 			db.unit.update(unitReturned, function() {
-				log(data.username + " has succed to rename unit type old:" + unitReturned.name + ", new: " + data.shipNewName,"success");
+				log(data.username + ' has succed to rename unit type old:' + unitReturned.name + ', new: ' + data.shipNewName,'success');
 				Units.refresh(data);
 			});
 		});
@@ -298,13 +298,13 @@ module.exports = class Units {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != data.id) { return; }
 
 			if(unitReturned.owned != 0) {
-				log(data.username + " has failed to delete unit model named " + unitReturned.name + " because it's used by some units.","fail");
-				Websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETE_USED_BY_UNITS"});
+				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
+				Websocket.SendMessageToClient({sid: data.sid, message: 'MODEL_DELETE_USED_BY_UNITS'});
 				return;
 			}
 
-			log(data.username + " has succed to delete unit model named " + unitReturned.name + ".","success");
-			Websocket.SendMessageToClient({sid: data.sid, message: "MODEL_DELETED"});
+			log(data.username + ' has succed to delete unit model named ' + unitReturned.name + '.','success');
+			Websocket.SendMessageToClient({sid: data.sid, message: 'MODEL_DELETED'});
 
 			db.unit.delete(data.unit, function() {
 				Units.refresh(data);
@@ -329,22 +329,22 @@ module.exports = class Units {
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
 				log(inputData.username +' failed to build units because another is already building.');
-				Websocket.SendMessageToClient({ sid: inputData.sid, message: "UNIT_ERROR_ALREADY" });
+				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
-			let id = (inputData.unit.substr(0,14) == "SHIP_WEP_MINES")?"000000000000000000000000":inputData.unit;
+			let id = (inputData.unit.substr(0,14) == 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,14) == "SHIP_WEP_MINES" && shipCosts[inputData.unit] !== undefined) {
+				if(inputData.unit.substr(0,14) == 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
-					unitReturned.shipType = "SHIP_DEF";
+					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
 				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId != inputData.id) { return; }
 				// Check defence fleet
-				if(inputData.fleet == -2 && unitReturned.shipType != "SHIP_DEF") { return; }
-				if(unitReturned.shipType == "SHIP_DEF") { inputData.fleet = -2; }
+				if(inputData.fleet == -2 && unitReturned.shipType != 'SHIP_DEF') { return; }
+				if(unitReturned.shipType == 'SHIP_DEF') { inputData.fleet = -2; }
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
@@ -352,7 +352,7 @@ module.exports = class Units {
 						choosenFleet = fleet;
 					}
 
-					if(inputData.fleet == -2 && fleet.name == "SHIP_DEF") {
+					if(inputData.fleet == -2 && fleet.name == 'SHIP_DEF') {
 						choosenFleet = fleet;
 					}
 				});
@@ -360,7 +360,7 @@ module.exports = class Units {
 				// Auto create def fleet if not existing
 				if(choosenFleet === undefined && inputData.fleet == -2) { 
 					inputData.fleet = -1;
-					inputData.fleetName = "SHIP_DEF";
+					inputData.fleetName = 'SHIP_DEF';
 				}
 
 				let totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
@@ -376,7 +376,7 @@ module.exports = class Units {
 					totalCost[2] > newPlanet.resources[5]) { // [Al,Fe,Ti,Cu,Time,Population]
 
 					log(inputData.username +' failed to build units because of no enough resources.');
-					Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_COST" });
+					Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_COST' });
 					return;
 				}
 
@@ -384,7 +384,7 @@ module.exports = class Units {
 					// Check if planet have enough population
 					if(prod < (cons + totalCost[5])) {
 						log(inputData.username +' failed to build units because of no enough people.');
-						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_PEOPLE" });
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_PEOPLE' });
 						return;
 					}
 
@@ -411,7 +411,7 @@ module.exports = class Units {
 						// Update planet 
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0,14) != "SHIP_WEP_MINES") {
+						if(inputData.unit.substr(0,14) != 'SHIP_WEP_MINES') {
 							// Update unit
 							let newUnit = unitReturned.toJSON();
 							newUnit.owned += inputData.count;
@@ -427,15 +427,15 @@ module.exports = class Units {
 
 						Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
-						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')',"success");
-						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_UNIT_OK" });
+						log(inputData.username+' began building '+inputData.count+' new units ('+inputData.unit+') on planet ' + newPlanet.name + ' (' +inputData.planet+')','success');
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_UNIT_OK' });
 					}
 
 					if(inputData.fleet == -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
-							Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_FLEET_SIZE' });
 							return;
 						}
 
@@ -445,22 +445,22 @@ module.exports = class Units {
 					} else if(inputData.fleet != -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
 						if(choosenFleet.position != newPlanet.address || choosenFleet.orbitPosition != 0) { 
-							Websocket.SendMessageToClient({ sid: inputData.sid, message: "FLEET_ISNT_IN_ORBIT" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
-						if(""+choosenFleet.motherPlanetId != ""+newPlanet._id) { return; }
+						if(''+choosenFleet.motherPlanetId != ''+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) { 
 							log(inputData.username +' failed to build units because fleet will be too big.');
-							Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_FLEET_SIZE" });
+							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_FLEET_SIZE' });
 							return;
 						}
 
 						callBackAfterfleet(newPlanet,choosenFleet,userReturned,unitReturned,totalCost,inputData);
 					}  else {
 						log(inputData.username +' failed to build units because fleet isn\'t valid.');
-						Websocket.SendMessageToClient({ sid: inputData.sid, message: "BUILDING_ERROR_INVALID_FLEET" });
+						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_INVALID_FLEET' });
 					}
 				});	
 			});			
@@ -470,7 +470,7 @@ module.exports = class Units {
 	static getSpeed(speed, tech) {
 		if(speed[0] == -1) { // First sup propulsion part
 			if(shipPartsSpeed[tech] === undefined) { 
-				log("Speed is not defined for part " + tech,"error");
+				log('Speed is not defined for part ' + tech,'error');
 				return [];
 			}
 			speed = shipPartsSpeed[tech].slice(0);
@@ -485,11 +485,11 @@ module.exports = class Units {
 
 	static calcSubSpeed(unit) {
 		let speed = [-1];
-		let tech = "";
+		let tech = '';
 		let count = 0;
 
 		for(let i in unit.parts) {
-			if(unit.parts[i].type == "sub_propulsion") {
+			if(unit.parts[i].type == 'sub_propulsion') {
 				tech = unit.parts[i].tech;
 				count++;
 
@@ -503,11 +503,11 @@ module.exports = class Units {
 
 	static calcSupraSpeed(unit) {
 		let speed = [-1];
-		let tech = "";
+		let tech = '';
 		let count = 0;
 
 		for(let i in unit.parts) {
-			if(unit.parts[i].type == "sup_propulsion") {
+			if(unit.parts[i].type == 'sup_propulsion') {
 				tech = unit.parts[i].tech;
 				count++;
 				

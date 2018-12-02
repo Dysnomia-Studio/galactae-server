@@ -119,7 +119,7 @@ module.exports = class Websocket {
 			// Change name
 			socket.on('planet-rename', function(data) {
 				// Vars
-				if(!isset(data) || !isset(data.planet) || !isset(data.name) || data.name=="") { return; }
+				if(!isset(data) || !isset(data.planet) || !isset(data.name) || data.name=='') { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
@@ -134,7 +134,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				    log(data.username + " wants to change research on " + data.pid + " to " + data.research,"info");
+				    log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research,'info');
 				   	Research.ChangePlanetResearch(data,data.research);
 				});
 			});
@@ -227,11 +227,11 @@ module.exports = class Websocket {
 
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 				
-				if(data.username=="***REMOVED***" && data.password=="***REMOVED***") {
+				if(data.username=='***REMOVED***' && data.password=='***REMOVED***') {
 					adminSid = socket.id;
-					log("Admin connected from " + clientIpAddress);
+					log('Admin connected from ' + clientIpAddress);
 				} else {
-					log("Failed to connect to admin account from " + clientIpAddress);
+					log('Failed to connect to admin account from ' + clientIpAddress);
 				}
 			});
 
@@ -243,33 +243,33 @@ module.exports = class Websocket {
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 				if(socket.id==adminSid) {
-					if(typeof(data.cmd) !== "string") {
+					if(typeof(data.cmd) !== 'string') {
 						return;
 					}
 
-					log("Executing admin command (" + data.cmd + ") from " + clientIpAddress);
+					log('Executing admin command (' + data.cmd + ') from ' + clientIpAddress);
 
 					switch(data.cmd) {
-						case "maintenanceOn":
+						case 'maintenanceOn':
 							Websocket.beginMaintenance();
 							break;
-						case "maintenanceOff":
+						case 'maintenanceOff':
 							Websocket.endMaintenance();
 							break;
-						case "restart":
+						case 'restart':
 							Websocket.restart();
 							break;
-						case "start":
+						case 'start':
 							// Can't do this now ... Waiting a way (@ADD)
 							break;
-						case "stop":
+						case 'stop':
 							// Can't do this now ... Waiting a way (@ADD)
 							break;
 						default:
-							log("Command " + data.cmd + " not found !");
+							log('Command ' + data.cmd + ' not found !');
 					}
 				} else {
-					log("Failed to execute admin command from " + clientIpAddress + ": ERR_NOT_LOGGED");
+					log('Failed to execute admin command from ' + clientIpAddress + ': ERR_NOT_LOGGED');
 				}
 			});
 		});
@@ -281,7 +281,7 @@ module.exports = class Websocket {
 	 * @param      {object}  data    The data
 	 */
 	static SendMessageToClient(data) {
-		io.to(data.sid).emit("server-alert",data.message);
+		io.to(data.sid).emit('server-alert',data.message);
 	}
 	/**
 	 * Sends a general message.
@@ -290,7 +290,7 @@ module.exports = class Websocket {
 	 * @param      {string}  msg     The message
 	 */
 	static SendGeneralMessage(msg) {
-		io.emit("server-general-alert",msg);
+		io.emit('server-general-alert',msg);
 		Discord.alert(msg);
 	}
 
@@ -298,7 +298,7 @@ module.exports = class Websocket {
 	 * Send notif to client
 	 */
 	static sendNotification(sid, type, args) {
-		io.to(sid).emit("notification", { type, args });
+		io.to(sid).emit('notification', { type, args });
 	}
 
 	/**
@@ -306,7 +306,7 @@ module.exports = class Websocket {
 	 */
 	static beginMaintenance() {
 		io.emit('server-maintenance');
-		Websocket.SendGeneralMessage("MAINTENANCE");
+		Websocket.SendGeneralMessage('MAINTENANCE');
 		maintenance = true;
 
 		db.server.find(function(server) {

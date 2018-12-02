@@ -31,7 +31,7 @@ module.exports = class Fleet {
 				}
 			}
 
-			io.to(sid).emit("fleet-recieve-data", fleet);
+			io.to(sid).emit('fleet-recieve-data', fleet);
 		});
 	}
 
@@ -43,16 +43,16 @@ module.exports = class Fleet {
 		db.fleet.findByMotherPlanet(planetData._id, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
-				log(data.username + " failed to create a new fleet on " + planetData.name + " because it has maximal fleet count.");
-				Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_MAX_REACHED" });
+				log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because it has maximal fleet count.');
+				Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_MAX_REACHED' });
 				return;
 			}
 
 			// Check name
 			for(let i=0; i<fleetReturned.length; i++) {
 				if(fleetReturned[i].name === data.fleetName) {
-					log(data.username + " failed to create a new fleet on " + planetData.name + " because a fleet with this name already exists.");
-					Websocket.SendMessageToClient({ sid: data.sid, message: "FLEET_NAME_ALREADY_EXISTS" });
+					log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because a fleet with this name already exists.');
+					Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_NAME_ALREADY_EXISTS' });
 					return;
 				}
 			}
@@ -100,11 +100,11 @@ module.exports = class Fleet {
 			for(let f in fleet.units) {
 				if(fleet.units[f][0] != unitList[u]._id) { continue; }
 
-				if(unitList[u].shipType == "SHIP_FIGHTER") {
+				if(unitList[u].shipType == 'SHIP_FIGHTER') {
 					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
-				} else if(unitList[u].shipType == "SHIP_CARRIER") {
+				} else if(unitList[u].shipType == 'SHIP_CARRIER') {
 					for(let p in unitList[u].parts) {
-						if(unitList[u].parts[p].type == "hangar") {
+						if(unitList[u].parts[p].type == 'hangar') {
 							fighterCap += hangarSize[unitList[u].parts[p].tech] * fleet.units[f][1];
 						}
 					}
@@ -155,7 +155,7 @@ module.exports = class Fleet {
 		};
 
 		for(let i=0; i<unitList.length; i++) {
-			if(unitList[i].shipType == "SHIP_FIGHTER") { continue; } // Don't care about fighter they are carried
+			if(unitList[i].shipType == 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
 			let curr = Units.calcSupraSpeed(unitList[i]);
 
@@ -196,23 +196,23 @@ module.exports = class Fleet {
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
-			if(!isset(fleetReturned)) { log("fleet not found"); return; } // Does this fleet exists
-			if(fleetReturned.ownerId != user.id) { log("user don't own ths fleet"); return; }
-			if(fleetReturned.name == "SHIP_DEF") { return; } // Is this fleet movable ? (not defense fleet)
+			if(!isset(fleetReturned)) { log('fleet not found'); return; } // Does this fleet exists
+			if(fleetReturned.ownerId != user.id) { log('user doesn\'t own ths fleet'); return; }
+			if(fleetReturned.name == 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: "IN_BUILDING_FLEET" }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' }); 
 				return; 
 			} 
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
 				log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_MOVING_FLEET" }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' }); 
 				return;
 			}
 
 			if(fleetReturned.position == destination) { // Current planet
 				log(user.username + ' failed to move fleet because fleet is already at destination.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: "ALREADY_AT_DESTINATION" }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_AT_DESTINATION' }); 
 				return;
 			}
 
@@ -227,7 +227,7 @@ module.exports = class Fleet {
 			Fleet.getUnitsList(fleetReturned.units, function(unitList) {
 				if(systemeDepart != systemeArrivee && !Fleet.hasEnoughCarrier(fleetReturned, unitList)) {
 					log(user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.');
-					Websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_CARRIER" });
+					Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_CARRIER' });
 					return;
 				}
 
@@ -240,7 +240,7 @@ module.exports = class Fleet {
 
 				if(minSpeed.speed[0] === undefined) {
 					log(user.username + ' failed to move fleet because some units can\'t make supraspeed move.');
-					Websocket.SendMessageToClient({ sid: user.sid, message: "CANT_MAKE_SUPRAMOVE" });
+					Websocket.SendMessageToClient({ sid: user.sid, message: 'CANT_MAKE_SUPRAMOVE' });
 					return;
 				}
 
@@ -248,7 +248,7 @@ module.exports = class Fleet {
 					db.planet.find(destination, function(planeteArrivee) {
 						if(!isset(planeteArrivee)) {
 							log(user.username + ' failed to move fleet because destination ('+destination+') does not exists.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: "DESTINATION_NOT_EXISTS" });
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_NOT_EXISTS' });
 							return;
 						}
 
@@ -288,7 +288,7 @@ module.exports = class Fleet {
 						let fuel = Fleet.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel) || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: "NO_ENOUGHT_FUEL" }); 
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_FUEL' }); 
 							return;
 						}
 
@@ -296,7 +296,7 @@ module.exports = class Fleet {
 
 						db.player.searchById(user.id, function(foundUser) {
 							let instability = time * 0.001 * (Math.random() - 0.5);
-							if(Research.getResearch(foundUser, "prop_suprastability") == -1) {
+							if(Research.getResearch(foundUser, 'prop_suprastability') == -1) {
 								instability /= 2;
 							}
 
@@ -308,7 +308,7 @@ module.exports = class Fleet {
 							newFleet.position = destination;
 							newFleet.orbitPosition = -1;
 
-							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + " (" + destination + ")" + 
+							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + ' (' + destination + ')' + 
 								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
 
 							db.fleet.update(newFleet, function() {

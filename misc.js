@@ -1,97 +1,97 @@
 let charList = [
     // a    
-    ["à","&agrave;"],
-    ["á","&aacute;"],
-    ["â","&acirc;"],
-    ["ã","&atilde;"],
-    ["ä","&auml;"],
-    ["å","&aring;"],
-    ["æ","&aelig;"],
+    ['à','&agrave;'],
+    ['á','&aacute;'],
+    ['â','&acirc;'],
+    ['ã','&atilde;'],
+    ['ä','&auml;'],
+    ['å','&aring;'],
+    ['æ','&aelig;'],
     // c
-    ["ç","&ccedil;"],
+    ['ç','&ccedil;'],
     // e        
-    ["è","&egrave;"],
-    ["é","&eacute;"],
-    ["ê","&ecirc;"],
-    ["ë","&euml;"],
+    ['è','&egrave;'],
+    ['é','&eacute;'],
+    ['ê','&ecirc;'],
+    ['ë','&euml;'],
     // i
-    ["ì","&igrave;"],
-    ["í","&iacute;"],
-    ["î","&icirc;"],
-    ["ï","&iuml;"], 
+    ['ì','&igrave;'],
+    ['í','&iacute;'],
+    ['î','&icirc;'],
+    ['ï','&iuml;'], 
     // n
-    ["ñ","&ntilde;"],
+    ['ñ','&ntilde;'],
     // o
-    ["ò","&ograve;"],
-    ["ó","&oacute;"],
-    ["ô","&ocirc;"],
-    ["õ","&otilde;"],
-    ["ö","&ouml;"],
+    ['ò','&ograve;'],
+    ['ó','&oacute;'],
+    ['ô','&ocirc;'],
+    ['õ','&otilde;'],
+    ['ö','&ouml;'],
     // u
-    ["ù","&ugrave;"],
-    ["ú","&uacute;"],
-    ["û","&ucirc;"],
-    ["ü","&uuml;"],
+    ['ù','&ugrave;'],
+    ['ú','&uacute;'],
+    ['û','&ucirc;'],
+    ['ü','&uuml;'],
     // y
-    ["ý","&yacute;"],
-    ["ÿ","&yuml;"],
+    ['ý','&yacute;'],
+    ['ÿ','&yuml;'],
     //math
-    ["÷","&divide;"],
-    ["×","&times;"],
-    ["±","&plusmn;"],
-    ["¼","&frac14;"],
-    ["½","&frac12;"],
-    ["¾","&frac34;"],
-    ["¹","&sup1;"],
-    ["²","&sup2;"],
-    ["³","&sup3;"],
+    ['÷','&divide;'],
+    ['×','&times;'],
+    ['±','&plusmn;'],
+    ['¼','&frac14;'],
+    ['½','&frac12;'],
+    ['¾','&frac34;'],
+    ['¹','&sup1;'],
+    ['²','&sup2;'],
+    ['³','&sup3;'],
     // others
-    ["€","&euro;"],
-    ["¢","&cent;"],
-    ["£","&pound;"],
-    ["ß","&szlig;"],
-    ["¿","&iquest;"],
-    ["µ","&micro;"],
-    ["©","&copy;"],
-    ["°","&deg;"],
-    ["¨","&uml;"],
-    ["§","&sect;"],
-    ["¤","&curren;"],
-    ["¦","&brvbar;"],
+    ['€','&euro;'],
+    ['¢','&cent;'],
+    ['£','&pound;'],
+    ['ß','&szlig;'],
+    ['¿','&iquest;'],
+    ['µ','&micro;'],
+    ['©','&copy;'],
+    ['°','&deg;'],
+    ['¨','&uml;'],
+    ['§','&sect;'],
+    ['¤','&curren;'],
+    ['¦','&brvbar;'],
     ['<','&lsaquo;'],
     ['>','&rsaquo;'],
 ];
 
 let smileys = [
-    [":D","😃"],
-    [":-D","😃"],
+    [':D','😃'],
+    [':-D','😃'],
 
-    ["xD","😆"],
-    ["XD","😆"],
-    ["xd","😆"],
-    ["Xd","😆"],
+    ['xD','😆'],
+    ['XD','😆'],
+    ['xd','😆'],
+    ['Xd','😆'],
 
-    ["X(","😣"],
-    ["x(","😣"],
+    ['X(','😣'],
+    ['x(','😣'],
 
-    ["XP","😝"],
-    ["Xp","😝"],
-    ["xP","😝"],
-    ["xp","😝"],
+    ['XP','😝'],
+    ['Xp','😝'],
+    ['xP','😝'],
+    ['xp','😝'],
 
-    [":p","😛"],
-    [":P","😛"],
+    [':p','😛'],
+    [':P','😛'],
 
-    [";)","😉"],
-    [";D","😉"],
+    [';)','😉'],
+    [';D','😉'],
 
-    [":)","🙂"],
+    [':)','🙂'],
 
-    [":(","🙁"],
+    [':(','🙁'],
 
-    ["^^","😄"],
+    ['^^','😄'],
 
-    ["<3","😍"],
+    ['<3','😍'],
 ];
 
 module.exports = function() {    
@@ -103,23 +103,23 @@ module.exports = function() {
     this.getDateTime = function(date = new Date()) {
         
 	    let hour = date.getHours();
-	    hour = (hour < 10 ? "0" : "") + hour;
+	    hour = (hour < 10 ? '0' : '') + hour;
 
 	    let min  = date.getMinutes();
-	    min = (min < 10 ? "0" : "") + min;
+	    min = (min < 10 ? '0' : '') + min;
 
 	    let sec  = date.getSeconds();
-	    sec = (sec < 10 ? "0" : "") + sec;
+	    sec = (sec < 10 ? '0' : '') + sec;
 
 	    let year = date.getFullYear();
 
 	    let month = date.getMonth() + 1;
-	    month = (month < 10 ? "0" : "") + month;
+	    month = (month < 10 ? '0' : '') + month;
 
 	    let day  = date.getDate();
-	    day = (day < 10 ? "0" : "") + day;
+	    day = (day < 10 ? '0' : '') + day;
 
-		return day + "/" + month + "/" + year + " " + hour + ":" + min + ":" + sec;
+		return day + '/' + month + '/' + year + ' ' + hour + ':' + min + ':' + sec;
 	};
 
 	/**
@@ -133,8 +133,8 @@ module.exports = function() {
             (typeof variable !== 'undefined' && 
                 variable != null && 
                 variable != {} && 
-                (typeof variable !== "string" || (
-                    variable.split(" ").join("") != ""
+                (typeof variable !== 'string' || (
+                    variable.split(' ').join('') != ''
                 ))
             ));
 	};
@@ -195,18 +195,18 @@ module.exports = function() {
         let unit = str.charAt(str.length-1).toLowerCase();
         let count = parseInt(str.substr(0,str.length-1));
 
-        if(typeof count != "number" || Number.isNaN(count)) {
+        if(typeof count != 'number' || Number.isNaN(count)) {
             return -1; // Send error code
         }
 
         switch(unit) {
-            case "d": // Days
+            case 'd': // Days
                 return 86400000*count;
-            case "h": // Hour
+            case 'h': // Hour
                 return 3600000*count;
-            case "m": // Minutes
+            case 'm': // Minutes
                 return 60000*count;
-            case "s": // Seconds
+            case 's': // Seconds
                 return 1000*count;
             default: // Wrong unit
                 return -1;
