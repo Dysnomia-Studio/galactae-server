@@ -67,7 +67,7 @@ module.exports = class Chat {
 
 							/* Recuperer le vrai message */
 							data.newmessage = data.message.substr(args[0].length+1);
-							data.message = args[0] + ': ' + data.message.substr(args[0].length+1)
+							data.message = args[0] + ': ' + data.message.substr(args[0].length+1);
 
 							/* Envoyer le PM */
 							if(sid !== undefined && sid !== '-1' && data.newmessage !== '' && sid !== data.sid) {
@@ -97,7 +97,7 @@ module.exports = class Chat {
 					}
 					if(data.message === '' || !isset(data.message)) { return; }
 
-				    if(data.channel !='hud-chat-ally') { // Normal chat
+				    if(data.channel !== 'hud-chat-ally') { // Normal chat
 				    	log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
 			        	io.emit('chat-message', { message: data.message, channel: data.channel });
 			        	Discord.sendChatMessage(data.channel,discordmsg);
@@ -125,7 +125,7 @@ module.exports = class Chat {
 		if(str.split(' ').join('') === '') { data.send = false; }
 
         /* Disable links */
-        if(str!=str.split('://').join('') || str!=str.split('www.').join('')) {
+        if(str !== str.split('://').join('') || str !== str.split('www.').join('')) {
         	data.send = false;
         	Chat.sendSM(data.sid,'NO_LINKS');
         }
@@ -202,7 +202,7 @@ module.exports = class Chat {
 						ban_begin: now,
 						ban_end: now + banTime,
 						ban_reason: banMessage,
-						admin: data.user_id
+						admin: data.user_id,
 					});
 
 					let sid = '' + target.sid;					
@@ -231,7 +231,7 @@ module.exports = class Chat {
 						ban_begin: now,
 						ban_end: now + muteTime,
 						ban_reason: muteMessage,
-						admin: data.user_id
+						admin: data.user_id,
 					});
 					
 					io.to(target.sid).emit('chat-mute', {muteTime: muteTime, message: muteMessage});

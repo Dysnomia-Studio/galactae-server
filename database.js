@@ -114,20 +114,20 @@ let userPrivilegesSchema = new Schema({
 	user_id: Schema.Types.ObjectId,
 	server_name: String,
 	user_privilege_lvl: Number,
-	user_whitelist: Number
+	user_whitelist: Number,
 });
 
 let serverSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	server_name: String,
-	server_maintenance: Boolean
+	server_maintenance: Boolean,
 });
 
 let userGameIdSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	game_id: String,
-	server_name: String
+	server_name: String,
 });
 
 let userBanSchema = new Schema({
@@ -138,7 +138,7 @@ let userBanSchema = new Schema({
 	ban_begin: Number,
 	ban_end: Number,
 	ban_reason: String,
-	admin: String
+	admin: String,
 });
 
 let globalRanksSchema = new Schema({
@@ -148,7 +148,7 @@ let globalRanksSchema = new Schema({
 	server_name: String,
 	rank: Number,
 	points: Number,
-	planets: Number
+	planets: Number,
 });
 
 let sectorRanksSchema = new Schema({
@@ -159,7 +159,7 @@ let sectorRanksSchema = new Schema({
 	sector: String,
 	rank: Number,
 	points: Number,
-	planets: Number
+	planets: Number,
 });
 
 let privileges;
@@ -231,13 +231,13 @@ module.exports = {
 		findAll: function(callback) {
 			users.find({ }, function (err, objReturned) {
 				if(err) { log(err); }
-				callback(objReturned)
+				callback(objReturned);
 			});
 		},
 		searchByName: function(name,callback) {
 			users.findOne({ name: { $regex: new RegExp('^' + name.toLowerCase(), 'i') } }, function (err, objReturned) {
 				if(err) { log(err); }
-				callback(objReturned)
+				callback(objReturned);
 			});
 		},
 		searchById: function(id,callback) {
@@ -249,13 +249,13 @@ module.exports = {
 		searchBySid: function(sid,callback) {
 			users.findOne({sid: sid}, function (err, objReturned) {
 				if(err) { log(err); }
-				callback(objReturned)
+				callback(objReturned);
 			});
 		},
 		update: function(user, callback) {
-			let conditions = { _id: user.id }
-						  , update = { $set: user }
-						  , options = { multi: true };
+			let conditions = { _id: user.id },
+						update = { $set: user },
+						options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
@@ -274,7 +274,7 @@ module.exports = {
 				if(error) { log(error);}
 				log('List cleared !') ;
 			});
-		}
+		},
 	},
 
 	/**
@@ -331,7 +331,7 @@ module.exports = {
 					callback(planetList);
 				}
 			});
-		}
+		},
 	},
 
 	/**
@@ -383,8 +383,7 @@ module.exports = {
 				if(err) { log(err);} 
 				if(callback) { callback(); }
 			});
-		}
-
+		},
 	},
 
 	/**
@@ -506,7 +505,7 @@ module.exports = {
 			bans.find({
 				user_id: uid,
 				server_name: globalCfg.serverGlobalName,
-				ban_type: type
+				ban_type: type,
 			}, function (err, obj) {
 				if(err) { log(err); }
 				callback(obj);
@@ -525,7 +524,7 @@ module.exports = {
 			// Chercher si l'utilisateur existe
 			globalRanks.find({
 				server_name: globalCfg.serverGlobalName,
-				user_id: data.user_id
+				user_id: data.user_id,
 			}, function(error, obj) {
 				if(error) { log(error); }
 				

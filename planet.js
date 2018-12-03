@@ -206,6 +206,28 @@ module.exports = class Planet {
 
 		return resources;
 	}
+
+	static buildingHasRequirements(user, planet, id) {
+		// @TODO: Will be activated soon, just disabled to make tests on dev server
+		//if(planetData.Buildings[id] > 0) { return true; }
+		if(buildingParents[id] === undefined) { return true; }
+
+		for(let i=0; i<buildingParents[id].research.length; i++) {
+			if(!Research.getResearch(user, buildingParents[id].research[i])) {
+				return false;
+			}
+		}
+
+		for(let i=0; i<buildingParents[id].building.length; i++) {
+			let currentBuilding = buildingParents[id].building[i];
+			if(currentBuilding[1] > planet.Buildings[currentBuilding[0]]) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	/**
 	 * Do we can upgrade a building ? And if yes build it !
 	 *
@@ -247,6 +269,12 @@ module.exports = class Planet {
 				if(newData.Buildings[data.building]>buildingMaxLvl[data.building]) {
 					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_MAXIMUM';
+				}
+
+				// Les requierments ?
+				if(!Planet.buildingHasRequirements(userReturned, planetReturned, data.building)) {
+					BlockBuild = true;
+					errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 				}
 
 				newData.Buildings[data.building]++; // Only for calcs
