@@ -11,7 +11,7 @@ module.exports = class Units {
 		 * YOU NEED TO AUTH USER BEFORE !
 		 */
 		db.unit.findByOwner(data.id,function(unitList) {
-			if(unitList==undefined) { unitList = []; }
+			if(unitList===undefined) { unitList = []; }
 			io.to(data.sid).emit('units-recieve-data', unitList);
 		});
 	}
@@ -73,7 +73,7 @@ module.exports = class Units {
 			if(valid) {
 				valid = false;
 				for(let j=0; j<shipShapesDetails[ship.type][ship.shape]['svg'].length; j++) {
-					if(isset(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]) && shipShapesDetails[ship.type][ship.shape]['svg'][j][6]==i) {
+					if(isset(shipShapesDetails[ship.type][ship.shape]['svg'][j][6]) && shipShapesDetails[ship.type][ship.shape]['svg'][j][6]===i) {
 						valid = true;
 						break;
 					}
@@ -84,7 +84,7 @@ module.exports = class Units {
 			if(valid) {
 				valid = false;
 				for(let j=0; j<shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type].length; j++) {
-					if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]==ship[i].value) {
+					if(shipShapesDetails[ship.type][ship.shape]['content'][ship[i].type][j]===ship[i].value) {
 						valid = true;
 						break;
 					}
@@ -191,7 +191,7 @@ module.exports = class Units {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
 				for(let i in ship) {
-					if(i=='name' || i=='type' || i=='shape') { continue; }
+					if(i==='name' || i==='type' || i==='shape') { continue; }
 
 					if(shipResearchDependencies[ship[i].value] !== undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
 						message = 'NEEDED_RESEARCH_MISSING';
@@ -221,7 +221,7 @@ module.exports = class Units {
 						shipToSave.parts.push({
 							type: ship[i].type,
 							name: i,
-							tech: ship[i].value
+							tech: ship[i].value,
 						});
 					}
 
@@ -392,7 +392,7 @@ module.exports = class Units {
 
 					// Check fleet
 					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
-						var currTime = Date.now();
+						let currTime = Date.now();
 
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
@@ -494,7 +494,7 @@ module.exports = class Units {
 				count++;
 
 				speed = Units.getSpeed(speed, tech);
-				if(speed[0] === undefined) return { speed: [] };
+				if(speed[0] === undefined) { return { speed: [] }; }
 			}
 		}
 
@@ -512,7 +512,7 @@ module.exports = class Units {
 				count++;
 				
 				speed = Units.getSpeed(speed, tech);
-				if(speed[0] === undefined) return { speed: [] };
+				if(speed[0] === undefined) { return { speed: [] }; }
 			}
 		}
 

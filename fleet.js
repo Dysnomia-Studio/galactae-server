@@ -69,7 +69,7 @@ module.exports = class Fleet {
 				units: [],
 				population: 0,
 				fuel: 0,
-				maxFuel: 0
+				maxFuel: 0,
 			};
 
 			db.fleet.create(newFleet, function(newFleet) {
@@ -129,7 +129,7 @@ module.exports = class Fleet {
 	static getMinSubSpeed(unitList) {
 		let min = {
 			speed: 0,
-			engines: {}
+			engines: {},
 		};
 
 		for(let i=0; i<unitList.length; i++) {
@@ -151,7 +151,7 @@ module.exports = class Fleet {
 	static getMinSupraSpeed(unitList) {
 		let min = {
 			speed: [],
-			engines: {}
+			engines: {},
 		};
 
 		for(let i=0; i<unitList.length; i++) {

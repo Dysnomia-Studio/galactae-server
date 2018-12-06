@@ -157,7 +157,7 @@ module.exports = class Player {
 		});
 	}
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
-		if(i==0) {
+		if(i===0) {
 			sector = {
 				'points': {},
 				'pcount': {},
@@ -313,7 +313,7 @@ module.exports = class Player {
 
 				db.player.update(newPlayerData);
 				io.to(userData.sid).emit('player-recieve-data',{
-					money: newPlayerData.money
+					money: newPlayerData.money,
 				});
 			}
 		}

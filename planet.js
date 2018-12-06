@@ -14,8 +14,8 @@ module.exports = class Planet {
 				let valid = false;
 
 				for(let i=0; i<longueur; i++) {
-					if(pid==userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-					    if(i==0 && decalage < 0) {
+					if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
+					    if(i===0 && decalage < 0) {
 					    	pid = userReturned.planetlist[longueur+decalage];
 					    } else if(i>=(longueur-decalage) && decalage > 0) {
 					    	pid = userReturned.planetlist[decalage-1];		    	
@@ -73,7 +73,7 @@ module.exports = class Planet {
 					orbitDist: p.orbitDist,
 					orbitDuration: p.orbitDuration,
 					galacticPos: p.galacticPos,
-					planetType: p.planetType
+					planetType: p.planetType,
 				};
 			}
 
@@ -136,33 +136,33 @@ module.exports = class Planet {
 		let metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
 
 		let storageHelium = 0;
-		if(buildings[10]!=0) {
+		if(buildings[10]!==0) {
 			storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
 		}
 
 		// Molecular compression, enhance max storage
-		if(Research.getResearch(user,'cp_molecular_compression')==-1) {
+		if(Research.getResearch(user,'cp_molecular_compression')===-1) {
 			mineralStorageBase *= researchBonus.cp_molecular_compression;
 			metalsStorageBase *= researchBonus.cp_molecular_compression;
 			storageHelium *= researchBonus.cp_molecular_compression;
 		}
 
 		//Minerals
-		if(currentBuilding!=0) {
+		if(currentBuilding!==0) {
 			resources[0] += mineralProdBase*time;
 		}
 
 		//Helium 3
-		if(buildings[13]!=0 && currentBuilding!=13) { resources[1] += heliumProdBase*time; }
+		if(buildings[13]!==0 && currentBuilding!==13) { resources[1] += heliumProdBase*time; }
 
 		//Metals
-		if(resources[0]-(metalProdBase*time)>0 && currentBuilding!=1) { //Verify if you can use basic ressources
+		if(resources[0]-(metalProdBase*time)>0 && currentBuilding!==1) { //Verify if you can use basic ressources
 		    for(let i=2; i<6; i++) {
 		    	resources[i] += (metalProdBase*time)*ratios[i-2];
 		    }
 
 			resources[0] -= (metalProdBase*time); //Consomation Algorithm
-		} else if(currentBuilding!=1) { // Do the max we can
+		} else if(currentBuilding!==1) { // Do the max we can
 		    for(let i=2; i<6; i++) {
 		    	resources[i] += resources[0]*ratios[i-2];
 		    }
@@ -238,7 +238,7 @@ module.exports = class Planet {
 		// Mauvais n° de batiment
 		if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
-			if(data.planet!=planetReturned.id) { // Stop if not belonging
+			if(data.planet!==planetReturned.id) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
 				return;
@@ -270,9 +270,8 @@ module.exports = class Planet {
 					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_MAXIMUM';
 				}
-
-				// Les requierments ?
-				if(!Planet.buildingHasRequirements(userReturned, planetReturned, data.building)) {
+				// Les requirements ?
+				if(!Planet.buildingHasRequirements(userReturned, newData, data.building)) {
 					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 				}
@@ -281,7 +280,7 @@ module.exports = class Planet {
 
 				// Energie ? Habitants ?
 				if(!BlockBuild) {	
-					if(!Planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!=4) { // Only ground buildings affected by this
+					if(!Planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
 						BlockBuild = true;
 						errormsg = 'BUILDING_ERROR_ENERGY';
 					}

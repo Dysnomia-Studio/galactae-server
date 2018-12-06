@@ -254,8 +254,8 @@ module.exports = {
 		},
 		update: function(user, callback) {
 			let conditions = { _id: user.id },
-						update = { $set: user },
-						options = { multi: true };
+					update = { $set: user },
+					options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
@@ -267,8 +267,8 @@ module.exports = {
 		clearList: function() {
 			log('Clearing player list ...');
 			let conditions = { },
-				update = { $set: { sid: '-1' } },
-				options = { multi: true };
+						update = { $set: { sid: '-1' } },
+						options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
@@ -291,8 +291,8 @@ module.exports = {
 		},
 		update: function(data) {
 			let conditions = { _id: data._id },
-							update = { $set: data },
-							options = { multi: true };
+						update = { $set: data },
+						options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); } 
@@ -369,7 +369,7 @@ module.exports = {
 		update: function(data, callback) {
 			let conditions = { _id: data._id },
 					update = { $set: data },
-				   options = { multi: true };
+					options = { multi: true };
 
 			units.update(conditions, update, options,function(err) {
 				if(err) { log(err); }
@@ -411,9 +411,9 @@ module.exports = {
 			});
 		},
 		update: function(data,callback) {
-			let conditions = { _id: data._id }
-						  , update = { $set: data }
-						  , options = { multi: true };
+			let conditions = { _id: data._id },
+						update = { $set: data },
+						options = { multi: true };
 
 			fleets.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
@@ -483,12 +483,9 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			let conditions = {server_name: globalCfg.serverGlobalName}
-						  , update = { $set: data }
-						  , options = { multi: true };
-
-			console.info(conditions);
-			console.info(data);
+			let conditions = {server_name: globalCfg.serverGlobalName},
+						update = { $set: data },
+						options = { multi: true };
 
 			servers.update(conditions, update, options,function(error) {
 				if(error) { log(error);} 
@@ -538,7 +535,7 @@ module.exports = {
 				} else { // Sinon update
 					let conditions = {
 						server_name: globalCfg.serverGlobalName,
-						user_id: data.user_id
+						user_id: data.user_id,
 						},
 						update = { $set: data },
 						options = { multi: false };
@@ -583,7 +580,7 @@ module.exports = {
 		},
 		count: function(callback) {
 			globalRanks.count({
-				server_name: globalCfg.serverGlobalName
+				server_name: globalCfg.serverGlobalName,
 			} , function(err, c) {
 				if(err) { log(err); } 
 				callback(c);
@@ -619,12 +616,12 @@ module.exports = {
 							rank: min,
 							points,
 							planets: pcount,
-							name
+							name,
 						});
 					});
 				});
 			});
-		}
+		},
 	},
 
 	sectorRank: {
@@ -633,7 +630,7 @@ module.exports = {
 			sectorRanks.find({
 				server_name: globalCfg.serverGlobalName,
 				user_id: data.user_id,
-				sector: data.sector
+				sector: data.sector,
 			}, function(error, obj) {
 				if(error) { log(error); }
 
@@ -648,7 +645,7 @@ module.exports = {
 					let conditions = {
 							server_name: globalCfg.serverGlobalName,
 							user_id: data.user_id,
-							sector: data.sector
+							sector: data.sector,
 						},
 						update = { $set: data },
 						options = { multi: false };
@@ -734,11 +731,11 @@ module.exports = {
 							rank: min,
 							points,
 							planets: pcount,
-							name
+							name,
 						});
 					});
 				});
 			});
-		}
+		},
 	},
 };

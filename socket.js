@@ -119,7 +119,7 @@ module.exports = class Websocket {
 			// Change name
 			socket.on('planet-rename', function(data) {
 				// Vars
-				if(!isset(data) || !isset(data.planet) || !isset(data.name) || data.name=='') { return; }
+				if(!isset(data) || !isset(data.planet) || !isset(data.name) || data.name==='') { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
@@ -227,7 +227,7 @@ module.exports = class Websocket {
 
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 				
-				if(data.username=='***REMOVED***' && data.password=='***REMOVED***') {
+				if(data.username==='***REMOVED***' && data.password==='***REMOVED***') {
 					adminSid = socket.id;
 					log('Admin connected from ' + clientIpAddress);
 				} else {
@@ -242,7 +242,7 @@ module.exports = class Websocket {
 				
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
-				if(socket.id==adminSid) {
+				if(socket.id===adminSid) {
 					if(typeof(data.cmd) !== 'string') {
 						return;
 					}

@@ -149,7 +149,6 @@ module.exports = class Research {
 	}
 
 	static sync(data) {
-		console.info(data); // pid
 		db.player.searchByName(data.username,function(userReturned) {
 			Research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.planet.find(data.pid, function(planetReturned) {
@@ -192,7 +191,7 @@ module.exports = class Research {
 		}
 
 		io.to(data.sid).emit('player-recieve-data', {
-			research: researchOut
+			research: researchOut,
 		});
 	}
 };
