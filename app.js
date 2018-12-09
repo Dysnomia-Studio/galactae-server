@@ -60,8 +60,8 @@ db.connect(function(success,general=false) {
 		return;
 	}
 
-	if(!general) {
-		//db.player.clearList();
+	if(!general && !globalCfg.dev) {
+		db.player.clearList();
 	}
 
 	if(general) {
@@ -95,9 +95,11 @@ db.connect(function(success,general=false) {
 	}
 });
 
-/**
- * Graceful stop
- */
-process.on('SIGINT', function() {
-    Websocket.restart();
-});
+if(!globalCfg.dev) {
+	/**
+	 * Graceful stop
+	 */
+	process.on('SIGINT', function() {
+	    Websocket.restart();
+	});
+}
