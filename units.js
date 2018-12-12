@@ -243,7 +243,7 @@ module.exports = class Units {
 								unitList[currObj].shipShape === shipToSave.shipShape &&
 								unitList[currObj].parts.length === shipToSave.parts.length) {
 
-								duplicate = checkIfSameParts(unitList[currObj], shipToSave);
+								duplicate = Units.checkIfSameParts(unitList[currObj], shipToSave);
 								if(duplicate) {
 									break;
 								}
