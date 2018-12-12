@@ -120,6 +120,7 @@ module.exports = class Player {
 		}
 
 		io.to(data.sid).emit('player-recieve-data',{
+			planetlist: playerData.planetlist,
 			money: playerData.money,
 			gvt: playerData.gvt,
 			currTutorial: playerData.currTutorial,
