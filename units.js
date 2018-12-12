@@ -322,7 +322,7 @@ module.exports = class Units {
 	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
-			if(!isset(planetReturned.owner) || planetReturned.owner !== inputData.id) { return; }
+			if(!isset(planetReturned.owner) || ''+planetReturned.owner !== ''+inputData.id) { return; }
 
 			let newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
@@ -341,7 +341,7 @@ module.exports = class Units {
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
-				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || unitReturned.ownerId !== inputData.id) { return; }
+				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
 				// Check defence fleet
 				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') { return; }
 				if(unitReturned.shipType === 'SHIP_DEF') { inputData.fleet = -2; }
