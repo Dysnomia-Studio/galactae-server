@@ -9,7 +9,7 @@ module.exports = function() {
 		units: 				0.0003,
 		money: 			    0.0001,
 	};
-	/** 
+	/**
 	 * Production
 	 */
 	this.planetRatios = [
@@ -104,15 +104,15 @@ module.exports = function() {
 			// Ground building
 			[0,0,0], // Quarry
 			[0,0,0], // Metallurgie
-			[0.4,9,-5], // Living
+			[0.35,9,-5], // Living
 			[0,0,0], // Serres
-			[0.7,3,-3], // Solar panel
+			[0.57,3,-3], // Solar panel
 			[0,0,0], // Warehouse
 			[0,0,0], // Hedquarters
-			[0.85,3,3], // Launching Center
-			[0.25,4,0], // Research Center
+			[0.8,3,3], // Launching Center
+			[0.45,4,0], // Research Center
 			// Space stations
-			[0.35,9,0], // Radar
+			[0.3,9,0], // Radar
 			[0,0,0], // Tank
 			[0,0,0], // Shipyard
 			[0,0,0], // Trade
@@ -212,7 +212,7 @@ module.exports = function() {
 		research: [],
 		building: [ [7, 8] ], // Launching Center lvl 8
 	};
-	
+
 	/**
 	 * Research
 	 */
@@ -295,8 +295,8 @@ module.exports = function() {
 	this.researchList = {
 		// Noeud Central
 		researchCenter: 			{ cost: 0, 		parents: [] },
-		industrialistion: 			{ cost: 8, 		parents: ['researchCenter'] },		
-		phyContemporaine: 			{ cost: 20, 	parents: ['researchCenter'] },	
+		industrialistion: 			{ cost: 8, 		parents: ['researchCenter'] },
+		phyContemporaine: 			{ cost: 20, 	parents: ['researchCenter'] },
 		thermodynamique: 			{ cost: 13, 	parents: ['researchCenter'] },
 		// Mise en orbite et propulsion
 		prop_main: 					{ cost: 380, 	parents: ['thermodynamique','misc_mecStellaire', [7,3] ] },
@@ -358,7 +358,7 @@ module.exports = function() {
 		misc_calcGravit: 			{ cost: 240, 	parents: ['misc_astronomie'] },
 		misc_em: 					{ cost: 110, 	parents: ['phyContemporaine'] },
 	};
-	
+
 	/**
 	 * Units
 	 */
@@ -408,12 +408,12 @@ module.exports = function() {
 		projector: 'def_shield_projector',
 
 		// Cloak
-		
+
 		// Scanners
 
 		// Hangar
 		hangarDouble: 'hangar_double',
-		
+
 		// Propulsion
 		vsl: 'prop_vsl',
 		wd: 'prop_wd',
@@ -550,7 +550,7 @@ module.exports = function() {
 		},
 		SHIP_CORVET: {
 			SHIP_CORVET_SMALL: {
-				svg: [			
+				svg: [
 					['struct','rect'  , 50,150,120, 60], // Moteur 1
 					['struct','rect'  , 50,290,120, 60], // Moteur 2
 					['struct','circle',250,250,150], // Corps
@@ -578,14 +578,14 @@ module.exports = function() {
 		SHIP_CARRIER: {
 			SHIP_CARRIER_MEDIUM: {
 				svg: [
-					['struct','path','M400',200,'Q',500,250,400,300,'L50',300,'Q',0,250,50,200,'L400',200], // Centre	
-					['struct','poly',60,200,60,130,220,130,240,200], // Aile gauche avant 
+					['struct','path','M400',200,'Q',500,250,400,300,'L50',300,'Q',0,250,50,200,'L400',200], // Centre
+					['struct','poly',60,200,60,130,220,130,240,200], // Aile gauche avant
 					['struct','poly',60,200,60,90,130,90,150,200], // Aile gauche arriere
 					['struct','poly',60,300,60,370,220,370,240,300], // Aile droite avant
 					['struct','poly',60,300,60,410,130,410,150,300], // Aile droite arriere
 					// Hangars
-					['hangar','rect', 70,110,50,50,'hangar_1'], // Aile gauche arriere 
-					['hangar','rect',160,140,50,50,'hangar_2'], // Aile gauche avant 
+					['hangar','rect', 70,110,50,50,'hangar_1'], // Aile gauche arriere
+					['hangar','rect',160,140,50,50,'hangar_2'], // Aile gauche avant
 					['hangar','rect', 70,340,50,50,'hangar_3'], // Aile droite arriere
 					['hangar','rect',160,310,50,50,'hangar_4'], // Aile droite avant
 					// Boucliers
@@ -621,18 +621,18 @@ module.exports = function() {
 		SHIP_SAT_AG2: 				[ 15, 20, 50, 23,0.37,   0],
 		SHIP_SAT_AG3: 				[ 30, 35, 60, 36,0.70,   0],
 		// Battlecruisers
-		SHIP_BATTLECRUISER_SMALL: 	[250,250,120, 70,1.12, 160],
+		SHIP_BATTLECRUISER_SMALL: 	[250,250,120, 65,1.12, 160],
 		// Cruisaders
-		SHIP_CUIRASSE_SMALL: 		[320,350,180,110,1.45, 220],
+		SHIP_CUIRASSE_SMALL: 		[320,350,180,100,1.45, 220],
 		// Fighters
 		SHIP_FIGHTER_SMALL: 		[ 45, 25, 40, 20, 0.35,   5],
 		SHIP_FIGHTER_MEDIUM: 		[ 65, 35, 60, 30, 0.52,  10],
-		SHIP_FIGHTER_BOMBER: 		[ 90, 60,100, 50, 0.78,  20],
+		SHIP_FIGHTER_BOMBER: 		[ 90, 60,100, 48, 0.78,  20],
 		// Corvets
 		SHIP_CORVET_SMALL: 			[115, 20, 90, 40,0.62,  40],
 		// Carriers
-		SHIP_CARRIER_SMALL: 		[400,300,140, 80,1.25, 920],
-		SHIP_CARRIER_MEDIUM: 		[500,420,190,105,1.65,1200],
+		SHIP_CARRIER_SMALL: 		[400,300,140, 75,1.25, 920],
+		SHIP_CARRIER_MEDIUM: 		[500,420,190, 95,1.65,1200],
 
 		/**
 		 * Ship parts
@@ -662,7 +662,7 @@ module.exports = function() {
 		// Hangars
 		hangarSimple: 	[  5, 30, 18,  5,0.50,   5],
 		hangarDouble: 	[ 12, 45, 25,  7,0.80,  10],
-			
+
 		none: [0,0,0,0,0,0],
 	};
 
@@ -686,6 +686,21 @@ module.exports = function() {
 		vsl: 			32761,
 		wd: 			29012,
 		hyperespace: 	25492,
+	};
+
+	this.fuelStorage = {
+		SHIP_BATTLECRUISER_SMALL: 250000,
+
+		SHIP_CUIRASSE_SMALL: 225000,
+
+		SHIP_FIGHTER_SMALL: 25000,
+		SHIP_FIGHTER_MEDIUM: 40000,
+		SHIP_FIGHTER_BOMBER: 45000,
+
+		SHIP_CORVET_SMALL: 80000,
+
+		SHIP_CARRIER_SMALL: 180000,
+		SHIP_CARRIER_MEDIUM: 320000,
 	};
 
 	this.fighterWeight = {
