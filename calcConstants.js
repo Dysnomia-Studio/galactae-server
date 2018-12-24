@@ -12,10 +12,6 @@ module.exports = function() {
 	/**
 	 * Production
 	 */
-	this.planetRatios = [
-		{ironRatio: 0.35, aluRatio: 0.50, copperRatio: 0.04, titanRatio: 0.10}, // Earth type
-	];
-
 	this.mineralProd = 	[2,-2,145];
 	this.metalProd = 	[1.85,-3,139];
 	this.heliumProd = 	[190,-424,500];
@@ -63,134 +59,7 @@ module.exports = function() {
 		6,	// Commerce
 		3,	// Mine He3
 	];
-	this.buildCost = {
-		aluminium: [
-			// Ground building
-			[0,0,0], // Quarry
-			[0,0,0], // Metallurgie
-			[0,0,0], // Living
-			[0.8,8,-5], // Serres
-			[0.6,3,0], // Solar panel
-			[0,0,0], // Warehouse
-			[0.6,8,-6], // Hedquarters
-			[0.6,3,0], // Launching Center
-			[0.25,8,0], // Research Center
-			// Space stations
-			[1.7,1,0], // Radar
-			[0.7,8,-3], // Tank
-			[0.5,4,5], // Shipyard
-			[0.6,3,5], // Trade
-			[0.9,9,-3], // He3exp
-		],
-		iron: [
-			// Ground building
-			[8,-20,17], // Quarry
-			[2,-2,0], // Metallurgie
-			[2.7,-6,8], // Living
-			[0,0,0], // Serres
-			[0.5,2,0], // Solar panel
-			[1.75,-1.5,0], // Warehouse
-			[0.8,2,0], // Hedquarters
-			[6,-20,24], // Launching Center
-			[1.25,-1,0], // Research Center
-			// Space stations
-			[0,0,0], // Radar
-			[2.2,2,0], // Tank
-			[2,2,8], // Shipyard
-			[2.5,4,0], // Trade
-			[1.5,3,0], // He3exp
-		],
-		copper: [
-			// Ground building
-			[0,0,0], // Quarry
-			[0,0,0], // Metallurgie
-			[0.35,9,-5], // Living
-			[0,0,0], // Serres
-			[0.57,3,-3], // Solar panel
-			[0,0,0], // Warehouse
-			[0,0,0], // Hedquarters
-			[0.8,3,3], // Launching Center
-			[0.45,4,0], // Research Center
-			// Space stations
-			[0.3,9,0], // Radar
-			[0,0,0], // Tank
-			[0,0,0], // Shipyard
-			[0,0,0], // Trade
-			[0,0,0], // He3exp
-		],
-		titanium: [
-			// Ground building
-			[0.75,6.5,-2], // Quarry
-			[2.8,6,6], // Metallurgie
-			[0,0,0], // Living
-			[1.2,12,-3.8], // Serres
-			[0,0,0], // Solar panel
-			[2.5,6,6.5], // Warehouse
-			[1.2,5,-6.5], // Hedquarters
-			[0.5,6.5,-2], // Launching Center
-			[0.8,6.5,-2], // Research Center
-			// Space stations
-			[0,0,0], // Radar
-			[0,0,0], // Tank
-			[3,0,8], // Shipyard
-			[0,0,0], // Trade
-			[0,0,0], // He3exp
-		],
-		time: [
-			// Ground building
-			[0.03,0.05,-0.2], // Quarry
-			[0.06,-0.15,0.1], // Metallurgie
-			[0.07,-0.1,0.05], // Living
-			[0.065,-0.1,0], // Serres
-			[0.05,-0.1,0.03], // Solar panel
-			[0.035,0.05,-0.2], // Warehouse
-			[0.05,0.1,-0.1], // Hedquarters
-			[0.04,0.08,-0.1], // Launching Center
-			[0.02,0.03,-0.1], // Research Center
-			// Space stations
-			[0.1,0.1,0], // Radar
-			[0.025,0.1,0], // Tank
-			[0.075,0.15,0.15], // Shipyard
-			[0.12,0.5,0], // Trade
-			[0.017,0.15,0], // He3exp
-		],
-		energy: [
-			// Ground building
-			[725,100000,500000], // Quarry
-			[1000,-10000,700], // Metallurgie
-			[400,-1100,700], // Living
-			[0,80000,-10000], // Serres
-			[0,0,0], // Solar panel
-			[35,-200,800], // Warehouse
-			[150,200,1200], // Hedquarters
-			[300,-1300,800], // Launching Center
-			[550,-2500,700], // Research Center
-			// Space stations
-			[0,0,0], // Radar
-			[0,0,0], // Tank
-			[0,0,0], // Shipyard
-			[0,0,0], // Trade
-			[0,0,0], // He3exp
-		],
-		habitants: [
-			// Ground building
-			[700,90120,-60000], // Quarry
-			[1300,72010,-32359], // Metallurgie
-			[0,0,0], // Living
-			[2035,24090,15464], // Serres
-			[323,18721,-3092], // Solar panel
-			[1640,12231,-6422], // Warehouse
-			[0,1750,-1250], // Hedquarters
-			[1550,40504,0], // Launching Center
-			[1000,22439,30231], // Research Center
-			// Space stations
-			[0,267,-167], // Radar
-			[800,14500,-1500], // Tank
-			[2205,32000,20000], // Shipyard
-			[7000,18000,20000], // Trade
-			[3029,10533,18000], // He3exp
-		],
-	};
+	
 	this.buildingParents = [];
 	this.buildingParents[9] = { // Radar
 		research: ['misc_telemetrie','misc_em'],

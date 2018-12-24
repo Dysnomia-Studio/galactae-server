@@ -6,7 +6,7 @@ let assert = require('assert');
 /**
  * My libs
  */
-global.db = require('./database');
+global.db = require('../database');
 
 let gameDb;
 let generalDb;
@@ -54,7 +54,7 @@ describe('• db', function() {
 			});
 		});
 		it('searchById(ok)', function(done) {
-			db.player.searchById("58fa309a7acc0f4281af935d", function(user) {
+			db.player.searchById("5bd73bd6c050b80095743eb4", function(user) {
 				assert(user !== undefined && user !== null);
 				if(user !== undefined && user !== null) {
 					assert(user.name === "Elanis");

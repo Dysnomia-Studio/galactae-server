@@ -38,6 +38,7 @@ require('./console')();
 global.db        = require('./database');
 global.Discord   = require('./discord');
 // Then include other classes
+global.Buildings = require('./Buildings').Buildings;
 global.Chat      = require('./chat');
 global.Combat    = require('./combat');
 global.Fleet 	 = require('./fleet');
@@ -45,6 +46,7 @@ global.GameMap   = require('./map');
 global.Planet    = require('./planet');
 global.Player    = require('./player');
 global.Research  = require('./research');
+global.Resources = require('./Resources').Resources;
 global.Tutorials = require('./tutorials');
 global.Units     = require('./units');
 // And that's in last

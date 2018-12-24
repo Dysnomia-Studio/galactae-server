@@ -549,7 +549,7 @@ module.exports = {
 		findByUserId: function(uid, callback) {
 			globalRanks.find({
 				server_name: globalCfg.serverGlobalName,
-				user_id: uid
+				user_id: uid,
 			}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
@@ -660,7 +660,7 @@ module.exports = {
 			sectorRanks.find({
 				sector: sector,
 				server_name: globalCfg.serverGlobalName,
-				user_id: uid
+				user_id: uid,
 			}, function (err, obj) {
 				if(err) { log(err); }
 				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
@@ -694,7 +694,7 @@ module.exports = {
 		count: function(sector, callback) {
 			sectorRanks.count({
 				server_name: globalCfg.serverGlobalName,
-				sector: sector
+				sector: sector,
 				} , function(err, c) {
 				if(err) { log(err); } 
 				callback(c);

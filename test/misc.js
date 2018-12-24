@@ -6,7 +6,7 @@ let assert = require('assert');
 /**
  * My libs
  */
-require('../../server-dev/misc')();
+require('../misc')();
 
 describe('• misc', function() {
 	/**

@@ -27,7 +27,7 @@ describe('• Units', function() {
 		});
 
 		it('Not a Fighter', function() {
-			let shipShape = "SHIP_CARRIER_MEDIUM"; //                            [500,420,190,105,1.65,1200]
+			let shipShape = "SHIP_CARRIER_MEDIUM"; //                            [500,420,190, 95,1.65,1200]
 			let parts = [
 				{ tech: "none", type: "hangar", name: "hangar_1" }, //           [  0,  0,  0,  0,   0,   0]
 				{ tech: "hangarSimple", type: "hangar", name: "hangar_2" }, //   [  5, 30, 18,  5,0.50,   5]
@@ -40,7 +40,7 @@ describe('• Units', function() {
 
 			assert.deepEqual(
 				Units.calcCost(shipShape, parts),
-				[687,755,356,162,4.45,1301]
+				[687,755,356,152,4.45,1301]
 			);
 		});
 

@@ -191,7 +191,7 @@ describe('• Fleet', function() {
 	describe('# getUnitsList()', function() {
 		it('Existing', function(done) {
 			let unitIdList = [
-				["5b94e5bef438470454da3f4c",1]
+				["5c1f62fe951265134ca2fa59",1]
 			];
 
 			Fleet.getUnitsList(unitIdList, function(unitList) {

@@ -95,20 +95,7 @@ module.exports = class Planet {
 
 		io.to(data.sid).emit('planet-recieve-data', data );
 	}
-	/**
-	 * Gets the minerals ratio.
-	 *
-	 * @class      GetMineralsRatio (name)
-	 * @param      {<type>}  type    The type of planet
-	 * @return     {Object}  The minerals ratio.
-	 */
-	static GetMineralsRatio(type) {
-		if(planetRatios[type] !== undefined) {
-			return planetRatios[type];	
-		} else {
-			return planetRatios[0];
-		}
-	}
+	
 	/**
 	 * Calculates the new resources based on constants building level on a
 	 * specific time period.
@@ -123,7 +110,7 @@ module.exports = class Planet {
 	static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 		time = time/3600/1000; // Passage en heures
 
-		let ratio = Planet.GetMineralsRatio(planetType);
+		let ratio = Resources.GetRatiosPerPlanet(planetType);
 		let ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
 		let mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
@@ -207,27 +194,6 @@ module.exports = class Planet {
 		return resources;
 	}
 
-	static buildingHasRequirements(user, planet, id) {
-		// @TODO: Will be activated soon, just disabled to make tests on dev server
-		//if(planetData.Buildings[id] > 0) { return true; }
-		if(buildingParents[id] === undefined) { return true; }
-
-		for(let i=0; i<buildingParents[id].research.length; i++) {
-			if(!Research.getResearch(user, buildingParents[id].research[i])) {
-				return false;
-			}
-		}
-
-		for(let i=0; i<buildingParents[id].building.length; i++) {
-			let currentBuilding = buildingParents[id].building[i];
-			if(currentBuilding[1] > planet.Buildings[currentBuilding[0]]) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	/**
 	 * Do we can upgrade a building ? And if yes build it !
 	 *
@@ -236,13 +202,14 @@ module.exports = class Planet {
 	 */
 	static build(data) {
 		// Mauvais n° de batiment
-		if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs
+		if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs;
+
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.id) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
 				return;
-			} 
+			}
 
 			let timeSpeed = 1;
 
@@ -251,8 +218,8 @@ module.exports = class Planet {
 			// Calc new planet data
 			let newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
-			// Vars for this building test
-			let cost = Planet.GetBuildingCost(data.building,newData.Buildings[data.building]+1);
+			// Vars for this building tes
+			let cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
 			let BlockBuild = false;
 			let errormsg = 'BUILD_ERROR'; // Message d'erreur par defaut
 				// Cost verif
@@ -271,7 +238,7 @@ module.exports = class Planet {
 					errormsg = 'BUILDING_ERROR_MAXIMUM';
 				}
 				// Les requirements ?
-				if(!Planet.buildingHasRequirements(userReturned, newData, data.building)) {
+				if(!Buildings.HasRequirements(userReturned, newData, data.building)) {
 					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 				}
@@ -280,7 +247,7 @@ module.exports = class Planet {
 
 				// Energie ? Habitants ?
 				if(!BlockBuild) {	
-					if(!Planet.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
+					if(!Buildings.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
 						BlockBuild = true;
 						errormsg = 'BUILDING_ERROR_ENERGY';
 					}
@@ -448,24 +415,6 @@ module.exports = class Planet {
 
 		return data;
 	}
-	/**
-	 * Is there enought energy on planet ?
-	 *
-	 * @param      {Object}  groundBuildings  The ground buildings list
-	 */
-	static enoughtEnergy(groundBuildings) {
-		let prod = Math.round(electricity[0]*Math.pow(groundBuildings[4],2) + electricity[1]*groundBuildings[4] + electricity[2]);
-		let cons = 0;
-
-		for(let i=0; i<9; i++) {
-			cons += parseInt(Planet.GetBuildingCost(i,groundBuildings[i]).energy);
-		}
-
-		if(prod<cons) {
-			return false;
-		}
-		return true;
-	}
 
 	/**
 	 * Gets the people count
@@ -483,10 +432,10 @@ module.exports = class Planet {
 			if(buildings[i]===0) { continue; }
 			if(i===planetData.nextBuilding) {
 				// Current in-build building
-				cons += parseInt(Planet.GetBuildingCost(i,buildings[i] + 1).habitants);
+				cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
 				continue; 
 			}
-			cons += parseInt(Planet.GetBuildingCost(i,buildings[i]).habitants);
+			cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants);
 		}
 
 		// Units builded and in-build
@@ -596,38 +545,5 @@ module.exports = class Planet {
 		}
 
 		return points;
-	}
-
-	/**
-	 * Gets the building cost.
-	 *
-	 * @class      GetBuildingCost (name)
-	 * @param      {number}  build   The building id
-	 * @param      {number}  level   The level asked
-	 * @return     {object}  The building cost.
-	 */
-	static GetBuildingCost(build,level) {
-		if(build < 0 || build >= globalConst.buildingNumber) { return; }
-
-		let retour = {
-			aluminium: 	Math.round(buildCost['aluminium'][build][0]*Math.pow(level,2) +		buildCost['aluminium'][build][1]*level + 	buildCost['aluminium'][build][2]),
-			iron: 		Math.round(buildCost['iron'][build][0]*Math.pow(level,2) +			buildCost['iron'][build][1]*level + 		buildCost['iron'][build][2]),
-			copper: 	Math.round(buildCost['copper'][build][0]*Math.pow(level,2) + 		buildCost['copper'][build][1]*level + 		buildCost['copper'][build][2]),
-			titanium: 	Math.round(buildCost['titanium'][build][0]*Math.pow(level,2) + 		buildCost['titanium'][build][1]*level + 	buildCost['titanium'][build][2]),
-			time: 				   buildCost['time'][build][0]*Math.pow(level,2) + 			buildCost['time'][build][1]*level + 		buildCost['time'][build][2],
-			energy: 	Math.round(Math.pow(buildCost['energy'][build][0]*level,2) + 		buildCost['energy'][build][1]*level + 		buildCost['energy'][build][2]),
-			energy_difference: Math.round(Math.pow(buildCost['energy'][build][0]*level,2) + buildCost['energy'][build][1]*level +       buildCost['energy'][build][2] 
-			                        - (Math.pow(buildCost['energy'][build][0]*(level-1),2) + buildCost['energy'][build][1]*(level-1) +   buildCost['energy'][build][2])),
-			habitants:  Math.round(buildCost['habitants'][build][0]*Math.pow(level,2) +		buildCost['habitants'][build][1]*level + 	buildCost['habitants'][build][2]),
-			habitants_difference: Math.round(buildCost['habitants'][build][0]*Math.pow(level,2) +	buildCost['habitants'][build][1]*level + 	buildCost['habitants'][build][2]
-				                         - (buildCost['habitants'][build][0]*Math.pow((level-1),2) +	buildCost['habitants'][build][1]*(level-1) + buildCost['habitants'][build][2])),
-		};
-
-		if(level === 1) {
-			retour.habitants_difference = retour.habitants;
-			retour.energy_difference = retour.energy;
-		}
-
-		return retour;
 	}
 };
