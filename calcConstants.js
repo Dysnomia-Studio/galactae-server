@@ -16,7 +16,7 @@ module.exports = function() {
 	this.metalProd = 	[1.85,-3,139];
 	this.heliumProd = 	[190,-424,500];
 
-	this.storageRatio = [47.52,8.29];
+	this.storageRatio = [0.1,0.5,7];
 	this.heliumStorageRatio = 0.2;
 
 	this.electricity = [2080000,165000,550000];

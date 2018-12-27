@@ -117,7 +117,7 @@ module.exports = class Planet {
 		let metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
 		let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
-		let warehouseBase = storageRatio[0]*Math.log(buildings[5]) + storageRatio[1];
+		let warehouseBase = storageRatio[0]*Math.pow(buildings[5], 2) + storageRatio[1]*buildings[5] + storageRatio[2];
 
 		let mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
 		let metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
@@ -129,7 +129,7 @@ module.exports = class Planet {
 					heliumProd[1]*buildings[10]  +
 					heliumProd[2]
 				)*
-				(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1]) *
+				(storageRatio[0]*Math.pow(buildings[10], 2) + storageRatio[1]*buildings[5] + storageRatio[2]) *
 				heliumStorageRatio; // Helium 3
 		}
 
