@@ -77,8 +77,7 @@ module.exports = class Fleet {
 				Fleet.refresh(planetData.id,data.sid);
 
 				if(callback) { callback(newFleet); }
-			});
-				
+			});	
 		});
 	}
 
@@ -118,7 +117,7 @@ module.exports = class Fleet {
 
 	static slowerSpeed(curr, other) {
 		let testDist = 1000; // Total galaxy
-		if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) > 
+		if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
 			(Math.pow(testDist, 2)*other[0] + testDist*other[1] + other[2])) { // Compare polynoms, more time = slower
 			return other;
 		} else {
@@ -201,18 +200,18 @@ module.exports = class Fleet {
 			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' }); 
-				return; 
-			} 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' });
+				return;
+			}
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
 				log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' });
 				return;
 			}
 
 			if(fleetReturned.position === destination) { // Current planet
 				log(user.username + ' failed to move fleet because fleet is already at destination.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_AT_DESTINATION' }); 
+				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_AT_DESTINATION' });
 				return;
 			}
 
@@ -265,7 +264,7 @@ module.exports = class Fleet {
 								planeteDepart,
 								planeteArrivee,
 								now/1000 + Math.round(baseTravelTime*360000)/100);
-							
+
 							if(Number.isNaN(previewDist) || previewDist < 0) { return; }
 							let previewTime = Fleet.calcMoveTime(previewDist, minSpeed.speed);
 
@@ -278,7 +277,7 @@ module.exports = class Fleet {
 							time = (baseTravelTime + previewTime)/2;
 						} else {
 							let dist = Math.sqrt(
-									Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) + 
+									Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
 									Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
 								);
 
@@ -288,7 +287,7 @@ module.exports = class Fleet {
 						let fuel = Fleet.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel) || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_FUEL' }); 
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_FUEL' });
 							return;
 						}
 
@@ -308,7 +307,7 @@ module.exports = class Fleet {
 							newFleet.position = destination;
 							newFleet.orbitPosition = -1;
 
-							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + ' (' + destination + ')' + 
+							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + ' (' + destination + ')' +
 								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
 
 							db.fleet.update(newFleet, function() {

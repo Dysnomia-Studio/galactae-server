@@ -8,13 +8,13 @@ module.exports = class Player {
 
 					let newData = searchSid;
 					newData.lastAction = Date.now();
-					db.player.update(newData);	
+					db.player.update(newData);
 				}
 			} else {
 				// Kick that Hacker ...
 				io.to(user.sid).emit('server-kick','INVALID_SESSION');
 			}
-		});	
+		});
 	}
 	/* Does the player can act ? */
 	static canAct(user) {
@@ -41,7 +41,7 @@ module.exports = class Player {
 
 			data.game_id = userGameIdObj[0].game_id;
 			data.user_id = userGameIdObj[0].user_id;
-			
+
 			db.ban.find(data.game_id, 2, function(banObj) {
 				if(isset(banObj)) {
 					let now = Date.now();
@@ -56,9 +56,9 @@ module.exports = class Player {
 
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
-						if(!isset(userPrivileges) || !isset(userPrivileges[0]) || 
+						if(!isset(userPrivileges) || !isset(userPrivileges[0]) ||
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== 1) {
-							
+
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
 							// @ADD: Kick & Message
 							return;
@@ -94,22 +94,22 @@ module.exports = class Player {
 
 		let playerData = dataReturned.toJSON();
 		playerData.sid = data.sid;
-		
+
 		let jour = 24*60*60*1000;
 		let minuit = Date.now() - (Date.now()%jour);
 		let hierMinuit = minuit - jour;
-		let dayStreak = 0 + playerData.dayBonusStreak +1; 
+		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 
 		if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
 		if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
-		if(playerData.lastBonus < minuit) { 
-			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest}); 
+		if(playerData.lastBonus < minuit) {
+			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest});
 		}
 
-		playerData.lastConnected = Date.now();		
+		playerData.lastConnected = Date.now();	
 
 		// Tutorials
 		if(!isset(playerData.currTutorial)) {
@@ -167,7 +167,7 @@ module.exports = class Player {
 
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
-			
+
 			i++;
 
 			let sectorAddress = planetReturned.address.split('-');
@@ -180,10 +180,10 @@ module.exports = class Player {
 			}
 			sector.points[sectorAddress] += planetReturned.points;
 			sector.pcount[sectorAddress]++;
-			
+
 			if(i<user.planetlist.length) {
 				Player.calcTotalPlanetPoints(user,callback,i,points,sector);
-			} else { 
+			} else {
 				points *= pointsCoef.planet;
 
 				let newSector = {
@@ -201,9 +201,9 @@ module.exports = class Player {
 				user.sectorPointsAddresses  = newSector.address;
 				user.sectorPointsValue = newSector.points;
 				user.sectorPointsPcount = newSector.pcount;
-				callback(user);	
+				callback(user);
 			}
-		});		
+		});
 	}
 	static calcResearchPoints(user) {
 		let points = 0;
@@ -211,7 +211,7 @@ module.exports = class Player {
 		for(let i=0; i<user.research.length; i++) {
 			if(user.research[i][1]===-1 && isset(researchList[user.research[i][0]].cost)) {
 				points+=researchList[user.research[i][0]].cost;
-			}	
+			}
 		}
 
 		points*=pointsCoef.research;
@@ -243,7 +243,7 @@ module.exports = class Player {
 			}
 
 			callback(newUserData);
-		},0,0);	
+		},0,0);
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {
@@ -274,13 +274,13 @@ module.exports = class Player {
 			else if(streak===3) { credits = 50; }
 			else if(streak===4) { credits = 80; }
 			else if(streak<10) { credits = 100; }
-			else if(streak<20) { 
+			else if(streak<20) {
 				credits = 10*(streak + 1); // 110 to 200
 				helium = 1750 * streak; // 15000 is about 45 min of ion propulsion for 1 vessel - 15000 to 33250
-			} else if(streak<30) { 
+			} else if(streak<30) {
 				credits = 15*streak; // 300 to 435
 				helium = 2000 * streak; // 40000 to 58000
-			} else { 
+			} else {
 				credits = 1000;
 			} // @ADD: generate random special bonus
 
@@ -305,7 +305,7 @@ module.exports = class Player {
 					db.player.update(newPlayerData);
 
 					Planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
-				}); 
+				});
 			} else {
 				newPlayerData.money += credits;
 				log(userData.username + ' takes its Daily Bonus ! ' + credits + ' credits');

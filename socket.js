@@ -31,7 +31,7 @@ module.exports = class Websocket {
 					// Log
 					log(user.username + ' (' + socket.id + ') disconnected');
 					Player.disconnect(user);
-				}); 
+				});
 			});
 
 			/**
@@ -45,7 +45,7 @@ module.exports = class Websocket {
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
 					Player.disconnect(user);
-				}); 
+				});
 			});
 
 			/**
@@ -57,14 +57,14 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Player.getAlly(data, Chat.analyse);	
-				}); 	
+					Player.getAlly(data, Chat.analyse);
+				});	
 			});
 
 			/**
 			* When a client ask for its planet data ...
 			*/
-			socket.on('planet-ask-data', function(data) { 
+			socket.on('planet-ask-data', function(data) {
 				// Vars
 				if(!isset(data)) { return; }
 				// User
@@ -81,7 +81,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				   	Planet.refresh(data,-1);
-				}); 
+				});
 			});
 			socket.on('planet-ask-data-next', function(data) {
 				// Vars
@@ -90,7 +90,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				   	Planet.refresh(data,1);
-				}); 
+				});
 			});
 
 			// Map
@@ -101,7 +101,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				   	Planet.getWholeSystem(data);
-				}); 
+				});
 			});
 
 
@@ -113,7 +113,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				   	Planet.build(data);
-				}); 
+				});
 			});
 
 			// Change name
@@ -124,7 +124,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				   	Planet.rename(data);
-				}); 
+				});
 			});
 
 			// Research
@@ -218,7 +218,7 @@ module.exports = class Websocket {
 				   	db.player.searchBySid(user.sid,function(dataReturned) {
 				   		Player.dayBonus(dataReturned,user,data.choice);
 				   	});
-				}); 
+				});
 			});
 
 			// Admin panel
@@ -226,8 +226,10 @@ module.exports = class Websocket {
 				if(!isset(data) || !isset(data.username) || !isset(data.password)) { return; }
 
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
-				
-				if(data.username==='***REMOVED***' && data.password==='***REMOVED***') {
+
+				if(data.username==='***REMOVED***' &&
+					data.password==='***REMOVED***') {
+
 					adminSid = socket.id;
 					log('Admin connected from ' + clientIpAddress);
 				} else {
@@ -337,7 +339,7 @@ module.exports = class Websocket {
 		Discord.alert('Restarting game server ...');
 
 		let decompte = 5;
-		
+
 		setInterval(function() {
 			if(decompte>0) {
 				log('Restarting server in ' + decompte-- + ' seconds');
@@ -347,7 +349,6 @@ module.exports = class Websocket {
 					process.exit(0);
 				});
 			}
-			
 		},1000);
 	}
 };

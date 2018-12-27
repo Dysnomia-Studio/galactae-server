@@ -15,7 +15,7 @@ module.exports = class Units {
 			io.to(data.sid).emit('units-recieve-data', unitList);
 		});
 	}
-	
+
 	/**
 	 * Calculates the unit costs.
 	 *
@@ -37,7 +37,7 @@ module.exports = class Units {
 				if(shipShape.substr(0,12) === 'SHIP_FIGHTER') {
 					addCost[i] *= fighterMult[shipShape];
 				}
-				
+
 				totalCost[i] += addCost[i];
 			}
 		}
@@ -170,7 +170,7 @@ module.exports = class Units {
 				if(ship[i].split(' ').join('')==='') {
 					message = 'SHIP_HAS_NO_NAME';
 					break;
-				} 
+				}
 			} else if(!isset(ship[i].value) || !isset(ship[i].type)) {
 				message = 'SHIP_HAS_EMPTY_FIELD';
 				break;
@@ -217,7 +217,7 @@ module.exports = class Units {
 
 					for(let i in ship) {
 						if(i==='name' || i==='type' || i==='shape') { continue; }
-						
+
 						shipToSave.parts.push({
 							type: ship[i].type,
 							name: i,
@@ -239,7 +239,7 @@ module.exports = class Units {
 								break;
 							}
 
-							if(unitList[currObj].shipType === shipToSave.shipType && 
+							if(unitList[currObj].shipType === shipToSave.shipType &&
 								unitList[currObj].shipShape === shipToSave.shipShape &&
 								unitList[currObj].parts.length === shipToSave.parts.length) {
 
@@ -259,11 +259,11 @@ module.exports = class Units {
 						} else if(duplicate) {
 							message = 'SHIP_TYPE_ALREADY_EXISTS';
 							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-							Websocket.SendMessageToClient({sid: data.sid, message: message});	
+							Websocket.SendMessageToClient({sid: data.sid, message: message});
 						} else {
 							message = 'SHIP_NAME_ALREADY_EXISTS';
 							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-							Websocket.SendMessageToClient({sid: data.sid, message: message});	
+							Websocket.SendMessageToClient({sid: data.sid, message: message});
 						}
 					});
 
@@ -308,7 +308,7 @@ module.exports = class Units {
 
 			db.unit.delete(data.unit, function() {
 				Units.refresh(data);
-			});			
+			});		
 		});
 	}
 
@@ -356,9 +356,9 @@ module.exports = class Units {
 						choosenFleet = fleet;
 					}
 				});
-				
+
 				// Auto create def fleet if not existing
-				if(choosenFleet === undefined && inputData.fleet === -2) { 
+				if(choosenFleet === undefined && inputData.fleet === -2) {
 					inputData.fleet = -1;
 					inputData.fleetName = 'SHIP_DEF';
 				}
@@ -408,7 +408,7 @@ module.exports = class Units {
 						newPlanet.resources[4] -= totalCost[3];
 						newPlanet.resources[5] -= totalCost[2];
 
-						// Update planet 
+						// Update planet
 						db.planet.update(newPlanet);
 
 						if(inputData.unit.substr(0,14) !== 'SHIP_WEP_MINES') {
@@ -433,7 +433,7 @@ module.exports = class Units {
 
 					if(inputData.fleet === -1 && isset(inputData.fleetName)) {
 						// Check if fleet max size is reached
-						if(totalCost[5] > globalConst.maxFleetSize) { 
+						if(totalCost[5] > globalConst.maxFleetSize) {
 							log(inputData.username +' failed to build units because fleet will be too big.');
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_FLEET_SIZE' });
 							return;
@@ -444,14 +444,14 @@ module.exports = class Units {
 						});
 					} else if(inputData.fleet !== -1 && choosenFleet !== undefined) {
 						// Check if this fleet is in orbit and belong to this planet
-						if(choosenFleet.position !== newPlanet.address || choosenFleet.orbitPosition !== 0) { 
+						if(choosenFleet.position !== newPlanet.address || choosenFleet.orbitPosition !== 0) {
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
 						if(''+choosenFleet.motherPlanetId !== ''+newPlanet._id) { return; }
 
 						// Check if fleet max size is reached
-						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) { 
+						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) {
 							log(inputData.username +' failed to build units because fleet will be too big.');
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_FLEET_SIZE' });
 							return;
@@ -462,14 +462,14 @@ module.exports = class Units {
 						log(inputData.username +' failed to build units because fleet isn\'t valid.');
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_INVALID_FLEET' });
 					}
-				});	
-			});			
+				});
+			});		
 		});
 	}
 
 	static getSpeed(speed, tech) {
 		if(speed[0] === -1) { // First sup propulsion part
-			if(shipPartsSpeed[tech] === undefined) { 
+			if(shipPartsSpeed[tech] === undefined) {
 				log('Speed is not defined for part ' + tech,'error');
 				return [];
 			}
@@ -510,7 +510,7 @@ module.exports = class Units {
 			if(unit.parts[i].type === 'sup_propulsion') {
 				tech = unit.parts[i].tech;
 				count++;
-				
+
 				speed = Units.getSpeed(speed, tech);
 				if(speed[0] === undefined) { return { speed: [] }; }
 			}

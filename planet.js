@@ -18,7 +18,7 @@ module.exports = class Planet {
 					    if(i===0 && decalage < 0) {
 					    	pid = userReturned.planetlist[longueur+decalage];
 					    } else if(i>=(longueur-decalage) && decalage > 0) {
-					    	pid = userReturned.planetlist[decalage-1];		    	
+					    	pid = userReturned.planetlist[decalage-1];
 						} else {
 							pid = userReturned.planetlist[i+decalage];
 						}
@@ -124,7 +124,13 @@ module.exports = class Planet {
 
 		let storageHelium = 0;
 		if(buildings[10]!==0) {
-			storageHelium = (heliumProd[0]*Math.pow(buildings[10],2)  + heliumProd[1]*buildings[10]  + heliumProd[2])*(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1])*heliumStorageRatio; // Helium 3
+			storageHelium = (
+					heliumProd[0]*Math.pow(buildings[10],2)  +
+					heliumProd[1]*buildings[10]  +
+					heliumProd[2]
+				)*
+				(storageRatio[0]*Math.log(buildings[10]) + storageRatio[1]) *
+				heliumStorageRatio; // Helium 3
 		}
 
 		// Molecular compression, enhance max storage
@@ -158,9 +164,9 @@ module.exports = class Planet {
 		}
 
 		// Si Max de tout les metaux
-		if((resources[5]>metalsStorageBase*ratio.titanRatio) && 
-			(resources[4]>metalsStorageBase*ratio.copperRatio) && 
-			(resources[3]>metalsStorageBase*ratio.aluRatio) && 
+		if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
+			(resources[4]>metalsStorageBase*ratio.copperRatio) &&
+			(resources[3]>metalsStorageBase*ratio.aluRatio) &&
 			(resources[2]>metalsStorageBase*ratio.ironRatio)) {
 
 			let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
@@ -207,7 +213,8 @@ module.exports = class Planet {
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.id) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
-				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
+				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
+					' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
 				return;
 			}
 
@@ -228,8 +235,8 @@ module.exports = class Planet {
 					errormsg = 'BUILDING_ERROR_COST';
 				}
 				// Un bâtiment est déja en construction ?
-				if(newData.nextBuildingTime>currTime) { 
-					BlockBuild = true; 
+				if(newData.nextBuildingTime > currTime) {
+					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_ALREADY';
 				}
 				// Niveau maximum ?
@@ -283,7 +290,7 @@ module.exports = class Planet {
 					newData.resources[4] -= cost.copper;
 					newData.resources[5] -= cost.titanium;
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);	
+					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);
 					newData.nextBuilding = data.building;
 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
@@ -296,7 +303,7 @@ module.exports = class Planet {
 
 				db.planet.update(newData);
 
-				Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid }); 
+				Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
 			});
 		});
 	}
@@ -335,12 +342,12 @@ module.exports = class Planet {
 				} else { // Partial add
 				 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
 				 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
-				 	unitCount = restantDepuisSynchro - restant;				 	
+				 	unitCount = restantDepuisSynchro - restant;			 	
 				}
 
 				if(unitCount === 0) { return; } // Prevent some bugs
 				
-				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, etant donne que dans le pire des cas la derniere update date de la demande de construction, mais c'est ici par sécurité
+				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
 					unitCount = planetIn.unitBuildingCount;
 				}
 
@@ -363,7 +370,7 @@ module.exports = class Planet {
 				db.fleet.update(newFleet, function() {
 					Units.refresh(user);
 					Fleet.refresh(planetIn._id,user.sid);
-				});	
+				});
 			});
 		});
 	}
@@ -433,7 +440,7 @@ module.exports = class Planet {
 			if(i===planetData.nextBuilding) {
 				// Current in-build building
 				cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
-				continue; 
+				continue;
 			}
 			cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants);
 		}
@@ -480,7 +487,7 @@ module.exports = class Planet {
 					empty = false;
 				 	break;
 				}
-			}	
+			}
 			if(empty) { return; }
 
 			let replace = [

@@ -128,7 +128,7 @@ module.exports = class Combat {
 				battle.joinTeam('def', fleets[i]);
 			} else if(fleets[i].orbitPosition === 1) {
 				battle.joinTeam('atk', fleets[i]);
-			} 
+			}
 		}
 
 		battle.fight();

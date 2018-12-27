@@ -1,5 +1,5 @@
 module.exports = class Research {
-	static refreshUserResearch(data,callback) {	
+	static refreshUserResearch(data,callback) {
 		// Checks if new research
 		if(researchList.length!==data.research.length) {
 			for(let name in researchList) {
@@ -111,7 +111,7 @@ module.exports = class Research {
 					user.research.push([index,researchData[index]]);
 				}
 
-				callback(user);	
+				callback(user);
 			}
 		});
 	}
@@ -129,7 +129,7 @@ module.exports = class Research {
 				let researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
 
 				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
-				
+
 				if(researchedParent && researchList[researchName] !== undefined) { // Just check if it exists ...
 					newData.currResearch = researchName;
 				}
@@ -145,7 +145,7 @@ module.exports = class Research {
 
 				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 			});
-		}); 
+		});
 	}
 
 	static sync(data) {

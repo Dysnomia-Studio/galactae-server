@@ -28,12 +28,12 @@ module.exports = class Chat {
 					if(isset(userPrivileges) && isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
 						data.lvl = userPrivileges[0].user_privilege_lvl;
 					}
-					
+
 					data = Chat.protect(data);
 
-					if(!data.send) { 
+					if(!data.send) {
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-						return; 
+						return;
 					}
 
 					/**
@@ -91,9 +91,9 @@ module.exports = class Chat {
 						}
 					}
 
-					if(!data.send) { 
+					if(!data.send) {
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-						return; 
+						return;
 					}
 					if(data.message === '' || !isset(data.message)) { return; }
 
@@ -183,7 +183,7 @@ module.exports = class Chat {
 				websocket.SendGeneralMessage(str.substr(6));
 				break;
 			case '!ban':
-				if(data.lvl<3) { return data; } // Admin & Operators only	
+				if(data.lvl<3) { return data; } // Admin & Operators only
 				if(args.length<4) { return data; }
 
 				Chat.searchTarget(data, args[1], function(target) {
@@ -205,7 +205,7 @@ module.exports = class Chat {
 						admin: data.user_id,
 					});
 
-					let sid = '' + target.sid;					
+					let sid = '' + target.sid;
 					io.to(sid).emit('server-kick', banMessage);
 
 					target.sid = -1;
@@ -233,7 +233,7 @@ module.exports = class Chat {
 						ban_reason: muteMessage,
 						admin: data.user_id,
 					});
-					
+
 					io.to(target.sid).emit('chat-mute', {muteTime: muteTime, message: muteMessage});
 				});
 				break;

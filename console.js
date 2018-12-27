@@ -1,7 +1,7 @@
 module.exports = function() {
 	this.errorFile = fs.createWriteStream('../galactae.error.log', { flags: 'a' });
-	process.__defineGetter__('stderr', function() { 
-		return fs.createWriteStream('../galactae.error.log', {flags:'a'}); 
+	process.__defineGetter__('stderr', function() {
+		return fs.createWriteStream('../galactae.error.log', {flags:'a'});
 	});
 	this.logFile = fs.createWriteStream('../galactae.log', { flags: 'a' });
 

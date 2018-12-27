@@ -14,7 +14,7 @@ module.exports = class GameMap {
 		let coordsArrivee = GameMap.getPlanetCoords(anglArrivee, to.orbitDist);
 
 		return Math.sqrt(
-			Math.pow(coordsDepart[0] - coordsArrivee[0],2) + 
+			Math.pow(coordsDepart[0] - coordsArrivee[0],2) +
 			Math.pow(coordsDepart[1] - coordsArrivee[1],2)
 		);
 	}

@@ -32,7 +32,7 @@ module.exports = {
 				data.message = '<strong>'+ data.username +' :</strong> '+ msg;
 
 				log('(Discord) [' + channel.substr(9) + '] '+message.author.username+': ' +msg);
-				
+
 				io.emit('chat-message',{ message: data.message, channel: data.channel });
 			}
 		});

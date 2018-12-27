@@ -1,5 +1,5 @@
 let charList = [
-    // a    
+    // a
     ['à','&agrave;'],
     ['á','&aacute;'],
     ['â','&acirc;'],
@@ -9,7 +9,7 @@ let charList = [
     ['æ','&aelig;'],
     // c
     ['ç','&ccedil;'],
-    // e        
+    // e
     ['è','&egrave;'],
     ['é','&eacute;'],
     ['ê','&ecirc;'],
@@ -18,7 +18,7 @@ let charList = [
     ['ì','&igrave;'],
     ['í','&iacute;'],
     ['î','&icirc;'],
-    ['ï','&iuml;'], 
+    ['ï','&iuml;'],
     // n
     ['ñ','&ntilde;'],
     // o
@@ -94,14 +94,14 @@ let smileys = [
     ['<3','😍'],
 ];
 
-module.exports = function() {    
+module.exports = function() {
 	/**
      * Gets the date time.
      *
      * @return     {string}  The date time.
      */
     this.getDateTime = function(date = new Date()) {
-        
+
 	    let hour = date.getHours();
 	    hour = (hour < 10 ? '0' : '') + hour;
 
@@ -129,10 +129,10 @@ module.exports = function() {
       * @return     {boolean}   True if the variable is set, False otherwise
       */
     this.isset = function(variable) {
-		return (variable===0 || 
-            (typeof variable !== 'undefined' && 
-                variable !== null && 
-                variable !== {} && 
+		return (variable===0 ||
+            (typeof variable !== 'undefined' &&
+                variable !== null &&
+                variable !== {} &&
                 (typeof variable !== 'string' || (
                     variable.split(' ').join('') !== ''
                 ))
