@@ -12,7 +12,7 @@ module.exports = function() {
 	/**
 	 * Production
 	 */
-	this.mineralProd = 	[2,-2,145];
+	this.mineralProd = 	[1.8,-1.5,147];
 	this.metalProd = 	[1.85,-3,139];
 	this.heliumProd = 	[190,-424,500];
 
