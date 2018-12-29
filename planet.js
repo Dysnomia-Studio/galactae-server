@@ -117,28 +117,8 @@ module.exports = class Planet {
 		let metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
 		let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
-		let warehouseBase = storageRatio[0]*Math.pow(buildings[5], 2) + storageRatio[1]*buildings[5] + storageRatio[2];
-
-		let mineralStorageBase = (mineralProd[0]*Math.pow(buildings[5],2) + mineralProd[1]*buildings[5] + mineralProd[2])*warehouseBase;
-		let metalsStorageBase  = (metalProd[0]*Math.pow(buildings[5],2)   + metalProd[1]*buildings[5]   + metalProd[2]  )*warehouseBase;
-
-		let storageHelium = 0;
-		if(buildings[10]!==0) {
-			storageHelium = (
-					heliumProd[0]*Math.pow(buildings[10],2)  +
-					heliumProd[1]*buildings[10]  +
-					heliumProd[2]
-				)*
-				(storageRatio[0]*Math.pow(buildings[10], 2) + storageRatio[1]*buildings[5] + storageRatio[2]) *
-				heliumStorageRatio; // Helium 3
-		}
-
-		// Molecular compression, enhance max storage
-		if(Research.getResearch(user,'cp_molecular_compression')===-1) {
-			mineralStorageBase *= researchBonus.cp_molecular_compression;
-			metalsStorageBase *= researchBonus.cp_molecular_compression;
-			storageHelium *= researchBonus.cp_molecular_compression;
-		}
+		let mineralStorageBase, metalsStorageBase, storageHelium;
+		[ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], research.isSearched(user, 'cp_molecular_compression'));
 
 		//Minerals
 		if(currentBuilding!==0) {

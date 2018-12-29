@@ -221,5 +221,39 @@
 		static enoughtEnergy(buildings) {
 			return Buildings.getEnergyProd(buildings) > Buildings.getEnergyCons(buildings);
 		}
+
+		static calcStorageCapacity(storageLvL, heliumStorageLvl, cp_molecular_compression) {
+			let warehouseBase = storageRatio[0]*Math.pow(storageLvL,2) + storageRatio[1]*storageLvL + storageRatio[2];
+
+			let mineralStorageBase = (mineralProd[0]*Math.pow(storageLvL,2) + mineralProd[1]*storageLvL + mineralProd[2])*warehouseBase;
+			let metalsStorageBase  = (metalProd[0]*Math.pow(storageLvL,2)   + metalProd[1]*storageLvL   + metalProd[2])*warehouseBase;
+			let storageHelium = 0;
+
+			if(heliumStorageLvl !== 0) {
+				storageHelium = (heliumProd[0]*Math.pow(heliumStorageLvl,2)  + heliumProd[1]*heliumStorageLvl  + heliumProd[2])*
+					(storageRatio[0]*Math.pow(heliumStorageLvl, 2) + storageRatio[1] * heliumStorageLvl + storageRatio[2])*heliumStorageRatio; // Helium 3
+			}
+
+			if(cp_molecular_compression) {
+				mineralStorageBase *= researchBonus.cp_molecular_compression;
+				metalsStorageBase *= researchBonus.cp_molecular_compression;
+				storageHelium *= researchBonus.cp_molecular_compression;
+			}
+
+			return [ mineralStorageBase, metalsStorageBase, storageHelium ];
+		}
+
+		static hasEnoughtStorage(planet, buildingId) {
+			let mineral, metal, helium;
+			[ mineral, metal, helium ] = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'));
+
+			let ratio = Resources.GetRatiosPerPlanet(planet.planetType);
+			let cost = Buildings.GetCost(buildingId, planet.Buildings[buildingId] + 1);
+
+			return (cost.titanium <= metal*ratio.titanRatio) &&
+				(cost.copper <= metal*ratio.copperRatio) &&
+				(cost.aluminium <= metal*ratio.aluRatio) &&
+				(cost.iron <= metal*ratio.ironRatio);
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);
