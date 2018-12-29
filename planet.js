@@ -118,7 +118,7 @@ module.exports = class Planet {
 		let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
 		let mineralStorageBase, metalsStorageBase, storageHelium;
-		[ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], research.isSearched(user, 'cp_molecular_compression'));
+		[ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
 
 		//Minerals
 		if(currentBuilding!==0) {
