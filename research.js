@@ -37,6 +37,10 @@ module.exports = class Research {
 		return 0;
 	}
 
+	static isSearched(data,research) {
+		return Research.getResearch(data,research) < 0;
+	}
+
 	static getResearchProduction(lvl) {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}

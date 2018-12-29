@@ -181,14 +181,14 @@
 			let requirements = '';
 
 			for(let i=0; i<buildingParents[id].research.length; i++) {
-				if(!research.isSearched(buildingParents[id].research[i])) {
+				if(!Research.isSearched(user, buildingParents[id].research[i])) {
 					requirements += ', ' + translate['research'][buildingParents[id].research[i]].name;
 				}
 			}
 
 			for(let i=0; i<buildingParents[id].building.length; i++) {
 				let currentBuilding = buildingParents[id].building[i];
-				if(currentBuilding[1] > planetData.Buildings[currentBuilding[0]]) {
+				if(currentBuilding[1] > planet.Buildings[currentBuilding[0]]) {
 					requirements += ', ' + translate['buildings'][currentBuilding[0]].name + ' ' + translate.messages['LEVEL'] + ' ' + currentBuilding[1];
 				}
 			}
