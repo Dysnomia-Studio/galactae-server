@@ -79,11 +79,11 @@ describe('• Buildings', function() {
 		});
 	});
 
-	describe('# enoughtEnergy()', function() {
+	describe('# enoughEnergy()', function() {
 		it('enough', function() {
 			let buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
-				Buildings.enoughtEnergy(buildings),
+				Buildings.enoughEnergy(buildings),
 				true
 			);
 		});
@@ -91,7 +91,7 @@ describe('• Buildings', function() {
 		it('no enough', function() {
 			let buildings = [30,30,30,30,1,1,1,1,1];
 			assert.equal(
-				Buildings.enoughtEnergy(buildings),
+				Buildings.enoughEnergy(buildings),
 				false
 			);
 		});

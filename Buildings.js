@@ -1,5 +1,8 @@
 (function (exports) { 
 	exports.Buildings = class Buildings {
+		/**
+		 * Build costs config
+		 */
 		static get buildCost() {
 			return { 
 				aluminium: [
@@ -132,7 +135,7 @@
 		}
 
 		/**
-		 * Gets the building cost.
+		 * Gets the cost for a specific building & level
 		 *
 		 * @class      GetCost (name)
 		 * @param      {number}  build   The building id
@@ -200,6 +203,13 @@
 			return Buildings.GetRequirements(user, planet, id) === '';
 		}
 
+
+		/**
+		 * Gets the energy production depending on building levels
+		 *
+		 * @param      {number}  buildings  The buildings list
+		 * @return     {<type>}  Energy production
+		 */
 		static getEnergyProd(buildings) {
 			return Math.round(
 					electricity[0] * Math.pow(buildings[4],2) +
@@ -208,6 +218,12 @@
 				);
 		}
 
+		/**
+		 * Gets the energy consumption depending on building levels
+		 *
+		 * @param      {number}  buildings  The buildings list
+		 * @return     {<type>}  Energy consumption
+		 */
 		static getEnergyCons(buildings) {
 			let cons = 0;
 
@@ -218,15 +234,30 @@
 			return cons;
 		}
 
-		static enoughtEnergy(buildings) {
+
+		/**
+		 * Check if a building configuration has enough energy to work
+		 *
+		 * @param      {<type>}  buildings  The buildings
+		 * @return     {<type>}  { description_of_the_return_value }
+		 */
+		static enoughEnergy(buildings) {
 			return Buildings.getEnergyProd(buildings) > Buildings.getEnergyCons(buildings);
 		}
 
-		static calcStorageCapacity(storageLvL, heliumStorageLvl, cp_molecular_compression) {
-			let warehouseBase = storageRatio[0]*Math.pow(storageLvL,2) + storageRatio[1]*storageLvL + storageRatio[2];
+		/**
+		 * Calculates the storage capacity of a planet depending on building levels
+		 *
+		 * @param      {number}  storageLvl                The storage level
+		 * @param      {number}  heliumStorageLvl          The helium storage level
+		 * @param      {<type>}  cp_molecular_compression  The status of cp_molecular_compression research
+		 * @return     {Array}   The differents storage capacity.
+		 */
+		static calcStorageCapacity(storageLvl, heliumStorageLvl, cp_molecular_compression) {
+			let warehouseBase = storageRatio[0]*Math.pow(storageLvl,2) + storageRatio[1]*storageLvl + storageRatio[2];
 
-			let mineralStorageBase = (mineralProd[0]*Math.pow(storageLvL,2) + mineralProd[1]*storageLvL + mineralProd[2])*warehouseBase;
-			let metalsStorageBase  = (metalProd[0]*Math.pow(storageLvL,2)   + metalProd[1]*storageLvL   + metalProd[2])*warehouseBase;
+			let mineralStorageBase = (mineralProd[0]*Math.pow(storageLvl,2) + mineralProd[1]*storageLvl + mineralProd[2])*warehouseBase;
+			let metalsStorageBase  = (metalProd[0]*Math.pow(storageLvl,2)   + metalProd[1]*storageLvl   + metalProd[2])*warehouseBase;
 			let storageHelium = 0;
 
 			if(heliumStorageLvl !== 0) {
@@ -243,6 +274,13 @@
 			return [ mineralStorageBase, metalsStorageBase, storageHelium ];
 		}
 
+		/**
+		 * Determines if a planet has enough storage to upgrade a specific building
+		 *
+		 * @param      {<type>}   planet      The planet data
+		 * @param      {<type>}   buildingId  The building number
+		 * @return     {boolean}  True if has enough storage, False otherwise.
+		 */
 		static hasEnoughtStorage(planet, buildingId) {
 			let mineral, metal, helium;
 			[ mineral, metal, helium ] = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'));

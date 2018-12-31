@@ -234,14 +234,14 @@ module.exports = class Planet {
 
 				// Energie ? Habitants ?
 				if(!BlockBuild) {	
-					if(!Buildings.enoughtEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
+					if(!Buildings.enoughEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
 						BlockBuild = true;
 						errormsg = 'BUILDING_ERROR_ENERGY';
 					}
 				}
 
-			Planet.enoughtPeople(newData, fleetReturned, function(newData,enoughtPeople) {
-				if(!enoughtPeople) {
+			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
+				if(!enoughPeople) {
 					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_PEOPLE';
 				}
@@ -434,11 +434,11 @@ module.exports = class Planet {
 	}
 
 	/**
-	 * Is there enought people on planet ?
+	 * Is there enough people on planet ?
 	 *
 	 * @param      {Object}  buildings  The buildings list
 	 */
-	static enoughtPeople(planetData, fleets, callback) {
+	static enoughPeople(planetData, fleets, callback) {
 		Planet.getPeople(planetData, fleets, function(planet, prod, cons) {
 			if(prod<cons) {
 				callback(planetData,false);
