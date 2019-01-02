@@ -11,27 +11,113 @@ module.exports = class Fleet {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(pid, function(fleet) {
-			if(fleet === undefined) { fleet = []; }
+		db.fleet.findByMotherPlanet(pid, function(originalFList) {
+			if(originalFList === undefined) { originalFList = []; }
 
-			let haveToDone = 0;
-			let done = 0;
-			for(let i=0; i<fleet.length; i++) {
-				let id = i;
+			Fleet.recalcFuel(originalFList, function(FleetList) {
+				let haveToDone = 0;
+				let done = 0;
+				for(let i=0; i<FleetList.length; i++) {
+					let id = i;
 
-				if(fleet[id].endMoveTime !== -1 && fleet[id].endMoveTime <= Date.now()) {
-					haveToDone++;
-					fleet[id].endMoveTime = -1;
+					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
+						haveToDone++;
 
-					db.fleet.update(fleet[id], function() {
-						if(++done === haveToDone) {
-							Fleet.refresh(fleet[id].motherPlanetId, sid);
-						}
-					});
+						FleetList[id].endMoveTime = -1;
+
+						let newFleet = {
+							_id: FleetList[id]._id,
+							endMoveTime: -1,
+							fuel: FleetList[id].fuel,
+						};
+
+						db.fleet.update(newFleet, function() {
+							if(++done === haveToDone) {
+								io.to(sid).emit('fleet-recieve-data', FleetList);
+							}
+						});
+					}
+				}
+
+				if(haveToDone === 0) {
+					io.to(sid).emit('fleet-recieve-data', FleetList);
+				}
+			});
+		});
+	}
+
+	static recalcFuel(fleetList, callback) {
+		let haveToUpdate = [];
+		for(let i=0; i<fleetList.length; i++) {
+			if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
+			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetId) {
+				haveToUpdate.push(i);
+			}
+		}
+
+		if(haveToUpdate.length === 0) { callback(fleetList); return; }
+		db.planet.find(fleetList[0].motherPlanetId, function(planetData) {
+			let newPlanet = planetData.toJSON();
+			let addCount = 0;
+
+			// Priority fleet
+			if(planetData.highPriorityFleet !== undefined) {
+				let prioId = fleetList.map(d => ''+d._id).indexOf(planetData.highPriorityFleet);
+
+				if(prioId !== -1 && fleetList[prioId].position === planetData.address) {
+					fleetList[prioId].fuel += planetData.resources[1];
+
+					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
+						planetData.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
+						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
+					} else {
+						planetData.resources[1] = 0;
+					}
 				}
 			}
 
-			io.to(sid).emit('fleet-recieve-data', fleet);
+			// Current planet fleets
+			while(haveToUpdate.length > 0 && planetData.resources[1] > 0 && (addCount = Math.floor(planetData.resources[1]/haveToUpdate.length)) > 0) {
+				for(let i=0; i<haveToUpdate.length; i++) {
+					let id = haveToUpdate[i];
+
+					fleetList[id].fuel += addCount;
+					planetData.resources[1] -= addCount;
+
+					if(fleetList[id].fuel > fleetList[id].maxFuel) {
+						planetData.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
+						fleetList[id].fuel = fleetList[id].maxFuel;
+
+						haveToUpdate[i] = -1;
+					}
+				}
+
+				haveToUpdate = haveToUpdate.filter(d => d>0);
+			}
+
+			if(haveToUpdate.length > 0) { // No ressources left
+				db.planet.update({
+					_id: newPlanet._id,
+					resources: newPlanet.resources,
+				});
+
+				callback(fleetList);
+				return;
+			}
+
+			// Current in-orbit fleets
+			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(fleets) {
+				// @TODO: Same owner, same ally, trade
+
+				db.planet.update({
+					_id: newPlanet._id,
+					resources: newPlanet.resources,
+				});
+
+				callback(fleetList);
+			});
+
+
 		});
 	}
 

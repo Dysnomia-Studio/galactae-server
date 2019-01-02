@@ -309,6 +309,10 @@ module.exports = class Planet {
 				let unitCount = 0;
 				let newFleet = fleetReturned.toJSON();
 
+				if(newFleet.maxFuel === undefined) {
+					newFleet.maxFuel = 0;
+				}
+
 				let timeCost = unitReturned.cost[4]*3600*1000;
 				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
 
@@ -335,6 +339,11 @@ module.exports = class Planet {
 				for(let i=0; i<newFleet.units.length; i++) {
 					if(''+newFleet.units[i][0] === ''+planetIn.unitBuildingID) {
 						newFleet.units[i][1] += unitCount;
+
+						if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
+							newFleet.maxFuel += fuelStorage[unitReturned.shipShape];
+						}
+
 						set=true;
 						break;
 					}

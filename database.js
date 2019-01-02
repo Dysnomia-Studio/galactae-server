@@ -398,6 +398,12 @@ module.exports = {
 				}
 			});
 		},
+		findAll: function(callback) {
+			fleets.find({ }, function (err, objReturned) {
+				if(err) { log(err); }
+				callback(objReturned);
+			});
+		},
 		findByOwner: function(id,callback) {
 			fleets.find({ownerId: id}, function (err, obj) {
 				if(err) { log(err); }
@@ -406,6 +412,12 @@ module.exports = {
 		},
 		findByMotherPlanet: function(planetId,callback) {
 			fleets.find({motherPlanetId: planetId}, function (err, obj) {
+				if(err) { log(err); }
+				callback(obj);
+			});
+		},
+		findByPosition: function(planetId,callback) {
+			fleets.find({position: planetId}, function (err, obj) {
 				if(err) { log(err); }
 				callback(obj);
 			});
