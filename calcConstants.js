@@ -318,9 +318,6 @@ module.exports = function() {
 					cannon: ['railgun','laser','plasma'],
 					shield: ['none','magnetic','projector'],
 				},
-				stats: {
-					mass: 0,
-				},
 			},
 		},
 		SHIP_BATTLECRUISER: {
@@ -347,9 +344,6 @@ module.exports = function() {
 					sup_propulsion: ['vsl','wd'],
 					shield: ['none','magnetic','turret'],
 				},
-				stats: {
-					mass: 0,
-				},
 			},
 		},
 		SHIP_CUIRASSE: {
@@ -373,9 +367,6 @@ module.exports = function() {
 					sup_propulsion: ['vsl','wd'],
 					shield: ['none','magnetic','turret','singularity','projector'],
 				},
-				stats: {
-					mass: 0,
-				},
 			},
 		},
 		SHIP_FIGHTER: {
@@ -393,9 +384,6 @@ module.exports = function() {
 					cannon: ['railgun','laser','plasma'],
 					sub_propulsion: ['vsolaire','ion'],
 				},
-				stats: {
-					mass: 0,
-				},
 			},
 			SHIP_FIGHTER_MEDIUM: {
 				svg: [
@@ -411,9 +399,6 @@ module.exports = function() {
 				content: {
 					cannon: ['railgun','laser','plasma'],
 					sub_propulsion: ['vsolaire','ion'],
-				},
-				stats: {
-					mass: 0,
 				},
 			},
 		},
@@ -438,9 +423,6 @@ module.exports = function() {
 					scanner: ['none'],
 					sub_propulsion: ['vsolaire','ion','pplasma'],
 					sup_propulsion: ['vsl','wd'],
-				},
-				stats: {
-					mass: 0,
 				},
 			},
 		},
@@ -468,9 +450,6 @@ module.exports = function() {
 					sub_propulsion: ['ion','pplasma'],
 					sup_propulsion: ['vsl','wd','hyperespace'],
 					shield: ['none','magnetic','turret'],
-				},
-				stats: {
-					mass: 0,
 				},
 			},
 		},
