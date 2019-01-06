@@ -84,6 +84,7 @@ let fleetsSchema = new Schema({
 	name: String,
 	ownerId: Schema.Types.ObjectId,
 	motherPlanetId: Schema.Types.ObjectId,
+	motherPlanetAdress: String,
 	position: String,
 	orbitPosition: Number, // -1 = Moving to, 0 = Low Orbit - Defense or siege, 1 = Mid Orbit - Attacking, 2 = High orbit - Just around the planet
 	points: String,

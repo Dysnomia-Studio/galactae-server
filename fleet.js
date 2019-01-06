@@ -21,22 +21,24 @@ module.exports = class Fleet {
 					let id = i;
 
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
-						haveToDone++;
-
 						FleetList[id].endMoveTime = -1;
-
-						let newFleet = {
-							_id: FleetList[id]._id,
-							endMoveTime: -1,
-							fuel: FleetList[id].fuel,
-						};
-
-						db.fleet.update(newFleet, function() {
-							if(++done === haveToDone) {
-								io.to(sid).emit('fleet-recieve-data', FleetList);
-							}
-						});
 					}
+					
+					haveToDone++;
+
+					let newFleet = {
+						_id: FleetList[id]._id,
+						endMoveTime: -1,
+						fuel: FleetList[id].fuel,
+					};
+
+					console.log(newFleet);
+
+					db.fleet.update(newFleet, function() {
+						if(++done === haveToDone) {
+							io.to(sid).emit('fleet-recieve-data', FleetList);
+						}
+					});
 				}
 
 				if(haveToDone === 0) {
@@ -50,42 +52,42 @@ module.exports = class Fleet {
 		let haveToUpdate = [];
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
-			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetId) {
+			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
 				haveToUpdate.push(i);
 			}
 		}
 
 		if(haveToUpdate.length === 0) { callback(fleetList); return; }
-		db.planet.find(fleetList[0].motherPlanetId, function(planetData) {
+		db.planet.find(fleetList[0].motherPlanetAdress, function(planetData) {
 			let newPlanet = planetData.toJSON();
 			let addCount = 0;
 
 			// Priority fleet
-			if(planetData.highPriorityFleet !== undefined) {
-				let prioId = fleetList.map(d => ''+d._id).indexOf(planetData.highPriorityFleet);
+			if(newPlanet.highPriorityFleet !== undefined) {
+				let prioId = fleetList.map(d => ''+d._id).indexOf(newPlanet.highPriorityFleet);
 
-				if(prioId !== -1 && fleetList[prioId].position === planetData.address) {
-					fleetList[prioId].fuel += planetData.resources[1];
+				if(prioId !== -1 && fleetList[prioId].position === newPlanet.address) {
+					fleetList[prioId].fuel += newPlanet.resources[1];
 
 					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
-						planetData.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
+						newPlanet.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
 						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
 					} else {
-						planetData.resources[1] = 0;
+						newPlanet.resources[1] = 0;
 					}
 				}
 			}
 
 			// Current planet fleets
-			while(haveToUpdate.length > 0 && planetData.resources[1] > 0 && (addCount = Math.floor(planetData.resources[1]/haveToUpdate.length)) > 0) {
+			while(haveToUpdate.length > 0 && newPlanet.resources[1] > 0 && (addCount = Math.floor(newPlanet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
 					let id = haveToUpdate[i];
 
 					fleetList[id].fuel += addCount;
-					planetData.resources[1] -= addCount;
+					newPlanet.resources[1] -= addCount;
 
 					if(fleetList[id].fuel > fleetList[id].maxFuel) {
-						planetData.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
+						newPlanet.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
 						fleetList[id].fuel = fleetList[id].maxFuel;
 
 						haveToUpdate[i] = -1;
@@ -148,6 +150,7 @@ module.exports = class Fleet {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: planetData._id,
+				motherPlanetAdress: planetData.address,
 				position: planetData.address,
 				orbitPosition: 0,
 				points: 0,
