@@ -14,7 +14,18 @@ module.exports = class Fleet {
 		db.fleet.findByMotherPlanet(pid, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			Fleet.recalcFuel(originalFList, function(FleetList) {
+			function sendtoPlayer(FleetList, newPlanet, sid) {
+				db.planet.update({
+					_id: newPlanet._id,
+					resources: newPlanet.resources,
+				});
+
+				Planet.sendPlanetDataToUser({data: {name: newPlanet.name}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+
+				io.to(sid).emit('fleet-recieve-data', FleetList);
+			}
+
+			Fleet.recalcFuel(originalFList, function(FleetList, newPlanet) {
 				let haveToDone = 0;
 				let done = 0;
 				for(let i=0; i<FleetList.length; i++) {
@@ -23,7 +34,7 @@ module.exports = class Fleet {
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 					}
-					
+
 					haveToDone++;
 
 					let newFleet = {
@@ -32,17 +43,15 @@ module.exports = class Fleet {
 						fuel: FleetList[id].fuel,
 					};
 
-					console.log(newFleet);
-
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							io.to(sid).emit('fleet-recieve-data', FleetList);
+							sendtoPlayer(FleetList, newPlanet, sid);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					io.to(sid).emit('fleet-recieve-data', FleetList);
+					sendtoPlayer(FleetList, newPlanet, sid);
 				}
 			});
 		});
@@ -97,13 +106,8 @@ module.exports = class Fleet {
 				haveToUpdate = haveToUpdate.filter(d => d>0);
 			}
 
-			if(haveToUpdate.length > 0) { // No ressources left
-				db.planet.update({
-					_id: newPlanet._id,
-					resources: newPlanet.resources,
-				});
-
-				callback(fleetList);
+			if(haveToUpdate.length > 0) { // No resources left
+				callback(fleetList, newPlanet);
 				return;
 			}
 
@@ -111,12 +115,7 @@ module.exports = class Fleet {
 			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(fleets) {
 				// @TODO: Same owner, same ally, trade
 
-				db.planet.update({
-					_id: newPlanet._id,
-					resources: newPlanet.resources,
-				});
-
-				callback(fleetList);
+				callback(fleetList, newPlanet);
 			});
 
 
