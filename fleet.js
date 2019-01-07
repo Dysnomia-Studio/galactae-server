@@ -165,7 +165,7 @@ module.exports = class Fleet {
 				Fleet.refresh(planetData.id,data.sid);
 
 				if(callback) { callback(newFleet); }
-			});	
+			});
 		});
 	}
 

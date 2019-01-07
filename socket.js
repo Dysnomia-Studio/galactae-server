@@ -58,7 +58,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 					Player.getAlly(data, Chat.analyse);
-				});	
+				});
 			});
 
 			/**
@@ -241,7 +241,7 @@ module.exports = class Websocket {
 				if(!isset(data) || !isset(data.cmd)) {
 					return;
 				}
-				
+
 				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 				if(socket.id===adminSid) {

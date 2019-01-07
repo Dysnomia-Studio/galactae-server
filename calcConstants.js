@@ -59,7 +59,7 @@ module.exports = function() {
 		6,	// Commerce
 		3,	// Mine He3
 	];
-	
+
 	this.buildingParents = [];
 	this.buildingParents[9] = { // Radar
 		research: ['misc_telemetrie','misc_em'],

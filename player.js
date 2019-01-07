@@ -109,7 +109,7 @@ module.exports = class Player {
 			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest});
 		}
 
-		playerData.lastConnected = Date.now();	
+		playerData.lastConnected = Date.now();
 
 		// Tutorials
 		if(!isset(playerData.currTutorial)) {

@@ -282,7 +282,7 @@ module.exports = class Units {
 
 	static renameType(data) {
 		db.unit.find(data.shipId, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ""+unitReturned.ownerId !== ""+data.id) { return; }
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			unitReturned.name = data.shipNewName;
 
@@ -295,7 +295,7 @@ module.exports = class Units {
 
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ""+unitReturned.ownerId !== ""+data.id) { return; }
+			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			if(unitReturned.owned !== 0) {
 				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
@@ -308,7 +308,7 @@ module.exports = class Units {
 
 			db.unit.delete(data.unit, function() {
 				Units.refresh(data);
-			});		
+			});
 		});
 	}
 
@@ -463,7 +463,7 @@ module.exports = class Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_ERROR_INVALID_FLEET' });
 					}
 				});
-			});		
+			});
 		});
 	}
 

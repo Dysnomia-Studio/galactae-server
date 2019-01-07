@@ -95,7 +95,7 @@ module.exports = class Planet {
 
 		io.to(data.sid).emit('planet-recieve-data', data );
 	}
-	
+
 	/**
 	 * Calculates the new resources based on constants building level on a
 	 * specific time period.
@@ -233,7 +233,7 @@ module.exports = class Planet {
 				newData.Buildings[data.building]++; // Only for calcs
 
 				// Energie ? Habitants ?
-				if(!BlockBuild) {	
+				if(!BlockBuild) {
 					if(!Buildings.enoughEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
 						BlockBuild = true;
 						errormsg = 'BUILDING_ERROR_ENERGY';
@@ -326,11 +326,11 @@ module.exports = class Planet {
 				} else { // Partial add
 				 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
 				 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
-				 	unitCount = restantDepuisSynchro - restant;			 	
+				 	unitCount = restantDepuisSynchro - restant;	 	
 				}
 
 				if(unitCount === 0) { return; } // Prevent some bugs
-				
+
 				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
 					unitCount = planetIn.unitBuildingCount;
 				}
