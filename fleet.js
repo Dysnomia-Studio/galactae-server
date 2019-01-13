@@ -85,7 +85,7 @@
 		static calcFuelCost(engines) {
 			let cost = 0;
 
-			for(let i in engines) {
+			for(let i in engines) { // @TODO: use fighterMult
 				cost += fuelCost[i] * engines[i];
 			}
 
