@@ -1,10 +1,10 @@
-(function (exports) { 
+(function (exports) {
 	exports.Buildings = class Buildings {
 		/**
 		 * Build costs config
 		 */
 		static get buildCost() {
-			return { 
+			return {
 				aluminium: [
 					// Ground building
 					[0,0,0], // Quarry
@@ -152,7 +152,7 @@
 				titanium: 	Math.round(Buildings.buildCost['titanium'][build][0]*Math.pow(level,2) + 		Buildings.buildCost['titanium'][build][1]*level + 	Buildings.buildCost['titanium'][build][2]),
 				time: 				   Buildings.buildCost['time'][build][0]*Math.pow(level,2) + 			Buildings.buildCost['time'][build][1]*level + 		Buildings.buildCost['time'][build][2],
 				energy: 	Math.round(Math.pow(Buildings.buildCost['energy'][build][0]*level,2) + 		Buildings.buildCost['energy'][build][1]*level + 		Buildings.buildCost['energy'][build][2]),
-				energy_difference: Math.round(Math.pow(Buildings.buildCost['energy'][build][0]*level,2) + Buildings.buildCost['energy'][build][1]*level +       Buildings.buildCost['energy'][build][2] 
+				energy_difference: Math.round(Math.pow(Buildings.buildCost['energy'][build][0]*level,2) + Buildings.buildCost['energy'][build][1]*level +       Buildings.buildCost['energy'][build][2]
 				                        - (Math.pow(Buildings.buildCost['energy'][build][0]*(level-1),2) + Buildings.buildCost['energy'][build][1]*(level-1) +   Buildings.buildCost['energy'][build][2])),
 				habitants:  Math.round(Buildings.buildCost['habitants'][build][0]*Math.pow(level,2) +		Buildings.buildCost['habitants'][build][1]*level + 	Buildings.buildCost['habitants'][build][2]),
 				habitants_difference: Math.round(Buildings.buildCost['habitants'][build][0]*Math.pow(level,2) +	Buildings.buildCost['habitants'][build][1]*level + 	Buildings.buildCost['habitants'][build][2]

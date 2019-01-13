@@ -1,4 +1,4 @@
-(function (exports) { 
+(function (exports) {
 	exports.Resources = class Resources {
 		/**
 		 * Config planet ratio
@@ -18,7 +18,7 @@
 		 */
 		static GetRatiosPerPlanet(type) {
 			if(Resources.planetRatios[type] !== undefined) {
-				return Resources.planetRatios[type];	
+				return Resources.planetRatios[type];
 			} else {
 				return Resources.planetRatios[0];
 			}

@@ -8,7 +8,7 @@ let assert = require('assert');
  */
 require('../calcConstants')();
 require('../misc')();
-let Fleet = require('../fleet');
+let Fleet = require('../fleets');
 let Units = require('../units');
 
 describe('• Units', function() {
@@ -264,112 +264,6 @@ describe('• Units', function() {
 			assert.deepEqual(
 				Units.checkIfSameParts(ship1, ship2),
 				false
-			);
-		});
-	});
-
-	describe('# getSpeed()', function() {
-		it('One Ion', function() {
-			assert.deepEqual(Units.getSpeed([-1], "ion"),
-				shipPartsSpeed['ion']
-			);
-		});
-
-		it('Two Ion', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
-			}
-			assert.deepEqual(Units.getSpeed(
-				shipPartsSpeed['ion'],
-				"ion"),
-				expected
-			);
-		});
-
-		it('Part not existing', function() {
-			assert.deepEqual(Units.getSpeed([-1],"invalid"),
-				[]
-			);
-		});
-	});
-
-	describe('# calcSubSpeed()', function() {
-		it('One Ion', function() {
-			assert.deepEqual(Units.calcSubSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
-					],
-				}).speed,
-				shipPartsSpeed['ion']
-			);
-		});
-
-		it('Two Ion', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
-			}
-			assert.deepEqual(Units.calcSubSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_2" },
-					],
-				}).speed,
-				expected
-			);
-		});
-
-		it('Part not existing', function() {
-			assert.deepEqual(Units.calcSubSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "myFalsePropulsion", type: "sub_propulsion", name: "prop_1" },
-					],
-				}),
-				{ speed: [] }
-			);
-		});
-	});
-
-	describe('# calcSupraSpeed()', function() {
-		it('One vsl', function() {
-			assert.deepEqual(Units.calcSupraSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
-					],
-				}).speed,
-				shipPartsSpeed['vsl']
-			);
-		});
-
-		it('Two vsl', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['vsl']) {
-				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
-			}
-			assert.deepEqual(Units.calcSupraSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_2" },
-					],
-				}).speed,
-				expected
-			);
-		});
-
-		it('Part not existing', function() {
-			assert.deepEqual(Units.calcSupraSpeed({
-					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "myFalsePropulsion", type: "sup_propulsion", name: "prop_1" },
-					],
-				}),
-				{ speed: [] }
 			);
 		});
 	});

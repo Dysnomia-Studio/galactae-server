@@ -12,17 +12,145 @@ require('../misc')();
 
 global.db = require('../database');
 
-global.Fleet = require('../fleet');
-global.Units = require('../units');
+global.Fleet = require('../Fleet').Fleet;
 
-let gameDb;
+console.log(require('../Fleet'));
 
 describe('• Fleet', function() {
-	before(function(done) {
-		db.connect(function(success,general,database) {
-			if(general) { database.close(); return; }
-			gameDb = database;
-			done();
+	describe('# getSpeed()', function() {
+		it('One Ion', function() {
+			assert.deepEqual(Fleet.getSpeed([-1], "ion"),
+				shipPartsSpeed['ion']
+			);
+		});
+
+		it('Two Ion', function() {
+			let expected = [];
+			for(var i in shipPartsSpeed['ion']) {
+				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
+			}
+			assert.deepEqual(Fleet.getSpeed(
+				shipPartsSpeed['ion'],
+				"ion"),
+				expected
+			);
+		});
+
+		it('Part not existing', function() {
+			assert.deepEqual(Fleet.getSpeed([-1],"invalid"),
+				[]
+			);
+		});
+	});
+
+	describe('# calcSubSpeed()', function() {
+		it('One Ion', function() {
+			assert.deepEqual(Fleet.calcSubSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
+					],
+				}).speed,
+				shipPartsSpeed['ion']
+			);
+		});
+
+		it('Two Ion', function() {
+			let expected = [];
+			for(var i in shipPartsSpeed['ion']) {
+				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
+			}
+			assert.deepEqual(Fleet.calcSubSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
+						{ tech: "ion", type: "sub_propulsion", name: "prop_2" },
+					],
+				}).speed,
+				expected
+			);
+		});
+
+		it('Part not existing', function() {
+			assert.deepEqual(Fleet.calcSubSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "myFalsePropulsion", type: "sub_propulsion", name: "prop_1" },
+					],
+				}),
+				{ speed: [] }
+			);
+		});
+	});
+
+	describe('# calcSupraSpeed()', function() {
+		it('One vsl', function() {
+			assert.deepEqual(Fleet.calcSupraSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
+					],
+				}).speed,
+				shipPartsSpeed['vsl']
+			);
+		});
+
+		it('Two vsl', function() {
+			let expected = [];
+			for(var i in shipPartsSpeed['vsl']) {
+				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
+			}
+			assert.deepEqual(Fleet.calcSupraSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
+						{ tech: "vsl", type: "sup_propulsion", name: "prop_2" },
+					],
+				}).speed,
+				expected
+			);
+		});
+
+		it('Part not existing', function() {
+			assert.deepEqual(Fleet.calcSupraSpeed({
+					parts: [
+						{ tech: "railgun", type: "cannon", name: "cannon_1" },
+						{ tech: "myFalsePropulsion", type: "sup_propulsion", name: "prop_1" },
+					],
+				}),
+				{ speed: [] }
+			);
+		});
+	});
+
+	/**
+	 * Calc fuel Cost ?
+ 	 */
+	describe('# calcFuelCost()', function() {
+		it('Sub', function() {
+			let engines = {
+				"vsolaire": 1, // 0
+				"ion": 2, // 21364
+				"pplasma": 3, // 21732
+			};
+
+			assert.equal(
+				Fleet.calcFuelCost(engines),
+				43096
+			);
+		});
+
+		it('Supra', function() {
+			let engines = {
+				"vsl": 1, // 32761
+				"wd": 2, // 58024
+				"hyperespace": 3, // 76476
+			};
+
+			assert.equal(
+				Fleet.calcFuelCost(engines),
+				167261
+			);
 		});
 	});
 
@@ -62,106 +190,6 @@ describe('• Fleet', function() {
 	});
 
 	/**
-	 * Calc fuel Cost ?
- 	 */
-	describe('# calcFuelCost()', function() {
-		it('Sub', function() {
-			let engines = {
-				"vsolaire": 1, // 0
-				"ion": 2, // 21364
-				"pplasma": 3, // 21732
-			};
-
-			assert.equal(
-				Fleet.calcFuelCost(engines),
-				43096
-			);
-		});
-
-		it('Supra', function() {
-			let engines = {
-				"vsl": 1, // 32761
-				"wd": 2, // 58024
-				"hyperespace": 3, // 76476
-			};
-
-			assert.equal(
-				Fleet.calcFuelCost(engines),
-				167261
-			);
-		});
-	});
-
-	/**
-	 * Calc fuel Cost ?
- 	 */
-	describe('# hasEnoughCarrier()', function() {
-		it('Enought', function() {
-			let fleetUnits = [
-				["fighter", 1],
-				["carrier", 1]
-			];
-
-			let unitList = [
-				{
-					_id: "fighter",
-					shipType: "SHIP_FIGHTER",
-					shipShape: "SHIP_FIGHTER_SMALL"
-				},
-				{
-					_id: "carrier",
-					shipType: "SHIP_CARRIER",
-					parts: [
-						{ type: "hangar", tech: "hangarDouble" },
-						{ type: "sub_propulsion", tech: "vsolaire" },
-					]
-				},
-				{
-					_id: "other",
-					shipType: "SHIP_OTHER",
-				},
-			];
-
-			assert.equal(
-				Fleet.hasEnoughCarrier(
-					{ units: fleetUnits },
-					unitList),
-				true
-			);
-		});
-
-		it('No Enought', function() {
-			let fleetUnits = [
-				["fighter", 80],
-				["carrier", 1]
-			];
-
-			let unitList = [
-				{
-					_id: "fighter",
-					shipType: "SHIP_FIGHTER",
-					shipShape: "SHIP_FIGHTER_SMALL"
-				},
-				{
-					_id: "carrier",
-					shipType: "SHIP_CARRIER",
-					parts: [
-						{ type: "hangar", tech: "hangarDouble" },
-						{ type: "sub_propulsion", tech: "vsolaire" },
-					]
-				},
-			];
-
-			assert.equal(
-				Fleet.hasEnoughCarrier(
-					{ units: fleetUnits },
-					unitList),
-				false
-			);
-		});
-	});
-
-	/**
 	 * Calc move time
 	 */
 	describe('# calcMoveTime()', function() {
@@ -185,49 +213,4 @@ describe('• Fleet', function() {
 		});
 	});
 
-	/**
-	 * Get units list
-	 */
-	describe('# getUnitsList()', function() {
-		it('Existing', function(done) {
-			let unitIdList = [
-				["5c1f62fe951265134ca2fa59",1]
-			];
-
-			Fleet.getUnitsList(unitIdList, function(unitList) {
-				assert.equal(
-					unitList.length,
-					1
-				);
-
-				assert.equal(
-					unitList[0].name,
-					"UnitTest Unit"
-				);
-
-				done();
-			});
-		});
-
-		it('Not existing', function(done) {
-			let unitIdList = [
-				["000000000000000000000000",1]
-			];
-
-			Fleet.getUnitsList(unitIdList, function(unitList) {
-				assert.equal(
-					unitList.length,
-					0
-				);
-
-				done();
-			});
-		});
-	});
-
-
-	after(function(done) {
-		gameDb.close();
-		done();
-	});
-});
+});	

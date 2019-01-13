@@ -439,7 +439,7 @@ module.exports = class Units {
 							return;
 						}
 
-						Fleet.create(inputData,newPlanet,function(fleetReturned) {
+						Fleets.create(inputData,newPlanet,function(fleetReturned) {
 							callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData);
 						});
 					} else if(inputData.fleet !== -1 && choosenFleet !== undefined) {
@@ -465,57 +465,5 @@ module.exports = class Units {
 				});
 			});
 		});
-	}
-
-	static getSpeed(speed, tech) {
-		if(speed[0] === -1) { // First sup propulsion part
-			if(shipPartsSpeed[tech] === undefined) {
-				log('Speed is not defined for part ' + tech,'error');
-				return [];
-			}
-			speed = shipPartsSpeed[tech].slice(0);
-		} else {
-			for(let i=0; i<speed.length; i++) {
-				speed[i] *= 1.5;
-			}
-		}
-
-		return speed;
-	}
-
-	static calcSubSpeed(unit) {
-		let speed = [-1];
-		let tech = '';
-		let count = 0;
-
-		for(let i in unit.parts) {
-			if(unit.parts[i].type === 'sub_propulsion') {
-				tech = unit.parts[i].tech;
-				count++;
-
-				speed = Units.getSpeed(speed, tech);
-				if(speed[0] === undefined) { return { speed: [] }; }
-			}
-		}
-
-		return {speed: speed, tech: tech, count: count};
-	}
-
-	static calcSupraSpeed(unit) {
-		let speed = [-1];
-		let tech = '';
-		let count = 0;
-
-		for(let i in unit.parts) {
-			if(unit.parts[i].type === 'sup_propulsion') {
-				tech = unit.parts[i].tech;
-				count++;
-
-				speed = Units.getSpeed(speed, tech);
-				if(speed[0] === undefined) { return { speed: [] }; }
-			}
-		}
-
-		return {speed: speed, tech: tech, count: count};
 	}
 };

@@ -194,7 +194,7 @@ module.exports = class Websocket {
 
 				Player.isValid(data,function(data) { // Verify identity
 				   	Units.refresh(data);
-					Fleet.refresh(data.planet,data.sid);
+					Fleets.refresh(data.planet,data.sid);
 				});
 			});
 			socket.on('fleet-move', function(data) {
@@ -204,7 +204,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-				   	Fleet.moveTo(data, data.fleetId, data.destination);
+				   	Fleets.moveTo(data, data.fleetId, data.destination);
 				});
 			});
 
