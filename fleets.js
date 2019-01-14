@@ -15,12 +15,14 @@ module.exports = class Fleets {
 			if(originalFList === undefined) { originalFList = []; }
 
 			function sendtoPlayer(FleetList, newPlanet, sid) {
-				db.planet.update({
-					_id: newPlanet._id,
-					resources: newPlanet.resources,
-				});
+				if(newPlanet !== undefined) {
+					db.planet.update({
+						_id: newPlanet._id,
+						resources: newPlanet.resources,
+					});
 
-				Planet.sendPlanetDataToUser({data: {name: newPlanet.name}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					Planet.sendPlanetDataToUser({data: {name: newPlanet.name}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+				}
 
 				io.to(sid).emit('fleet-recieve-data', FleetList);
 			}
@@ -214,7 +216,7 @@ module.exports = class Fleets {
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
 			if(!isset(fleetReturned)) { log('fleet not found'); return; } // Does this fleet exists
-			if(fleetReturned.ownerId !== user.id) { log('user doesn\'t own ths fleet'); return; }
+			if('' + fleetReturned.ownerId !== '' + user.id) { log('user doesn\'t own ths fleet'); return; }
 			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
@@ -329,7 +331,7 @@ module.exports = class Fleets {
 								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
 
 							db.fleet.update(newFleet, function() {
-								fleet.refresh(newFleet.motherPlanetId, user.sid);
+								Fleets.refresh(newFleet.motherPlanetId, user.sid);
 							});
 						});
 					});
