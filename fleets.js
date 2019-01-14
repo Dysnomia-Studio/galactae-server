@@ -307,7 +307,7 @@ module.exports = class Fleets {
 						let fuel = Fleet.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel) || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_FUEL' });
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGH_FUEL' });
 							return;
 						}
 
@@ -331,6 +331,7 @@ module.exports = class Fleets {
 								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
 
 							db.fleet.update(newFleet, function() {
+								Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
 								Fleets.refresh(newFleet.motherPlanetId, user.sid);
 							});
 						});
