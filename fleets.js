@@ -325,7 +325,10 @@ module.exports = class Fleets {
 
 							newFleet.endMoveTime = date + Math.round((time + instability) * 3600000);
 							newFleet.position = destination;
-							newFleet.orbitPosition = -1;
+							newFleet.orbitPosition = 2;
+							if(destination === newFleet.motherPlanetAdress) {
+								newFleet.orbitPosition = 0;
+							}
 
 							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + ' (' + destination + ')' +
 								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
