@@ -19,9 +19,9 @@
 		static GetRatiosPerPlanet(type) {
 			if(Resources.planetRatios[type] !== undefined) {
 				return Resources.planetRatios[type];
-			} else {
-				return Resources.planetRatios[0];
 			}
+
+			return Resources.planetRatios[0];
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

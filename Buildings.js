@@ -4,6 +4,7 @@
 		 * Build costs config
 		 */
 		static get buildCost() {
+			/*eslint-disable no-magic-numbers */
 			return {
 				aluminium: [
 					// Ground building
@@ -132,6 +133,7 @@
 					[3029,10533,18000], // He3exp
 				],
 			};
+			/*eslint-enable no-magic-numbers */
 		}
 
 		/**
@@ -145,7 +147,7 @@
 		static GetCost(build,level) {
 			if(build < 0 || build >= globalConst.buildingNumber) { return; }
 
-			let retour = {
+			const retour = {
 				aluminium: 	Math.round(Buildings.buildCost['aluminium'][build][0]*Math.pow(level,2) +		Buildings.buildCost['aluminium'][build][1]*level + 	Buildings.buildCost['aluminium'][build][2]),
 				iron: 		Math.round(Buildings.buildCost['iron'][build][0]*Math.pow(level,2) +			Buildings.buildCost['iron'][build][1]*level + 		Buildings.buildCost['iron'][build][2]),
 				copper: 	Math.round(Buildings.buildCost['copper'][build][0]*Math.pow(level,2) + 		Buildings.buildCost['copper'][build][1]*level + 		Buildings.buildCost['copper'][build][2]),
@@ -153,10 +155,10 @@
 				time: 				   Buildings.buildCost['time'][build][0]*Math.pow(level,2) + 			Buildings.buildCost['time'][build][1]*level + 		Buildings.buildCost['time'][build][2],
 				energy: 	Math.round(Math.pow(Buildings.buildCost['energy'][build][0]*level,2) + 		Buildings.buildCost['energy'][build][1]*level + 		Buildings.buildCost['energy'][build][2]),
 				energy_difference: Math.round(Math.pow(Buildings.buildCost['energy'][build][0]*level,2) + Buildings.buildCost['energy'][build][1]*level +       Buildings.buildCost['energy'][build][2]
-				                        - (Math.pow(Buildings.buildCost['energy'][build][0]*(level-1),2) + Buildings.buildCost['energy'][build][1]*(level-1) +   Buildings.buildCost['energy'][build][2])),
+											- (Math.pow(Buildings.buildCost['energy'][build][0]*(level-1),2) + Buildings.buildCost['energy'][build][1]*(level-1) +   Buildings.buildCost['energy'][build][2])),
 				habitants:  Math.round(Buildings.buildCost['habitants'][build][0]*Math.pow(level,2) +		Buildings.buildCost['habitants'][build][1]*level + 	Buildings.buildCost['habitants'][build][2]),
 				habitants_difference: Math.round(Buildings.buildCost['habitants'][build][0]*Math.pow(level,2) +	Buildings.buildCost['habitants'][build][1]*level + 	Buildings.buildCost['habitants'][build][2]
-					                         - (Buildings.buildCost['habitants'][build][0]*Math.pow((level-1),2) +	Buildings.buildCost['habitants'][build][1]*(level-1) + Buildings.buildCost['habitants'][build][2])),
+											- (Buildings.buildCost['habitants'][build][0]*Math.pow((level-1),2) +	Buildings.buildCost['habitants'][build][1]*(level-1) + Buildings.buildCost['habitants'][build][2])),
 			};
 
 			if(level === 1) {
@@ -190,7 +192,7 @@
 			}
 
 			for(let i=0; i<buildingParents[id].building.length; i++) {
-				let currentBuilding = buildingParents[id].building[i];
+				const currentBuilding = buildingParents[id].building[i];
 				if(currentBuilding[1] > planet.Buildings[currentBuilding[0]]) {
 					requirements += ', ' + translate['buildings'][currentBuilding[0]].name + ' ' + translate.messages['LEVEL'] + ' ' + currentBuilding[1];
 				}
@@ -212,10 +214,10 @@
 		 */
 		static getEnergyProd(buildings) {
 			return Math.round(
-					electricity[0] * Math.pow(buildings[4],2) +
-					electricity[1] * buildings[4] +
-					electricity[2]
-				);
+				electricity[0] * Math.pow(buildings[4],2) +
+				electricity[1] * buildings[4] +
+				electricity[2]
+			);
 		}
 
 		/**
@@ -227,7 +229,7 @@
 		static getEnergyCons(buildings) {
 			let cons = 0;
 
-			for(let i=0; i<9; i++) {
+			for(let i=0; i<globalConst.groundBuildingNumber; i++) {
 				cons += parseInt(Buildings.GetCost(i,buildings[i]).energy);
 			}
 
@@ -254,7 +256,7 @@
 		 * @return     {Array}   The differents storage capacity.
 		 */
 		static calcStorageCapacity(storageLvl, heliumStorageLvl, cp_molecular_compression) {
-			let warehouseBase = storageRatio[0]*Math.pow(storageLvl,2) + storageRatio[1]*storageLvl + storageRatio[2];
+			const warehouseBase = storageRatio[0]*Math.pow(storageLvl,2) + storageRatio[1]*storageLvl + storageRatio[2];
 
 			let mineralStorageBase = (mineralProd[0]*Math.pow(storageLvl,2) + mineralProd[1]*storageLvl + mineralProd[2])*warehouseBase;
 			let metalsStorageBase  = (metalProd[0]*Math.pow(storageLvl,2)   + metalProd[1]*storageLvl   + metalProd[2])*warehouseBase;
@@ -282,11 +284,10 @@
 		 * @return     {boolean}  True if has enough storage, False otherwise.
 		 */
 		static hasEnoughtStorage(planet, buildingId) {
-			let mineral, metal, helium;
-			[ mineral, metal, helium ] = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'));
+			const [ mineral, metal, helium ] = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'));
 
-			let ratio = Resources.GetRatiosPerPlanet(planet.planetType);
-			let cost = Buildings.GetCost(buildingId, planet.Buildings[buildingId] + 1);
+			const ratio = Resources.GetRatiosPerPlanet(planet.planetType);
+			const cost = Buildings.GetCost(buildingId, planet.Buildings[buildingId] + 1);
 
 			return (cost.titanium <= metal*ratio.titanRatio) &&
 				(cost.copper <= metal*ratio.copperRatio) &&

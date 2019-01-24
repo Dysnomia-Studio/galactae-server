@@ -35,7 +35,7 @@
 			let tech = '';
 			let count = 0;
 
-			for(let i in unit.parts) {
+			for(const i in unit.parts) {
 				if(unit.parts[i].type === 'sub_propulsion') {
 					tech = unit.parts[i].tech;
 					count++;
@@ -61,7 +61,7 @@
 			let tech = '';
 			let count = 0;
 
-			for(let i in unit.parts) {
+			for(const i in unit.parts) {
 				if(unit.parts[i].type === 'sup_propulsion') {
 					tech = unit.parts[i].tech;
 					count++;
@@ -85,7 +85,7 @@
 		static calcFuelCost(engines) {
 			let cost = 0;
 
-			for(let i in engines) { // @TODO: use fighterMult
+			for(const i in engines) { // @TODO: use fighterMult
 				cost += fuelCost[i] * engines[i];
 			}
 
@@ -100,13 +100,13 @@
 		 * @return     {number}  Slower speed
 		 */
 		static slowerSpeed(curr, other) {
-			let testDist = 1000; // Total galaxy
+			const testDist = 1000; // Total galaxy
 			if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
 				(Math.pow(testDist, 2)*other[0] + testDist*other[1] + other[2])) { // Compare polynoms, more time = slower
 				return other;
-			} else {
-				return curr;
 			}
+
+			return curr;
 		}
 
 		/**
@@ -116,13 +116,13 @@
 		 * @return     {Object}  The minimum sub speed.
 		 */
 		static getMinSubSpeed(unitList) {
-			let min = {
+			const min = {
 				speed: 0,
 				engines: {},
 			};
 
 			for(let i=0; i<unitList.length; i++) {
-				let curr = Fleet.calcSubSpeed(unitList[i]);
+				const curr = Fleet.calcSubSpeed(unitList[i]);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
@@ -144,7 +144,7 @@
 		 * @return     {Object}  The minimum supra speed.
 		 */
 		static getMinSupraSpeed(unitList) {
-			let min = {
+			const min = {
 				speed: [],
 				engines: {},
 			};
@@ -152,7 +152,7 @@
 			for(let i=0; i<unitList.length; i++) {
 				if(unitList[i].shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
-				let curr = Fleet.calcSupraSpeed(unitList[i]);
+				const curr = Fleet.calcSupraSpeed(unitList[i]);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
