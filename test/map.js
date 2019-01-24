@@ -1,12 +1,12 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
  */
-global.GameMap = require('../map');
+global.GameMap   = require('../GameMap').GameMap;
 
 describe('• GameMap', function() {
 	/**
