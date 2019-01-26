@@ -31,7 +31,7 @@ module.exports = class Fleets {
 				let haveToDone = 0;
 				let done = 0;
 				for(let i=0; i<FleetList.length; i++) {
-					let id = i;
+					const id = i;
 
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
@@ -40,7 +40,7 @@ module.exports = class Fleets {
 
 					haveToDone++;
 
-					let newFleet = {
+					const newFleet = {
 						_id: FleetList[id]._id,
 						endMoveTime: -1,
 						fuel: FleetList[id].fuel,
