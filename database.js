@@ -1,10 +1,10 @@
-let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 /**
  * Server schemas
  */
-let planetSchema = new Schema({
+const planetSchema = new Schema({
 	// General informations
 	_id: Schema.Types.ObjectId,
 	name: String,
@@ -39,7 +39,7 @@ let planetSchema = new Schema({
 	currResearch: String,
 });
 
-let userSchema = new Schema({
+const userSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	gvt: Number,
@@ -66,7 +66,7 @@ let userSchema = new Schema({
 	dayBonusBest: Number,
 });
 
-let unitsSchema = new Schema({
+const unitsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
@@ -79,7 +79,7 @@ let unitsSchema = new Schema({
 	note: Number,
 });
 
-let fleetsSchema = new Schema({
+const fleetsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	name: String,
 	ownerId: Schema.Types.ObjectId,
@@ -96,7 +96,7 @@ let fleetsSchema = new Schema({
 	maxFuel: Number,
 });
 
-let statsSchema = new Schema({
+const statsSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	plCount: Number,
 	time: Number,
@@ -111,7 +111,7 @@ let stats;
 /**
  * General schemas
  */
-let userPrivilegesSchema = new Schema({
+const userPrivilegesSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: Schema.Types.ObjectId,
 	server_name: String,
@@ -119,20 +119,20 @@ let userPrivilegesSchema = new Schema({
 	user_whitelist: Number,
 });
 
-let serverSchema = new Schema({
+const serverSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	server_name: String,
 	server_maintenance: Boolean,
 });
 
-let userGameIdSchema = new Schema({
+const userGameIdSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	game_id: String,
 	server_name: String,
 });
 
-let userBanSchema = new Schema({
+const userBanSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	server_name: String,
@@ -143,7 +143,7 @@ let userBanSchema = new Schema({
 	admin: String,
 });
 
-let globalRanksSchema = new Schema({
+const globalRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	name: String,
@@ -153,7 +153,7 @@ let globalRanksSchema = new Schema({
 	planets: Number,
 });
 
-let sectorRanksSchema = new Schema({
+const sectorRanksSchema = new Schema({
 	_id: Schema.Types.ObjectId,
 	user_id: String,
 	name: String,
@@ -254,9 +254,9 @@ module.exports = {
 			});
 		},
 		update: function(user, callback) {
-			let conditions = { _id: user.id },
-					update = { $set: user },
-					options = { multi: true };
+			const conditions = { _id: user.id },
+				update = { $set: user },
+				options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
@@ -267,9 +267,9 @@ module.exports = {
 		},
 		clearList: function() {
 			log('Clearing player list ...');
-			let conditions = { },
-						update = { $set: { sid: '-1' } },
-						options = { multi: true };
+			const conditions = { },
+				update = { $set: { sid: '-1' } },
+				options = { multi: true };
 
 			users.update(conditions, update, options,function(error) {
 				if(error) { log(error);}
@@ -291,9 +291,9 @@ module.exports = {
 			});
 		},
 		update: function(data) {
-			let conditions = { _id: data._id },
-						update = { $set: data },
-						options = { multi: true };
+			const conditions = { _id: data._id },
+				update = { $set: data },
+				options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); }
@@ -303,11 +303,11 @@ module.exports = {
 			planets.find({ 'address': new RegExp('^' + systemAddr + '-', 'i') }, function(err, planetList) {
 				if(err) { log(err); return; }
 
-				let pList = [];
+				const pList = [];
 
 				let ended = 0;
 				for(let i=0; i<planetList.length; i++) {
-					let id = i;
+					const id = i;
 
 					pList[id] = planetList[id].toJSON();
 
@@ -368,9 +368,9 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			let conditions = { _id: data._id },
-					update = { $set: data },
-					options = { multi: true };
+			const conditions = { _id: data._id },
+				update = { $set: data },
+				options = { multi: true };
 
 			units.update(conditions, update, options,function(err) {
 				if(err) { log(err); }
@@ -424,9 +424,9 @@ module.exports = {
 			});
 		},
 		update: function(data,callback) {
-			let conditions = { _id: data._id },
-						update = { $set: data },
-						options = { multi: true };
+			const conditions = { _id: data._id },
+				update = { $set: data },
+				options = { multi: true };
 
 			fleets.update(conditions, update, options,function(error) {
 				if(error) { log(error); }
@@ -448,7 +448,7 @@ module.exports = {
 
 	stat: {
 		submit: function(currTime) {
-			let data = {};
+			const data = {};
 			data._id = new mongoose.Types.ObjectId();
 			data.plCount = plCount;
 			data.time = currTime;
@@ -496,9 +496,9 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			let conditions = {server_name: globalCfg.serverGlobalName},
-						update = { $set: data },
-						options = { multi: true };
+			const conditions = {server_name: globalCfg.serverGlobalName},
+				update = { $set: data },
+				options = { multi: true };
 
 			servers.update(conditions, update, options,function(error) {
 				if(error) { log(error); }
@@ -546,9 +546,9 @@ module.exports = {
 						if(error) { log(error); }
 					});
 				} else { // Sinon update
-					let conditions = {
-						server_name: globalCfg.serverGlobalName,
-						user_id: data.user_id,
+					const conditions = {
+							server_name: globalCfg.serverGlobalName,
+							user_id: data.user_id,
 						},
 						update = { $set: data },
 						options = { multi: false };
@@ -580,9 +580,9 @@ module.exports = {
 			});
 		},
 		incrementInRange: function(min, max) {
-			let conditions = {
-				server_name: globalCfg.serverGlobalName,
-				rank: { $gte: min,  $lte: max },
+			const conditions = {
+					server_name: globalCfg.serverGlobalName,
+					rank: { $gte: min,  $lte: max },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -655,7 +655,7 @@ module.exports = {
 						if(error) { log(error); }
 					});
 				} else { // Sinon update
-					let conditions = {
+					const conditions = {
 							server_name: globalCfg.serverGlobalName,
 							user_id: data.user_id,
 							sector: data.sector,
@@ -692,10 +692,10 @@ module.exports = {
 			});
 		},
 		incrementInRange: function(sector, min, max) {
-			let conditions = {
-				sector: sector,
-				server_name: globalCfg.serverGlobalName,
-				rank: { $gte: min,  $lte: max },
+			const conditions = {
+					sector: sector,
+					server_name: globalCfg.serverGlobalName,
+					rank: { $gte: min,  $lte: max },
 				},
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
@@ -708,7 +708,7 @@ module.exports = {
 			sectorRanks.count({
 				server_name: globalCfg.serverGlobalName,
 				sector: sector,
-				} , function(err, c) {
+			} , function(err, c) {
 				if(err) { log(err); }
 				callback(c);
 			});

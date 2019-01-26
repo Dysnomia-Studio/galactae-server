@@ -298,9 +298,9 @@ module.exports = class Fleets {
 							time = (baseTravelTime + previewTime)/2;
 						} else {
 							let dist = Math.sqrt(
-									Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
-									Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
-								);
+								Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
+								Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
+							);
 
 							time = Fleet.calcMoveTime(dist, minSpeed.speed);
 						}

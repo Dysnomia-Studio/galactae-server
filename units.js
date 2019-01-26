@@ -34,7 +34,7 @@ module.exports = class Units {
 			let addCost = shipCosts[parts[id].tech];
 
 			for(let i=0; i<6; i++) {
-				if(shipShape.substr(0,12) === 'SHIP_FIGHTER') {
+				if(shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
 					addCost[i] *= fighterMult[shipShape];
 				}
 
