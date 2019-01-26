@@ -42,7 +42,7 @@ module.exports = class Fleets {
 
 					const newFleet = {
 						_id: FleetList[id]._id,
-						endMoveTime: -1,
+						endMoveTime: FleetList[id].endMoveTime,
 						fuel: FleetList[id].fuel,
 					};
 
@@ -320,19 +320,24 @@ module.exports = class Fleets {
 								instability /= 2;
 							}
 
-							let date = Date.now();
-
 							let newFleet = fleetReturned.toJSON();
 
-							newFleet.endMoveTime = date + Math.round((time + instability) * 3600000);
+							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * 3600000);
 							newFleet.position = destination;
 							newFleet.orbitPosition = 2;
 							if(destination === newFleet.motherPlanetAdress) {
 								newFleet.orbitPosition = 0;
 							}
 
-							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + planeteArrivee.name + ' (' + destination + ')' +
-								'. ETA: ' + (new Date(newFleet.endMoveTime).toISOString()));
+							let textDestination = destination;
+							if(planeteArrivee.name !== undefined) {
+								textDestination = planeteArrivee.name + ' (' + destination + ')';
+							}
+
+							const endTime = new Date(newFleet.endMoveTime);
+
+							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + textDestination +
+								'. ETA: ' + getDateTime(endTime));
 
 							db.fleet.update(newFleet, function() {
 								Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
