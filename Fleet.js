@@ -115,14 +115,18 @@
 		 * @param      {<type>}  unitList  Fleet units list
 		 * @return     {Object}  The minimum sub speed.
 		 */
-		static getMinSubSpeed(unitList) {
+		static getMinSubSpeed(unitList, fleetUnits) {
 			const min = {
 				speed: 0,
 				engines: {},
 			};
 
-			for(let i=0; i<unitList.length; i++) {
-				const curr = Fleet.calcSubSpeed(unitList[i]);
+			const unitListId = unitList.map((unit) => unit._id);
+
+			for(let i=0; i<fleetUnits.length; i++) {
+				const currUnit = unitList[unitListId.indexOf(fleetUnits[i][0])];
+
+				const curr = Fleet.calcSubSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
@@ -131,7 +135,7 @@
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
-				min.engines[curr.tech] += curr.count;
+				min.engines[curr.tech] += curr.count * fleetUnits[i][1];
 			}
 
 			return min;
@@ -143,16 +147,20 @@
 		 * @param      {<type>}  unitList  Fleet units list
 		 * @return     {Object}  The minimum supra speed.
 		 */
-		static getMinSupraSpeed(unitList) {
+		static getMinSupraSpeed(unitList, fleetUnits) {
 			const min = {
 				speed: [],
 				engines: {},
 			};
 
-			for(let i=0; i<unitList.length; i++) {
-				if(unitList[i].shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
+			const unitListId = unitList.map((unit) => unit._id);
 
-				const curr = Fleet.calcSupraSpeed(unitList[i]);
+			for(let i=0; i<fleetUnits.length; i++) {
+				const currUnit = unitList[unitListId.indexOf(fleetUnits[i][0])];
+
+				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
+
+				const curr = Fleet.calcSupraSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
@@ -161,7 +169,7 @@
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
-				min.engines[curr.tech] += curr.count;
+				min.engines[curr.tech] += curr.count * fleetUnits[i][1];
 			}
 
 			return min;

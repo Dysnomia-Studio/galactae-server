@@ -253,9 +253,9 @@ module.exports = class Fleets {
 
 				let minSpeed;
 				if(systemeDepart === systemeArrivee) {
-					minSpeed = Fleet.getMinSubSpeed(unitList);
+					minSpeed = Fleet.getMinSubSpeed(unitList, fleet.units);
 				} else {
-					minSpeed = Fleet.getMinSupraSpeed(unitList);
+					minSpeed = Fleet.getMinSupraSpeed(unitList, fleet.units);
 				}
 
 				if(minSpeed.speed[0] === undefined) {
