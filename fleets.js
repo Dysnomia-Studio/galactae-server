@@ -71,12 +71,12 @@ module.exports = class Fleets {
 
 		if(haveToUpdate.length === 0) { callback(fleetList); return; }
 		db.planet.find(fleetList[0].motherPlanetAdress, function(planetData) {
-			let newPlanet = planetData.toJSON();
+			const newPlanet = planetData.toJSON();
 			let addCount = 0;
 
 			// Priority fleet
 			if(newPlanet.highPriorityFleet !== undefined) {
-				let prioId = fleetList.map(d => ''+d._id).indexOf(newPlanet.highPriorityFleet);
+				const prioId = fleetList.map(d => ''+d._id).indexOf(newPlanet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === newPlanet.address) {
 					fleetList[prioId].fuel += newPlanet.resources[1];
@@ -93,7 +93,7 @@ module.exports = class Fleets {
 			// Current planet fleets
 			while(haveToUpdate.length > 0 && newPlanet.resources[1] > 0 && (addCount = Math.floor(newPlanet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
-					let id = haveToUpdate[i];
+					const id = haveToUpdate[i];
 
 					fleetList[id].fuel += addCount;
 					newPlanet.resources[1] -= addCount;
@@ -148,7 +148,7 @@ module.exports = class Fleets {
 			}
 
 			// Add it to db
-			let newFleet = {
+			const newFleet = {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: planetData._id,
@@ -176,14 +176,14 @@ module.exports = class Fleets {
 		let fighterCount = 0;
 		let fighterCap   = 0;
 
-		for(let u in unitList) {
-			for(let f in fleet.units) {
+		for(const u in unitList) {
+			for(const f in fleet.units) {
 				if(fleet.units[f][0] !== unitList[u]._id) { continue; }
 
 				if(unitList[u].shipType === 'SHIP_FIGHTER') {
 					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
 				} else if(unitList[u].shipType === 'SHIP_CARRIER') {
-					for(let p in unitList[u].parts) {
+					for(const p in unitList[u].parts) {
 						if(unitList[u].parts[p].type === 'hangar') {
 							fighterCap += hangarSize[unitList[u].parts[p].tech] * fleet.units[f][1];
 						}
@@ -212,7 +212,7 @@ module.exports = class Fleets {
 	}
 
 	static moveTo(user, fleetId, destination) {
-		let now = Date.now();
+		const now = Date.now();
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
@@ -274,20 +274,20 @@ module.exports = class Fleets {
 
 						let time;
 						if(systemeDepart === systemeArrivee) {
-							let baseDist = GameMap.getPlanetDistance(
+							const baseDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
 								now/1000);
 							if(Number.isNaN(baseDist) || baseDist < 0) { return; }
-							let baseTravelTime = Fleet.calcMoveTime(baseDist, minSpeed.speed);
+							const baseTravelTime = Fleet.calcMoveTime(baseDist, minSpeed.speed);
 
-							let previewDist = GameMap.getPlanetDistance(
+							const previewDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
 								now/1000 + Math.round(baseTravelTime*360000)/100);
 
 							if(Number.isNaN(previewDist) || previewDist < 0) { return; }
-							let previewTime = Fleet.calcMoveTime(previewDist, minSpeed.speed);
+							const previewTime = Fleet.calcMoveTime(previewDist, minSpeed.speed);
 
 							/* Final travel time:
 								Average of ...
@@ -297,7 +297,7 @@ module.exports = class Fleets {
 							*/
 							time = (baseTravelTime + previewTime)/2;
 						} else {
-							let dist = Math.sqrt(
+							const dist = Math.sqrt(
 								Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
 								Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
 							);
@@ -305,7 +305,7 @@ module.exports = class Fleets {
 							time = Fleet.calcMoveTime(dist, minSpeed.speed);
 						}
 
-						let fuel = Fleet.calcFuelCost(minSpeed.engines);
+						const fuel = Fleet.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel) || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGH_FUEL' });
@@ -320,7 +320,7 @@ module.exports = class Fleets {
 								instability /= 2;
 							}
 
-							let newFleet = fleetReturned.toJSON();
+							const newFleet = fleetReturned.toJSON();
 
 							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * 3600000);
 							newFleet.position = destination;
