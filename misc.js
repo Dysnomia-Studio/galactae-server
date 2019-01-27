@@ -200,16 +200,16 @@ module.exports = function() {
 		}
 
 		switch(unit) {
-			case 'd': // Days
-				return 86400000*count;
-			case 'h': // Hour
-				return 3600000*count;
-			case 'm': // Minutes
-				return 60000*count;
-			case 's': // Seconds
-				return 1000*count;
-			default: // Wrong unit
-				return -1;
+		case 'd': // Days
+			return TIME.DAY_TO_MS*count;
+		case 'h': // Hour
+			return TIME.HOUR_TO_MS*count;
+		case 'm': // Minutes
+			return TIME.MINUTES_TO_MS*count;
+		case 's': // Seconds
+			return TIME.SECONDS_TO_MS*count;
+		default: // Wrong unit
+			return -1;
 		}
 	};
 };

@@ -322,7 +322,7 @@ module.exports = class Fleets {
 
 							const newFleet = fleetReturned.toJSON();
 
-							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * 3600000);
+							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
 							newFleet.position = destination;
 							newFleet.orbitPosition = 2;
 							if(destination === newFleet.motherPlanetAdress) {
