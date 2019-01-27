@@ -58,11 +58,11 @@ module.exports = class Units {
 		let subprop = '';
 		let supprop = '';
 
-		for(let i in ship) {
+		for(const i in ship) {
 			if(i==='name' || i==='type' || i==='shape') { continue; }
 			// Check if that kind of part exists in that kind of ship
 			let valid = false;
-			for(let type in shipShapesDetails[ship.type][ship.shape].content) {
+			for(const type in shipShapesDetails[ship.type][ship.shape].content) {
 				if(type===ship[i].type) {
 					valid = true;
 					break;
@@ -125,7 +125,7 @@ module.exports = class Units {
 	 */
 	static createType(data) {
 		let message = '';
-		let ship = data.ship;
+		const ship = data.ship;
 
 		// That block 90% of tries to crash
 		if(ship.name===undefined || ship.shape===undefined || ship.type===undefined) { return; }
@@ -134,7 +134,7 @@ module.exports = class Units {
 		ship.name = filterUnwantedChars(ship.name );
 
 		// Check entries valdity
-		for(let i in ship) {
+		for(const i in ship) {
 			// Empty fields
 			if(i==='name' || i==='type' || i==='shape') { // In facts, the two last verifications won't display error, but they're here to simplify the else
 				if(ship[i].split(' ').join('')==='') {
@@ -160,7 +160,7 @@ module.exports = class Units {
 		if(!isset(message)) {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
-				for(let i in ship) {
+				for(const i in ship) {
 					if(i==='name' || i==='type' || i==='shape') { continue; }
 
 					if(shipResearchDependencies[ship[i].value] !== undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
@@ -172,7 +172,7 @@ module.exports = class Units {
 				// Saving
 				if(!isset(message)) {
 					// Save to database
-					let shipToSave = {
+					const shipToSave = {
 						name: ship.name,
 						shipType: ship.type,
 						shipShape: ship.shape,
@@ -276,7 +276,7 @@ module.exports = class Units {
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner) || ''+planetReturned.owner !== ''+inputData.id) { return; }
 
-			let newPlanet = Planet.update(planetReturned,userReturned,fleetList);
+			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime > Date.now()) {
@@ -284,9 +284,9 @@ module.exports = class Units {
 				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
-			let id = (inputData.unit.substr(0,14) === 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
+			const id = (inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,14) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
+				if(inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
 					unitReturned._id = inputData.unit;
 					unitReturned.shipType = 'SHIP_DEF';
@@ -315,7 +315,7 @@ module.exports = class Units {
 					inputData.fleetName = 'SHIP_DEF';
 				}
 
-				let totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
+				const totalCost = []; // [Al,Fe,Ti,Cu,Time,Population]
 
 				// Check if planet have enough resources
 				for(let i=0; i<unitReturned.cost.length; i++) {
@@ -344,7 +344,7 @@ module.exports = class Units {
 
 					// Check fleet
 					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
-						let currTime = Date.now();
+						const currTime = Date.now();
 
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
@@ -363,9 +363,9 @@ module.exports = class Units {
 						// Update planet
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0,14) !== 'SHIP_WEP_MINES') {
+						if(inputData.unit.substr(0, 'SHIP_WEP_MINES'.length) !== 'SHIP_WEP_MINES') {
 							// Update unit
-							let newUnit = unitReturned.toJSON();
+							const newUnit = unitReturned.toJSON();
 							newUnit.owned += inputData.count;
 
 							db.unit.update(newUnit);
