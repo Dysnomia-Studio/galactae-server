@@ -1,7 +1,9 @@
+/* eslint-disable no-magic-numbers */
+
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
@@ -45,7 +47,7 @@ describe('• Buildings', function() {
 
 	describe('# getEnergyProd()', function() {
 		it('level 1', function() {
-			let buildings = [1,1,1,1,1,1,1,1,1];
+			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyProd(buildings),
 				2795000
@@ -53,7 +55,7 @@ describe('• Buildings', function() {
 		});
 
 		it('level 30', function() {
-			let buildings = [1,1,1,1,30,1,1,1,1];
+			const buildings = [1,1,1,1,30,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyProd(buildings),
 				1877500000
@@ -63,7 +65,7 @@ describe('• Buildings', function() {
 
 	describe('# getEnergyCons()', function() {
 		it('level 1', function() {
-			let buildings = [1,1,1,1,1,1,1,1,1];
+			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyCons(buildings),
 				2761850
@@ -71,7 +73,7 @@ describe('• Buildings', function() {
 		});
 
 		it('level 5 total', function() {
-			let buildings = [5,5,5,5,5,5,5,5,5];
+			const buildings = [5,5,5,5,5,5,5,5,5];
 			assert.equal(
 				Buildings.getEnergyCons(buildings),
 				53866650
@@ -81,7 +83,7 @@ describe('• Buildings', function() {
 
 	describe('# enoughEnergy()', function() {
 		it('enough', function() {
-			let buildings = [1,1,1,1,1,1,1,1,1];
+			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.enoughEnergy(buildings),
 				true
@@ -89,7 +91,7 @@ describe('• Buildings', function() {
 		});
 
 		it('no enough', function() {
-			let buildings = [30,30,30,30,1,1,1,1,1];
+			const buildings = [30,30,30,30,1,1,1,1,1];
 			assert.equal(
 				Buildings.enoughEnergy(buildings),
 				false

@@ -67,5 +67,43 @@
 
 			return [duplicate, duplicateName];
 		}
+
+		/**
+		 * Calculates the unit costs.
+		 *
+		 * @param      {<type>}  data    The data
+		 * @return     {Array}   Unit total cost
+		 */
+		static calcCost(shipShape,parts) {
+			const totalCost = shipCosts[shipShape];
+
+			for(let id=0; id<parts.length; id++) {
+				if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
+					log('Cost is not defined for part ' + parts[id].tech + ' in ship ' + shipShape,'error');
+					return [-1];
+				}
+
+				const addCost = shipCosts[parts[id].tech];
+
+				for(let i=0; i<6; i++) {
+					if(shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
+						addCost[i] *= fighterMult[shipShape];
+					}
+
+					totalCost[i] += addCost[i];
+				}
+			}
+
+			// Round this
+			for(let i=0; i<6; i++) {
+				if(i !== 4) {
+					totalCost[i] = Math.round(totalCost[i]);
+				} else {
+					totalCost[i] = Math.round(totalCost[i]*100)/100;
+				}
+			}
+
+			return totalCost;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

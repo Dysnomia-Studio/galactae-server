@@ -1,5 +1,6 @@
 module.exports = function() {
 	this.globalConst = {
+		groundBuildingNumber:9,
 		buildingNumber: 	14,
 		maxFleetSize:   300000, // Number of people
 	};
