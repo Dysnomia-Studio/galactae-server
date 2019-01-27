@@ -23,7 +23,7 @@ module.exports = class Units {
 	 * @return     {Array}   Unit total cost
 	 */
 	static calcCost(shipShape,parts) {
-		let totalCost = shipCosts[shipShape];
+		const totalCost = shipCosts[shipShape];
 
 		for(let id=0; id<parts.length; id++) {
 			if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
@@ -31,7 +31,7 @@ module.exports = class Units {
 				return [-1];
 			}
 
-			let addCost = shipCosts[parts[id].tech];
+			const addCost = shipCosts[parts[id].tech];
 
 			for(let i=0; i<6; i++) {
 				if(shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
@@ -117,35 +117,7 @@ module.exports = class Units {
 		return true;
 	}
 
-	static checkIfSameParts(ship1, ship2) {
-		// Sort
-		ship1.parts.sort(function(a,b) {
-			if(a.name < b.name) {
-				return -1;
-			}
-			return 1;
-		});
 
-		ship2.parts.sort(function(a,b) {
-			if(a.name < b.name) {
-				return -1;
-			}
-			return 1;
-		});
-
-		// Compare
-		let duplicate = true;
-		for(let i=0; i<ship2.parts.length; i++) {
-			for(let id in ship2.parts[i]) {
-				if(ship2.parts[i][id] !== ship1.parts[i][id]) {
-					duplicate = false;
-					break;
-				}
-			}
-		}
-
-		return duplicate;
-	}
 
 	/**
 	 * Creates an unit type.
@@ -215,7 +187,7 @@ module.exports = class Units {
 						owned: 0,
 					};
 
-					for(let i in ship) {
+					for(const i in ship) {
 						if(i==='name' || i==='type' || i==='shape') { continue; }
 
 						shipToSave.parts.push({
@@ -230,25 +202,7 @@ module.exports = class Units {
 					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure
 
 					db.unit.findByOwner(data.id,function(unitList) {
-						let duplicate = false;
-						let duplicateName = false;
-
-						for(let currObj in unitList) {
-							if(unitList[currObj].name === shipToSave.name) {
-								duplicateName = true;
-								break;
-							}
-
-							if(unitList[currObj].shipType === shipToSave.shipType &&
-								unitList[currObj].shipShape === shipToSave.shipShape &&
-								unitList[currObj].parts.length === shipToSave.parts.length) {
-
-								duplicate = Units.checkIfSameParts(unitList[currObj], shipToSave);
-								if(duplicate) {
-									break;
-								}
-							} // End check parts
-						}
+						const [duplicate, duplicateName] = Unit.checkIfDuplicate(unitList, shipToSave);
 
 						if(!duplicate && !duplicateName) {
 							db.unit.create(shipToSave, function() {
