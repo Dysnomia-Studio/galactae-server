@@ -115,7 +115,7 @@ module.exports = class Fleets {
 			}
 
 			// Current in-orbit fleets
-			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(fleets) {
+			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {
 				// @TODO: Same owner, same ally, trade
 
 				callback(fleetList, newPlanet);
@@ -172,20 +172,20 @@ module.exports = class Fleets {
 		});
 	}
 
-	static hasEnoughCarrier(fleet, unitList) {
+	static hasEnoughCarrier(currFleet, unitList) {
 		let fighterCount = 0;
 		let fighterCap   = 0;
 
 		for(const u in unitList) {
-			for(const f in fleet.units) {
-				if(fleet.units[f][0] !== unitList[u]._id) { continue; }
+			for(const f in currFleet.units) {
+				if(currFleet.units[f][0] !== unitList[u]._id) { continue; }
 
 				if(unitList[u].shipType === 'SHIP_FIGHTER') {
-					fighterCount += fighterWeight[unitList[u].shipShape] * fleet.units[f][1];
+					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f][1];
 				} else if(unitList[u].shipType === 'SHIP_CARRIER') {
 					for(const p in unitList[u].parts) {
 						if(unitList[u].parts[p].type === 'hangar') {
-							fighterCap += hangarSize[unitList[u].parts[p].tech] * fleet.units[f][1];
+							fighterCap += hangarSize[unitList[u].parts[p].tech] * currFleet.units[f][1];
 						}
 					}
 				}
@@ -253,9 +253,9 @@ module.exports = class Fleets {
 
 				let minSpeed;
 				if(systemeDepart === systemeArrivee) {
-					minSpeed = Fleet.getMinSubSpeed(unitList, fleet.units);
+					minSpeed = Fleet.getMinSubSpeed(unitList, fleetReturned.units);
 				} else {
-					minSpeed = Fleet.getMinSupraSpeed(unitList, fleet.units);
+					minSpeed = Fleet.getMinSupraSpeed(unitList, fleetReturned.units);
 				}
 
 				if(minSpeed.speed[0] === undefined) {
