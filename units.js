@@ -117,8 +117,6 @@ module.exports = class Units {
 		return true;
 	}
 
-
-
 	/**
 	 * Creates an unit type.
 	 *

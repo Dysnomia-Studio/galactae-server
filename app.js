@@ -50,6 +50,7 @@ global.Research  = require('./research');
 global.Resources = require('./Resources').Resources;
 global.Tutorials = require('./tutorials');
 global.Units     = require('./units');
+global.Units     = require('./Unit').Unit;
 // And that's in last
 global.Websocket = require('./socket');
 
