@@ -85,7 +85,7 @@
 		static calcFuelCost(engines) {
 			let cost = 0;
 
-			for(const i in engines) { // @TODO: use fighterMult
+			for(const i in engines) {
 				cost += fuelCost[i] * engines[i];
 			}
 
@@ -135,7 +135,12 @@
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
-				min.engines[curr.tech] += curr.count * fleetUnits[i][1];
+
+				let count = curr.count;
+				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
+					count *= fighterMult[currUnit.shipShape];
+				}
+				min.engines[curr.tech] += count * fleetUnits[i][1];
 			}
 
 			return min;
@@ -169,7 +174,12 @@
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
-				min.engines[curr.tech] += curr.count * fleetUnits[i][1];
+
+				let count = curr.count;
+				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
+					count *= fighterMult[currUnit.shipShape];
+				}
+				min.engines[curr.tech] += count * fleetUnits[i][1];
 			}
 
 			return min;
