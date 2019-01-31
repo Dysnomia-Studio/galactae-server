@@ -4,7 +4,7 @@
 		 * Gets an unit speed depending on a specific tech & speed created by other
 		 * parts.
 		 *
-		 * @param      {array}   speed   Current speed, [-1] if no speed yet
+		 * @param      {Array}   speed   Current speed, [-1] if no speed yet
 		 * @param      {string}  tech    Engines tech
 		 * @return     {Array}   New current speed
 		 */
@@ -79,7 +79,7 @@
 		/**
 		 * Calculates the fuel cost of moving with specific engines, pattern: { type: count, type2: count2 }
 		 *
-		 * @param      {Object}  engines  The engines
+		 * @param      {Object: type => count}  engines  The engines
 		 * @return     {number}  The fuel cost.
 		 */
 		static calcFuelCost(engines) {
@@ -95,9 +95,9 @@
 		/**
 		 * Get the slower speed between two polynomial speed
 		 *
-		 * @param      {number}  curr    Current speed
-		 * @param      {number}  other   Other speed to compare with
-		 * @return     {number}  Slower speed
+		 * @param      {polynom}  curr    Current speed
+		 * @param      {polynom}  other   Other speed to compare with
+		 * @return     {polynom}  Slower speed
 		 */
 		static slowerSpeed(curr, other) {
 			const testDist = 1000; // Total galaxy
@@ -112,7 +112,7 @@
 		/**
 		 * Get the slowest subspeed in a fleet
 		 *
-		 * @param      {<type>}  unitList  Fleet units list
+		 * @param      {Array}   unitList  Fleet units list
 		 * @return     {Object}  The minimum sub speed.
 		 */
 		static getMinSubSpeed(unitList, fleetUnits) {
@@ -149,7 +149,7 @@
 		/**
 		 * Get the slowest supraspeed in a fleet
 		 *
-		 * @param      {<type>}  unitList  Fleet units list
+		 * @param      {Array}   unitList  Fleet units list
 		 * @return     {Object}  The minimum supra speed.
 		 */
 		static getMinSupraSpeed(unitList, fleetUnits) {
@@ -194,6 +194,66 @@
 		 */
 		static calcMoveTime(dist, speed) {
 			return Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
+		}
+
+		/**
+		 * Distribute planet helium 3 to all fleets
+		 *
+		 * @param      {<type>}  planet     Old planet data
+		 * @param      {<type>}  fleetList  Old fleet list
+		 * @return     {<type>}  [New planet data, New fleet list]
+		 */
+		static distributeFuel(planet, fleetList) {
+			let haveToUpdate = [];
+			for(let i=0; i<fleetList.length; i++) {
+				if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
+				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
+					haveToUpdate.push(i);
+				}
+			}
+
+			let addCount = 0;
+
+			// Priority fleet
+			if(planet.highPriorityFleet !== undefined) {
+				const prioId = fleetList.map(d => ''+d._id).indexOf(planet.highPriorityFleet);
+
+				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
+					fleetList[prioId].fuel += planet.resources[1];
+
+					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
+						planet.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
+						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
+					} else {
+						planet.resources[1] = 0;
+					}
+				}
+			}
+
+			// Current planet fleets
+			while(haveToUpdate.length > 0 && planet.resources[1] > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
+				for(let i=0; i<haveToUpdate.length; i++) {
+					const id = haveToUpdate[i];
+
+					fleetList[id].fuel += addCount;
+					planet.resources[1] -= addCount;
+
+					if(fleetList[id].fuel > fleetList[id].maxFuel) {
+						planet.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
+						fleetList[id].fuel = fleetList[id].maxFuel;
+
+						haveToUpdate[i] = -1;
+					}
+				}
+
+				haveToUpdate = haveToUpdate.filter(d => d>0);
+			}
+
+			return [
+				planet,
+				fleetList,
+				haveToUpdate.length === 0 // No resources left
+			];
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

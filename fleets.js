@@ -61,58 +61,21 @@ module.exports = class Fleets {
 	}
 
 	static recalcFuel(fleetList, callback) {
-		let haveToUpdate = [];
+		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
 			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
-				haveToUpdate.push(i);
+				haveToUpdate = true;
 			}
 		}
 
-		if(haveToUpdate.length === 0) { callback(fleetList); return; }
+		if(!haveToUpdate) { callback(fleetList); return; }
+
 		db.planet.find(fleetList[0].motherPlanetAdress, function(planetData) {
-			const newPlanet = planetData.toJSON();
-			let addCount = 0;
+			let newPlanet, empty;
+			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData.toJSON(), fleetList);
 
-			// Priority fleet
-			if(newPlanet.highPriorityFleet !== undefined) {
-				const prioId = fleetList.map(d => ''+d._id).indexOf(newPlanet.highPriorityFleet);
-
-				if(prioId !== -1 && fleetList[prioId].position === newPlanet.address) {
-					fleetList[prioId].fuel += newPlanet.resources[1];
-
-					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
-						newPlanet.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
-						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
-					} else {
-						newPlanet.resources[1] = 0;
-					}
-				}
-			}
-
-			// Current planet fleets
-			while(haveToUpdate.length > 0 && newPlanet.resources[1] > 0 && (addCount = Math.floor(newPlanet.resources[1]/haveToUpdate.length)) > 0) {
-				for(let i=0; i<haveToUpdate.length; i++) {
-					const id = haveToUpdate[i];
-
-					fleetList[id].fuel += addCount;
-					newPlanet.resources[1] -= addCount;
-
-					if(fleetList[id].fuel > fleetList[id].maxFuel) {
-						newPlanet.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
-						fleetList[id].fuel = fleetList[id].maxFuel;
-
-						haveToUpdate[i] = -1;
-					}
-				}
-
-				haveToUpdate = haveToUpdate.filter(d => d>0);
-			}
-
-			if(haveToUpdate.length > 0) { // No resources left
-				callback(fleetList, newPlanet);
-				return;
-			}
+			if(empty) { callback(fleetList); return; }
 
 			// Current in-orbit fleets
 			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {
