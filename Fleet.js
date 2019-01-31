@@ -29,6 +29,8 @@
 			let tech = '';
 			let count = 0;
 
+			if(unit === undefined) { return { speed: [] }; }
+
 			for(const i in unit.parts) {
 				if(unit.parts[i].type === type) {
 					tech = unit.parts[i].tech;
