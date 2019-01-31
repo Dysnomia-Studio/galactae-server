@@ -24,19 +24,13 @@
 			return speed;
 		}
 
-		/**
-		 * Calculates the subspeed of an unit
-		 *
-		 * @param      {Object}  unit    Unit description
-		 * @return     {Object}  Subspeed
-		 */
-		static calcSubSpeed(unit) {
+		static calcSpeed(unit, type) {
 			let speed = [-1];
 			let tech = '';
 			let count = 0;
 
 			for(const i in unit.parts) {
-				if(unit.parts[i].type === 'sub_propulsion') {
+				if(unit.parts[i].type === type) {
 					tech = unit.parts[i].tech;
 					count++;
 
@@ -51,29 +45,23 @@
 		}
 
 		/**
+		 * Calculates the subspeed of an unit
+		 *
+		 * @param      {Object}  unit    Unit description
+		 * @return     {Object}  Subspeed
+		 */
+		static calcSubSpeed(unit) {
+			return Fleet.calcSpeed(unit, 'sub_propulsion');
+		}
+
+		/**
 		 * Calculates the supraspeed of an unit
 		 *
 		 * @param      {Object}  unit    Unit description
 		 * @return     {Object}  Supraspeed
 		 */
 		static calcSupraSpeed(unit) {
-			let speed = [-1];
-			let tech = '';
-			let count = 0;
-
-			for(const i in unit.parts) {
-				if(unit.parts[i].type === 'sup_propulsion') {
-					tech = unit.parts[i].tech;
-					count++;
-
-					speed = Fleet.getSpeed(speed, tech);
-					if(speed[0] === undefined) {
-						return { speed: [] };
-					}
-				}
-			}
-
-			return {speed: speed, tech: tech, count: count};
+			return Fleet.calcSpeed(unit, 'sup_propulsion');
 		}
 
 		/**
@@ -252,7 +240,7 @@
 			return [
 				planet,
 				fleetList,
-				haveToUpdate.length === 0 // No resources left
+				haveToUpdate.length === 0, // No resources left
 			];
 		}
 	};

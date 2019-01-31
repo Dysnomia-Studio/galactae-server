@@ -166,7 +166,6 @@ module.exports = class Units {
 
 						if(!duplicate && !duplicateName) {
 							db.unit.create(shipToSave, function() {
-								// Notify client
 								log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
 								Units.refresh(data);
 							});
