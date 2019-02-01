@@ -90,12 +90,52 @@ describe('• Unit', function() {
 			]
 		};
 
-		it('diff name diff parts', function() {
+		it('different parts', function() {
 			assert.deepEqual(
 				Unit.checkIfDuplicate([	ship1 ], ship2),
 				[false, false]
 			);
 		});
+
+		it('different type', function() {
+			const ship3 = JSON.parse(JSON.stringify(ship1));
+			const ship4 = JSON.parse(JSON.stringify(ship1));
+			ship3.shipType = '1';
+			ship3.name = '1';
+			ship4.shipType = '2';
+			ship4.name = '2';
+
+			assert.deepEqual(
+				Unit.checkIfDuplicate([	ship4 ], ship3),
+				[false, false]
+			);
+		});
+
+		it('different shape', function() {
+			const ship3 = JSON.parse(JSON.stringify(ship1));
+			const ship4 = JSON.parse(JSON.stringify(ship1));
+			ship3.shipShape = '1';
+			ship3.name = '1';
+			ship4.shipShape = '2';
+			ship4.name = '2';
+
+			assert.deepEqual(
+				Unit.checkIfDuplicate([	ship4 ], ship3),
+				[false, false]
+			);
+		});
+
+		it('different parts length', function() {
+			const ship3 = JSON.parse(JSON.stringify(ship1));
+			ship3.parts = [];
+			ship3.name = '1';
+
+			assert.deepEqual(
+				Unit.checkIfDuplicate([	ship1 ], ship3),
+				[false, false]
+			);
+		});
+
 
 		it('diff name same parts', function() {
 			const ship3 = {

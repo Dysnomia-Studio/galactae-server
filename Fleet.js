@@ -24,6 +24,13 @@
 			return speed;
 		}
 
+		/**
+		 * Calculates the speed.
+		 *
+		 * @param      {<type>}  unit    The unit
+		 * @param      {<type>}  type    The type
+		 * @return     {Object}  The speed.
+		 */
 		static calcSpeed(unit, type) {
 			let speed = [-1];
 			let tech = '';
