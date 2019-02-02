@@ -118,7 +118,7 @@
 				engines: {},
 			};
 
-			const unitListId = unitList.map((unit) => unit._id);
+			const unitListId = unitList.map((unit) => '' + unit._id);
 
 			for(let i=0; i<fleetUnits.length; i++) {
 				const currUnit = unitList[unitListId.indexOf(fleetUnits[i][0])];
