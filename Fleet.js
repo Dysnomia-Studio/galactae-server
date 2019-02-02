@@ -36,7 +36,7 @@
 			let tech = '';
 			let count = 0;
 
-			if(unit === undefined) { return { speed: [] }; }
+			if(unit === undefined) { console.error('Error: undefined unit in Fleet.calcSpeed()'); return { speed: [] }; }
 
 			for(const i in unit.parts) {
 				if(unit.parts[i].type === type) {

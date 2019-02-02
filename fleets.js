@@ -221,9 +221,12 @@ module.exports = class Fleets {
 					minSpeed = Fleet.getMinSupraSpeed(unitList, fleetReturned.units);
 				}
 
-				if(minSpeed.speed[0] === undefined) {
+				if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
 					log(user.username + ' failed to move fleet because some units can\'t make supraspeed move.');
 					Websocket.SendMessageToClient({ sid: user.sid, message: 'CANT_MAKE_SUPRAMOVE' });
+					return;
+				} else if(minSpeed.speed[0] === undefined) {
+					log(user.username + ' failed to move fleet because some units haven\'t speed data.');
 					return;
 				}
 
