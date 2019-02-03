@@ -14,10 +14,10 @@ describe('• GameMap', function() {
 	 */
 	describe('# getPlanetCoords()', function() {
 		it('getPlanetCoords(90° (=1/2 Pi))', function() {
-			assert.deepEqual(
-				GameMap.getPlanetCoords(0.5*Math.PI, 1),
-				[0.5, 1]
-			);
+			const coords = GameMap.getPlanetCoords(0.5*Math.PI, 1);
+
+			assert.equal(Math.round(coords[0]), 0);
+			assert.equal(Math.round(coords[1]), 1);
 		});
 	});
 });

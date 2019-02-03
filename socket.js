@@ -183,7 +183,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-				   	Units.build(data);
+					Units.build(data);
 				});
 			});
 			socket.on('units-ask-data', function(data) {
@@ -193,8 +193,18 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-				   	Units.refresh(data);
+					Units.refresh(data);
 					Fleets.refresh(data.planet,data.sid);
+				});
+			});
+			socket.on('fleet-set-priority', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.planet) || !isset(data.fleet)) { return; }
+				// User
+				data.sid = socket.id;
+
+				Player.isValid(data,function(data) { // Verify identity
+					Planet.setPriorityFleet(data.planet, data.fleet, data.sid);
 				});
 			});
 			socket.on('fleet-move', function(data) {
@@ -204,7 +214,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-				   	Fleets.moveTo(data, data.fleetId, data.destination);
+					Fleets.moveTo(data, data.fleetId, data.destination);
 				});
 			});
 
@@ -215,9 +225,9 @@ module.exports = class Websocket {
 				// User
 				data.user.sid = socket.id;
 				Player.isValid(data.user,function(user) { // Verify identity
-				   	db.player.searchBySid(user.sid,function(dataReturned) {
-				   		Player.dayBonus(dataReturned,user,data.choice);
-				   	});
+					db.player.searchBySid(user.sid,function(dataReturned) {
+						Player.dayBonus(dataReturned,user,data.choice);
+					});
 				});
 			});
 

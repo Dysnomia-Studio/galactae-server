@@ -542,4 +542,13 @@ module.exports = class Planet {
 
 		return points;
 	}
+
+	static setPriorityFleet(planet, fleet, sid) {
+		db.planet.find(planet, function(planetData) {
+			db.planet.update({ _id: planetData._id, highPriorityFleet: fleet }, function() {
+				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
+				Fleets.refresh(planetData._id, sid);
+			});
+		});
+	}
 };

@@ -290,13 +290,14 @@ module.exports = {
 				}
 			});
 		},
-		update: function(data) {
+		update: function(data, callback) {
 			const conditions = { _id: data._id },
 				update = { $set: data },
 				options = { multi: true };
 
 			planets.update(conditions, update, options,function(error) {
 				if(error) { log(error); }
+				if(callback) { callback(); }
 			});
 		},
 		findBySystemWithOwners: function(systemAddr, callback) {
