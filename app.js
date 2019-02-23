@@ -81,6 +81,7 @@ db.connect(function(success,general=false) {
 	if(!general) {
 		global.io = require('socket.io').listen(globalCfg.serverPort);
 		io.set('transports', ['websocket','xhr-polling','polling']);
+		io.set('allowedOrigins', '*.galactae.eu');
 
 		/**
 		 * Lancement du serveur en écoute
