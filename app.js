@@ -2,15 +2,6 @@
  * Npm libs
  */
 global.fs = require('fs');
-let options = {
-	key: fs.readFileSync(process.cwd() + '/keys/privkey.pem'),
-	cert: fs.readFileSync(process.cwd() + '/keys/cert.pem'),
-};
-let express = require('express');
-let app = express();
-global.https = require('https').createServer(options, app);
-global.io = require('socket.io')(https);
-io.set('transports', ['websocket','xhr-polling','polling']);
 
 /**
  * Global vars
@@ -88,14 +79,15 @@ db.connect(function(success,general=false) {
 	},statsInterval - Date.now()%statsInterval);
 
 	if(!general) {
+		global.io = require('socket.io').listen(globalCfg.serverPort);
+		io.set('transports', ['websocket','xhr-polling','polling']);
+
 		/**
 		 * Lancement du serveur en écoute
 		 */
-		https.listen(globalCfg.serverPort, function () {
-			Websocket.init();
-			Discord.connect();
-			log('Server is listening on *:' + globalCfg.serverPort);
-		});
+		Websocket.init();
+		Discord.connect();
+		log('Server is listening on *:' + globalCfg.serverPort);
 	}
 });
 
