@@ -197,9 +197,12 @@ module.exports = class Units {
 		db.unit.find(data.shipId, function(unitReturned) {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
-			unitReturned.name = data.shipNewName;
+			const newUnit = {
+				_id: unitReturned._id,
+				name: data.shipNewName
+			};
 
-			db.unit.update(unitReturned, function() {
+			db.unit.update(newUnit, function() {
 				log(data.username + ' has succed to rename unit type old:' + unitReturned.name + ', new: ' + data.shipNewName,'success');
 				Units.refresh(data);
 			});

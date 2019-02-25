@@ -217,6 +217,15 @@ module.exports = class Websocket {
 					Fleets.moveTo(data, data.fleetId, data.destination);
 				});
 			});
+			socket.on('fleet-rename', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.fleetId) || !isset(data.fleetNewName)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Fleets.renameFleet(data);
+				});
+			});
 
 			// Daily Bonus
 			socket.on('daily-bonus', function(data) {

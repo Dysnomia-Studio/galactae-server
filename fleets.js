@@ -315,4 +315,21 @@ module.exports = class Fleets {
 			});
 		});
 	}
+
+	static renameFleet(data) {
+		db.fleet.find(data.fleetId, function(fleetReturned) {
+			if(!isset(fleetReturned) || !isset(fleetReturned.ownerId) || ''+fleetReturned.ownerId !== ''+data.id) { return; }
+			if(fleetReturned.name === 'SHIP_DEF') { return; }
+
+			const newFleet = {
+				_id: fleetReturned._id,
+				name: data.fleetNewName
+			};
+
+			db.fleet.update(newFleet, function() {
+				log(data.username + ' has succed to rename fleet type old:' + fleetReturned.name + ', new: ' + data.fleetNewName,'success');
+				Fleets.refresh(fleetReturned.motherPlanetId, data.sid);
+			});
+		});
+	}
 };
