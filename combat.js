@@ -15,7 +15,7 @@ module.exports = class Combat {
 		this.defAI = [];
 
 		// Cache des types d'unités
-		this.unitCache = [];
+		this.unitCache = {};
 
 		// Logs de bataille
 		this.battleLog = [];
@@ -74,7 +74,26 @@ module.exports = class Combat {
 	 * @param      {Function}  callback  Function to call back after these calls
 	 */
 	getAllUnits(callback) {
-		// @ADD: Get All units from db then call callback
+		// Get units id list
+		const unitIdList = new Set();
+		for(const fleet of [].concat(this.atkFleets, this.defFleets)) {
+			for(const unit of fleet.units) {
+				unitIdList.add(unit);
+			}
+		}
+
+		function done(unit) {
+			this.unitCache[unit._id] = unit;
+
+			if(unitIdList.size <= this.unitCache.length) {
+				callback();
+			}
+		}
+
+		// Get all units from db
+		for(const unitId of unitIdList) {
+			db.unit.find(unitId, done);
+		}
 	}
 
 	/**
@@ -117,22 +136,21 @@ module.exports = class Combat {
 
 		// @ADD: check beginners protection
 
-		// @ADD: Get all in-orbit fleets
-		let fleets = {};
+		db.fleet.findByPosition(pid, function(fleetList) {
+			const battle = new Combat();
 
-		let battle = new Combat();
-
-		// Add all fleets to fight
-		for(let i in fleets) {
-			if(fleets[i].orbitPosition === 0) {
-				battle.joinTeam('def', fleets[i]);
-			} else if(fleets[i].orbitPosition === 1) {
-				battle.joinTeam('atk', fleets[i]);
+			// Add all fleets to fight
+			for(const i in fleetList) {
+				if(fleetList[i].orbitPosition === 0) {
+					battle.joinTeam('def', fleetList[i]);
+				} else if(fleetList[i].orbitPosition === 1) {
+					battle.joinTeam('atk', fleetList[i]);
+				}
 			}
-		}
 
-		battle.fight();
+			battle.fight();
 
-		preventRestarts++;
+			preventRestarts++;
+		});
 	}
 };
