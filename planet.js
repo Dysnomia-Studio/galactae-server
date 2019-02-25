@@ -317,16 +317,16 @@ module.exports = class Planet {
 				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
 
 				if(currTime>planetIn.unitBuildingEndTime) { // total add
-					let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro;
 
 					newFleet.inBuilding = false;
 
 					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
 				} else { // Partial add
-				 	let restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
-				 	let restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
-				 	unitCount = restantDepuisSynchro - restant;	 	
+					const restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
+					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+					unitCount = restantDepuisSynchro - restant;
 				}
 
 				if(unitCount === 0) { return; } // Prevent some bugs

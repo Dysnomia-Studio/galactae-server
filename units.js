@@ -199,7 +199,7 @@ module.exports = class Units {
 
 			const newUnit = {
 				_id: unitReturned._id,
-				name: data.shipNewName
+				name: data.shipNewName,
 			};
 
 			db.unit.update(newUnit, function() {

@@ -323,7 +323,7 @@ module.exports = class Fleets {
 
 			const newFleet = {
 				_id: fleetReturned._id,
-				name: data.fleetNewName
+				name: data.fleetNewName,
 			};
 
 			db.fleet.update(newFleet, function() {
