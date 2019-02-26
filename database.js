@@ -445,6 +445,12 @@ module.exports = {
 				if(callback) { callback(data); }
 			});
 		},
+		remove: function(doc, callback) {
+			doc.remove(function(err, data) {
+				if(err) { log(err); }
+				if(callback) { callback(data); }
+			});
+		}
 	},
 
 	stat: {

@@ -33,6 +33,12 @@ module.exports = class Fleets {
 				for(let i=0; i<FleetList.length; i++) {
 					const id = i;
 
+					// Autoremove fleet if needed
+					if(FleetList[id].unitList.length === 0) {
+						db.fleet.remove(FleetList[id]);
+						continue;
+					}
+
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
@@ -331,5 +337,13 @@ module.exports = class Fleets {
 				Fleets.refresh(fleetReturned.motherPlanetId, data.sid);
 			});
 		});
+	}
+
+	static moveUnits(unitId, count, from, to) {
+
+	}
+
+	static mergeFleet(from, to) {
+
 	}
 };
