@@ -134,7 +134,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				    log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research,'info');
+					log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research,'info');
 					Research.ChangePlanetResearch(data,data.research);
 				});
 			});
@@ -224,6 +224,24 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 					Fleets.renameFleet(data);
+				});
+			});
+			socket.on('fleet-merge', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.from) || !isset(data.to)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Fleets.mergeFleet(data.from, data.to, data);
+				});
+			});
+			socket.on('fleet-units-transfer', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.from) || !isset(data.to) || !isset(data.unitId) || !isset(data.unitCount)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Fleets.transferSomeUnits(data.from, data.to, data);
 				});
 			});
 
@@ -364,7 +382,7 @@ module.exports = class Websocket {
 				log('Restarting server in ' + decompte-- + ' seconds');
 			} else {
 				log('Restarting now !');
-				    db.closeConnections(function() {
+				db.closeConnections(function() {
 					process.exit(0);
 				});
 			}

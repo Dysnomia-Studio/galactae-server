@@ -340,10 +340,105 @@ module.exports = class Fleets {
 	}
 
 	static moveUnits(unitId, count, from, to) {
+		if(count <= 0) { return [from, to]; }
 
+		const units = to.units;
+		let index = -1;
+		for(let i=0; i<units.length; i++) {
+			if(units[i][0] === unitId && count <= units[i][1]) {
+				index = i;
+				break;
+			} else if(units[i][0] === unitId) {
+				log(data.username + 'has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'error');
+				return [-1];
+			}
+		}
+
+		if(index < 0) {
+			to.units.push([unitId, count]);
+		} else {
+			to.units[index][1] += count;
+		}
+
+		return [from, to];
 	}
 
-	static mergeFleet(from, to) {
+	static transferSomeUnits(from, to, data) {
+		if(typeof(from) === 'string') {
+			db.fleet.find(from, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.transferSomeUnits(fleetData, to, data);
+			});
+			return;
+		}
+		if(typeof(to) === 'string') {
+			db.fleet.find(to, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.transferSomeUnits(from, fleetData, data);
+			});
+			return;
+		}
 
+		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+			log(data.username + 'has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'error');
+			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
+			return;
+		}
+
+		// TODO: check people limit for fleet & planet
+
+		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
+
+		if(from === -1) { return; }
+
+		Fleet.removeEmptyUnits(from);
+
+		db.fleet.update(from, function() {
+			db.fleet.update(to, function() {
+				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
+				Fleets.refresh(from.motherPlanetId, data.sid);
+			});
+		});
+	}
+
+	static mergeFleet(from, to, data) {
+		if(typeof(from) === 'string') {
+			db.fleet.find(from, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.mergeFleet(fleetData, to, data);
+			});
+			return;
+		}
+		if(typeof(to) === 'string') {
+			db.fleet.find(to, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.mergeFleet(from, fleetData, data);
+			});
+			return;
+		}
+
+		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+			log(data.username + 'has failed merging fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'error');
+			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
+			return;
+		}
+
+		// TODO: check people limit for fleet & planet
+
+		const units = from.units;
+		for(let i=0; i<units.length; i++) {
+			[from, to] = Fleets.moveUnits(units[i][0], units[i][1], from, to);
+			if(from === -1) { return; }
+		}
+
+		from.units = [];
+
+		db.fleet.update(from, function() {
+			db.fleet.update(to, function() {
+				log(data.username + 'has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
+				Fleets.refresh(from.motherPlanetId, data.sid);
+			});
+		});
 	}
 };
