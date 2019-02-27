@@ -34,7 +34,7 @@ module.exports = class Fleets {
 					const id = i;
 
 					// Autoremove fleet if needed
-					if(FleetList[id].unitList.length === 0) {
+					if(FleetList[id].units.length === 0) {
 						db.fleet.remove(FleetList[id]);
 						continue;
 					}
