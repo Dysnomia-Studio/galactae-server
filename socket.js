@@ -70,7 +70,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.refresh(data,0);
+					Planet.refresh(data,0);
 				});
 			});
 			// Next/Prev planet
@@ -80,7 +80,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.refresh(data,-1);
+					Planet.refresh(data,-1);
 				});
 			});
 			socket.on('planet-ask-data-next', function(data) {
@@ -89,7 +89,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.refresh(data,1);
+					Planet.refresh(data,1);
 				});
 			});
 
@@ -100,7 +100,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.getWholeSystem(data);
+					Planet.getWholeSystem(data);
 				});
 			});
 
@@ -112,7 +112,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.build(data);
+					Planet.build(data);
 				});
 			});
 
@@ -123,7 +123,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Planet.rename(data);
+					Planet.rename(data);
 				});
 			});
 
@@ -135,7 +135,7 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 				    log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research,'info');
-				   	Research.ChangePlanetResearch(data,data.research);
+					Research.ChangePlanetResearch(data,data.research);
 				});
 			});
 			socket.on('research-sync', function(data) {
@@ -144,7 +144,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Research.sync(data);
+					Research.sync(data);
 				});
 			});
 
@@ -155,7 +155,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Units.createType(data);
+					Units.createType(data);
 				});
 			});
 			socket.on('unit-type-rename', function(data) {
@@ -164,7 +164,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Units.renameType(data);
+					Units.renameType(data);
 				});
 			});
 			socket.on('unit-type-delete', function(data) {
@@ -173,7 +173,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-				   	Units.deleteType(data);
+					Units.deleteType(data);
 				});
 			});
 			socket.on('unit-build', function(data) {
