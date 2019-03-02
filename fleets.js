@@ -349,7 +349,7 @@ module.exports = class Fleets {
 				index = i;
 				break;
 			} else if(units[i][0] === unitId) {
-				log(data.username + 'has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'error');
+				log('Failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'fail');
 				return [-1];
 			}
 		}
@@ -380,7 +380,7 @@ module.exports = class Fleets {
 		}
 
 		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
-			log(data.username + 'has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'error');
+			log(data.username + ' has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;
 		}
@@ -402,6 +402,9 @@ module.exports = class Fleets {
 	}
 
 	static mergeFleet(from, to, data) {
+		console.log('From: ' + from);
+		console.log('To: ' + to);
+
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
 				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
@@ -418,7 +421,7 @@ module.exports = class Fleets {
 		}
 
 		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
-			log(data.username + 'has failed merging fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'error');
+			log(data.username + ' has failed merging fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;
 		}
@@ -435,7 +438,7 @@ module.exports = class Fleets {
 
 		db.fleet.update(from, function() {
 			db.fleet.update(to, function() {
-				log(data.username + 'has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+				log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
 				Fleets.refresh(from.motherPlanetId, data.sid);
 			});
