@@ -387,6 +387,8 @@ module.exports = class Fleets {
 
 		// TODO: check people limit for fleet & planet
 
+		// TODO: move fuel
+
 		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
 
 		if(from === -1) { return; }
@@ -435,6 +437,10 @@ module.exports = class Fleets {
 		}
 
 		from.units = [];
+
+		// Move fuel
+		to.fuel += from.fuel;
+		to.maxFuel += from.maxFuel;
 
 		db.fleet.update(from, function() {
 			db.fleet.update(to, function() {
