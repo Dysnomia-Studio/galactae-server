@@ -340,7 +340,7 @@ module.exports = class Fleets {
 	}
 
 	static moveUnits(unitId, count, from, to) {
-		if(count <= 0) { return [from, to]; }
+		if(count <= 0) { return [-1]; }
 
 		const units = to.units;
 		let index = -1;
@@ -364,6 +364,9 @@ module.exports = class Fleets {
 	}
 
 	static transferSomeUnits(from, to, data) {
+		data.unitCount = parseInt(data.unitCount);
+		if(Number.isNaN(data.unitCount)) { return; }
+
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
 				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
@@ -380,27 +383,47 @@ module.exports = class Fleets {
 		}
 
 		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
-			log(data.username + ' has failed to move units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
+			log(data.username + ' has failed to tranfer units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;
 		}
 
 		// TODO: check people limit for fleet & planet
 
-		// TODO: move fuel
-
 		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
 
 		if(from === -1) { return; }
 
-		Fleet.removeEmptyUnits(from);
+		db.unit.find(data.unitId, function(unit) {
+			if(!isset(unit) || !isset(unit.shipShape)) { return; }
 
-		db.fleet.update(from, function() {
-			db.fleet.update(to, function() {
-				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetId, data.sid);
+			for(let i=0; i<from.units.length; i++) {
+				if(from.units[i][0] === data.unitId) {
+					from.units[i][1] -= data.unitCount;
+				}
+			}
+
+			// Tranfer fuel
+			const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
+			const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
+
+			from.maxFuel -= transferMaxFuel;
+			to.maxFuel += transferMaxFuel;
+
+			from.fuel -= transferFuel;
+			to.fuel += transferFuel;
+
+			Fleet.removeEmptyUnits(from);
+
+			db.fleet.update(from, function() {
+				db.fleet.update(to, function() {
+					log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+					Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
+					Fleets.refresh(from.motherPlanetId, data.sid);
+				});
 			});
 		});
+
 	}
 
 	static mergeFleet(from, to, data) {
