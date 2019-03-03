@@ -15,16 +15,16 @@ module.exports = class Planet {
 
 				for(let i=0; i<longueur; i++) {
 					if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-					    if(i===0 && decalage < 0) {
-					    	pid = userReturned.planetlist[longueur+decalage];
-					    } else if(i>=(longueur-decalage) && decalage > 0) {
-					    	pid = userReturned.planetlist[decalage-1];
+						if(i===0 && decalage < 0) {
+							pid = userReturned.planetlist[longueur+decalage];
+						} else if(i>=(longueur-decalage) && decalage > 0) {
+							pid = userReturned.planetlist[decalage-1];
 						} else {
 							pid = userReturned.planetlist[i+decalage];
 						}
 
-					    valid = true;
-					    break;
+						valid = true;
+						break;
 					}
 				}
 				// Si pas d'info, on met la premiere planete dans la liste
@@ -130,15 +130,15 @@ module.exports = class Planet {
 
 		//Metals
 		if(resources[0]-(metalProdBase*time)>0 && currentBuilding!==1) { //Verify if you can use basic ressources
-		    for(let i=2; i<6; i++) {
-		    	resources[i] += (metalProdBase*time)*ratios[i-2];
-		    }
+			for(let i=2; i<6; i++) {
+				resources[i] += (metalProdBase*time)*ratios[i-2];
+			}
 
 			resources[0] -= (metalProdBase*time); //Consomation Algorithm
 		} else if(currentBuilding!==1) { // Do the max we can
-		    for(let i=2; i<6; i++) {
-		    	resources[i] += resources[0]*ratios[i-2];
-		    }
+			for(let i=2; i<6; i++) {
+				resources[i] += resources[0]*ratios[i-2];
+			}
 
 			resources[0] = 0;
 		}
@@ -159,9 +159,9 @@ module.exports = class Planet {
 				}
 			}
 			resources[0]+=min;
-		    for(let i=2; i<6; i++) {
-		    	resources[i] -= min*ratios[i-2];
-		    }
+			for(let i=2; i<6; i++) {
+				resources[i] -= min*ratios[i-2];
+			}
 		}
 
 		//Max Storage
@@ -171,11 +171,11 @@ module.exports = class Planet {
 		if(resources[1]>storageHelium) {
 			resources[1] = storageHelium;
 		}
-	    for(let i=2; i<6; i++) {
-	    	if(resources[i]>metalsStorageBase*ratios[i-2]) { // You can't have more iron than your storage capacity
+		for(let i=2; i<6; i++) {
+			if(resources[i]>metalsStorageBase*ratios[i-2]) { // You can't have more iron than your storage capacity
 				resources[i] = metalsStorageBase*ratios[i-2];
 			}
-	    }
+		}
 
 		return resources;
 	}
