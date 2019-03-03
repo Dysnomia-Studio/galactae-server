@@ -340,10 +340,6 @@ module.exports = class Planet {
 					if(''+newFleet.units[i][0] === ''+planetIn.unitBuildingID) {
 						newFleet.units[i][1] += unitCount;
 
-						if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
-							newFleet.maxFuel += fuelStorage[unitReturned.shipShape];
-						}
-
 						set=true;
 						break;
 					}
@@ -352,7 +348,11 @@ module.exports = class Planet {
 					newFleet.units.push([planetIn.unitBuildingID,unitCount]);
 				}
 
-				let popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
+				if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
+					newFleet.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
+				}
+
+				const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
 				newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
 				newFleet.points = '' + newFleet.points;
 
