@@ -413,6 +413,8 @@ module.exports = class Fleets {
 			from.fuel -= transferFuel;
 			to.fuel += transferFuel;
 
+			// TODO: move cargo
+
 			Fleet.removeEmptyUnits(from);
 
 			db.fleet.update(from, function() {
@@ -427,9 +429,6 @@ module.exports = class Fleets {
 	}
 
 	static mergeFleet(from, to, data) {
-		console.log('From: ' + from);
-		console.log('To: ' + to);
-
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
 				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
@@ -465,10 +464,55 @@ module.exports = class Fleets {
 		to.fuel += from.fuel;
 		to.maxFuel += from.maxFuel;
 
+		// TODO: move cargo
+
 		db.fleet.update(from, function() {
 			db.fleet.update(to, function() {
 				log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
+				Fleets.refresh(from.motherPlanetId, data.sid);
+			});
+		});
+	}
+
+	static transferFuelBetweenFleets(from, to, data) {
+		if(typeof(from) === 'string') {
+			db.fleet.find(from, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.transferFuelBetweenFleets(fleetData, to, data);
+			});
+			return;
+		}
+		if(typeof(to) === 'string') {
+			db.fleet.find(to, function(fleetData) {
+				if(!isset(fleetData) || !isset(fleetData.name) || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				Fleets.transferFuelBetweenFleets(from, fleetData, data);
+			});
+			return;
+		}
+
+		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+			log(data.username + ' has failed tranfering fuel from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
+			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
+			return;
+		}
+
+		data.fuelCount = parseInt(data.fuelCount);
+		if(Number.isNaN(data.fuelCount) || data.fuelCount <= 0) { return; }
+		if(from.fuel <= data.fuelCount) { return; }
+
+		from.fuel -= data.fuelCount;
+		to.fuel += data.fuelCount;
+
+		if(to.fuel > to.maxFuel) {
+			from.fuel += (to.fuel - to.maxFuel);
+			to.fuel = to.maxFuel;
+		}
+
+		db.fleet.update(from, function() {
+			db.fleet.update(to, function() {
+				log(data.username + ' has tranfered fuel from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+				Websocket.SendMessageToClient( { sid: data.sid, message: 'FUEL_TRANSFER_SUCCESSFUL' });
 				Fleets.refresh(from.motherPlanetId, data.sid);
 			});
 		});

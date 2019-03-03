@@ -244,6 +244,15 @@ module.exports = class Websocket {
 					Fleets.transferSomeUnits(data.from, data.to, data);
 				});
 			});
+			socket.on('fleet-transferFuel', function(data) {
+				// Vars
+				if(!isset(data) || !isset(data.id) || !isset(data.username) || !isset(data.from) || !isset(data.to) || !isset(data.fuelCount)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Fleets.transferFuelBetweenFleets(data.from, data.to, data);
+				});
+			});
 
 			// Daily Bonus
 			socket.on('daily-bonus', function(data) {
