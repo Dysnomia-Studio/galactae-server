@@ -296,9 +296,9 @@ module.exports = class Planet {
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
 		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-			let id = (planetIn.unitBuildingID.substr(0,14) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
+			let id = (planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
 			db.unit.find(id, function(unitReturned) {
-				if(planetIn.unitBuildingID.substr(0,14) === 'SHIP_WEP_MINES') {
+				if(planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
 					unitReturned = {};
 					unitReturned._id = planetIn.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
@@ -403,7 +403,7 @@ module.exports = class Planet {
 		if(currTime>data.unitBuildingEndTime) {
 			data.unitBuildingEndTime = -1;
 			data.unitBuildingID = '-1';
-			data.unitBuildingCount = -1;
+			data.unitBuildingCount = 0;
 			data.unitBuildingFleetID = db.Schema.Types.ObjectId('-1');
 		}
 
@@ -474,7 +474,7 @@ module.exports = class Planet {
 			for(let i=0; i<data.name.length; i++) {
 				if(data.name[i]!==' ') {
 					empty = false;
-				 	break;
+					break;
 				}
 			}
 			if(empty) { return; }
