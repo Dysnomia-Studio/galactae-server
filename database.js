@@ -1,226 +1,63 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
-/**
- * Server schemas
- */
-const planetSchema = new Schema({
-	// General informations
-	_id: Schema.Types.ObjectId,
-	name: String,
-	address: String,
-	owner: Schema.Types.ObjectId,
-	points: Number,
-
-	// Geographic informations
-	orbitDist: Number,
-	orbitDuration: Number,
-	galacticPos: Array,
-	planetType: Number,
-
-	// Buildings
-	Buildings: Array,
-	nextBuilding: Number,
-	nextBuildingTime: Number,
-
-	// Resources
-	resources: Array,
-	lastResourcesUpdate: Number,
-
-	// Units
-	unitBuildingID: String,
-	unitBuildingCount: Number,
-	unitBuildingEndTime: Number,
-	unitBuildingFleetID: Schema.Types.ObjectId,
-	lastUnitUpdate: Number,
-	highPriorityFleet: String,
-
-	// Misc
-	currResearch: String,
-});
-
-const userSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	name: String,
-	gvt: Number,
-	ally: String,
-	sid: String,
-
-	planetlist: Array,
-
-	currTutorial: Number,
-
-	beginnerProtectEnd: Number,
-
-	lastConnected: Number,
-	lastAction: Number,
-
-	points: Number,
-	money: Number,
-	// Research
-	lastResearchUpdate: Number,
-	research: Array,
-	// Bonus journalier
-	lastBonus: Number,
-	dayBonusStreak: Number,
-	dayBonusBest: Number,
-});
-
-const unitsSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	name: String,
-	ownerId: Schema.Types.ObjectId,
-	cost: Array, // [Al,Fe,Ti,Cu,Time,Population]
-	shipType: String,
-	shipShape: String,
-	parts: Array,
-	armorType: String,
-	owned: Number,
-	note: Number,
-});
-
-const fleetsSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	name: String,
-	ownerId: Schema.Types.ObjectId,
-	motherPlanetId: Schema.Types.ObjectId,
-	motherPlanetAdress: String,
-	position: String,
-	orbitPosition: Number, // -1 = Moving to, 0 = Low Orbit - Defense or siege, 1 = Mid Orbit - Attacking, 2 = High orbit - Just around the planet
-	points: String,
-	endMoveTime: Number,
-	units: Array,
-	population: Number,
-	inBuilding: Boolean,
-	fuel: Number,
-	maxFuel: Number,
-});
-
-const statsSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	plCount: Number,
-	time: Number,
-});
-
-let planets;
-let users;
-let units;
-let fleets;
-let stats;
-
-/**
- * General schemas
- */
-const userPrivilegesSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	user_id: Schema.Types.ObjectId,
-	server_name: String,
-	user_privilege_lvl: Number,
-	user_whitelist: Number,
-});
-
-const serverSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	server_name: String,
-	server_maintenance: Boolean,
-});
-
-const userGameIdSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	user_id: String,
-	game_id: String,
-	server_name: String,
-});
-
-const userBanSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	user_id: String,
-	server_name: String,
-	ban_type: Number, // 1 = Chat, 2 = Game
-	ban_begin: Number,
-	ban_end: Number,
-	ban_reason: String,
-	admin: String,
-});
-
-const globalRanksSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	user_id: String,
-	name: String,
-	server_name: String,
-	rank: Number,
-	points: Number,
-	planets: Number,
-});
-
-const sectorRanksSchema = new Schema({
-	_id: Schema.Types.ObjectId,
-	user_id: String,
-	name: String,
-	server_name: String,
-	sector: String,
-	rank: Number,
-	points: Number,
-	planets: Number,
-});
-
-let privileges;
-let servers;
-let userGameIds;
-let bans;
-let globalRanks;
-let sectorRanks;
-
-let mongoSrv;
-let mongoGen;
+const { Pool } = require('pg');
+let generalPool,
+	generalClient,
+	serverPool,
+	serverClient;
 
 module.exports = {
-	Schema: Schema,
 	/**
 	 * Used to connect to database
 	 */
 	connect: function(callback) {
-		mongoSrv = mongoose.createConnection(globalCfg.dbAdress);
-		mongoGen = mongoose.createConnection('***REMOVED***');
+		generalPool = new Pool({
+			user: '',
+			host: '***REMOVED***',
+			database: '',
+			password: '',
+			port: 5432,
+		});
 
-		/**
-		 * Server schemas
-		 */
-		planets = mongoSrv.model('planets', planetSchema);
-		users = mongoSrv.model('users', userSchema);
-		units = mongoSrv.model('units', unitsSchema);
-		fleets = mongoSrv.model('fleets', fleetsSchema);
-		stats = mongoSrv.model('stats', statsSchema);
-
-		/**
-		 * General schemas
-		 */
-		privileges = mongoGen.model('privileges', userPrivilegesSchema);
-		servers = mongoGen.model('servers', serverSchema);
-		userGameIds = mongoGen.model('game_ids', userGameIdSchema);
-		bans = mongoGen.model('bans', userBanSchema);
-		globalRanks = mongoGen.model('globalRanks', globalRanksSchema);
-		sectorRanks = mongoGen.model('sectorRanks', sectorRanksSchema);
+		serverPool = new Pool({
+			user: '',
+			host: '***REMOVED***',
+			database: '',
+			password: '',
+			port: 5432,
+		});
 
 		/**
 		 * Events
 		 */
-		mongoSrv.on('error', function(err) { log(err.message,'warn'); callback(false); });
-		mongoSrv.once('open', function() {
+		generalPool.connect((err, client, done) => {
+			if (err) {
+				log(err.message,'warn');
+				callback(false);
+				return;
+			}
+
+			generalClient = client;
+
 			log('Successfuly connected to server database.');
-			callback(true,false,mongoSrv);
+			callback(true);
 		});
 
-		mongoGen.on('error', function(err) { log(err.message,'warn'); callback(false); });
-		mongoGen.once('open', function() {
+		serverPool.connect((err, client, done) => {
+			if (err) {
+				log(err.message,'warn');
+				callback(false,true);
+				return;
+			}
+
+			serverClient = client;
+
 			log('Successfuly connected to general database.');
-			callback(true,true,mongoGen);
+			callback(true,true);
 		});
 	},
 
 	closeConnections: function(callback) {
-		mongoSrv.close();
-		mongoSrv.close();
+		generalPool.end();
+		serverPool.end();
 
 		callback();
 	},

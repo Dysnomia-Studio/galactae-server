@@ -404,7 +404,7 @@ module.exports = class Planet {
 			data.unitBuildingEndTime = -1;
 			data.unitBuildingID = '-1';
 			data.unitBuildingCount = 0;
-			data.unitBuildingFleetID = db.Schema.Types.ObjectId('-1');
+			data.unitBuildingFleetID = '-1';
 		}
 
 		data.lastUnitUpdate = currTime;
