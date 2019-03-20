@@ -300,13 +300,10 @@ module.exports = {
 
 	stat: {
 		submit: function(currTime) {
-			const data = {};
-			data._id = new mongoose.Types.ObjectId();
-			data.plCount = plCount;
-			data.time = currTime;
-
-			stats.create(data, function(error) {
-				if(error) { log(error); }
+			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, plCount], (err) => {
+				if(err) {
+					log(err);
+				}
 			});
 		},
 	},
