@@ -128,25 +128,30 @@ module.exports = {
 	 */
 	planet: {
 		find: function(addr,callback) {
-			planets.findOne({address: addr}, function (err, planetReturned) {
+			serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
 				if(err) { log(err); }
 				if(isset(planetReturned)) {
 					callback(planetReturned);
 				}
 			});
 		},
-		update: function(data, callback) {
-			const conditions = { _id: data._id },
-				update = { $set: data },
-				options = { multi: true };
+		update: function(planet, callback) {
+			const id = planet.id;
+			delete planet.id;
 
-			planets.update(conditions, update, options,function(error) {
-				if(error) { log(error); }
-				if(callback) { callback(); }
+			let [query, values] = this.buildUpdateQuery('planets', planet);
+			values.push(id);
+			query += ' WHERE id = $' + values.length;
+
+			serverClient.query(query, values, (err) => {
+				if(err) { log(err); }
+				if(callback) {
+					callback();
+				}
 			});
 		},
 		findBySystemWithOwners: function(systemAddr, callback) {
-			planets.find({ 'address': new RegExp('^' + systemAddr + '-', 'i') }, function(err, planetList) {
+			serverClient.query('SELECT * FROM planets WHERE address LIKE \'$1%\'', [systemAddr], (err, planetList) => {
 				if(err) { log(err); return; }
 
 				const pList = [];
