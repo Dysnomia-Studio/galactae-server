@@ -198,7 +198,7 @@ module.exports = class Units {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			const newUnit = {
-				_id: unitReturned._id,
+				_id: unitReturned.id,
 				name: data.shipNewName,
 			};
 
@@ -252,7 +252,7 @@ module.exports = class Units {
 			db.unit.find(id, function(unitReturned) {
 				if(inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
-					unitReturned._id = inputData.unit;
+					unitReturned.id = inputData.unit;
 					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
@@ -264,7 +264,7 @@ module.exports = class Units {
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
-					if(fleet._id === inputData.fleet || fleet.id === inputData.fleet) {
+					if(fleet.id === inputData.fleet || fleet.id === inputData.fleet) {
 						choosenFleet = fleet;
 					}
 
@@ -314,7 +314,7 @@ module.exports = class Units {
 						newPlanet.unitBuildingID = inputData.unit;
 						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * 3600 * 1000);
 						newPlanet.unitBuildingCount = inputData.count;
-						newPlanet.unitBuildingFleetID = fleetReturned._id;
+						newPlanet.unitBuildingFleetID = fleetReturned.id;
 
 						newPlanet.lastUnitUpdate = currTime;
 
@@ -364,7 +364,7 @@ module.exports = class Units {
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
-						if(''+choosenFleet.motherPlanetId !== ''+newPlanet._id) { return; }
+						if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) { return; }
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) {

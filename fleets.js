@@ -17,7 +17,7 @@ module.exports = class Fleets {
 			function sendtoPlayer(FleetList, newPlanet, sid) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
-						_id: newPlanet._id,
+						_id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
@@ -34,7 +34,7 @@ module.exports = class Fleets {
 					const id = i;
 
 					// Autoremove fleet if needed
-					if(FleetList[id].units.length === 0 && ''+newPlanet.unitBuildingFleetID !== ''+FleetList[id]._id) {
+					if(FleetList[id].units.length === 0 && ''+newPlanet.unitBuildingFleetID !== ''+FleetList[id].id) {
 						db.fleet.remove(FleetList[id]);
 						continue;
 					}
@@ -47,7 +47,7 @@ module.exports = class Fleets {
 					haveToDone++;
 
 					const newFleet = {
-						_id: FleetList[id]._id,
+						_id: FleetList[id].id,
 						endMoveTime: FleetList[id].endMoveTime,
 						fuel: FleetList[id].fuel,
 					};
@@ -99,7 +99,7 @@ module.exports = class Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(planetData._id, function(fleetReturned) {
+		db.fleet.findByMotherPlanet(planetData.id, function(fleetReturned) {
 			// Check max count
 			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
 				log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because it has maximal fleet count.');
@@ -120,7 +120,7 @@ module.exports = class Fleets {
 			const newFleet = {
 				name: data.fleetName,
 				ownerId: data.id,
-				motherPlanetId: planetData._id,
+				motherPlanetId: planetData.id,
 				motherPlanetAdress: planetData.address,
 				position: planetData.address,
 				orbitPosition: 0,
@@ -147,7 +147,7 @@ module.exports = class Fleets {
 
 		for(const u in unitList) {
 			for(const f in currFleet.units) {
-				if(currFleet.units[f][0] !== unitList[u]._id) { continue; }
+				if(currFleet.units[f][0] !== unitList[u].id) { continue; }
 
 				if(unitList[u].shipType === 'SHIP_FIGHTER') {
 					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f][1];
@@ -328,7 +328,7 @@ module.exports = class Fleets {
 			if(fleetReturned.name === 'SHIP_DEF') { return; }
 
 			const newFleet = {
-				_id: fleetReturned._id,
+				_id: fleetReturned.id,
 				name: data.fleetNewName,
 			};
 

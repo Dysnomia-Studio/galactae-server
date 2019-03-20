@@ -191,7 +191,7 @@ module.exports = {
 	 */
 	unit: {
 		create: function(data,callback) {
-			data._id = new mongoose.Types.ObjectId();
+			data.id = new mongoose.Types.ObjectId();
 
 			units.create(data, function(error) {
 				if(error) { log(error); }
@@ -219,7 +219,7 @@ module.exports = {
 			});
 		},
 		update: function(data, callback) {
-			const conditions = { _id: data._id },
+			const conditions = { id: data.id },
 				update = { $set: data },
 				options = { multi: true };
 
@@ -275,7 +275,7 @@ module.exports = {
 			});
 		},
 		update: function(data,callback) {
-			const conditions = { _id: data._id },
+			const conditions = { id: data.id },
 				update = { $set: data },
 				options = { multi: true };
 
@@ -288,7 +288,7 @@ module.exports = {
 			});
 		},
 		create: function(data,callback) {
-			data._id = new mongoose.Types.ObjectId();
+			data.id = new mongoose.Types.ObjectId();
 
 			fleets.create(data, function(error) {
 				if(error) { log(error); }
@@ -376,7 +376,7 @@ module.exports = {
 			});
 		},
 		create: function(data) {
-			data._id = new mongoose.Types.ObjectId();
+			data.id = new mongoose.Types.ObjectId();
 
 			bans.create(data, function(error) {
 				if(error) { log(error); }
@@ -393,7 +393,7 @@ module.exports = {
 				if(error) { log(error); }
 
 				if(!isset(obj) || obj.length === 0) { // Si non creer
-					data._id = new mongoose.Types.ObjectId();
+					data.id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
 					globalRanks.create(data, function(error) {
@@ -502,7 +502,7 @@ module.exports = {
 				if(error) { log(error); }
 
 				if(!isset(obj) || obj.length === 0) { // Si non creer
-					data._id = new mongoose.Types.ObjectId();
+					data.id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
 					sectorRanks.create(data, function(error) {

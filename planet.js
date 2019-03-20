@@ -32,7 +32,7 @@ module.exports = class Planet {
 					pid = userReturned.planetlist[0];
 				}
 				db.planet.find(pid,function(planetReturned) {
-					db.fleet.findByMotherPlanet(planetReturned._id, function(fleetReturned) {
+					db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
 						callback(planetReturned,userReturned,fleetReturned);
 					});
 				});
@@ -52,7 +52,7 @@ module.exports = class Planet {
 
 			db.planet.update(newData);
 
-			Fleets.refresh(newData._id,data.sid);
+			Fleets.refresh(newData.id,data.sid);
 
 			Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 		});
@@ -300,7 +300,7 @@ module.exports = class Planet {
 			db.unit.find(id, function(unitReturned) {
 				if(planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
 					unitReturned = {};
-					unitReturned._id = planetIn.unitBuildingID;
+					unitReturned.id = planetIn.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[planetIn.unitBuildingID];
 					unitReturned.ownerId = user.id;
@@ -358,7 +358,7 @@ module.exports = class Planet {
 
 				db.fleet.update(newFleet, function() {
 					Units.refresh(user);
-					Fleets.refresh(planetIn._id,user.sid);
+					Fleets.refresh(planetIn.id,user.sid);
 				});
 			});
 		});
@@ -545,9 +545,9 @@ module.exports = class Planet {
 
 	static setPriorityFleet(planet, fleet, sid) {
 		db.planet.find(planet, function(planetData) {
-			db.planet.update({ _id: planetData._id, highPriorityFleet: fleet }, function() {
+			db.planet.update({ _id: planetData.id, highPriorityFleet: fleet }, function() {
 				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData._id, sid);
+				Fleets.refresh(planetData.id, sid);
 			});
 		});
 	}

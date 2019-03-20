@@ -131,7 +131,7 @@ module.exports = class Player {
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-				userNewResearch.id = userNewResearch._id;
+				userNewResearch.id = userNewResearch.id;
 					db.player.update(userNewResearch, function() {
 					plCount++;
 
@@ -232,11 +232,11 @@ module.exports = class Player {
 			newUserData.points = Math.round(newUserData.points);
 
 			// MaJ des BDD Globales
-			db.globalRank.reSortRanks(user._id, newUserData.points, newUserData.planetlist.length, newUserData.name);
+			db.globalRank.reSortRanks(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
 				db.sectorRank.reSortRanks(
-					user._id,
+					user.id,
 					newUserData.sectorPointsAddresses[sector],
 					newUserData.sectorPointsValue[sector],
 					newUserData.sectorPointsPcount[sector],
