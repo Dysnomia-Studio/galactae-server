@@ -10,45 +10,39 @@ module.exports = {
 	 */
 	connect: function(callback) {
 		generalPool = new Pool({
-			user: '',
+			user: '***REMOVED***',
 			host: '***REMOVED***',
-			database: '',
-			password: '',
+			database: 'galactae',
+			password: '***REMOVED***',
 			port: 5432,
 		});
 
-		serverPool = new Pool({
-			user: '',
-			host: '***REMOVED***',
-			database: '',
-			password: '',
-			port: 5432,
-		});
+		serverPool = new Pool(globalCfg.db);
 
 		/**
 		 * Events
 		 */
-		generalPool.connect((err, client, done) => {
+		serverPool.connect((err, client, done) => {
 			if (err) {
 				log(err.message,'warn');
 				callback(false);
 				return;
 			}
 
-			generalClient = client;
+			serverClient = client;
 
 			log('Successfuly connected to server database.');
 			callback(true);
 		});
 
-		serverPool.connect((err, client, done) => {
+		generalPool.connect((err, client, done) => {
 			if (err) {
 				log(err.message,'warn');
 				callback(false,true);
 				return;
 			}
 
-			serverClient = client;
+			generalClient = client;
 
 			log('Successfuly connected to general database.');
 			callback(true,true);
