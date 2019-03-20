@@ -62,6 +62,10 @@ db.connect(function(success,general=false) {
 	if(general) {
 		db.server.find(function(server) {
 			maintenance = server.server_maintenance;
+
+			if(maintenance) {
+				log('Server maintenance enabled by database configuration', 'warn');
+			}
 		});
 	}
 
