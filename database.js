@@ -56,6 +56,20 @@ module.exports = {
 		callback();
 	},
 
+	buildUpdateQuery: function(table, fields) {
+		let query = 'UPDATE ' + table + ' SET';
+		const values = [];
+
+		for(const key in fields) {
+			values.push(fields[key]);
+			query += ' ' + key + ' = $' + values.length + ',';
+		}
+
+		query = query.substr(query.length-1);
+
+		return [query, values];
+	},
+
 	/**
 	 * PLAYERS
 	 */
