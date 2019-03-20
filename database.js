@@ -338,23 +338,23 @@ module.exports = {
 
 	server: {
 		find: function(callback) {
-			servers.find({server_name: globalCfg.serverGlobalName}, function (err, obj) {
+			generalClient.query('SELECT * FROM servers WHERE server_name = $1', [globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err); }
-				if(isset(obj) && isset(obj[0])) {
-					callback(obj[0]);
-				} else if(isset(obj)) {
-					callback(obj);
+				if(isset(obj)) {
+					callback(obj.rows[0]);
 				}
 			});
 		},
-		update: function(data, callback) {
-			const conditions = {server_name: globalCfg.serverGlobalName},
-				update = { $set: data },
-				options = { multi: true };
+		update: function(serverData, callback) {
+			const server_name = serverData.server_name;
+			delete serverData.server_name;
 
-			servers.update(conditions, update, options,function(error) {
-				if(error) { log(error); }
+			let [query, values] = this.buildUpdateQuery('servers', serverData);
+			values.push(server_name);
+			query += ' WHERE server_name = $' + values.length;
 
+			serverClient.query(query, values, (err) => {
+				if(err) { log(err); }
 				if(callback) {
 					callback();
 				}
