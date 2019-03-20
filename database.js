@@ -75,49 +75,49 @@ module.exports = {
 	 */
 	player: {
 		findAll: function(callback) {
-			users.find({ }, function (err, objReturned) {
+			serverClient.query('SELECT * FROM users', [], (err, objReturned) => {
 				if(err) { log(err); }
 				callback(objReturned);
 			});
 		},
 		searchByName: function(name,callback) {
-			users.findOne({ name: { $regex: new RegExp('^' + name.toLowerCase(), 'i') } }, function (err, objReturned) {
+			serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name.toLowerCase()], (err, objReturned) => {
 				if(err) { log(err); }
 				callback(objReturned);
 			});
 		},
 		searchById: function(id,callback) {
-			users.findById(id, function (err, objReturned) {
+			serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id], (err, objReturned) => {
 				if(err) { log(err); }
 				callback(objReturned);
 			});
 		},
 		searchBySid: function(sid,callback) {
-			users.findOne({sid: sid}, function (err, objReturned) {
+			serverClient.query('SELECT * FROM users WHERE sid = $1 LIMIT 1', [sid], (err, objReturned) => {
 				if(err) { log(err); }
 				callback(objReturned);
 			});
 		},
 		update: function(user, callback) {
-			const conditions = { _id: user.id },
-				update = { $set: user },
-				options = { multi: true };
+			const id = user.id;
+			delete user.id;
 
-			users.update(conditions, update, options,function(error) {
-				if(error) { log(error);}
-				if(callback !== undefined) {
+			let [query, values] = this.buildUpdateQuery('users', user);
+			values.push(id);
+			query += ' WHERE id = $' + values.length;
+
+			serverClient.query(query, values, (err) => {
+				if(err) { log(err); }
+				if(callback) {
 					callback();
 				}
 			});
 		},
 		clearList: function() {
 			log('Clearing player list ...');
-			const conditions = { },
-				update = { $set: { sid: '-1' } },
-				options = { multi: true };
 
-			users.update(conditions, update, options,function(error) {
-				if(error) { log(error);}
+			serverClient.query('UPDATE users SET sid = \'-1\'', [sid], (err) => {
+				if(err) { log(err); }
 				log('List cleared !') ;
 			});
 		},
@@ -327,7 +327,7 @@ module.exports = {
 
 	userGameId: {
 		find: function(id,callback) {
-			userGameIds.find({game_id: id}, function (err, obj) {
+			generalClient.query('SELECT * FROM "userGameIds" WHERE game_id = $1', [id], (err, obj) => {
 				if(err) { log(err); }
 				if(isset(obj)) {
 					callback(obj);
