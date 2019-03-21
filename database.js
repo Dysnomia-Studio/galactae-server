@@ -76,26 +76,26 @@ module.exports = {
 	player: {
 		findAll: function(callback) {
 			serverClient.query('SELECT * FROM users', [], (err, objReturned) => {
-				if(err) { log(err); }
-				callback(objReturned);
+				if(err) { log(err); return; }
+				callback(objReturned.rows);
 			});
 		},
 		searchByName: function(name,callback) {
 			serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name.toLowerCase()], (err, objReturned) => {
-				if(err) { log(err); }
-				callback(objReturned);
+				if(err) { log(err); return; }
+				callback(objReturned.rows);
 			});
 		},
 		searchById: function(id,callback) {
 			serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id], (err, objReturned) => {
-				if(err) { log(err); }
-				callback(objReturned);
+				if(err) { log(err); return; }
+				callback(objReturned.rows);
 			});
 		},
 		searchBySid: function(sid,callback) {
 			serverClient.query('SELECT * FROM users WHERE sid = $1 LIMIT 1', [sid], (err, objReturned) => {
-				if(err) { log(err); }
-				callback(objReturned);
+				if(err) { log(err); return; }
+				callback(objReturned.rows);
 			});
 		},
 		update: function(user, callback) {
@@ -107,7 +107,7 @@ module.exports = {
 			query += ' WHERE id = $' + values.length;
 
 			serverClient.query(query, values, (err) => {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) {
 					callback();
 				}
@@ -117,7 +117,7 @@ module.exports = {
 			log('Clearing player list ...');
 
 			serverClient.query('UPDATE users SET sid = \'-1\'', [sid], (err) => {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				log('List cleared !') ;
 			});
 		},
@@ -129,9 +129,9 @@ module.exports = {
 	planet: {
 		find: function(addr,callback) {
 			serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(isset(planetReturned)) {
-					callback(planetReturned);
+					callback(planetReturned.rows);
 				}
 			});
 		},
@@ -144,7 +144,7 @@ module.exports = {
 			query += ' WHERE id = $' + values.length;
 
 			serverClient.query(query, values, (err) => {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) {
 					callback();
 				}
@@ -153,6 +153,7 @@ module.exports = {
 		findBySystemWithOwners: function(systemAddr, callback) {
 			serverClient.query('SELECT * FROM planets WHERE address LIKE \'$1%\'', [systemAddr], (err, planetList) => {
 				if(err) { log(err); return; }
+				planetList = planetList.rows;
 
 				const pList = [];
 
@@ -200,7 +201,7 @@ module.exports = {
 		},
 		find: function(id,callback) {
 			units.findById(id, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) {
 					callback(obj);
 				}
@@ -208,13 +209,13 @@ module.exports = {
 		},
 		findByOwner: function(id,callback) {
 			units.find({ownerId: id}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
 		findAll: function(callback) {
 			units.find({ }, function (err, objReturned) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(objReturned);
 			});
 		},
@@ -224,7 +225,7 @@ module.exports = {
 				options = { multi: true };
 
 			units.update(conditions, update, options,function(err) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				else if(callback) {
 					callback();
 				}
@@ -232,7 +233,7 @@ module.exports = {
 		},
 		delete: function(id,callback) {
 			units.findByIdAndRemove(id,function(err) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) { callback(); }
 			});
 		},
@@ -244,7 +245,7 @@ module.exports = {
 	fleet: {
 		find: function(id,callback) {
 			fleets.findById(id, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(isset(obj)) {
 					callback(obj);
 				}
@@ -252,25 +253,25 @@ module.exports = {
 		},
 		findAll: function(callback) {
 			fleets.find({ }, function (err, objReturned) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(objReturned);
 			});
 		},
 		findByOwner: function(id,callback) {
 			fleets.find({ownerId: id}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
 		findByMotherPlanet: function(planetId,callback) {
 			fleets.find({motherPlanetId: planetId}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
 		findByPosition: function(planetId,callback) {
 			fleets.find({position: planetId}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
@@ -297,7 +298,7 @@ module.exports = {
 		},
 		remove: function(doc, callback) {
 			doc.remove(function(err, data) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) { callback(data); }
 			});
 		}
@@ -306,9 +307,7 @@ module.exports = {
 	stat: {
 		submit: function(currTime) {
 			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, plCount], (err) => {
-				if(err) {
-					log(err);
-				}
+				if(err) { log(err); }
 			});
 		},
 	},
@@ -320,7 +319,7 @@ module.exports = {
 			}
 
 			privileges.find({user_id: id, server_name: globalCfg.serverGlobalName}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
 				callback(obj);
 			});
@@ -330,9 +329,9 @@ module.exports = {
 	userGameId: {
 		find: function(id,callback) {
 			generalClient.query('SELECT * FROM "userGameIds" WHERE game_id = $1', [id], (err, obj) => {
-				if(err) { log(err); }
-				if(isset(obj)) {
-					callback(obj);
+				if(err) { log(err); return; }
+				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
+					callback(obj.rows[0]);
 				}
 			});
 		},
@@ -341,8 +340,8 @@ module.exports = {
 	server: {
 		find: function(callback) {
 			generalClient.query('SELECT * FROM servers WHERE server_name = $1', [globalCfg.serverGlobalName], (err, obj) => {
-				if(err) { log(err); }
-				if(isset(obj)) {
+				if(err) { log(err); return; }
+				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
 					callback(obj.rows[0]);
 				}
 			});
@@ -356,7 +355,7 @@ module.exports = {
 			query += ' WHERE server_name = $' + values.length;
 
 			serverClient.query(query, values, (err) => {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(callback) {
 					callback();
 				}
@@ -371,7 +370,7 @@ module.exports = {
 				server_name: globalCfg.serverGlobalName,
 				ban_type: type,
 			}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
@@ -418,7 +417,7 @@ module.exports = {
 				server_name: globalCfg.serverGlobalName,
 				user_id: uid,
 			}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
 				callback(obj);
 			});
@@ -429,7 +428,7 @@ module.exports = {
 				rank: { $lt: rank },
 				server_name: globalCfg.serverGlobalName,
 			}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
@@ -449,7 +448,7 @@ module.exports = {
 			globalRanks.count({
 				server_name: globalCfg.serverGlobalName,
 			} , function(err, c) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(c);
 			});
 		},
@@ -529,7 +528,7 @@ module.exports = {
 				server_name: globalCfg.serverGlobalName,
 				user_id: uid,
 			}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
 				callback(obj);
 			});
@@ -541,7 +540,7 @@ module.exports = {
 				rank: { $lt: rank },
 				server_name: globalCfg.serverGlobalName,
 			}, function (err, obj) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
@@ -563,7 +562,7 @@ module.exports = {
 				server_name: globalCfg.serverGlobalName,
 				sector: sector,
 			} , function(err, c) {
-				if(err) { log(err); }
+				if(err) { log(err); return; }
 				callback(c);
 			});
 		},
