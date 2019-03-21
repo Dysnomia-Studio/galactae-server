@@ -33,14 +33,15 @@ module.exports = class Player {
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			/*if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
+			if(!isset(userGameIdObj) || !isset(userGameIdObj.game_id) || !isset(userGameIdObj.user_id)) {
+				log('Error: Invalid user');
 				// Kick that Hacker ...
 				io.to(data.sid).emit('server-kick','INVALID_SESSION');
 				return;
-			}*/
+			}
 
-			data.game_id = userGameIdObj[0].game_id;
-			data.user_id = userGameIdObj[0].user_id;
+			data.game_id = userGameIdObj.game_id;
+			data.user_id = userGameIdObj.user_id;
 
 			db.ban.find(data.game_id, 2, function(banObj) {
 				if(isset(banObj)) {
@@ -57,7 +58,7 @@ module.exports = class Player {
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) ||
-							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== 1) {
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
 							// @ADD: Kick & Message
@@ -65,13 +66,13 @@ module.exports = class Player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							if(!dataReturned) { console.error('User: ' + data.username + ' not found !'); return; }
+							if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
 							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						if(!dataReturned) { console.error('User: ' + data.username + ' not found !'); return; }
+						if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
 						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
@@ -80,26 +81,25 @@ module.exports = class Player {
 		}); // Gamedata db query
 	}
 
-	static traitementsConnexion(data, dataReturned) {
-		if(data.id !== dataReturned.id) {
+	static traitementsConnexion(data, playerData) {
+		if(data.id !== playerData.id) {
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
 			return;
 		}
 
 		// Kick double accounts
-		let oldSid = dataReturned.sid;
+		const oldSid = playerData.sid;
 		if(oldSid !== '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
+			log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
-		let playerData = dataReturned.toJSON();
 		playerData.sid = data.sid;
 
-		let jour = 24*60*60*1000;
-		let minuit = Date.now() - (Date.now()%jour);
-		let hierMinuit = minuit - jour;
+		const jour = TIME.DAY_TO_MS;
+		const minuit = Date.now() - (Date.now()%jour);
+		const hierMinuit = minuit - jour;
 		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 

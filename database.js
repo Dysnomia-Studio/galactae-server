@@ -81,21 +81,21 @@ module.exports = {
 			});
 		},
 		searchByName: function(name,callback) {
-			serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name.toLowerCase()], (err, objReturned) => {
+			serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name], (err, objReturned) => {
 				if(err) { log(err); return; }
-				callback(objReturned.rows);
+				callback(objReturned.rows[0]);
 			});
 		},
 		searchById: function(id,callback) {
 			serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id], (err, objReturned) => {
 				if(err) { log(err); return; }
-				callback(objReturned.rows);
+				callback(objReturned.rows[0]);
 			});
 		},
 		searchBySid: function(sid,callback) {
 			serverClient.query('SELECT * FROM users WHERE sid = $1 LIMIT 1', [sid], (err, objReturned) => {
 				if(err) { log(err); return; }
-				callback(objReturned.rows);
+				callback(objReturned.rows[0]);
 			});
 		},
 		update: function(user, callback) {
@@ -314,14 +314,10 @@ module.exports = {
 
 	privilege: {
 		find: function(id,callback) {
-			if(typeof id === 'string') {
-				id = mongoose.Types.ObjectId(id);
-			}
-
-			privileges.find({user_id: id, server_name: globalCfg.serverGlobalName}, function (err, obj) {
+			generalClient.query('SELECT * FROM privileges WHERE user_id=$1 AND server_name=$2', [id, globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err); return; }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
 	},
@@ -365,13 +361,9 @@ module.exports = {
 
 	ban: {
 		find: function(uid,type,callback) {
-			bans.find({
-				user_id: uid,
-				server_name: globalCfg.serverGlobalName,
-				ban_type: type,
-			}, function (err, obj) {
+			generalClient.query('SELECT * FROM bans WHERE user_id=$1 AND server_name=$2 AND ban_type=$3', [uid, globalCfg.serverGlobalName, type], (err, obj) => {
 				if(err) { log(err); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
 		create: function(data) {
