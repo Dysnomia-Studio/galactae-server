@@ -296,6 +296,8 @@ module.exports = class Planet {
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
 		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
+			if(!isset(fleetReturned) || !isset(fleetReturned.ownerId) || fleetReturned.ownerId !== user.id) { return; }
+
 			let id = (planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
 			db.unit.find(id, function(unitReturned) {
 				if(planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {

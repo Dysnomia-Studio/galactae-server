@@ -199,8 +199,8 @@ module.exports = {
 				if(callback) { callback(data); }
 			});
 		},
-		find: function(id,callback) {
-			units.findById(id, function (err, obj) {
+		find: (id,callback) => {
+			serverClient.query('SELECT * FROM units WHERE id=$1',[id], (err, obj) => {
 				if(err) { log(err); return; }
 				if(callback) {
 					callback(obj);
@@ -208,15 +208,15 @@ module.exports = {
 			});
 		},
 		findByOwner: function(id,callback) {
-			units.find({ownerId: id}, function (err, obj) {
+			serverClient.query('SELECT * FROM units WHERE ownerId=$1',[id], (err, obj) => {
 				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
-		findAll: function(callback) {
-			units.find({ }, function (err, objReturned) {
+		findAll: (callback) => {
+			serverClient.query('SELECT * FROM units', [], (err, obj) => {
 				if(err) { log(err); return; }
-				callback(objReturned);
+				callback(obj);
 			});
 		},
 		update: function(data, callback) {
@@ -244,33 +244,33 @@ module.exports = {
 	 */
 	fleet: {
 		find: function(id,callback) {
-			fleets.findById(id, function (err, obj) {
+			serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
 				if(err) { log(err); return; }
-				if(isset(obj)) {
+				if(callback) {
 					callback(obj);
 				}
 			});
 		},
-		findAll: function(callback) {
-			fleets.find({ }, function (err, objReturned) {
+		findAll: (callback) => {
+			serverClient.query('SELECT * FROM fleets', [], (err, obj) => {
 				if(err) { log(err); return; }
-				callback(objReturned);
+				callback(obj);
 			});
 		},
 		findByOwner: function(id,callback) {
-			fleets.find({ownerId: id}, function (err, obj) {
+			serverClient.query('SELECT * FROM fleets WHERE ownerId=$1', [id], (err, obj) => {
 				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
 		findByMotherPlanet: function(planetId,callback) {
-			fleets.find({motherPlanetId: planetId}, function (err, obj) {
+			serverClient.query('SELECT * FROM fleets WHERE motherPlanetId=$1', [planetId], (err, obj) => {
 				if(err) { log(err); return; }
 				callback(obj);
 			});
 		},
 		findByPosition: function(planetId,callback) {
-			fleets.find({position: planetId}, function (err, obj) {
+			serverClient.query('SELECT * FROM fleets WHERE position=$1', [planetId], (err, obj) => {
 				if(err) { log(err); return; }
 				callback(obj);
 			});
