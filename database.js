@@ -194,8 +194,8 @@ module.exports = {
 		create: function(data,callback) {
 			data.id = new mongoose.Types.ObjectId();
 
-			units.create(data, function(error) {
-				if(error) { log(error); }
+			units.create(data, function(err) {
+				if(err) { log(err); return; }
 				if(callback) { callback(data); }
 			});
 		},
@@ -280,8 +280,8 @@ module.exports = {
 				update = { $set: data },
 				options = { multi: true };
 
-			fleets.update(conditions, update, options,function(error) {
-				if(error) { log(error); }
+			fleets.update(conditions, update, options,function(err) {
+				if(err) { log(err); return; }
 
 				if(callback) {
 					callback();
@@ -291,8 +291,8 @@ module.exports = {
 		create: function(data,callback) {
 			data.id = new mongoose.Types.ObjectId();
 
-			fleets.create(data, function(error) {
-				if(error) { log(error); }
+			fleets.create(data, function(err) {
+				if(err) { log(err); return; }
 				if(callback) { callback(data); }
 			});
 		},
@@ -369,8 +369,8 @@ module.exports = {
 		create: function(data) {
 			data.id = new mongoose.Types.ObjectId();
 
-			bans.create(data, function(error) {
-				if(error) { log(error); }
+			bans.create(data, function(err) {
+				if(err) { log(err); return; }
 			});
 		},
 	},
@@ -380,15 +380,15 @@ module.exports = {
 			globalRanks.find({
 				server_name: globalCfg.serverGlobalName,
 				user_id: data.user_id,
-			}, function(error, obj) {
-				if(error) { log(error); }
+			}, function(err, obj) {
+				if(err) { log(err); return; }
 
 				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data.id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
-					globalRanks.create(data, function(error) {
-						if(error) { log(error); }
+					globalRanks.create(data, function(err) {
+						if(err) { log(err); return; }
 					});
 				} else { // Sinon update
 					const conditions = {
@@ -398,8 +398,8 @@ module.exports = {
 						update = { $set: data },
 						options = { multi: false };
 
-					globalRanks.update(conditions, update, options,function(error) {
-						if(error) { log(error); }
+					globalRanks.update(conditions, update, options,function(err) {
+						if(err) { log(err); return; }
 					});
 				}
 			});
@@ -432,8 +432,8 @@ module.exports = {
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
 
-			globalRanks.update(conditions, update, options,function(error) {
-				if(error) { log(error); }
+			globalRanks.update(conditions, update, options,function(err) {
+				if(err) { log(err); return; }
 			});
 		},
 		count: function(callback) {
@@ -489,15 +489,15 @@ module.exports = {
 				server_name: globalCfg.serverGlobalName,
 				user_id: data.user_id,
 				sector: data.sector,
-			}, function(error, obj) {
-				if(error) { log(error); }
+			}, function(err, obj) {
+				if(err) { log(err); return; }
 
 				if(!isset(obj) || obj.length === 0) { // Si non creer
 					data.id = new mongoose.Types.ObjectId();
 					data.server_name = globalCfg.serverGlobalName;
 
-					sectorRanks.create(data, function(error) {
-						if(error) { log(error); }
+					sectorRanks.create(data, function(err) {
+						if(err) { log(err); return; }
 					});
 				} else { // Sinon update
 					const conditions = {
@@ -508,8 +508,8 @@ module.exports = {
 						update = { $set: data },
 						options = { multi: false };
 
-					sectorRanks.update(conditions, update, options,function(error) {
-						if(error) { log(error); }
+					sectorRanks.update(conditions, update, options,function(err) {
+						if(err) { log(err); return; }
 					});
 				}
 			});
@@ -545,8 +545,8 @@ module.exports = {
 				update = { $inc: {'rank': 1 } },
 				options = { multi: true };
 
-			sectorRanks.update(conditions, update, options,function(error) {
-				if(error) { log(error); }
+			sectorRanks.update(conditions, update, options,function(err) {
+				if(err) { log(err); return; }
 			});
 		},
 		count: function(sector, callback) {
