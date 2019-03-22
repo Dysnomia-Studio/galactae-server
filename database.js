@@ -131,7 +131,7 @@ module.exports = {
 			serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
 				if(err) { log(err, 'error'); return; }
 				if(isset(planetReturned)) {
-					callback(planetReturned.rows);
+					callback(planetReturned.rows[0]);
 				}
 			});
 		},
@@ -203,20 +203,20 @@ module.exports = {
 			serverClient.query('SELECT * FROM units WHERE id=$1',[id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				if(callback) {
-					callback(obj);
+					callback(obj.rows[0]);
 				}
 			});
 		},
-		findByOwner: function(id,callback) {
+		findByOwner: (id,callback) => {
 			serverClient.query('SELECT * FROM units WHERE ownerId=$1',[id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
 		findAll: (callback) => {
 			serverClient.query('SELECT * FROM units', [], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
 		update: function(data, callback) {
@@ -231,10 +231,12 @@ module.exports = {
 				}
 			});
 		},
-		delete: function(id,callback) {
-			units.findByIdAndRemove(id,function(err) {
+		delete: (id,callback) => {
+			serverClient.query('DELETE FROM units WHERE id=$1',[id], (err) => {
 				if(err) { log(err, 'error'); return; }
-				if(callback) { callback(); }
+				if(callback) {
+					callback();
+				}
 			});
 		},
 	},
@@ -243,36 +245,36 @@ module.exports = {
 	 * FLEETS
 	 */
 	fleet: {
-		find: function(id,callback) {
+		find: (id,callback) => {
 			serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				if(callback) {
-					callback(obj);
+					callback(obj.rows[0]);
 				}
 			});
 		},
 		findAll: (callback) => {
 			serverClient.query('SELECT * FROM fleets', [], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
-		findByOwner: function(id,callback) {
+		findByOwner: (id,callback) => {
 			serverClient.query('SELECT * FROM fleets WHERE ownerId=$1', [id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
-		findByMotherPlanet: function(planetId,callback) {
+		findByMotherPlanet: (planetId,callback) => {
 			serverClient.query('SELECT * FROM fleets WHERE motherPlanetId=$1', [planetId], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
-		findByPosition: function(planetId,callback) {
+		findByPosition: (planetId,callback) => {
 			serverClient.query('SELECT * FROM fleets WHERE position=$1', [planetId], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				callback(obj);
+				callback(obj.rows);
 			});
 		},
 		update: function(data,callback) {
@@ -404,14 +406,12 @@ module.exports = {
 				}
 			});
 		},
-		findByUserId: function(uid, callback) {
-			globalRanks.find({
-				server_name: globalCfg.serverGlobalName,
-				user_id: uid,
-			}, function (err, obj) {
+		findByUserId: (uid, callback) => {
+			generalClient.query('SELECT * FROM globalRanks WHERE server_name=$1 AND user_id=$2', [globalCfg.serverGlobalName, uid], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
-				callback(obj);
+				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
+					callback(obj.rows[0]);
+				}
 			});
 		},
 		findBetweenPointsAndRanks: function(points, rank, callback) {
@@ -514,15 +514,12 @@ module.exports = {
 				}
 			});
 		},
-		findByUserId: function(uid, sector, callback) {
-			sectorRanks.find({
-				sector: sector,
-				server_name: globalCfg.serverGlobalName,
-				user_id: uid,
-			}, function (err, obj) {
+		findByUserId: (uid, sector, callback) => {
+			generalClient.query('SELECT * FROM sectorRanks WHERE server_name=$1 AND user_id=$2 AND sector=$3', [globalCfg.serverGlobalName, uid, sector], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj[0])) { obj = obj[0]; }
-				callback(obj);
+				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
+					callback(obj.rows[0]);
+				}
 			});
 		},
 		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
