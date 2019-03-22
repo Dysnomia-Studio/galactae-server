@@ -8,7 +8,7 @@ module.exports = {
 	/**
 	 * Used to connect to database
 	 */
-	connect: function(callback) {
+	connect: (callback) => {
 		generalPool = new Pool({
 			user: '***REMOVED***',
 			host: '***REMOVED***',
@@ -49,14 +49,14 @@ module.exports = {
 		});
 	},
 
-	closeConnections: function(callback) {
+	closeConnections: (callback) => {
 		generalPool.end();
 		serverPool.end();
 
 		callback();
 	},
 
-	buildUpdateQuery: function(table, fields) {
+	buildUpdateQuery: (table, fields) => {
 		let query = 'UPDATE ' + table + ' SET';
 		const values = [];
 
@@ -74,31 +74,31 @@ module.exports = {
 	 * PLAYERS
 	 */
 	player: {
-		findAll: function(callback) {
+		findAll: (callback) => {
 			serverClient.query('SELECT * FROM users', [], (err, objReturned) => {
 				if(err) { log(err); return; }
 				callback(objReturned.rows);
 			});
 		},
-		searchByName: function(name,callback) {
+		searchByName: (name,callback) => {
 			serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name], (err, objReturned) => {
 				if(err) { log(err); return; }
 				callback(objReturned.rows[0]);
 			});
 		},
-		searchById: function(id,callback) {
+		searchById: (id,callback) => {
 			serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id], (err, objReturned) => {
 				if(err) { log(err); return; }
 				callback(objReturned.rows[0]);
 			});
 		},
-		searchBySid: function(sid,callback) {
+		searchBySid: (sid,callback) => {
 			serverClient.query('SELECT * FROM users WHERE sid = $1 LIMIT 1', [sid], (err, objReturned) => {
 				if(err) { log(err); return; }
 				callback(objReturned.rows[0]);
 			});
 		},
-		update: function(user, callback) {
+		update: (user, callback) => {
 			const id = user.id;
 			delete user.id;
 
@@ -113,7 +113,7 @@ module.exports = {
 				}
 			});
 		},
-		clearList: function() {
+		clearList: () => {
 			log('Clearing player list ...');
 
 			serverClient.query('UPDATE users SET sid = \'-1\'', [sid], (err) => {
@@ -127,7 +127,7 @@ module.exports = {
 	 * PLANET
 	 */
 	planet: {
-		find: function(addr,callback) {
+		find: (addr,callback) => {
 			serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
 				if(err) { log(err); return; }
 				if(isset(planetReturned)) {
@@ -135,7 +135,7 @@ module.exports = {
 				}
 			});
 		},
-		update: function(planet, callback) {
+		update: (planet, callback) => {
 			const id = planet.id;
 			delete planet.id;
 
@@ -150,7 +150,7 @@ module.exports = {
 				}
 			});
 		},
-		findBySystemWithOwners: function(systemAddr, callback) {
+		findBySystemWithOwners: (systemAddr, callback) => {
 			serverClient.query('SELECT * FROM planets WHERE address LIKE \'$1%\'', [systemAddr], (err, planetList) => {
 				if(err) { log(err); return; }
 				planetList = planetList.rows;
@@ -163,7 +163,7 @@ module.exports = {
 
 					pList[id] = planetList[id].toJSON();
 
-					db.player.searchById(planetList[id].owner, function(user) {
+					db.player.searchById(planetList[id].owner, (user) => {
 						if(isset(user)) {
 							pList[id].ownerName = user.name;
 							pList[id].ally = user.ally;
@@ -305,7 +305,7 @@ module.exports = {
 	},
 
 	stat: {
-		submit: function(currTime) {
+		submit: (currTime) => {
 			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, plCount], (err) => {
 				if(err) { log(err); }
 			});
@@ -313,7 +313,7 @@ module.exports = {
 	},
 
 	privilege: {
-		find: function(id,callback) {
+		find: (id,callback) => {
 			generalClient.query('SELECT * FROM privileges WHERE user_id=$1 AND server_name=$2', [id, globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err); return; }
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
@@ -323,7 +323,7 @@ module.exports = {
 	},
 
 	userGameId: {
-		find: function(id,callback) {
+		find: (id,callback) => {
 			generalClient.query('SELECT * FROM "userGameIds" WHERE game_id = $1', [id], (err, obj) => {
 				if(err) { log(err); return; }
 				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
@@ -334,7 +334,7 @@ module.exports = {
 	},
 
 	server: {
-		find: function(callback) {
+		find: (callback) => {
 			generalClient.query('SELECT * FROM servers WHERE server_name = $1', [globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err); return; }
 				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
@@ -342,7 +342,7 @@ module.exports = {
 				}
 			});
 		},
-		update: function(serverData, callback) {
+		update: (serverData, callback) => {
 			const server_name = serverData.server_name;
 			delete serverData.server_name;
 
@@ -360,7 +360,7 @@ module.exports = {
 	},
 
 	ban: {
-		find: function(uid,type,callback) {
+		find: (uid,type,callback) => {
 			generalClient.query('SELECT * FROM bans WHERE user_id=$1 AND server_name=$2 AND ban_type=$3', [uid, globalCfg.serverGlobalName, type], (err, obj) => {
 				if(err) { log(err); return; }
 				callback(obj.rows);
