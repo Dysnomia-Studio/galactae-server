@@ -204,7 +204,7 @@
 			let haveToUpdate = [];
 			for(let i=0; i<fleetList.length; i++) {
 				if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
-				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
+				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
 					haveToUpdate.push(i);
 				}
 			}

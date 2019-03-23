@@ -70,14 +70,14 @@ module.exports = class Fleets {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
-			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
+			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
 				haveToUpdate = true;
 			}
 		}
 
 		if(!haveToUpdate) { callback(fleetList); return; }
 
-		db.planet.find(fleetList[0].motherPlanetAdress, function(planetData) {
+		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
 			let newPlanet, empty;
 			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData.toJSON(), fleetList);
 
@@ -121,7 +121,7 @@ module.exports = class Fleets {
 				name: data.fleetName,
 				ownerId: data.id,
 				motherPlanetId: planetData.id,
-				motherPlanetAdress: planetData.address,
+				motherPlanetAddress: planetData.address,
 				position: planetData.address,
 				orbitPosition: 0,
 				points: 0,
@@ -297,7 +297,7 @@ module.exports = class Fleets {
 							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
 							newFleet.position = destination;
 							newFleet.orbitPosition = 2;
-							if(destination === newFleet.motherPlanetAdress) {
+							if(destination === newFleet.motherPlanetAddress) {
 								newFleet.orbitPosition = 0;
 							}
 
