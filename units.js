@@ -125,7 +125,7 @@ module.exports = class Units {
 				for(const i in ship) {
 					if(i==='name' || i==='type' || i==='shape') { continue; }
 
-					if(shipResearchDependencies[ship[i].value] !== undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+					if(shipResearchDependencies[ship[i].value] !== undefined && !Research.isSearched(userReturned,shipResearchDependencies[ship[i].value])) {
 						message = 'NEEDED_RESEARCH_MISSING';
 						break;
 					}

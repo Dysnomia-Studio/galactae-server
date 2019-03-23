@@ -35,7 +35,7 @@ module.exports = class Fleets {
 
 					// Autoremove fleet if needed
 					if(FleetList[id].units.length === 0 && ''+newPlanet.unitBuildingFleetID !== ''+FleetList[id].id) {
-						db.fleet.remove(FleetList[id]);
+						db.fleet.remove(FleetList[id].id);
 						continue;
 					}
 
@@ -288,7 +288,7 @@ module.exports = class Fleets {
 
 						db.player.searchById(user.id, function(foundUser) {
 							let instability = time * 0.001 * (Math.random() - 0.5);
-							if(Research.getResearch(foundUser, 'prop_suprastability') === -1) {
+							if(Research.isSearched(foundUser, 'prop_suprastability')) {
 								instability /= 2;
 							}
 

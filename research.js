@@ -1,44 +1,14 @@
 module.exports = class Research {
 	static refreshUserResearch(data,callback) {
-		// Checks if new research
-		if(researchList.length!==data.research.length) {
-			for(let name in researchList) {
-				let key = -1;
-				for(let j=0; j<data.research.length; j++) {
-					if(name===data.research[j][0]) {
-						key = j;
-						break;
-					}
-				}
-				if(key === -1) {
-					data.research.push([name,0]);
-				}
-			}
-		}
-
-		let researchOut = {};
-
-		for(let i=0; i<data.research.length; i++) {
-			researchOut[data.research[i][0]] = data.research[i][1];
-		}
-
-		Research.recalc(data,researchOut,function(user) {
+		Research.recalc(data,data.research,function(user) {
 			user.lastAction = Date.now();
 			user.lastResearchUpdate = Date.now();
 			callback(user);
 		});
 	}
-	static getResearch(data,research) {
-		for(let i=0; i<data.research.length; i++) {
-			if(data.research[i][0]===research) {
-				return data.research[i][1];
-			}
-		}
-		return 0;
-	}
 
-	static isSearched(data,research) {
-		return Research.getResearch(data,research) < 0;
+	static isSearched(data,researchName) {
+		return data.research[researchName] < 0;
 	}
 
 	static getResearchProduction(lvl) {
@@ -55,7 +25,7 @@ module.exports = class Research {
 
 			if(typeof currentParent === 'string') {
 				if((!isset(currentParent) ||
-					Research.getResearch(user,currentParent) !== -1) &&
+					!Research.isSearched(user,currentParent)) &&
 					currentParent !== 'researchCenter') { // Recherche
 
 					if(!atleastOne) {

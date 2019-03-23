@@ -249,14 +249,14 @@ module.exports = class Planet {
 
 				if(!BlockBuild) {
 					// Research bonus
-						if(Research.getResearch(userReturned,'cp_mecanisation') === -1) {
+						if(Research.isSearched(userReturned,'cp_mecanisation')) {
 							timeSpeed += researchBonus.cp_mecanisation;
 						}
 						if(data.building>8) {
-							if(Research.getResearch(userReturned,'cp_tracteur') === -1) {
+							if(Research.isSearched(userReturned,'cp_tracteur')) {
 								timeSpeed += researchBonus.cp_tracteur;
 							}
-							if(Research.getResearch(userReturned,'cp_materielTp') === -1) {
+							if(Research.isSearched(userReturned,'cp_materielTp')) {
 								timeSpeed += researchBonus.cp_materielTp;
 							}
 						}
