@@ -307,7 +307,7 @@ module.exports = class Units {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
+					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitData,totalCost,inputData) {
 						const currTime = Date.now();
 
 						// Create entry in planet db for in-build unit
@@ -329,10 +329,9 @@ module.exports = class Units {
 
 						if(inputData.unit.substr(0, 'SHIP_WEP_MINES'.length) !== 'SHIP_WEP_MINES') {
 							// Update unit
-							const newUnit = unitReturned.toJSON();
-							newUnit.owned += inputData.count;
+							unitData.owned += inputData.count;
 
-							db.unit.update(newUnit);
+							db.unit.update(unitData);
 						}
 
 						// Update fleet

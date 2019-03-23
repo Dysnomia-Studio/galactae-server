@@ -61,17 +61,15 @@ module.exports = class Research {
 	static recalc(user,researchData,callback,i=0) {
 		let time = (Date.now() - user.lastResearchUpdate)/3600/1000;
 
-		db.planet.find(user.planetlist[i],function(planetReturned) {
-			let newPlanet = planetReturned.toJSON();
+		db.planet.find(user.planetlist[i],function(planetData) {
+			if(isset(researchData[planetData.currResearch]) && isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
+				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
 
-			if(isset(researchData[planetReturned.currResearch]) && isset(researchList[planetReturned.currResearch].cost) && researchData[planetReturned.currResearch] !== -1) {
-				researchData[planetReturned.currResearch] += (Research.getResearchProduction(planetReturned.Buildings[8])*time);
-
-				if(researchData[planetReturned.currResearch] >= researchList[planetReturned.currResearch].cost) {
-					researchData[planetReturned.currResearch] = -1;
-					db.planet.update(newPlanet);
-					log(user.name + ' has unlocked research ' + planetReturned.currResearch,'success');
-					Websocket.sendNotification(user.sid, 'research', { research: planetReturned.currResearch });
+				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
+					researchData[planetData.currResearch] = -1;
+					db.planet.update(planetData);
+					log(user.name + ' has unlocked research ' + planetData.currResearch,'success');
+					Websocket.sendNotification(user.sid, 'research', { research: planetData.currResearch });
 				}
 			}
 

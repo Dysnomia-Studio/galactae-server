@@ -155,27 +155,23 @@ module.exports = {
 				if(err) { log(err, 'error'); return; }
 				planetList = planetList.rows;
 
-				const pList = [];
-
 				let ended = 0;
 				for(let i=0; i<planetList.length; i++) {
 					const id = i;
 
-					pList[id] = planetList[id].toJSON();
-
 					db.player.searchById(planetList[id].owner, (user) => {
 						if(isset(user)) {
-							pList[id].ownerName = user.name;
-							pList[id].ally = user.ally;
+							planetList[id].ownerName = user.name;
+							planetList[id].ally = user.ally;
 						} else {
-							pList[id].ownerName = null;
-							pList[id].ally = null;
+							planetList[id].ownerName = null;
+							planetList[id].ally = null;
 						}
 
 						ended++;
 
 						if(ended === planetList.length) {
-							callback(pList);
+							callback(planetList);
 						}
 					});
 				}
@@ -298,10 +294,9 @@ module.exports = {
 				if(callback) { callback(data); }
 			});
 		},
-		remove: function(doc, callback) {
-			doc.remove(function(err, data) {
+		remove: (id) => {
+			serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
 				if(err) { log(err, 'error'); return; }
-				if(callback) { callback(data); }
 			});
 		}
 	},

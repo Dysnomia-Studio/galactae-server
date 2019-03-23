@@ -79,7 +79,7 @@ module.exports = class Fleets {
 
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
 			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData.toJSON(), fleetList);
+			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList);
 
 			if(empty) { callback(fleetList); return; }
 
@@ -292,13 +292,11 @@ module.exports = class Fleets {
 								instability /= 2;
 							}
 
-							const newFleet = fleetReturned.toJSON();
-
-							newFleet.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
-							newFleet.position = destination;
-							newFleet.orbitPosition = 2;
-							if(destination === newFleet.motherPlanetAddress) {
-								newFleet.orbitPosition = 0;
+							fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
+							fleetReturned.position = destination;
+							fleetReturned.orbitPosition = 2;
+							if(destination === fleetReturned.motherPlanetAddress) {
+								fleetReturned.orbitPosition = 0;
 							}
 
 							let textDestination = destination;
@@ -306,14 +304,14 @@ module.exports = class Fleets {
 								textDestination = planeteArrivee.name + ' (' + destination + ')';
 							}
 
-							const endTime = new Date(newFleet.endMoveTime);
+							const endTime = new Date(fleetReturned.endMoveTime);
 
-							log(user.username + ' began to move fleet ' + newFleet.name + ' to ' + textDestination +
+							log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
 								'. ETA: ' + getDateTime(endTime));
 
-							db.fleet.update(newFleet, function() {
+							db.fleet.update(fleetReturned, function() {
 								Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-								Fleets.refresh(newFleet.motherPlanetId, user.sid);
+								Fleets.refresh(fleetReturned.motherPlanetId, user.sid);
 							});
 						});
 					});
