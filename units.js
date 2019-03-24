@@ -139,7 +139,6 @@ module.exports = class Units {
 						shipType: ship.type,
 						shipShape: ship.shape,
 						ownerId: data.id,
-						inBuilding: [],
 						cost: [],
 						parts: [],
 						armorType: 0, // None yet
@@ -312,7 +311,7 @@ module.exports = class Units {
 
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
-						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * 3600 * 1000);
+						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * TIME.HOUR_TO_MS);
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingFleetID = fleetReturned.id;
 

@@ -129,37 +129,8 @@ module.exports = class Research {
 	}
 
 	static sendResearchDataToUser(data, planet, user) {
-		// Send data to client
-		let researched = [];
-		let userResearch = user.research;
-
-		for(let i=0; i<userResearch.length; i++) {
-			// Check if you have parent research
-			let researchedParent = Research.researchedParent(user, planet, userResearch[i][0], true);
-			let parentsList = researchList[userResearch[i][0]].parents;
-
-			if(userResearch[i][0] === 'researchCenter' || researchedParent) {
-				for(let j in parentsList) {
-					if(researched.indexOf(parentsList[j]) === -1) {
-						researched.push(parentsList[j]);
-					}
-				}
-
-				if(researched.indexOf(userResearch[i][0]) === -1) {
-					researched.push(userResearch[i][0]);
-				}
-			}
-		}
-
-		let researchOut = {};
-		for(let i=0; i<userResearch.length; i++) {
-			if(researched.indexOf(userResearch[i][0]) !== -1) {
-				researchOut[userResearch[i][0]] = userResearch[i][1];
-			}
-		}
-
 		io.to(data.sid).emit('player-recieve-data', {
-			research: researchOut,
+			research: user.research,
 		});
 	}
 };

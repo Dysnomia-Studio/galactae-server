@@ -70,6 +70,27 @@ module.exports = {
 		return [query, values];
 	},
 
+	buildInsertQuery: (table, fields) => {
+		let query = 'INSERT INTO "' + table + '"(';
+		let columns = '';
+		let valueStr = '';
+		const values = [];
+
+		for(const key in fields) {
+			values.push(fields[key]);
+
+			columns += '"' + key + '",';
+			valueStr += '$' + values.length + ',';
+		}
+
+		columns = columns.substr(0, columns.length - 1);
+		valueStr = valueStr.substr(0, valueStr.length - 1);
+
+		query += columns + ') VALUES (' + valueStr + ')';
+
+		return [query, values];
+	},
+
 	/**
 	 * PLAYERS
 	 */
@@ -191,12 +212,14 @@ module.exports = {
 	 * UNITS
 	 */
 	unit: {
-		create: function(data,callback) {
-			data.id = new mongoose.Types.ObjectId();
+		create: (unit,callback) => {
+			const [query, values] = db.buildInsertQuery('units', unit);
 
-			units.create(data, function(err) {
+			serverClient.query(query, values, (err) => {
 				if(err) { log(err, 'error'); return; }
-				if(callback) { callback(data); }
+				if(callback) {
+					callback(unit);
+				}
 			});
 		},
 		find: (id,callback) => {
@@ -219,14 +242,17 @@ module.exports = {
 				callback(obj.rows);
 			});
 		},
-		update: function(data, callback) {
-			const conditions = { id: data.id },
-				update = { $set: data },
-				options = { multi: true };
+		update: (unit, callback) => {
+			const id = unit.id;
+			delete unit.id;
 
-			units.update(conditions, update, options,function(err) {
+			let [query, values] = db.buildUpdateQuery('units', unit);
+			values.push(id);
+			query += ' WHERE id = $' + values.length;
+
+			serverClient.query(query, values, (err) => {
 				if(err) { log(err, 'error'); return; }
-				else if(callback) {
+				if(callback) {
 					callback();
 				}
 			});
@@ -277,25 +303,29 @@ module.exports = {
 				callback(obj.rows);
 			});
 		},
-		update: function(data,callback) {
-			const conditions = { id: data.id },
-				update = { $set: data },
-				options = { multi: true };
+		update: (fleet,callback) => {
+			const id = fleet.id;
+			delete fleet.id;
 
-			fleets.update(conditions, update, options,function(err) {
+			let [query, values] = db.buildUpdateQuery('fleets', fleet);
+			values.push(id);
+			query += ' WHERE id = $' + values.length;
+
+			serverClient.query(query, values, (err) => {
 				if(err) { log(err, 'error'); return; }
-
 				if(callback) {
 					callback();
 				}
 			});
 		},
-		create: function(data,callback) {
-			data.id = new mongoose.Types.ObjectId();
+		create: (fleet,callback) => {
+			const [query, values] = db.buildInsertQuery('fleets', fleet);
 
-			fleets.create(data, function(err) {
+			serverClient.query(query, values, (err) => {
 				if(err) { log(err, 'error'); return; }
-				if(callback) { callback(data); }
+				if(callback) {
+					callback(fleet);
+				}
 			});
 		},
 		remove: (id) => {

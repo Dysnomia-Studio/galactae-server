@@ -135,6 +135,7 @@ module.exports = class Fleets {
 				population: 0,
 				fuel: 0,
 				maxFuel: 0,
+				inBuilding: false,
 			};
 
 			db.fleet.create(newFleet, function(newFleet) {
