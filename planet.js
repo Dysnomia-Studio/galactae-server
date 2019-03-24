@@ -117,8 +117,7 @@ module.exports = class Planet {
 		let metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
 		let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
-		let mineralStorageBase, metalsStorageBase, storageHelium;
-		[ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
+		let [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
 
 		//Minerals
 		if(currentBuilding!==0) {
@@ -177,6 +176,10 @@ module.exports = class Planet {
 			}
 		}
 
+		for(let i=0; i<resources.length; i++) {
+			resources[i] = Math.round(resources[i] * 1000)/1000;
+		}
+
 		return resources;
 	}
 
@@ -191,7 +194,7 @@ module.exports = class Planet {
 		if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs;
 
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
-			if(data.planet!==planetReturned.id) { // Stop if not belonging
+			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
 					' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
@@ -200,7 +203,7 @@ module.exports = class Planet {
 
 			let timeSpeed = 1;
 
-			let currTime = Date.now();
+			const currTime = Date.now();
 
 			// Calc new planet data
 			let newData = Planet.update(planetReturned,userReturned,fleetReturned);
@@ -270,7 +273,7 @@ module.exports = class Planet {
 					newData.resources[4] -= cost.copper;
 					newData.resources[5] -= cost.titanium;
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);
+					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS/timeSpeed);
 					newData.nextBuilding = data.building;
 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
@@ -295,6 +298,8 @@ module.exports = class Planet {
 	 * @param      {<type>}  user      The user
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
+		if(!planetIn.unitBuildingID || !planetIn.unitBuildingFleetID) { return; }
+
 		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
 			if(!isset(fleetReturned) || !isset(fleetReturned.ownerId) || fleetReturned.ownerId !== user.id) { return; }
 
@@ -379,9 +384,10 @@ module.exports = class Planet {
 		planetData.lastResourcesUpdate = currTime;
 
 		// Update resources
-		planetData.resources = Planet.UpdateResources(planetIn,user);
+		planetData.resources = Planet.UpdateResources(planetData,user);
+
 		// Update points
-		planetData.points = Planet.calcPlanetPoints(planetIn);
+		planetData.points = Planet.calcPlanetPoints(planetData);
 		planetData.points += parseFloat(Planet.calcFleetPoints(fleetList));
 		planetData.points = Math.round(planetData.points);
 
@@ -397,14 +403,14 @@ module.exports = class Planet {
 
 		// Update units
 		if(planetData.unitBuildingEndTime !== -1) {
-			Planet.UpdateUnits(planetIn,user,currTime);
+			Planet.UpdateUnits(planetData,user,currTime);
 		}
 
 		if(currTime>planetData.unitBuildingEndTime) {
 			planetData.unitBuildingEndTime = -1;
-			planetData.unitBuildingID = '-1';
+			planetData.unitBuildingID = null;
 			planetData.unitBuildingCount = 0;
-			planetData.unitBuildingFleetID = '-1';
+			planetData.unitBuildingFleetID = null;
 		}
 
 		planetData.lastUnitUpdate = currTime;
@@ -508,7 +514,7 @@ module.exports = class Planet {
 		let Dtime = Date.now()-dataIn.nextBuildingTime;
 		let resources = dataIn.resources;
 
-		if(Dtime<0 || dataIn.nextBuildingTime===-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+		if(Dtime<0 || dataIn.nextBuildingTime==="-1") { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update

@@ -28,13 +28,18 @@ module.exports = class Fleets {
 			}
 
 			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
+				if(!newPlanet || !newPlanet.unitBuildingFleetID) {
+					sendtoPlayer(FleetList, newPlanet, sid);
+					return;
+				}
+
 				let haveToDone = 0;
 				let done = 0;
 				for(let i=0; i<FleetList.length; i++) {
 					const id = i;
 
 					// Autoremove fleet if needed
-					if(FleetList[id].units.length === 0 && ''+newPlanet.unitBuildingFleetID !== ''+FleetList[id].id) {
+					if(FleetList[id].units.length === 0 && newPlanet.unitBuildingFleetID !== FleetList[id].id) {
 						db.fleet.remove(FleetList[id].id);
 						continue;
 					}

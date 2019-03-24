@@ -108,7 +108,7 @@ module.exports = class Websocket {
 			//Building
 			socket.on('planet-build', function(data) {
 				// Vars
-				if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.building)) { return; }
+				if(!isset(data) || !isset(data.username) || !isset(data.id) || !isset(data.building) || !isset(data.planet)) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity

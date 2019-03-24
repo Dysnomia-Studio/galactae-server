@@ -57,15 +57,15 @@ module.exports = {
 	},
 
 	buildUpdateQuery: (table, fields) => {
-		let query = 'UPDATE ' + table + ' SET';
+		let query = 'UPDATE "' + table + '" SET';
 		const values = [];
 
 		for(const key in fields) {
 			values.push(fields[key]);
-			query += ' ' + key + ' = $' + values.length + ',';
+			query += ' "' + key + '" = $' + values.length + ',';
 		}
 
-		query = query.substr(query.length-1);
+		query = query.substr(0, query.length-1);
 
 		return [query, values];
 	},
@@ -102,7 +102,11 @@ module.exports = {
 			const id = user.id;
 			delete user.id;
 
-			let [query, values] = this.buildUpdateQuery('users', user);
+			delete user.sectorPointsAddresses;
+			delete user.sectorPointsValue;
+			delete user.sectorPointsPcount;
+
+			let [query, values] = db.buildUpdateQuery('users', user);
 			values.push(id);
 			query += ' WHERE id = $' + values.length;
 
@@ -139,7 +143,7 @@ module.exports = {
 			const id = planet.id;
 			delete planet.id;
 
-			let [query, values] = this.buildUpdateQuery('planets', planet);
+			let [query, values] = db.buildUpdateQuery('planets', planet);
 			values.push(id);
 			query += ' WHERE id = $' + values.length;
 
@@ -204,7 +208,7 @@ module.exports = {
 			});
 		},
 		findByOwner: (id,callback) => {
-			serverClient.query('SELECT * FROM units WHERE ownerId=$1',[id], (err, obj) => {
+			serverClient.query('SELECT * FROM units WHERE "ownerId"=$1',[id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				callback(obj.rows);
 			});
@@ -256,13 +260,13 @@ module.exports = {
 			});
 		},
 		findByOwner: (id,callback) => {
-			serverClient.query('SELECT * FROM fleets WHERE ownerId=$1', [id], (err, obj) => {
+			serverClient.query('SELECT * FROM fleets WHERE "ownerId"=$1', [id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				callback(obj.rows);
 			});
 		},
 		findByMotherPlanet: (planetId,callback) => {
-			serverClient.query('SELECT * FROM fleets WHERE motherPlanetId=$1', [planetId], (err, obj) => {
+			serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				callback(obj.rows);
 			});
@@ -343,7 +347,7 @@ module.exports = {
 			const server_name = serverData.server_name;
 			delete serverData.server_name;
 
-			let [query, values] = this.buildUpdateQuery('servers', serverData);
+			let [query, values] = db.buildUpdateQuery('servers', serverData);
 			values.push(server_name);
 			query += ' WHERE server_name = $' + values.length;
 
@@ -402,7 +406,7 @@ module.exports = {
 			});
 		},
 		findByUserId: (uid, callback) => {
-			generalClient.query('SELECT * FROM globalRanks WHERE server_name=$1 AND user_id=$2', [globalCfg.serverGlobalName, uid], (err, obj) => {
+			generalClient.query('SELECT * FROM "globalRanks" WHERE server_name=$1 AND game_id=$2', [globalCfg.serverGlobalName, uid], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
 					callback(obj.rows[0]);
@@ -510,7 +514,7 @@ module.exports = {
 			});
 		},
 		findByUserId: (uid, sector, callback) => {
-			generalClient.query('SELECT * FROM sectorRanks WHERE server_name=$1 AND user_id=$2 AND sector=$3', [globalCfg.serverGlobalName, uid, sector], (err, obj) => {
+			generalClient.query('SELECT * FROM "sectorRanks" WHERE server_name=$1 AND game_id=$2 AND sector=$3', [globalCfg.serverGlobalName, uid, sector], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
 					callback(obj.rows[0]);

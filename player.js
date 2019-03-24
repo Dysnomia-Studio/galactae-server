@@ -1,14 +1,13 @@
 module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		db.player.searchBySid(user.sid,function(searchSid) {
-			if(isset(searchSid) && searchSid.name===user.username && searchSid.id === user.id) {
-				if(Player.canAct(searchSid)) { // Don't spam
+		db.player.searchBySid(user.sid,function(playerData) {
+			if(isset(playerData) && playerData.name===user.username && playerData.id === user.id) {
+				if(Player.canAct(playerData)) { // Don't spam
 					callback(user);
 
-					let newData = searchSid;
-					newData.lastAction = Date.now();
-					db.player.update(newData);
+					playerData.lastAction = Date.now();
+					db.player.update(playerData);
 				}
 			} else {
 				// Kick that Hacker ...
@@ -131,8 +130,7 @@ module.exports = class Player {
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-				userNewResearch.id = userNewResearch.id;
-					db.player.update(userNewResearch, function() {
+				db.player.update(userNewResearch, function() {
 					plCount++;
 
 					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {

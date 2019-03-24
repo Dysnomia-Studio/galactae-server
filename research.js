@@ -77,11 +77,7 @@ module.exports = class Research {
 			if(i+1<user.planetlist.length) {
 				Research.recalc(user,researchData,callback,i+1);
 			} else {
-				user.research = [];
-
-				for(let index in researchData) {
-					user.research.push([index,researchData[index]]);
-				}
+				user.research = researchData;
 
 				callback(user);
 			}

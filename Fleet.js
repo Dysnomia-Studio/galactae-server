@@ -212,7 +212,7 @@
 			let addCount = 0;
 
 			// Priority fleet
-			if(planet.highPriorityFleet !== undefined) {
+			if(planet.highPriorityFleet) {
 				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
