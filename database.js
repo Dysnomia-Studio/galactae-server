@@ -119,7 +119,8 @@ module.exports = {
 				callback(objReturned.rows[0]);
 			});
 		},
-		update: (user, callback) => {
+		update: (inputUser, callback) => {
+			const user = Object.assign({}, inputUser);
 			const id = user.id;
 			delete user.id;
 
@@ -160,7 +161,8 @@ module.exports = {
 				}
 			});
 		},
-		update: (planet, callback) => {
+		update: (inputPlanet, callback) => {
+			const planet = Object.assign({}, inputPlanet);
 			const id = planet.id;
 			delete planet.id;
 
@@ -242,7 +244,8 @@ module.exports = {
 				callback(obj.rows);
 			});
 		},
-		update: (unit, callback) => {
+		update: (inputUser, callback) => {
+			const unit = Object.assign({}, inputUser);
 			const id = unit.id;
 			delete unit.id;
 
@@ -303,7 +306,8 @@ module.exports = {
 				callback(obj.rows);
 			});
 		},
-		update: (fleet,callback) => {
+		update: (inputFleet,callback) => {
+			const fleet = Object.assign({}, inputFleet);
 			const id = fleet.id;
 			delete fleet.id;
 
@@ -373,7 +377,8 @@ module.exports = {
 				}
 			});
 		},
-		update: (serverData, callback) => {
+		update: (inputServerData, callback) => {
+			const serverData = Object.assign({}, inputServerData);
 			const server_name = serverData.server_name;
 			delete serverData.server_name;
 

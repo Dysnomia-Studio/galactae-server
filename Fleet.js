@@ -254,16 +254,7 @@
 		}
 
 		static removeEmptyUnits(fleet) {
-			const units = fleet.units;
-			fleet.units = [];
-
-			for(let i=0; i<units.length; i++) {
-				if(units[i][1] !== 0) {
-					fleet.units.push([units[i][0], units[i][1]]);
-				}
-			}
-
-			return fleet;
+			return fleet.units.filter((unitCount) => unitCount > 0);
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

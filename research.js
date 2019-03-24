@@ -59,7 +59,7 @@ module.exports = class Research {
 	}
 
 	static recalc(user,researchData,callback,i=0) {
-		let time = (Date.now() - user.lastResearchUpdate)/3600/1000;
+		const time = (Date.now() - user.lastResearchUpdate)/TIME.HOUR_TO_MS;
 
 		db.planet.find(user.planetlist[i],function(planetData) {
 			if(isset(researchData[planetData.currResearch]) && isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {

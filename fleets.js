@@ -153,14 +153,14 @@ module.exports = class Fleets {
 
 		for(const u in unitList) {
 			for(const f in currFleet.units) {
-				if(currFleet.units[f][0] !== unitList[u].id) { continue; }
+				if(f !== unitList[u].id) { continue; }
 
 				if(unitList[u].shipType === 'SHIP_FIGHTER') {
-					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f][1];
+					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f];
 				} else if(unitList[u].shipType === 'SHIP_CARRIER') {
 					for(const p in unitList[u].parts) {
 						if(unitList[u].parts[p].type === 'hangar') {
-							fighterCap += hangarSize[unitList[u].parts[p].tech] * currFleet.units[f][1];
+							fighterCap += hangarSize[unitList[u].parts[p].tech] * currFleet.units[f];
 						}
 					}
 				}
@@ -345,24 +345,15 @@ module.exports = class Fleets {
 
 	static moveUnits(unitId, count, from, to) {
 		if(count <= 0) { return [-1]; }
-
-		const units = to.units;
-		let index = -1;
-		for(let i=0; i<units.length; i++) {
-			if(units[i][0] === unitId && count <= units[i][1]) {
-				index = i;
-				break;
-			} else if(units[i][0] === unitId) {
-				log('Failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'fail');
-				return [-1];
-			}
+		if(from.units[unitId] < count) {
+			log('Failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'fail');
+			return [-1];
 		}
 
-		if(index < 0) {
-			to.units.push([unitId, count]);
-		} else {
-			to.units[index][1] += count;
+		if(!to.units[unitId]) {
+			to.units[unitId] = 0;
 		}
+		to.units[unitId] += count;
 
 		return [from, to];
 	}
@@ -401,13 +392,7 @@ module.exports = class Fleets {
 		db.unit.find(data.unitId, function(unit) {
 			if(!isset(unit) || !isset(unit.shipShape)) { return; }
 
-			for(let i=0; i<from.units.length; i++) {
-				if(from.units[i][0] === data.unitId) {
-					from.units[i][1] -= data.unitCount;
-				}
-			}
-
-			// Tranfer fuel
+			// Transfer fuel
 			const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
 			const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
 
@@ -456,9 +441,8 @@ module.exports = class Fleets {
 
 		// TODO: check people limit for fleet & planet
 
-		const units = from.units;
-		for(let i=0; i<units.length; i++) {
-			[from, to] = Fleets.moveUnits(units[i][0], units[i][1], from, to);
+		for(const key in from.units) {
+			[from, to] = Fleets.moveUnits(key, from.units[key], from, to);
 			if(from === -1) { return; }
 		}
 

@@ -298,18 +298,21 @@ module.exports = class Planet {
 	 * @param      {<type>}  user      The user
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
-		if(!planetIn.unitBuildingID || !planetIn.unitBuildingFleetID) { return; }
+		const newPlanet = Object.assign({}, planetIn);
+		newPlanet.unitBuildingEndTime = parseInt(newPlanet.unitBuildingEndTime);
 
-		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
+		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) { return; }
+
+		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
 			if(!isset(fleetReturned) || !isset(fleetReturned.ownerId) || fleetReturned.ownerId !== user.id) { return; }
 
-			let id = (planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
+			let id = (newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':newPlanet.unitBuildingID;
 			db.unit.find(id, function(unitReturned) {
-				if(planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
+				if(newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
 					unitReturned = {};
-					unitReturned.id = planetIn.unitBuildingID;
+					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
-					unitReturned.cost = shipCosts[planetIn.unitBuildingID];
+					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
 					unitReturned.ownerId = user.id;
 				}
 
@@ -319,40 +322,32 @@ module.exports = class Planet {
 					fleetReturned.maxFuel = 0;
 				}
 
-				let timeCost = unitReturned.cost[4]*3600*1000;
-				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
+				let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
+				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
 
-				if(currTime>planetIn.unitBuildingEndTime) { // total add
-					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+				if(currTime>newPlanet.unitBuildingEndTime) { // total add
+					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro;
 
 					fleetReturned.inBuilding = false;
 
-					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
+					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
 				} else { // Partial add
-					const restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
-					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+					const restant = Math.ceil((newPlanet.unitBuildingEndTime - currTime)/timeCost);
+					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro - restant;
 				}
 
 				if(unitCount === 0) { return; } // Prevent some bugs
 
-				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
-					unitCount = planetIn.unitBuildingCount;
+				if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
+					unitCount = newPlanet.unitBuildingCount;
 				}
 
-				let set = false;
-				for(let i=0; i<fleetReturned.units.length; i++) {
-					if(''+fleetReturned.units[i][0] === ''+planetIn.unitBuildingID) {
-						fleetReturned.units[i][1] += unitCount;
-
-						set=true;
-						break;
-					}
+				if(!fleetReturned.units[newPlanet.unitBuildingID]) {
+					fleetReturned.units[newPlanet.unitBuildingID] = 0;
 				}
-				if(!set) {
-					fleetReturned.units.push([planetIn.unitBuildingID,unitCount]);
-				}
+				fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
 
 				if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
 					fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
@@ -364,7 +359,7 @@ module.exports = class Planet {
 
 				db.fleet.update(fleetReturned, function() {
 					Units.refresh(user);
-					Fleets.refresh(planetIn.id,user.sid);
+					Fleets.refresh(newPlanet.id,user.sid);
 				});
 			});
 		});
