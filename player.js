@@ -230,10 +230,10 @@ module.exports = class Player {
 			newUserData.points = Math.round(newUserData.points);
 
 			// MaJ des BDD Globales
-			db.globalRank.reSortRanks(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name);
+			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
-				db.sectorRank.reSortRanks(
+				db.sectorRank.update(
 					user.id,
 					newUserData.sectorPointsAddresses[sector],
 					newUserData.sectorPointsValue[sector],
