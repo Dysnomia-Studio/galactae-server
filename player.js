@@ -1,8 +1,8 @@
 module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		db.player.searchBySid(user.sid,function(playerData) {
-			if(isset(playerData) && playerData.name===user.username && playerData.id === user.id) {
+		db.player.searchBySid(user.sid, (playerData) => {
+			if(isset(playerData) && playerData.name === user.username && playerData.id === user.id) {
 				if(Player.canAct(playerData)) { // Don't spam
 					callback(user);
 
@@ -17,7 +17,7 @@ module.exports = class Player {
 	}
 	/* Does the player can act ? */
 	static canAct(user) {
-		let minTime = 100; //time in ms
+		const minTime = 100; //time in ms
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
@@ -44,7 +44,7 @@ module.exports = class Player {
 
 			db.ban.find(data.game_id, 2, function(banObj) {
 				if(isset(banObj)) {
-					let now = Date.now();
+					const now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end > now) {
 							log('Error: ' + data.username + ' is banned.');
@@ -186,12 +186,12 @@ module.exports = class Player {
 			} else {
 				points *= pointsCoef.planet;
 
-				let newSector = {
+				const newSector = {
 					address: [],
 					points: [],
 					pcount: [],
 				};
-				for(let j in sector.points) {
+				for(const j in sector.points) {
 					newSector.address.push(j);
 					newSector.points.push(sector.points[j] * pointsCoef.planet);
 					newSector.pcount.push(sector.pcount[j]);
@@ -247,13 +247,13 @@ module.exports = class Player {
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {
-		let jour = 24*60*60*1000;
-		let minuit = Date.now() - (Date.now()%jour);
-		let hierMinuit = minuit - jour;
+		const jour = 24*60*60*1000;
+		const minuit = Date.now() - (Date.now()%jour);
+		const hierMinuit = minuit - jour;
 
 		if(data.lastBonus < minuit) {
 			// Update player
-			let newPlayerData = data;
+			const newPlayerData = data;
 			newPlayerData.dayBonusStreak = data.dayBonusStreak+1;
 
 			if(data.lastBonus < hierMinuit) { // Si pas hier
@@ -267,7 +267,7 @@ module.exports = class Player {
 
 			let credits;
 			let helium = 0;
-			let streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
+			const streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
 			if(streak===1) { credits = 15; }
 			else if(streak===2) { credits = 25; }
@@ -292,7 +292,7 @@ module.exports = class Player {
 						return;
 					}
 
-					let newPlanetData = Planet.update(planetReturned);
+					const newPlanetData = Planet.update(planetReturned);
 
 					newPlanetData.resources[1]+=helium;
 
