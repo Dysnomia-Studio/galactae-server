@@ -263,7 +263,7 @@ module.exports = class Units {
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
-					if(fleet.id === inputData.fleet || fleet.id === inputData.fleet) {
+					if(fleet.id === inputData.fleet) {
 						choosenFleet = fleet;
 					}
 

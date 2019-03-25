@@ -402,229 +402,55 @@ module.exports = {
 				callback(obj.rows);
 			});
 		},
-		create: function(data) {
-			data.id = new mongoose.Types.ObjectId();
+		create: (bans) => {
+			const [query, values] = db.buildInsertQuery('bans', bans);
 
-			bans.create(data, function(err) {
+			generalClient.query(query, values, (err) => {
 				if(err) { log(err, 'error'); return; }
+				if(callback) {
+					callback(bans);
+				}
 			});
 		},
 	},
 	globalRank: {
-		update: function(data) {
-			// Chercher si l'utilisateur existe
-			globalRanks.find({
-				server_name: globalCfg.serverGlobalName,
-				user_id: data.user_id,
-			}, function(err, obj) {
+		update: (game_id, points, pcount, name) => {
+			generalClient.query('SELECT * FROM "globalRanks" WHERE game_id=$1 AND server_name=$2', [game_id,globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 
-				if(!isset(obj) || obj.length === 0) { // Si non creer
-					data.id = new mongoose.Types.ObjectId();
-					data.server_name = globalCfg.serverGlobalName;
-
-					globalRanks.create(data, function(err) {
-						if(err) { log(err, 'error'); return; }
-					});
-				} else { // Sinon update
-					const conditions = {
-							server_name: globalCfg.serverGlobalName,
-							user_id: data.user_id,
-						},
-						update = { $set: data },
-						options = { multi: false };
-
-					globalRanks.update(conditions, update, options,function(err) {
-						if(err) { log(err, 'error'); return; }
-					});
-				}
-			});
-		},
-		findByUserId: (uid, callback) => {
-			generalClient.query('SELECT * FROM "globalRanks" WHERE server_name=$1 AND game_id=$2', [globalCfg.serverGlobalName, uid], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
-					callback(obj.rows[0]);
-				}
-			});
-		},
-		findBetweenPointsAndRanks: function(points, rank, callback) {
-			globalRanks.find({
-				points: { $lt: points },
-				rank: { $lt: rank },
-				server_name: globalCfg.serverGlobalName,
-			}, function (err, obj) {
-				if(err) { log(err, 'error'); return; }
-				callback(obj);
-			});
-		},
-		incrementInRange: function(min, max) {
-			const conditions = {
-					server_name: globalCfg.serverGlobalName,
-					rank: { $gte: min,  $lte: max },
-				},
-				update = { $inc: {'rank': 1 } },
-				options = { multi: true };
-
-			globalRanks.update(conditions, update, options,function(err) {
-				if(err) { log(err, 'error'); return; }
-			});
-		},
-		count: function(callback) {
-			globalRanks.count({
-				server_name: globalCfg.serverGlobalName,
-			} , function(err, c) {
-				if(err) { log(err, 'error'); return; }
-				callback(c);
-			});
-		},
-		reSortRanks: function(user_id, points, pcount, name) {
-			db.globalRank.findByUserId(user_id, function(user) {
-				db.globalRank.count(function(MaxRank) {
-					MaxRank++;
-					let rank = MaxRank;
-
-					if(isset(user) && isset(user.rank)) { rank = user.rank; }
-
-					db.globalRank.findBetweenPointsAndRanks(points, rank, function(userList) {
-						let min = rank;
-
-						if(isset(userList) && isset(userList[0])) { // Changement(s) de rang à faire ?
-							min = userList[0].rank;
-
-							for(let i=1; i<userList.length; i++) {
-								if(min > userList[i].rank) {
-									min = userList[i].rank;
-								}
-							}
-						}
-
-						if(min < rank) {
-							db.globalRank.incrementInRange(min, rank-1);
-						}
-
-						db.globalRank.update({
-							user_id,
-							rank: min,
-							points,
-							planets: pcount,
-							name,
+				if(obj.rows.length > 0) {
+					generalClient.query('UPDATE "globalRanks" SET points=$1, pcount=$2 WHERE game_id=$3 AND server_name=$4',
+						[points,pcount,game_id,globalCfg.serverGlobalName], (err) => {
+							if(err) { log(err, 'error'); return; }
 						});
-					});
-				});
+				} else {
+					generalClient.query('INSERT INTO "globalRanks"(points,pcount,game_id,server_name,name) VALUES($1,$2,$3,$4,$5)',
+						[points,pcount,game_id,globalCfg.serverGlobalName,name], (err) => {
+							if(err) { log(err, 'error'); return; }
+						});
+				}
 			});
 		},
 	},
 
 	sectorRank: {
-		update: function(data) {
-			// Chercher si l'utilisateur existe
-			sectorRanks.find({
-				server_name: globalCfg.serverGlobalName,
-				user_id: data.user_id,
-				sector: data.sector,
-			}, function(err, obj) {
-				if(err) { log(err, 'error'); return; }
+		update: (user_id, sector, points, pcount, name) => {
+			generalClient.query('SELECT * FROM "sectorRanks" WHERE game_id=$1 AND server_name=$2 AND sector=$3',
+				[game_id,globalCfg.serverGlobalName,sector], (err, obj) => {
+					if(err) { log(err, 'error'); return; }
 
-				if(!isset(obj) || obj.length === 0) { // Si non creer
-					data.id = new mongoose.Types.ObjectId();
-					data.server_name = globalCfg.serverGlobalName;
-
-					sectorRanks.create(data, function(err) {
-						if(err) { log(err, 'error'); return; }
-					});
-				} else { // Sinon update
-					const conditions = {
-							server_name: globalCfg.serverGlobalName,
-							user_id: data.user_id,
-							sector: data.sector,
-						},
-						update = { $set: data },
-						options = { multi: false };
-
-					sectorRanks.update(conditions, update, options,function(err) {
-						if(err) { log(err, 'error'); return; }
-					});
-				}
-			});
-		},
-		findByUserId: (uid, sector, callback) => {
-			generalClient.query('SELECT * FROM "sectorRanks" WHERE server_name=$1 AND game_id=$2 AND sector=$3', [globalCfg.serverGlobalName, uid, sector], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
-					callback(obj.rows[0]);
-				}
-			});
-		},
-		findBetweenPointsAndRanks: function(sector, points, rank, callback) {
-			sectorRanks.find({
-				sector: sector,
-				points: { $lt: points },
-				rank: { $lt: rank },
-				server_name: globalCfg.serverGlobalName,
-			}, function (err, obj) {
-				if(err) { log(err, 'error'); return; }
-				callback(obj);
-			});
-		},
-		incrementInRange: function(sector, min, max) {
-			const conditions = {
-					sector: sector,
-					server_name: globalCfg.serverGlobalName,
-					rank: { $gte: min,  $lte: max },
-				},
-				update = { $inc: {'rank': 1 } },
-				options = { multi: true };
-
-			sectorRanks.update(conditions, update, options,function(err) {
-				if(err) { log(err, 'error'); return; }
-			});
-		},
-		count: function(sector, callback) {
-			sectorRanks.count({
-				server_name: globalCfg.serverGlobalName,
-				sector: sector,
-			} , function(err, c) {
-				if(err) { log(err, 'error'); return; }
-				callback(c);
-			});
-		},
-		reSortRanks: function(user_id, sector, points, pcount, name) {
-			db.sectorRank.findByUserId(user_id, sector, function(user) {
-				db.sectorRank.count(sector, function(MaxRank) {
-					MaxRank++;
-
-					let rank = MaxRank;
-
-					if(isset(user) && isset(user.rank)) { rank = user.rank; }
-					db.sectorRank.findBetweenPointsAndRanks(sector, points, rank, function(userList) {
-						let min = rank;
-
-						if(isset(userList) && isset(userList[0])) { // Changement(s) de rang à faire ?
-							min = userList[0].rank;
-
-							for(let i=1; i<userList.length; i++) {
-								if(min > userList[i].rank) {
-									min = userList[i].rank;
-								}
-							}
-						}
-
-						if(min < rank) {
-							db.sectorRank.incrementInRange(sector, min, rank-1);
-						}
-
-						db.sectorRank.update({
-							user_id,
-							sector: sector,
-							rank: min,
-							points,
-							planets: pcount,
-							name,
-						});
-					});
+					if(obj.rows.length > 0) {
+						generalClient.query('UPDATE "sectorRanks" SET points=$1, pcount=$2 WHERE game_id=$3 AND server_name=$4 AND sector=$5',
+							[points,pcount,game_id,globalCfg.serverGlobalName,sector], (err) => {
+								if(err) { log(err, 'error'); return; }
+							});
+					} else {
+						generalClient.query('INSERT INTO "sectorRanks"(points,pcount,game_id,server_name,name,sector) VALUES($1,$2,$3,$4,$5,$6)',
+							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector], (err) => {
+								if(err) { log(err, 'error'); return; }
+							});
+					}
 				});
-			});
 		},
 	},
 };
