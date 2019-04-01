@@ -28,7 +28,7 @@ module.exports = class Combat {
 	 * @param      {Fleet}   fleet   Fleet details
 	 */
 	joinTeam(team, fleet) {
-		if(fleet.id === undefined) {
+		if(!isset(fleet, 'object')) {
 			log('Fleet object misbuilded !','error');
 			return;
 		}

@@ -128,16 +128,58 @@ module.exports = function() {
 	  * @param	  {anything}  variable  The variable needs to be tested
 	  * @return	 {boolean}   True if the variable is set, False otherwise
 	  */
-	this.isset = function(variable) {
-		return (variable===0 ||
-			(typeof variable !== 'undefined' &&
-				variable !== null &&
-				variable !== {} &&
-				(typeof variable !== 'string' || (
-					variable.split(' ').join('') !== ''
-				))
-			));
-	};
+    this.isset = function(variable, type='') {
+        let array = (type === 'array');
+        if(array) { type = 'object'; }
+
+        if(variable === null ||
+            typeof variable === 'undefined') {
+            return false;
+        }
+
+        if(type !== '' && typeof variable !== type) {
+            return false;
+        }
+
+        if(type === '') {
+			type = typeof variable;
+			array = Array.isArray(variable);
+        }
+
+        if(type === 'string') {
+            return variable.split(' ').join('') !== '';
+
+        } else if(type === 'number') {
+            // Do nothing
+
+        } else if(type === 'object') {
+            if(array && (!Array.isArray(variable) || variable.length === 0)) { 
+                return false;
+            } else if(!array && Array.isArray(variable)) {
+                return false;
+            } else if(!array) {
+                let empty = true;
+                for(const key in variable) {
+                    if(variable.hasOwnProperty(key)) {
+                        empty = false;
+                    }
+                }
+
+                if(empty) {
+                    return false;
+                }
+            }
+
+        } else if(type === 'boolean') {
+            // Do nothing
+
+        } /*else if(type === 'symbol') {
+
+        }*/
+
+        return true;
+    };
+
 	/**
 	 * Normalize a text to be compatible with sockets
 	 *
