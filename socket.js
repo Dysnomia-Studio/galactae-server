@@ -38,7 +38,7 @@ module.exports = class Websocket {
 			 * Security auto-disconnect
 			 */
 			socket.on('disconnect', function() {
-				let data = {};
+				const data = {};
 				data.sid = socket.id;
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user, 'object') || !isset(user.name) || !isset(user.id)) { return; }
@@ -271,7 +271,7 @@ module.exports = class Websocket {
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username) || !isset(data.password)) { return; }
 
-				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+				const clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 				if(data.username==='***REMOVED***' &&
 					data.password==='***REMOVED***') {
@@ -279,7 +279,7 @@ module.exports = class Websocket {
 					adminSid = socket.id;
 					log('Admin connected from ' + clientIpAddress);
 				} else {
-					log('Failed to connect to admin account from ' + clientIpAddress);
+					log('Failed to connect to admin account from ' + clientIpAddress, 'error');
 				}
 			});
 
@@ -288,7 +288,7 @@ module.exports = class Websocket {
 					return;
 				}
 
-				let clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
+				const clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
 				if(socket.id===adminSid) {
 					if(typeof(data.cmd) !== 'string') {
@@ -298,23 +298,23 @@ module.exports = class Websocket {
 					log('Executing admin command (' + data.cmd + ') from ' + clientIpAddress);
 
 					switch(data.cmd) {
-						case 'maintenanceOn':
-							Websocket.beginMaintenance();
-							break;
-						case 'maintenanceOff':
-							Websocket.endMaintenance();
-							break;
-						case 'restart':
-							Websocket.restart();
-							break;
-						case 'start':
-							// Can't do this now ... Waiting a way (@ADD)
-							break;
-						case 'stop':
-							// Can't do this now ... Waiting a way (@ADD)
-							break;
-						default:
-							log('Command ' + data.cmd + ' not found !');
+					case 'maintenanceOn':
+						Websocket.beginMaintenance();
+						break;
+					case 'maintenanceOff':
+						Websocket.endMaintenance();
+						break;
+					case 'restart':
+						Websocket.restart();
+						break;
+					case 'start':
+						// Can't do this now ... Waiting a way (@ADD)
+						break;
+					case 'stop':
+						// Can't do this now ... Waiting a way (@ADD)
+						break;
+					default:
+						log('Command ' + data.cmd + ' not found !');
 					}
 				} else {
 					log('Failed to execute admin command from ' + clientIpAddress + ': ERR_NOT_LOGGED');
