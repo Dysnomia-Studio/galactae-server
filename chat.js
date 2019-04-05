@@ -4,7 +4,7 @@ module.exports = class Chat {
 			data.game_id = userGameIdObj[0].game_id;
 			data.user_id = userGameIdObj[0].user_id;
 			db.ban.find(data.game_id, 1, function(banObj) {
-				if(isset(banObj)) {
+				if(isset(banObj, 'object')) {
 					let now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end < now) {
@@ -25,7 +25,7 @@ module.exports = class Chat {
 					data.send = true;
 					data.lvl = 1;
 
-					if(isset(userPrivileges) && isset(userPrivileges[0]) && isset(userPrivileges[0].user_privilege_lvl)) {
+					if(isset(userPrivileges, 'array') && isset(userPrivileges[0], 'object') && isset(userPrivileges[0].user_privilege_lvl)) {
 						data.lvl = userPrivileges[0].user_privilege_lvl;
 					}
 

@@ -35,10 +35,11 @@ module.exports = function() {
 		let text = msg;
 		switch(type) {
 			case 'warn':
-				text = redText('WARNING:') + yellowText(text);
+				text = redText('WARNING: ') + yellowText(text);
 				break;
 			case 'error':
-				text = redText('ERROR:') + redText(text);
+				console.trace(redText('ERROR: ') + redText(text));
+				return;
 				break;
 			case 'fail':
 				text = yellowText(text);

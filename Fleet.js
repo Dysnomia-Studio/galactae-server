@@ -118,10 +118,10 @@
 				engines: {},
 			};
 
-			const unitListId = unitList.map((unit) => '' + unit._id);
+			const unitListId = unitList.map((unit) => unit.id);
 
-			for(let i=0; i<fleetUnits.length; i++) {
-				const currUnit = unitList[unitListId.indexOf(fleetUnits[i][0])];
+			for(const key in fleetUnits) {
+				const currUnit = unitList[unitListId.indexOf(key)];
 
 				const curr = Fleet.calcSubSpeed(currUnit);
 
@@ -137,7 +137,7 @@
 				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
 					count *= fighterMult[currUnit.shipShape];
 				}
-				min.engines[curr.tech] += count * fleetUnits[i][1];
+				min.engines[curr.tech] += count * fleetUnits[key];
 			}
 
 			return min;
@@ -155,10 +155,10 @@
 				engines: {},
 			};
 
-			const unitListId = unitList.map((unit) => unit._id);
+			const unitListId = unitList.map((unit) => unit.id);
 
 			for(let i=0; i<fleetUnits.length; i++) {
-				const currUnit = unitList[unitListId.indexOf(fleetUnits[i][0])];
+				const currUnit = unitList[unitListId.indexOf(key)];
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
@@ -176,7 +176,7 @@
 				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
 					count *= fighterMult[currUnit.shipShape];
 				}
-				min.engines[curr.tech] += count * fleetUnits[i][1];
+				min.engines[curr.tech] += count * fleetUnits[key];
 			}
 
 			return min;
@@ -204,7 +204,7 @@
 			let haveToUpdate = [];
 			for(let i=0; i<fleetList.length; i++) {
 				if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
-				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAdress) {
+				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
 					haveToUpdate.push(i);
 				}
 			}
@@ -212,8 +212,8 @@
 			let addCount = 0;
 
 			// Priority fleet
-			if(planet.highPriorityFleet !== undefined) {
-				const prioId = fleetList.map(d => ''+d._id).indexOf(planet.highPriorityFleet);
+			if(planet.highPriorityFleet) {
+				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
 					fleetList[prioId].fuel += planet.resources[1];
@@ -254,16 +254,7 @@
 		}
 
 		static removeEmptyUnits(fleet) {
-			const units = fleet.units;
-			fleet.units = [];
-
-			for(let i=0; i<units.length; i++) {
-				if(units[i][1] !== 0) {
-					fleet.units.push([units[i][0], units[i][1]]);
-				}
-			}
-
-			return fleet;
+			return fleet.units.filter((unitCount) => unitCount > 0);
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

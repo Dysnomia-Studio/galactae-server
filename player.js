@@ -1,14 +1,13 @@
 module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		db.player.searchBySid(user.sid,function(searchSid) {
-			if(isset(searchSid) && searchSid.name===user.username && searchSid.id === user.id) {
-				if(Player.canAct(searchSid)) { // Don't spam
+		db.player.searchBySid(user.sid, (playerData) => {
+			if(isset(playerData) && playerData.name === user.username && playerData.id === user.id) {
+				if(Player.canAct(playerData)) { // Don't spam
 					callback(user);
 
-					let newData = searchSid;
-					newData.lastAction = Date.now();
-					db.player.update(newData);
+					playerData.lastAction = Date.now();
+					db.player.update(playerData);
 				}
 			} else {
 				// Kick that Hacker ...
@@ -18,7 +17,7 @@ module.exports = class Player {
 	}
 	/* Does the player can act ? */
 	static canAct(user) {
-		let minTime = 100; //time in ms
+		const minTime = 100; //time in ms
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
@@ -33,18 +32,19 @@ module.exports = class Player {
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			/*if(!isset(userGameIdObj) || !isset(userGameIdObj[0]) || !isset(userGameIdObj).user_id) {
+			if(!isset(userGameIdObj) || !isset(userGameIdObj.game_id) || !isset(userGameIdObj.user_id)) {
+				log('Error: Invalid user');
 				// Kick that Hacker ...
 				io.to(data.sid).emit('server-kick','INVALID_SESSION');
 				return;
-			}*/
+			}
 
-			data.game_id = userGameIdObj[0].game_id;
-			data.user_id = userGameIdObj[0].user_id;
+			data.game_id = userGameIdObj.game_id;
+			data.user_id = userGameIdObj.user_id;
 
 			db.ban.find(data.game_id, 2, function(banObj) {
 				if(isset(banObj)) {
-					let now = Date.now();
+					const now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end > now) {
 							log('Error: ' + data.username + ' is banned.');
@@ -57,7 +57,7 @@ module.exports = class Player {
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
 						if(!isset(userPrivileges) || !isset(userPrivileges[0]) ||
-							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== 1) {
+							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
 							// @ADD: Kick & Message
@@ -65,13 +65,13 @@ module.exports = class Player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							if(!dataReturned) { console.error('User: ' + data.username + ' not found !'); return; }
+							if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
 							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						if(!dataReturned) { console.error('User: ' + data.username + ' not found !'); return; }
+						if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
 						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
@@ -80,26 +80,25 @@ module.exports = class Player {
 		}); // Gamedata db query
 	}
 
-	static traitementsConnexion(data, dataReturned) {
-		if(data.id !== dataReturned.id) {
+	static traitementsConnexion(data, playerData) {
+		if(data.id !== playerData.id) {
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
 			return;
 		}
 
 		// Kick double accounts
-		let oldSid = dataReturned.sid;
+		const oldSid = playerData.sid;
 		if(oldSid !== '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-			log(dataReturned.name +' ('+ dataReturned.sid +') was kicked because of double sessions.');
+			log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
-		let playerData = dataReturned.toJSON();
 		playerData.sid = data.sid;
 
-		let jour = 24*60*60*1000;
-		let minuit = Date.now() - (Date.now()%jour);
-		let hierMinuit = minuit - jour;
+		const jour = TIME.DAY_TO_MS;
+		const minuit = Date.now() - (Date.now()%jour);
+		const hierMinuit = minuit - jour;
 		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 
@@ -131,8 +130,7 @@ module.exports = class Player {
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-				userNewResearch.id = userNewResearch._id;
-					db.player.update(userNewResearch, function() {
+				db.player.update(userNewResearch, function() {
 					plCount++;
 
 					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
@@ -188,12 +186,12 @@ module.exports = class Player {
 			} else {
 				points *= pointsCoef.planet;
 
-				let newSector = {
+				const newSector = {
 					address: [],
 					points: [],
 					pcount: [],
 				};
-				for(let j in sector.points) {
+				for(const j in sector.points) {
 					newSector.address.push(j);
 					newSector.points.push(sector.points[j] * pointsCoef.planet);
 					newSector.pcount.push(sector.pcount[j]);
@@ -232,11 +230,11 @@ module.exports = class Player {
 			newUserData.points = Math.round(newUserData.points);
 
 			// MaJ des BDD Globales
-			db.globalRank.reSortRanks(user._id, newUserData.points, newUserData.planetlist.length, newUserData.name);
+			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
-				db.sectorRank.reSortRanks(
-					user._id,
+				db.sectorRank.update(
+					user.id,
 					newUserData.sectorPointsAddresses[sector],
 					newUserData.sectorPointsValue[sector],
 					newUserData.sectorPointsPcount[sector],
@@ -249,13 +247,13 @@ module.exports = class Player {
 	}
 	/* dayBonus */
 	static dayBonus(data,userData,choice) {
-		let jour = 24*60*60*1000;
-		let minuit = Date.now() - (Date.now()%jour);
-		let hierMinuit = minuit - jour;
+		const jour = 24*60*60*1000;
+		const minuit = Date.now() - (Date.now()%jour);
+		const hierMinuit = minuit - jour;
 
 		if(data.lastBonus < minuit) {
 			// Update player
-			let newPlayerData = data;
+			const newPlayerData = data;
 			newPlayerData.dayBonusStreak = data.dayBonusStreak+1;
 
 			if(data.lastBonus < hierMinuit) { // Si pas hier
@@ -269,7 +267,7 @@ module.exports = class Player {
 
 			let credits;
 			let helium = 0;
-			let streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
+			const streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
 			if(streak===1) { credits = 15; }
 			else if(streak===2) { credits = 25; }
@@ -294,7 +292,7 @@ module.exports = class Player {
 						return;
 					}
 
-					let newPlanetData = Planet.update(planetReturned);
+					const newPlanetData = Planet.update(planetReturned);
 
 					newPlanetData.resources[1]+=helium;
 

@@ -62,23 +62,30 @@ db.connect(function(success,general=false) {
 	if(general) {
 		db.server.find(function(server) {
 			maintenance = server.server_maintenance;
+
+			if(maintenance) {
+				log('Server maintenance enabled by database configuration', 'warn');
+			}
 		});
 	}
 
-	/**
-	 * Stats Auto Submit to db
-	 */
-	let statsInterval = 5 * 60 * 1000;
-
-	setTimeout(function() {
-		db.stat.submit(Date.now() - Date.now()%statsInterval);
-
-		setInterval(function() {
-			db.stat.submit(Date.now() - Date.now()%statsInterval);
-		},statsInterval);
-	},statsInterval - Date.now()%statsInterval);
-
 	if(!general) {
+		/**
+		 * Stats Auto Submit to db
+		 */
+		const statsInterval = 5 * TIME.MINUTES_TO_MS;
+
+		setTimeout(function() {
+			db.stat.submit(Date.now() - Date.now()%statsInterval);
+
+			setInterval(function() {
+				db.stat.submit(Date.now() - Date.now()%statsInterval);
+			},statsInterval);
+		},statsInterval - Date.now()%statsInterval);
+
+		/**
+		 * Socket.io server
+		 */
 		global.io = require('socket.io').listen(globalCfg.serverPort);
 		io.set('transports', ['websocket']);
 

@@ -13,12 +13,19 @@ module.exports = function() {
 	};
 	this.TIME = {
 		DAY_TO_HOUR: 24,
+		DAY_TO_MINUTES: 24*60,
+		DAY_TO_SECONDS: 24*60*60,
 		DAY_TO_MS: 24*60*60*1000,
+
 		HOUR_TO_MINUTES: 60,
+		HOUR_TO_SECONDS: 60*60,
 		HOUR_TO_MS: 60*60*1000,
+
 		MINUTES_TO_SECONDS: 60,
 		MINUTES_TO_MS: 60*1000,
+
 		SECONDS_TO_MS: 1000,
+
 		SECOND_MARGIN: 5,
 	};
 	/**
