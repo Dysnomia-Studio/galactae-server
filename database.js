@@ -178,7 +178,7 @@ module.exports = {
 			});
 		},
 		findBySystemWithOwners: (systemAddr, callback) => {
-			serverClient.query('SELECT * FROM planets WHERE address LIKE \'$1%\'', [systemAddr], (err, planetList) => {
+			serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'], (err, planetList) => {
 				if(err) { log(err, 'error'); return; }
 				planetList = planetList.rows;
 
@@ -187,7 +187,7 @@ module.exports = {
 					const id = i;
 
 					db.player.searchById(planetList[id].owner, (user) => {
-						if(isset(user)) {
+						if(isset(user) && !user.name.includes('Colonisable')) {
 							planetList[id].ownerName = user.name;
 							planetList[id].ally = user.ally;
 						} else {
