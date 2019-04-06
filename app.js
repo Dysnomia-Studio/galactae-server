@@ -70,18 +70,20 @@ db.connect(function(success,general=false) {
 	}
 
 	if(!general) {
-		/**
-		 * Stats Auto Submit to db
-		 */
-		const statsInterval = 5 * TIME.MINUTES_TO_MS;
+		if(!globalCfg.dev) {
+			/**
+			 * Stats Auto Submit to db
+			 */
+			const statsInterval = 5 * TIME.MINUTES_TO_MS;
 
-		setTimeout(function() {
-			db.stat.submit(Date.now() - Date.now()%statsInterval);
-
-			setInterval(function() {
+			setTimeout(function() {
 				db.stat.submit(Date.now() - Date.now()%statsInterval);
-			},statsInterval);
-		},statsInterval - Date.now()%statsInterval);
+
+				setInterval(function() {
+					db.stat.submit(Date.now() - Date.now()%statsInterval);
+				},statsInterval);
+			},statsInterval - Date.now()%statsInterval);
+		}
 
 		/**
 		 * Socket.io server
