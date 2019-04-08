@@ -278,7 +278,19 @@ module.exports = {
 			serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 				if(callback) {
-					callback(obj.rows[0]);
+					const fleet = obj.rows[0];
+
+					if(isset(fleet, 'object')) {
+						fleet.fuel = parseInt(fleet.fuel);
+						fleet.maxFuel = parseInt(fleet.maxFuel);
+
+						if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
+							log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');
+							return;
+						}
+					}
+
+					callback(fleet);
 				}
 			});
 		},
