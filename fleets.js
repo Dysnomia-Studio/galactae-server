@@ -17,7 +17,7 @@ module.exports = class Fleets {
 			function sendtoPlayer(FleetList, newPlanet, sid) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
-						_id: newPlanet.id,
+						id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
@@ -52,7 +52,7 @@ module.exports = class Fleets {
 					haveToDone++;
 
 					const newFleet = {
-						_id: FleetList[id].id,
+						id: FleetList[id].id,
 						endMoveTime: FleetList[id].endMoveTime,
 						fuel: FleetList[id].fuel,
 					};
@@ -332,7 +332,7 @@ module.exports = class Fleets {
 			if(fleetReturned.name === 'SHIP_DEF') { return; }
 
 			const newFleet = {
-				_id: fleetReturned.id,
+				id: fleetReturned.id,
 				name: data.fleetNewName,
 			};
 

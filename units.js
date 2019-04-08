@@ -197,7 +197,7 @@ module.exports = class Units {
 			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			const newUnit = {
-				_id: unitReturned.id,
+				id: unitReturned.id,
 				name: data.shipNewName,
 			};
 

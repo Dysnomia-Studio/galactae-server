@@ -545,7 +545,7 @@ module.exports = class Planet {
 
 	static setPriorityFleet(planet, fleet, sid) {
 		db.planet.find(planet, function(planetData) {
-			db.planet.update({ _id: planetData.id, highPriorityFleet: fleet }, function() {
+			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
 				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
 				Fleets.refresh(planetData.id, sid);
 			});
