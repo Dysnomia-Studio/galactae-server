@@ -376,10 +376,9 @@ module.exports = class Planet {
 	static update(planetData,user,fleetList) {
 		let currTime = Date.now();
 
-		planetData.lastResourcesUpdate = currTime;
-
 		// Update resources
 		planetData.resources = Planet.UpdateResources(planetData,user);
+		planetData.lastResourcesUpdate = currTime;
 
 		// Update points
 		planetData.points = Planet.calcPlanetPoints(planetData);
@@ -509,7 +508,7 @@ module.exports = class Planet {
 		let Dtime = Date.now()-dataIn.nextBuildingTime;
 		let resources = dataIn.resources;
 
-		if(Dtime<0 || dataIn.nextBuildingTime==="-1") { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+		if(Dtime<0 || parseInt(dataIn.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
