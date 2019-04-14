@@ -44,6 +44,7 @@ module.exports = class Fleets {
 						continue;
 					}
 
+					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
