@@ -62,7 +62,11 @@ module.exports = class Research {
 		const time = (Date.now() - user.lastResearchUpdate)/TIME.HOUR_TO_MS;
 
 		db.planet.find(user.planetlist[i],function(planetData) {
-			if(isset(researchData[planetData.currResearch]) && isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
+			if(isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
+				if(!isset(researchData[planetData.currResearch])) {
+					researchData[planetData.currResearch] = 0;
+				}
+
 				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
 
 				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
