@@ -8,7 +8,7 @@ module.exports = class Research {
 	}
 
 	static isSearched(data,researchName) {
-		return data.research[researchName] < 0;
+		return isset(data.research[researchName]) && data.research[researchName] < 0;
 	}
 
 	static getResearchProduction(lvl) {
