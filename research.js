@@ -1,6 +1,6 @@
 module.exports = class Research {
 	static refreshUserResearch(data,callback) {
-		Research.recalc(data,data.research,function(user) {
+		Research.recalc(data, data.research, function(user) {
 			user.lastAction = Date.now();
 			user.lastResearchUpdate = Date.now();
 			callback(user);
@@ -20,8 +20,8 @@ module.exports = class Research {
 
 		let count = 0;
 
-		for(let i in researchList[researchName].parents) {
-			let currentParent = researchList[researchName].parents[i];
+		for(const i in researchList[researchName].parents) {
+			const currentParent = researchList[researchName].parents[i];
 
 			if(typeof currentParent === 'string') {
 				if((!isset(currentParent) ||
@@ -58,11 +58,23 @@ module.exports = class Research {
 		return true;
 	}
 
+	static addChilds(user) {
+		for(const researchName in researchList) {
+			if(!isset(user.research[researchName]) &&
+				Research.researchedParent(user, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}, researchName, true)) {
+
+				user.research[researchName] = 0;
+			}
+		}
+
+		return user.research;
+	}
+
 	static recalc(user,researchData,callback,i=0) {
 		const time = (Date.now() - user.lastResearchUpdate)/TIME.HOUR_TO_MS;
 
 		db.planet.find(user.planetlist[i],function(planetData) {
-			if(isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
+			if(isset(planetData.currResearch) && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
 				if(!isset(researchData[planetData.currResearch])) {
 					researchData[planetData.currResearch] = 0;
 				}
@@ -83,6 +95,8 @@ module.exports = class Research {
 			} else {
 				user.research = researchData;
 
+				user.research = Research.addChilds(user);
+
 				callback(user);
 			}
 		});
@@ -98,9 +112,9 @@ module.exports = class Research {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
-				let researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
+				const researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
 
-				let newData = Planet.update(planetReturned,userReturned,fleetReturned);
+				const newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
 				if(researchedParent && researchList[researchName] !== undefined) { // Just check if it exists ...
 					newData.currResearch = researchName;
