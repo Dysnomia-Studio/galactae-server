@@ -208,9 +208,9 @@ module.exports = class Player {
 	static calcResearchPoints(user) {
 		let points = 0;
 
-		for(let i=0; i<user.research.length; i++) {
-			if(user.research[i][1]===-1 && isset(researchList[user.research[i][0]].cost)) {
-				points+=researchList[user.research[i][0]].cost;
+		for(const research in user.research) {
+			if(user.research[research] === -1 && isset(researchList[research].cost)) {
+				points += researchList[research].cost;
 			}
 		}
 
