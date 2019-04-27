@@ -8,7 +8,7 @@ module.exports = class Research {
 	}
 
 	static isSearched(data,researchName) {
-		return isset(data.research[researchName], 'object') && data.research[researchName] < 0;
+		return isset(data.research[researchName], 'number') && data.research[researchName] < 0;
 	}
 
 	static getResearchProduction(lvl) {
@@ -60,7 +60,7 @@ module.exports = class Research {
 
 	static addChilds(user) {
 		for(const researchName in researchList) {
-			if(!isset(user.research[researchName], 'object') &&
+			if(!isset(user.research[researchName], 'number') &&
 				Research.researchedParent(user, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}, researchName, true)) {
 
 				user.research[researchName] = 0;
