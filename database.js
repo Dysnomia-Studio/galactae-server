@@ -156,7 +156,7 @@ module.exports = {
 		find: (addr,callback) => {
 			serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
 				if(err) { log(err, 'error'); return; }
-				if(isset(planetReturned)) {
+				if(isset(planetReturned, 'object') && isset(planetReturned.rows[0], 'object')) {
 					callback(planetReturned.rows[0]);
 				}
 			});
@@ -187,7 +187,7 @@ module.exports = {
 					const id = i;
 
 					db.player.searchById(planetList[id].owner, (user) => {
-						if(isset(user) && !user.name.includes('Colonisable')) {
+						if(isset(user, 'object') && !user.name.includes('Colonisable')) {
 							planetList[id].ownerName = user.name;
 							planetList[id].ally = user.ally;
 						} else {
@@ -373,7 +373,7 @@ module.exports = {
 		find: (id,callback) => {
 			generalClient.query('SELECT * FROM "userGameIds" WHERE game_id = $1', [id], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
+				if(isset(obj, 'object') && isset(obj.rows, 'array') && isset(obj.rows[0], 'object')) {
 					callback(obj.rows[0]);
 				}
 			});
@@ -384,7 +384,7 @@ module.exports = {
 		find: (callback) => {
 			generalClient.query('SELECT * FROM servers WHERE server_name = $1', [globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
-				if(isset(obj) && isset(obj.rows) && isset(obj.rows[0])) {
+				if(isset(obj, 'object') && isset(obj.rows, 'array') && isset(obj.rows[0], 'object')) {
 					callback(obj.rows[0]);
 				}
 			});

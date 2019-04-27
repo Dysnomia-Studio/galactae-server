@@ -194,7 +194,7 @@ module.exports = class Units {
 
 	static renameType(data) {
 		db.unit.find(data.shipId, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			const newUnit = {
 				id: unitReturned.id,
@@ -210,7 +210,7 @@ module.exports = class Units {
 
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			if(unitReturned.owned !== 0) {
 				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
@@ -237,7 +237,7 @@ module.exports = class Units {
 	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
-			if(!isset(planetReturned.owner) || ''+planetReturned.owner !== ''+inputData.id) { return; }
+			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) { return; }
 
 			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
@@ -256,7 +256,7 @@ module.exports = class Units {
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
-				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
+				if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
 				// Check defence fleet
 				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') { return; }
 				if(unitReturned.shipType === 'SHIP_DEF') { inputData.fleet = -2; }
@@ -345,7 +345,7 @@ module.exports = class Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_UNIT_OK' });
 					}
 
-					if(inputData.fleet === -1 && isset(inputData.fleetName)) {
+					if(inputData.fleet === -1 && isset(inputData.fleetName, 'string')) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst.maxFleetSize) {
 							log(inputData.username +' failed to build units because fleet will be too big.');

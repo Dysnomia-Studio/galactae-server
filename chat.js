@@ -25,7 +25,7 @@ module.exports = class Chat {
 					data.send = true;
 					data.lvl = 1;
 
-					if(isset(userPrivileges, 'array') && isset(userPrivileges[0], 'object') && isset(userPrivileges[0].user_privilege_lvl)) {
+					if(isset(userPrivileges, 'array') && isset(userPrivileges[0], 'object') && isset(userPrivileges[0].user_privilege_lvl, 'number')) {
 						data.lvl = userPrivileges[0].user_privilege_lvl;
 					}
 
@@ -95,7 +95,7 @@ module.exports = class Chat {
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
 						return;
 					}
-					if(data.message === '' || !isset(data.message)) { return; }
+					if(data.message === '' || !isset(data.message, 'string')) { return; }
 
 				    if(data.channel !== 'hud-chat-ally') { // Normal chat
 				    	log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
@@ -144,14 +144,14 @@ module.exports = class Chat {
 	 */
 	static searchTarget(currUser, name,callback) {
 		db.player.searchByName(name, function(dataReturned) {
-			if(!isset(dataReturned) || !isset(dataReturned.sid)) {
+			if(!isset(dataReturned, 'object') || !isset(dataReturned.sid, 'string')) {
 				Chat.sendSM(currUser.sid,'PLY_NOT_FOUND');
 				log('Player not found');
 			} else {
 				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
 					db.privilege.find(targetGameIdObj[0].user_id, function(targetPrivileges) {
 						let targetLvl = 1;
-						if(isset(targetPrivileges[0]) && isset(targetPrivileges[0].user_privilege_lvl)) {
+						if(isset(targetPrivileges[0], 'object') && isset(targetPrivileges[0].user_privilege_lvl, 'number')) {
 							targetLvl = targetPrivileges[0].user_privilege_lvl;
 						}
 

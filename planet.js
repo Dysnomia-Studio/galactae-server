@@ -9,7 +9,7 @@ module.exports = class Planet {
 	 */
 	static find(user,pid,decalage,callback) {
 		db.player.searchById(user.id, function(userReturned) {
-			if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
+			if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
 				let longueur = userReturned.planetlist.length;
 				let valid = false;
 
@@ -304,7 +304,7 @@ module.exports = class Planet {
 		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) { return; }
 
 		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
-			if(!isset(fleetReturned) || !isset(fleetReturned.ownerId) || fleetReturned.ownerId !== user.id) { return; }
+			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
 
 			let id = (newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':newPlanet.unitBuildingID;
 			db.unit.find(id, function(unitReturned) {

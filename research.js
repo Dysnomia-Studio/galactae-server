@@ -8,7 +8,7 @@ module.exports = class Research {
 	}
 
 	static isSearched(data,researchName) {
-		return isset(data.research[researchName]) && data.research[researchName] < 0;
+		return isset(data.research[researchName], 'object') && data.research[researchName] < 0;
 	}
 
 	static getResearchProduction(lvl) {
@@ -24,7 +24,7 @@ module.exports = class Research {
 			const currentParent = researchList[researchName].parents[i];
 
 			if(typeof currentParent === 'string') {
-				if((!isset(currentParent) ||
+				if((!isset(currentParent, 'object') ||
 					!Research.isSearched(user,currentParent)) &&
 					currentParent !== 'researchCenter') { // Recherche
 
@@ -60,7 +60,7 @@ module.exports = class Research {
 
 	static addChilds(user) {
 		for(const researchName in researchList) {
-			if(!isset(user.research[researchName]) &&
+			if(!isset(user.research[researchName], 'object') &&
 				Research.researchedParent(user, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}, researchName, true)) {
 
 				user.research[researchName] = 0;
@@ -74,8 +74,8 @@ module.exports = class Research {
 		const time = (Date.now() - user.lastResearchUpdate)/TIME.HOUR_TO_MS;
 
 		db.planet.find(user.planetlist[i],function(planetData) {
-			if(isset(planetData.currResearch) && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost) && researchData[planetData.currResearch] !== -1) {
-				if(!isset(researchData[planetData.currResearch])) {
+			if(isset(planetData.currResearch, 'string') && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost, 'number') && researchData[planetData.currResearch] !== -1) {
+				if(!isset(researchData[planetData.currResearch], 'object')) {
 					researchData[planetData.currResearch] = 0;
 				}
 
@@ -103,10 +103,10 @@ module.exports = class Research {
 	}
 
 	static ChangePlanetResearch(data, researchName) {
-		if(!isset(researchList[researchName])) { return; }
+		if(!isset(researchList[researchName], 'object')) { return; }
 
 		Planet.find(data,data.pid,0,function(planetReturned,userReturned,fleetReturned) {
-			if(!isset(planetReturned) || !isset(userReturned)) { return; }
+			if(!isset(planetReturned, 'object') || !isset(userReturned, 'object')) { return; }
 
 			Research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);

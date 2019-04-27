@@ -2,7 +2,7 @@ module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
 		db.player.searchBySid(user.sid, (playerData) => {
-			if(isset(playerData) && playerData.name === user.username && playerData.id === user.id) {
+			if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
 				if(Player.canAct(playerData)) { // Don't spam
 					callback(user);
 
@@ -24,7 +24,7 @@ module.exports = class Player {
 	/* Get player ally */
 	static getAlly(data,callback) {
 		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj)) { log('Error: ' + data.username + ' not found.'); return; }
+			if(!isset(obj, 'object')) { log('Error: ' + data.username + ' not found.'); return; }
 			data.ally = obj.ally;
 			callback(data);
 		});
@@ -32,7 +32,7 @@ module.exports = class Player {
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			if(!isset(userGameIdObj) || !isset(userGameIdObj.game_id) || !isset(userGameIdObj.user_id)) {
+			if(!isset(userGameIdObj, 'object') || !isset(userGameIdObj.game_id, 'string') || !isset(userGameIdObj.user_id, 'string')) {
 				log('Error: Invalid user');
 				// Kick that Hacker ...
 				io.to(data.sid).emit('server-kick','INVALID_SESSION');
@@ -43,7 +43,7 @@ module.exports = class Player {
 			data.user_id = userGameIdObj.user_id;
 
 			db.ban.find(data.game_id, 2, function(banObj) {
-				if(isset(banObj)) {
+				if(isset(banObj, 'object')) {
 					const now = Date.now();
 					for(let i=0; banObj.length; banObj++) {
 						if(banObj[i].ban_end > now) {
@@ -56,7 +56,7 @@ module.exports = class Player {
 
 				if(maintenance) { // Check whitelist
 					db.privilege.find(data.user_id, function(userPrivileges) {
-						if(!isset(userPrivileges) || !isset(userPrivileges[0]) ||
+						if(!isset(userPrivileges, 'array') || !isset(userPrivileges[0], 'object') ||
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
@@ -113,7 +113,7 @@ module.exports = class Player {
 		playerData.lastConnected = Date.now();
 
 		// Tutorials
-		if(!isset(playerData.currTutorial)) {
+		if(!isset(playerData.currTutorial, 'number')) {
 			playerData.currTutorial = 0;
 		}
 		if(!Tutorials.hasFinishedTutorials(playerData)) {
@@ -149,9 +149,9 @@ module.exports = class Player {
 
 	/* Disconnect Player */
 	static disconnect(data) {
-		if(!isset(data.sid)) { return; }
+		if(!isset(data.sid, 'string')) { return; }
 		db.player.searchBySid(data.sid,function(dataReturned) {
-			if(!isset(dataReturned)) { return; }
+			if(!isset(dataReturned, 'string')) { return; }
 			dataReturned.sid = '-1';
 			db.player.update(dataReturned);
 			plCount--;
@@ -209,7 +209,7 @@ module.exports = class Player {
 		let points = 0;
 
 		for(const research in user.research) {
-			if(user.research[research] === -1 && isset(researchList[research].cost)) {
+			if(user.research[research] === -1 && isset(researchList[research].cost, 'number')) {
 				points += researchList[research].cost;
 			}
 		}

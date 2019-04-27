@@ -6,6 +6,6 @@ module.exports = class Tutorials {
 	 * @return     {boolean}  True if has finished tutorials, False otherwise.
 	 */
 	static hasFinishedTutorials(user) {
-		return (isset(user.currTutorial) && user.currTutorial >= tutorialsList.length);
+		return (isset(user.currTutorial, 'number') && user.currTutorial >= tutorialsList.length);
 	}
 };
