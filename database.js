@@ -142,7 +142,7 @@ module.exports = {
 		clearList: () => {
 			log('Clearing player list ...');
 
-			serverClient.query('UPDATE users SET sid = \'-1\'', [sid], (err) => {
+			serverClient.query('UPDATE users SET sid = \'-1\'', [], (err) => {
 				if(err) { log(err, 'error'); return; }
 				log('List cleared !') ;
 			});
