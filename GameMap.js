@@ -25,11 +25,11 @@
 		 * @return     {number}  Distance between planets
 		 */
 		static getPlanetDistance(from, to, when) {
-			const angleDepart = (2* Math.PI) - (when%from.orbitDuration / from.orbitDuration) * (2* Math.PI);
-			const angleArrivee = (2* Math.PI) - (when%to.orbitDuration / to.orbitDuration) * (2* Math.PI);
+			const angleDepart = (2* Math.PI) - (when%parseFloat(from.orbitDuration) / parseFloat(from.orbitDuration)) * (2* Math.PI);
+			const angleArrivee = (2* Math.PI) - (when%parseFloat(to.orbitDuration) / parseFloat(to.orbitDuration)) * (2* Math.PI);
 
-			const coordsDepart = GameMap.getPlanetCoords(angleDepart, from.orbitDist);
-			const coordsArrivee = GameMap.getPlanetCoords(angleArrivee, to.orbitDist);
+			const coordsDepart = GameMap.getPlanetCoords(angleDepart, parseFloat(from.orbitDist));
+			const coordsArrivee = GameMap.getPlanetCoords(angleArrivee, parseFloat(to.orbitDist));
 
 			return Math.sqrt(
 				Math.pow(coordsDepart[0] - coordsArrivee[0],2) +
