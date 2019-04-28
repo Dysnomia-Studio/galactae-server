@@ -16,16 +16,13 @@ module.exports = class Research {
 	}
 
 	static researchedParent(user, planet, researchName, atleastOne=false) {
-		if(researchList[researchName] === undefined) { return; }
+		if(researchList[researchName] === undefined) { return false; }
 
 		let count = 0;
 
-		for(const i in researchList[researchName].parents) {
-			const currentParent = researchList[researchName].parents[i];
-
+		for(const currentParent of researchList[researchName].parents) {
 			if(typeof currentParent === 'string') {
-				if((!isset(currentParent, 'object') ||
-					!Research.isSearched(user,currentParent)) &&
+				if((!Research.isSearched(user,currentParent)) &&
 					currentParent !== 'researchCenter') { // Recherche
 
 					if(!atleastOne) {
@@ -116,12 +113,10 @@ module.exports = class Research {
 
 				const newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
-				if(researchedParent && researchList[researchName] !== undefined) { // Just check if it exists ...
+				if(researchedParent) { // Just check if it exists ...
 					newData.currResearch = researchName;
-				}
-
-				if(!researchedParent) {
-					log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research + ' but doesn\'t have all needed parents.','error');
+				} else {
+					log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research + ' but doesn\'t have all needed parents.','warn');
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'MISSING_PARENTS'});
 				}
 
