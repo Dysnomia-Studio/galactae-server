@@ -18,7 +18,7 @@ module.exports = {
 		});
 
 		client.on('message', function(message) {
-			if(message.author.id===463990941473177600) { return; }
+			if(message.author.id === '463990941473177600') { return; }
 			if(message.channel.name.substr(0,globalCfg.serverName.length)===globalCfg.serverName) { // If it's a message for this server then send it to chat
 				let msg = message.cleanContent;
 				if(msg!==msg.replace('http','')) { return; }
