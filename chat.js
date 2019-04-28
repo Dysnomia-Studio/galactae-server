@@ -1,8 +1,8 @@
 module.exports = class Chat {
 	static analyse(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
-			data.game_id = userGameIdObj[0].game_id;
-			data.user_id = userGameIdObj[0].user_id;
+			data.game_id = userGameIdObj.game_id;
+			data.user_id = userGameIdObj.user_id;
 			db.ban.find(data.game_id, 1, function(banObj) {
 				if(isset(banObj, 'object')) {
 					let now = Date.now();
@@ -149,7 +149,7 @@ module.exports = class Chat {
 				log('Player not found');
 			} else {
 				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
-					db.privilege.find(targetGameIdObj[0].user_id, function(targetPrivileges) {
+					db.privilege.find(targetGameIdObj.user_id, function(targetPrivileges) {
 						let targetLvl = 1;
 						if(isset(targetPrivileges[0], 'object') && isset(targetPrivileges[0].user_privilege_lvl, 'number')) {
 							targetLvl = targetPrivileges[0].user_privilege_lvl;
