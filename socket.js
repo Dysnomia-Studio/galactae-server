@@ -259,7 +259,7 @@ module.exports = class Websocket {
 				// Vars
 				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.choice, 'number')) { return; }
 				// User
-				data.user.sid = socket.id;
+				data.sid = socket.id;
 				Player.isValid(data, function(user) { // Verify identity
 					db.player.searchBySid(user.sid,function(dataReturned) {
 						Player.dayBonus(dataReturned,user,data.choice);
