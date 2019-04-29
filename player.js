@@ -128,6 +128,7 @@ module.exports = class Player {
 		});
 
 		Units.refresh(data);
+		Tactics.refresh(data.id, data.sid);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				db.player.update(userNewResearch, function() {

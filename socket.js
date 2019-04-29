@@ -195,6 +195,7 @@ module.exports = class Websocket {
 				Player.isValid(data,function(data) { // Verify identity
 					Units.refresh(data);
 					Fleets.refresh(data.planet,data.sid);
+					Tactics.refresh(data.id, data.sid);
 				});
 			});
 			socket.on('fleet-set-priority', function(data) {
@@ -251,6 +252,43 @@ module.exports = class Websocket {
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
 					Fleets.transferFuelBetweenFleets(data.from, data.to, data);
+				});
+			});
+
+			socket.on('tactics-create', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.tactic, 'object')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Tactics.create(data.id, data.sid, data.tactic);
+				});
+			});
+			socket.on('tactics-update', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.tactic, 'object') || !isset(data.tactic.id)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Tactics.update(data.id, data.sid, data.tactic);
+				});
+			});
+			socket.on('tactics-delete', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.tacticId)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Tactics.delete(data.id, data.sid, data.tacticId);
+				});
+			});
+			socket.on('fleet-tactics-assign', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.fleetId) || !isset(data.tacticId)) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data,function(data) { // Verify identity
+					Tactics.assign(data.id, data.sid, data.fleetId, data.tacticId);
 				});
 			});
 

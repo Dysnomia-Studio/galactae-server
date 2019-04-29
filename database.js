@@ -4,6 +4,12 @@ let generalPool,
 	serverPool,
 	serverClient;
 
+function rollback() {
+	serverClient.query('ROLLBACK', (err) => {
+		if(err) { log(err, 'error'); return; }
+	});
+}
+
 module.exports = {
 	/**
 	 * Used to connect to database
@@ -348,13 +354,162 @@ module.exports = {
 			serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
 				if(err) { log(err, 'error'); return; }
 			});
+		},
+		assignFleet: (fid, tid, callback) => {
+			serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
+				if(err) { log(err, 'error'); return; }
+				callback();
+			});
+		}
+	},
+
+	tactics: {
+		find: (tid, callback) => {
+			serverClient.query('SELECT * FROM tactics WHERE id=$1', [tid], (err, tacticListQuery) => {
+				if(err) { log(err, 'error'); return; }
+
+				if(tacticListQuery.rows.length === 0) {
+					callback();
+					return;
+				}
+
+				const tactic = tacticListQuery.rows[0];
+				db.tacticsOrders.findByTactic(tactic.id, (orders) => {
+					tactic.orders = orders;
+
+					callback(tactic);
+				});
+			});
+		},
+		findByOwner: (owner, callback) => {
+			serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], (err, tacticListQuery) => {
+				if(err) { log(err, 'error'); return; }
+
+				const tacticList = tacticListQuery.rows;
+				let todo = 0;
+				let done = 0;
+				for(const tactic of tacticList) {
+					todo++;
+
+					db.tacticsOrders.findByTactic(tactic.id, (orders) => {
+						done++;
+						tactic.orders = orders;
+
+						if(todo === done) {
+							callback(tacticList);
+						}
+					});
+				}
+
+				if(tacticList.length === 0) {
+					callback([]);
+				}
+			});
+		},
+		upsert: (inputTactic, callback) => {
+			inputTactic.id = (inputTactic.id) ? inputTactic.id : '';
+
+			function innerCallback() {
+				serverClient.query('COMMIT', (err) => {
+					callback();
+				});
+			}
+
+			serverClient.query('BEGIN', (err) => {
+				if(err) { rollback(); }
+
+				db.tactics.find(inputTactic.id, (tactic) => {
+					if(!isset(tactic)) {
+						db.tactics.insert(tactic, () => {
+							db.tactics.findByOwnerAndName(tactic, (newTactic) => {
+								db.tacticsOrders.upsertAll(tactic.orders, newTactic.id, innerCallback);
+							});
+						});
+					} else if(tactic.name !== inputTactic.name) {
+						db.tactics.updateName(tactic, () => db.tacticsOrders.upsertAll(tactic.orders, tactic.id, () => {
+							db.tacticsOrders.upsertAll(tactic.orders, tactic.id, innerCallback);
+						}));
+					} else {
+						db.tacticsOrders.upsertAll(tactic.orders, tactic.id, innerCallback);
+					}
+				});
+			});
+
+		},
+		insert: (tactic, callback) => {
+			serverClient.query('INSERT INTO tactics (name, owner) VALUES ($1, $2)', [tactic.name, tactic.owner], (err) => {
+				if(err) { log(err, 'error'); return; }
+
+				callback();
+			});
+		},
+		updateName: (tactic, callback) => {
+			serverClient.query('UPDATE tactics SET name=$1 WHERE id=$2', [tactic.name, tactic.id], (err) => {
+				if(err) { log(err, 'error'); return; }
+
+				callback();
+			});
+		},
+		delete: (tid, callback) => {
+			serverClient.query('DELETE FROM tactics WHERE id=$1', [tid], (err) => {
+				if(err) { log(err, 'error'); return; }
+
+				callback();
+			});
+		}
+	},
+
+	tacticsOrders: {
+		find: (tid, unit, target, callback) => {
+			serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1 AND unit=$2 AND target=$3', [tid, unit, target], (err, tacticOrdersQuery) => {
+				if(err) { log(err, 'error'); return; }
+
+				callback(tacticOrdersQuery.rows);
+			});
+		},
+		findByTactic: (id, callback) => {
+			serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1', [id], (err, tacticOrdersQuery) => {
+				if(err) { log(err, 'error'); return; }
+
+				callback(tacticOrdersQuery.rows);
+			});
+		},
+		upsertAll: (orders, tid) => {
+			db.tacticsOrders.delete(tid, () => {
+				let done = 0;
+
+				for(const order of orders) {
+					order.tactic_id = tid;
+
+					db.tacticsOrders.insert(order, () => {
+						done++;
+						if(orders.length === done) {
+							callback();
+						}
+					});
+				}
+			});
+		},
+		insert: (order, callback) => {
+			serverClient.query('INSERT INTO tactics_orders (tactic_id, unit, target, priority) VALUES ($1, $2)', [order.tactic_id, order.unit, order.target, order.priority], (err) => {
+				if(err) { log(err, 'error'); rollback(); return; }
+
+				callback();
+			});
+		},
+		delete: (tid, callback) => {
+			serverClient.query('DELETE FROM tactics_orders WHERE tactic_id=$1', [tid], (err) => {
+				if(err) { log(err, 'error'); rollback(); return; }
+
+				callback();
+			});
 		}
 	},
 
 	stat: {
 		submit: (currTime) => {
 			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, plCount], (err) => {
-				if(err) { log(err, 'error'); }
+				if(err) { log(err, 'error'); return; }
 			});
 		},
 	},

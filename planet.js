@@ -360,6 +360,7 @@ module.exports = class Planet {
 				db.fleet.update(fleetReturned, function() {
 					Units.refresh(user);
 					Fleets.refresh(newPlanet.id,user.sid);
+					Tactics.refresh(user.id, user.sid);
 				});
 			});
 		});
