@@ -255,22 +255,17 @@ module.exports = class Websocket {
 				});
 			});
 
-			socket.on('tactics-create', (data) => {
+			socket.on('tactics-upsert', (data) => {
 				// Vars
 				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.tactic, 'object')) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Tactics.create(data.id, data.sid, data.tactic);
-				});
-			});
-			socket.on('tactics-update', (data) => {
-				// Vars
-				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.tactic, 'object') || !isset(data.tactic.id)) { return; }
-				// User
-				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Tactics.update(data.id, data.sid, data.tactic);
+					if(isset(data.tactic.id)) {
+						Tactics.update(data, data.tactic);
+					} else {
+						Tactics.create(data, data.tactic);
+					}
 				});
 			});
 			socket.on('tactics-delete', (data) => {
@@ -279,7 +274,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Tactics.delete(data.id, data.sid, data.tacticId);
+					Tactics.delete(data, data.tacticId);
 				});
 			});
 			socket.on('fleet-tactics-assign', (data) => {
@@ -288,7 +283,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Tactics.assign(data.id, data.sid, data.fleetId, data.tacticId);
+					Tactics.assign(data, data.fleetId, data.tacticId);
 				});
 			});
 
