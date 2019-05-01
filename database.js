@@ -1,8 +1,8 @@
 const { Pool } = require('pg');
 let generalPool,
-	generalClient,
-	serverPool,
-	serverClient;
+	generalClient;
+global.serverPool;
+global.serverClient;
 
 function rollback() {
 	serverClient.query('ROLLBACK', (err) => {
@@ -98,8 +98,12 @@ module.exports = {
 	},
 
 	/**
-	 * PLAYERS
+	 * Game Server queries
 	 */
+	fleet: require('./database/fleet'),
+	player: require('./database/player'),
+	planet: require('./database/planet'),
+	unit: require('./database/unit'),
 	player: {
 		findAll: (callback) => {
 			serverClient.query('SELECT * FROM users', [], (err, objReturned) => {
@@ -514,6 +518,9 @@ module.exports = {
 		},
 	},
 
+	/**
+	 * General Server queries
+	 */
 	privilege: {
 		find: (id,callback) => {
 			generalClient.query('SELECT * FROM privileges WHERE user_id=$1 AND server_name=$2', [id, globalCfg.serverGlobalName], (err, obj) => {
