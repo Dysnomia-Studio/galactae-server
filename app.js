@@ -39,6 +39,7 @@ global.Planet    = require('./planet');
 global.Player    = require('./player');
 global.Research  = require('./research');
 global.Resources = require('./Resources').Resources;
+global.Tactics   = require('./tactics');
 global.Tutorials = require('./tutorials');
 global.Units     = require('./units');
 global.Unit     = require('./Unit').Unit;

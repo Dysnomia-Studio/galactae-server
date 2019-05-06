@@ -593,6 +593,11 @@ module.exports = function() {
 	};
 
 	/**
+	 * Tactics
+	 */
+	this.TACTIC_MAX_ORDERS = 50;
+
+	/**
 	 * Tutorials
 	 */
 	this.tutorialsList = [

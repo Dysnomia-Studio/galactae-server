@@ -43,6 +43,12 @@ module.exports = {
 			callback(obj.rows);
 		});
 	},
+	findByTactic: (tid,callback) => {
+		serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid], (err, obj) => {
+			if(err) { log(err, 'error'); return; }
+			callback(obj.rows);
+		});
+	},
 	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
@@ -72,6 +78,12 @@ module.exports = {
 	remove: (id) => {
 		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
 			if(err) { log(err, 'error'); return; }
+		});
+	},
+	assignFleet: (fid, tid, callback) => {
+		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
+			if(err) { log(err, 'error'); return; }
+			callback();
 		});
 	}
 };
