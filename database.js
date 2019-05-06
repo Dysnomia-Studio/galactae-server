@@ -4,12 +4,6 @@ let generalPool,
 global.serverPool;
 global.serverClient;
 
-function rollback() {
-	serverClient.query('ROLLBACK', (err) => {
-		if(err) { log(err, 'error'); return; }
-	});
-}
-
 module.exports = {
 	/**
 	 * Used to connect to database

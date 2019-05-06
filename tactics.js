@@ -21,7 +21,7 @@ module.exports = class Tactics {
 	static checkTactic(tactic, user) {
 		// Check variables types:
 		// Keep only "name": string, "id": string or null or undefined, owner: string or null or undefined, orders: array
-		for(const key of tactic) {
+		for(const key in tactic) {
 			switch(key) {
 				case 'name':
 					if(!isset(tactic[key],'string')) { return false; }
@@ -51,11 +51,10 @@ module.exports = class Tactics {
 		}
 
 		// Check orders content
-		for(const key in tactic.orders) {
-			const order = tactic.orders[key];
+		for(const order of tactic.orders) {
+			if(order.unit.includes('SHIP_WEP_MINES')) { return false; }
 
-			if((!!order.tactic_id && !isset(order.tactic, 'string')) ||
-				!isset(order.unit, 'string') ||
+			if( !isset(order.unit, 'string') ||
 				!isset(order.target, 'string') ||
 				!isset(order.priority, 'number')) { return false; }
 		}
@@ -111,10 +110,12 @@ module.exports = class Tactics {
 	static assign(user, fleetId, tacticId) {
 		Tactics.checkOwner(user.id, tacticId, () => {
 			Fleets.checkOwner(user.id, fleetId, () => {
-				db.fleets.assignFleet(fleetId, tacticId, () => {
+				if(tacticId === '-1') { tacticId = null; }
+
+				db.fleet.assignFleet(fleetId, tacticId, () => {
 					log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
 					Websocket.SendMessageToClient('TACTIC_ASSIGNED');
-					Fleets.refresh();
+					Fleets.refresh(user.pid, user.sid);
 				});
 			});
 		});

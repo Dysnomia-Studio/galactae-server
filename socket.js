@@ -279,7 +279,7 @@ module.exports = class Websocket {
 			});
 			socket.on('fleet-tactics-assign', (data) => {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.fleetId) || !isset(data.tacticId)) { return; }
+				if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.pid, 'string') || !isset(data.fleetId) || !isset(data.tacticId)) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity

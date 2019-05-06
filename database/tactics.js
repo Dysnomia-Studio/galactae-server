@@ -1,5 +1,16 @@
+function rollback() {
+	serverClient.query('ROLLBACK', (err) => {
+		if(err) { log(err, 'error'); return; }
+	});
+}
+
 module.exports = {
 	find: (tid, callback) => {
+		if(tid === '') {
+			callback();
+			return;
+		}
+
 		serverClient.query('SELECT * FROM tactics WHERE id=$1', [tid], (err, tacticListQuery) => {
 			if(err) { log(err, 'error'); return; }
 
@@ -41,6 +52,23 @@ module.exports = {
 			}
 		});
 	},
+	findByOwnerAndName: (tactic, callback) => {
+		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], (err, tacticListQuery) => {
+			if(err) { log(err, 'error'); return; }
+
+			if(tacticListQuery.rows.length === 0) {
+				callback();
+				return;
+			}
+
+			const tactic = tacticListQuery.rows[0];
+			db.tacticsOrders.findByTactic(tactic.id, (orders) => {
+				tactic.orders = orders;
+
+				callback(tactic);
+			});
+		});
+	},
 	upsert: (inputTactic, callback) => {
 		inputTactic.id = (inputTactic.id) ? inputTactic.id : '';
 
@@ -55,17 +83,17 @@ module.exports = {
 
 			db.tactics.find(inputTactic.id, (tactic) => {
 				if(!isset(tactic)) {
-					db.tactics.insert(tactic, () => {
-						db.tactics.findByOwnerAndName(tactic, (newTactic) => {
-							db.tacticsOrders.upsertAll(tactic.orders, newTactic.id, innerCallback);
+					db.tactics.insert(inputTactic, () => {
+						db.tactics.findByOwnerAndName(inputTactic, (newTactic) => {
+							db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
 						});
 					});
 				} else if(tactic.name !== inputTactic.name) {
-					db.tactics.updateName(tactic, () => db.tacticsOrders.upsertAll(tactic.orders, tactic.id, () => {
-						db.tacticsOrders.upsertAll(tactic.orders, tactic.id, innerCallback);
-					}));
+					db.tactics.updateName(inputTactic, () =>
+						db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback)
+					);
 				} else {
-					db.tacticsOrders.upsertAll(tactic.orders, tactic.id, innerCallback);
+					db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback);
 				}
 			});
 		});
