@@ -179,7 +179,7 @@
 		 * @return     {string}  The requirements.
 		 */
 		static GetRequirements(user, planet, id) {
-			if(planetData.Buildings[id] > 0) { return ''; }
+			if(planet.Buildings[id] > 0) { return ''; }
 			if(buildingParents[id] === undefined) { return ''; }
 
 			let requirements = '';
