@@ -1,0 +1,53 @@
+function rollback() {
+	serverClient.query('ROLLBACK', (err) => {
+		if(err) { log(err, 'error'); return; }
+	});
+}
+
+module.exports = {
+	find: (tid, unit, target, callback) => {
+		serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1 AND unit=$2 AND target=$3', [tid, unit, target], (err, tacticOrdersQuery) => {
+			if(err) { log(err, 'error'); return; }
+
+			callback(tacticOrdersQuery.rows);
+		});
+	},
+	findByTactic: (id, callback) => {
+		serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1', [id], (err, tacticOrdersQuery) => {
+			if(err) { log(err, 'error'); return; }
+
+			callback(tacticOrdersQuery.rows);
+		});
+	},
+	upsertAll: (orders, tid, callback) => {
+		db.tacticsOrders.delete(tid, () => {
+			let done = 0;
+
+			for(const order of orders) {
+				order.tactic_id = tid;
+
+				db.tacticsOrders.insert(order, () => {
+
+					done++;
+					if(orders.length === done) {
+						callback();
+					}
+				});
+			}
+		});
+	},
+	insert: (order, callback) => {
+		serverClient.query('INSERT INTO tactics_orders (tactic_id, unit, target, priority) VALUES ($1, $2, $3, $4)', [order.tactic_id, order.unit, order.target, order.priority], (err) => {
+			if(err) { log(err, 'error'); rollback(); return; }
+
+			callback();
+		});
+	},
+	delete: (tid, callback) => {
+		serverClient.query('DELETE FROM tactics_orders WHERE tactic_id=$1', [tid], (err) => {
+			if(err) { log(err, 'error'); rollback(); return; }
+
+			callback();
+		});
+	}
+};

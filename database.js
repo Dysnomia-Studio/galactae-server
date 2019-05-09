@@ -98,10 +98,13 @@ module.exports = {
 	player: require('./database/player'),
 	planet: require('./database/planet'),
 	unit: require('./database/unit'),
+	tactics: require('./database/tactics'),
+	tacticsOrders: require('./database/tacticsOrders'),
+
 	stat: {
 		submit: (currTime) => {
 			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, plCount], (err) => {
-				if(err) { log(err, 'error'); }
+				if(err) { log(err, 'error'); return; }
 			});
 		},
 	},

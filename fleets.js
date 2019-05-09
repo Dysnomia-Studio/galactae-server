@@ -72,6 +72,19 @@ module.exports = class Fleets {
 		});
 	}
 
+	static checkOwner(uid, fleetId, callback) {
+		if(fleetId === '-1') {
+			callback();
+			return;
+		}
+
+		db.fleet.find(fleetId, (obj) => {
+			if(obj.ownerId === uid) {
+				callback();
+			}
+		});
+	}
+
 	static recalcFuel(fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
