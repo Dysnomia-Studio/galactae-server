@@ -192,36 +192,36 @@ module.exports = class Planet {
 		return resources;
 	}
 
-	static checkIfCanBuild(planet, cost, building) {
+	static checkIfCanBuild(planet, user, cost, building, currTime) {
 		let BlockBuild = false;
 		let errormsg = '';
 
 		// Cost verif
-		if(cost.iron>newData.resources[2] || cost.aluminium>newData.resources[3] || cost.copper>newData.resources[4] || cost.titanium>newData.resources[5] ) {
+		if(cost.iron>planet.resources[2] || cost.aluminium>planet.resources[3] || cost.copper>planet.resources[4] || cost.titanium>planet.resources[5] ) {
 			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_COST';
 		}
 		// Un bâtiment est déja en construction ?
-		if(newData.nextBuildingTime > currTime) {
+		if(planet.nextBuildingTime > currTime) {
 			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_ALREADY';
 		}
 		// Niveau maximum ?
-		if(newData.Buildings[data.building]>buildingMaxLvl[data.building]) {
+		if(planet.Buildings[building]>buildingMaxLvl[building]) {
 			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_MAXIMUM';
 		}
 		// Les requirements ?
-		if(!Buildings.HasRequirements(userReturned, newData, data.building)) {
+		if(!Buildings.HasRequirements(user, planet, building)) {
 			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 		}
 
-		newData.Buildings[data.building]++; // Only for calcs
+		planet.Buildings[building]++; // Only for calcs
 
 		// Energie ? Habitants ?
 		if(!BlockBuild) {
-			if(!Buildings.enoughEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
+			if(!Buildings.enoughEnergy(planet.Buildings) && building<=globalConst.groundBuildingNumber && building!==4) { // Only ground buildings affected by this
 				BlockBuild = true;
 				errormsg = 'BUILDING_ERROR_ENERGY';
 			}
@@ -257,7 +257,7 @@ module.exports = class Planet {
 
 			// Vars for this building tes
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
-			let errormsg = checkIfCanBuild(newData, cost, data.building);
+			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
 			if(errormsg !== '') { // We just update ressources
 				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
@@ -270,7 +270,7 @@ module.exports = class Planet {
 				}
 				newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 
-				if(errormsg !== '') {
+				if(errormsg === '') {
 					// Research bonus
 					if(Research.isSearched(userReturned,'cp_mecanisation')) {
 						timeSpeed += researchBonus.cp_mecanisation;
