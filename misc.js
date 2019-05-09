@@ -128,57 +128,57 @@ module.exports = function() {
 	  * @param	  {anything}  variable  The variable needs to be tested
 	  * @return	 {boolean}   True if the variable is set, False otherwise
 	  */
-    this.isset = function(variable, type='') {
-        let array = (type === 'array');
-        if(array) { type = 'object'; }
+	this.isset = function(variable, type='') {
+		let array = (type === 'array');
+		if(array) { type = 'object'; }
 
-        if(variable === null ||
-            typeof variable === 'undefined') {
-            return false;
-        }
+		if(variable === null ||
+			typeof variable === 'undefined') {
+			return false;
+		}
 
-        if(type !== '' && typeof variable !== type) {
-            return false;
-        }
+		if(type !== '' && typeof variable !== type) {
+			return false;
+		}
 
-        if(type === '') {
+		if(type === '') {
 			type = typeof variable;
 			array = Array.isArray(variable);
-        }
+		}
 
-        if(type === 'string') {
-            return variable.split(' ').join('') !== '';
+		if(type === 'string') {
+			return variable.split(' ').join('') !== '';
 
-        } else if(type === 'number') {
-            // Do nothing
+		} else if(type === 'number') {
+			// Do nothing
 
-        } else if(type === 'object') {
-            if(array && (!Array.isArray(variable) || variable.length === 0)) { 
-                return false;
-            } else if(!array && Array.isArray(variable)) {
-                return false;
-            } else if(!array) {
-                let empty = true;
-                for(const key in variable) {
-                    if(variable.hasOwnProperty(key)) {
-                        empty = false;
-                    }
-                }
+		} else if(type === 'object') {
+			if(array && (!Array.isArray(variable) || variable.length === 0)) {
+				return false;
+			} else if(!array && Array.isArray(variable)) {
+				return false;
+			} else if(!array) {
+				let empty = true;
+				for(const key in variable) {
+					if(variable.hasOwnProperty(key)) {
+						empty = false;
+					}
+				}
 
-                if(empty) {
-                    return false;
-                }
-            }
+				if(empty) {
+					return false;
+				}
+			}
 
-        } else if(type === 'boolean') {
-            // Do nothing
+		} else if(type === 'boolean') {
+			// Do nothing
 
-        } /*else if(type === 'symbol') {
+		} /*else if(type === 'symbol') {
 
-        }*/
+		}*/
 
-        return true;
-    };
+		return true;
+	};
 
 	/**
 	 * Normalize a text to be compatible with sockets
@@ -242,16 +242,16 @@ module.exports = function() {
 		}
 
 		switch(unit) {
-		case 'd': // Days
-			return TIME.DAY_TO_MS*count;
-		case 'h': // Hour
-			return TIME.HOUR_TO_MS*count;
-		case 'm': // Minutes
-			return TIME.MINUTES_TO_MS*count;
-		case 's': // Seconds
-			return TIME.SECONDS_TO_MS*count;
-		default: // Wrong unit
-			return -1;
+			case 'd': // Days
+				return TIME.DAY_TO_MS*count;
+			case 'h': // Hour
+				return TIME.HOUR_TO_MS*count;
+			case 'm': // Minutes
+				return TIME.MINUTES_TO_MS*count;
+			case 's': // Seconds
+				return TIME.SECONDS_TO_MS*count;
+			default: // Wrong unit
+				return -1;
 		}
 	};
 };

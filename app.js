@@ -37,6 +37,7 @@ global.Fleets 	 = require('./fleets');
 global.GameMap   = require('./GameMap').GameMap;
 global.Planet    = require('./planet');
 global.Player    = require('./player');
+global.Privileges = require('./privileges');
 global.Research  = require('./research');
 global.Resources = require('./Resources').Resources;
 global.Tactics   = require('./tactics');
@@ -106,6 +107,6 @@ if(!globalCfg.dev) {
 	 * Graceful stop
 	 */
 	process.on('SIGINT', function() {
-	    Websocket.restart();
+		Websocket.restart();
 	});
 }
