@@ -46,15 +46,24 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(inputData,decalage=0) {
-		Planet.find(inputData,inputData.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-			const newPlanet = Planet.update(planetReturned,userReturned,fleetReturned);
+	static refresh(inputData) {
+		db.player.searchById(inputData.id, (userReturned) => {
+			db.planet.findByOwner(inputData.id, (planetsReturned) => {
+				for(const currPlanet of planetsReturned) {
+					db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
+						const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
 
-			db.planet.update(newPlanet);
+						db.planet.update(newPlanet);
 
-			Fleets.refresh(newPlanet.id,inputData.sid);
+						Fleets.refresh(newPlanet.id,inputData.sid);
 
-			Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						if(inputData.pid === currPlanet.address) {
+							Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						}
+					});
+
+				}
+			});
 		});
 	}
 

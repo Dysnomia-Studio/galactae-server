@@ -66,30 +66,11 @@ module.exports = class Websocket {
 			*/
 			socket.on('planet-ask-data', function(data) {
 				// Vars
-				if(!isset(data, 'object')) { return; }
+				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string') || !isset(data.pid, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,0);
-				});
-			});
-			// Next/Prev planet
-			socket.on('planet-ask-data-prev', function(data) {
-				// Vars
-				if(!isset(data, 'object')) { return; }
-				// User
-				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,-1);
-				});
-			});
-			socket.on('planet-ask-data-next', function(data) {
-				// Vars
-				if(!isset(data, 'object')) { return; }
-				// User
-				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,1);
+					Planet.refresh(data);
 				});
 			});
 
