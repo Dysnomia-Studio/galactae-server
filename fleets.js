@@ -21,7 +21,7 @@ module.exports = class Fleets {
 						resources: newPlanet.resources,
 					});
 
-					Planet.sendPlanetDataToUser({data: {name: newPlanet.name}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
 				}
 
 				io.to(sid).emit('fleet-recieve-data', FleetList);

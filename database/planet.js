@@ -7,6 +7,14 @@ module.exports = {
 			}
 		});
 	},
+	findByOwner: (userId, callback) => {
+		serverClient.query('SELECT * FROM planets WHERE owner = $1', [userId], (err, planetReturned) => {
+			if(err) { log(err, 'error'); return; }
+			if(isset(planetReturned, 'object')) {
+				callback(planetReturned.rows);
+			}
+		});
+	},
 	update: (inputPlanet, callback) => {
 		const planet = Object.assign({}, inputPlanet);
 		const id = planet.id;
