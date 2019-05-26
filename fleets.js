@@ -14,14 +14,16 @@ module.exports = class Fleets {
 		db.fleet.findByMotherPlanet(pid, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			function sendtoPlayer(FleetList, newPlanet, sid) {
+			function sendtoPlayer(FleetList, newPlanet, sid, pid) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
 						id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
-					Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					if(newPlanet.address === pid) {
+						Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					}
 				}
 
 				io.to(sid).emit('fleet-recieve-data', FleetList);
@@ -29,7 +31,7 @@ module.exports = class Fleets {
 
 			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
 				if(!newPlanet || !newPlanet.unitBuildingFleetID) {
-					sendtoPlayer(FleetList, newPlanet, sid);
+					sendtoPlayer(FleetList, newPlanet, sid, pid);
 					return;
 				}
 
@@ -60,13 +62,13 @@ module.exports = class Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							sendtoPlayer(FleetList, newPlanet, sid);
+							sendtoPlayer(FleetList, newPlanet, sid, pid);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					sendtoPlayer(FleetList, newPlanet, sid);
+					sendtoPlayer(FleetList, newPlanet, sid, pid);
 				}
 			});
 		});
