@@ -139,7 +139,7 @@ module.exports = class Planet {
 		}
 
 		//Metals
-		if(currentBuilding !== -1) {
+		if(currentBuilding !== 1) {
 			if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
 				for(let i=2; i<6; i++) {
 					resources[i] += (metalProdBase*time)*ratios[i-2];
