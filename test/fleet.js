@@ -1,7 +1,7 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
@@ -14,30 +14,28 @@ global.db = require('../database');
 
 global.Fleet = require('../Fleet').Fleet;
 
-console.log(require('../Fleet'));
-
 describe('• Fleet', function() {
 	describe('# getSpeed()', function() {
 		it('One Ion', function() {
-			assert.deepEqual(Fleet.getSpeed([-1], "ion"),
+			assert.deepEqual(Fleet.getSpeed([-1], 'ion'),
 				shipPartsSpeed['ion']
 			);
 		});
 
 		it('Two Ion', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['ion']) {
+			const expected = [];
+			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
 			}
 			assert.deepEqual(Fleet.getSpeed(
 				shipPartsSpeed['ion'],
-				"ion"),
+				'ion'),
 				expected
 			);
 		});
 
 		it('Part not existing', function() {
-			assert.deepEqual(Fleet.getSpeed([-1],"invalid"),
+			assert.deepEqual(Fleet.getSpeed([-1],'invalid'),
 				[]
 			);
 		});
@@ -47,8 +45,8 @@ describe('• Fleet', function() {
 		it('One Ion', function() {
 			assert.deepEqual(Fleet.calcSubSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
 					],
 				}).speed,
 				shipPartsSpeed['ion']
@@ -56,15 +54,15 @@ describe('• Fleet', function() {
 		});
 
 		it('Two Ion', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['ion']) {
+			const expected = [];
+			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
 			}
 			assert.deepEqual(Fleet.calcSubSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_1" },
-						{ tech: "ion", type: "sub_propulsion", name: "prop_2" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
+						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_2' },
 					],
 				}).speed,
 				expected
@@ -74,8 +72,8 @@ describe('• Fleet', function() {
 		it('Part not existing', function() {
 			assert.deepEqual(Fleet.calcSubSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "myFalsePropulsion", type: "sub_propulsion", name: "prop_1" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'myFalsePropulsion', type: 'sub_propulsion', name: 'prop_1' },
 					],
 				}),
 				{ speed: [] }
@@ -87,8 +85,8 @@ describe('• Fleet', function() {
 		it('One vsl', function() {
 			assert.deepEqual(Fleet.calcSupraSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
 					],
 				}).speed,
 				shipPartsSpeed['vsl']
@@ -96,15 +94,15 @@ describe('• Fleet', function() {
 		});
 
 		it('Two vsl', function() {
-			let expected = [];
-			for(var i in shipPartsSpeed['vsl']) {
+			const expected = [];
+			for(const i in shipPartsSpeed['vsl']) {
 				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
 			}
 			assert.deepEqual(Fleet.calcSupraSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_1" },
-						{ tech: "vsl", type: "sup_propulsion", name: "prop_2" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
+						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_2' },
 					],
 				}).speed,
 				expected
@@ -114,8 +112,8 @@ describe('• Fleet', function() {
 		it('Part not existing', function() {
 			assert.deepEqual(Fleet.calcSupraSpeed({
 					parts: [
-						{ tech: "railgun", type: "cannon", name: "cannon_1" },
-						{ tech: "myFalsePropulsion", type: "sup_propulsion", name: "prop_1" },
+						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+						{ tech: 'myFalsePropulsion', type: 'sup_propulsion', name: 'prop_1' },
 					],
 				}),
 				{ speed: [] }
@@ -128,10 +126,10 @@ describe('• Fleet', function() {
  	 */
 	describe('# calcFuelCost()', function() {
 		it('Sub', function() {
-			let engines = {
-				"vsolaire": 1, // 0
-				"ion": 2, // 21364
-				"pplasma": 3, // 21732
+			const engines = {
+				'vsolaire': 1, // 0
+				'ion': 2, // 21364
+				'pplasma': 3, // 21732
 			};
 
 			assert.equal(
@@ -141,10 +139,10 @@ describe('• Fleet', function() {
 		});
 
 		it('Supra', function() {
-			let engines = {
-				"vsl": 1, // 32761
-				"wd": 2, // 58024
-				"hyperespace": 3, // 76476
+			const engines = {
+				'vsl': 1, // 32761
+				'wd': 2, // 58024
+				'hyperespace': 3, // 76476
 			};
 
 			assert.equal(
@@ -159,8 +157,8 @@ describe('• Fleet', function() {
  	 */
 	describe('# slowerSpeed()', function() {
 		it('A slower than B', function() {
-			let a = [1,2,3];
-			let b = [3,2,1];
+			const a = [1,2,3];
+			const b = [3,2,1];
 
 			assert.equal(
 				Fleet.slowerSpeed(a, b),
@@ -169,8 +167,8 @@ describe('• Fleet', function() {
 		});
 
 		it('A equals to B', function() {
-			let a = [1,2,3];
-			let b = [1,2,3];
+			const a = [1,2,3];
+			const b = [1,2,3];
 
 			assert.equal(
 				Fleet.slowerSpeed(a, b),
@@ -179,9 +177,9 @@ describe('• Fleet', function() {
 		});
 
 		it('A faster than B', function() {
-			let a = [3,2,1];
-			let b = [1,2,3];
-			
+			const a = [3,2,1];
+			const b = [1,2,3];
+
 			assert.equal(
 				Fleet.slowerSpeed(a, b),
 				b
@@ -212,5 +210,4 @@ describe('• Fleet', function() {
 			);
 		});
 	});
-
-});	
+});
