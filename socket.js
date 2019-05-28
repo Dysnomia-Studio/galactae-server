@@ -132,7 +132,7 @@ module.exports = class Websocket {
 			// Units
 			socket.on('unit-type-create', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.ship, 'string') || !isset(data.username, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.ship, 'object') || !isset(data.username, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
