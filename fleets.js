@@ -202,8 +202,12 @@ module.exports = class Fleets {
 		});
 	}
 
-	static moveTo(user, fleetId, destination) {
+	static moveTo(user, fleetId, destination, moveType) {
 		const now = Date.now();
+
+		moveType = Math.round(moveType);
+		if(moveType < 0 || moveType > 3) { return; }
+		if(moveType === 3) { return; } // @TODO: remove this when adding spying
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
@@ -316,7 +320,7 @@ module.exports = class Fleets {
 
 							fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
 							fleetReturned.position = destination;
-							fleetReturned.orbitPosition = 2;
+							fleetReturned.orbitPosition = moveType;
 							if(destination === fleetReturned.motherPlanetAddress) {
 								fleetReturned.orbitPosition = 0;
 							}

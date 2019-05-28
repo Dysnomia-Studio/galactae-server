@@ -159,7 +159,7 @@ module.exports = class Websocket {
 			});
 			socket.on('unit-build', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.unit, 'string') || !isset(data.count, 'number') || !isset(data.fleet, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.unit, 'string') || !isset(data.count, 'number') || !isset(data.fleet)) { return; }
 				// User
 				data.sid = socket.id;
 
@@ -191,12 +191,12 @@ module.exports = class Websocket {
 			});
 			socket.on('fleet-move', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.fleetId, 'string') || !isset(data.destination, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.fleetId, 'string') || !isset(data.destination, 'string') || !isset(data.moveType, 'number')) { return; }
 				// User
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-					Fleets.moveTo(data, data.fleetId, data.destination);
+					Fleets.moveTo(data, data.fleetId, data.destination, data.moveType);
 				});
 			});
 			socket.on('fleet-rename', function(data) {

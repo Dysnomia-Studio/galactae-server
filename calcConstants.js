@@ -250,6 +250,12 @@ module.exports = function() {
 	/**
 	 * Units
 	 */
+	this.specialUnitsUID = {
+		SHIP_WEP_MINES: '00000000-0000-0000-0000-000000000001',
+		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
+		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003'
+	};
+
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
 		// Satelites shapes

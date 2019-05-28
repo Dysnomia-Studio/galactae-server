@@ -336,9 +336,11 @@ module.exports = class Planet {
 		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
 			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
 
-			const id = (newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':newPlanet.unitBuildingID;
-			db.unit.find(id, function(unitReturned) {
-				if(newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
+			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
+				const key = Object.keys(specialUnitsUID).find(key => specialUnitsUID[key] === newPlanet.unitBuildingID);
+				if(key !== undefined) {
+					newPlanet.unitBuildingID = key;
+
 					unitReturned = {};
 					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
