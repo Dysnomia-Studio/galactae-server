@@ -13,12 +13,19 @@ module.exports = function() {
 	};
 	this.TIME = {
 		DAY_TO_HOUR: 24,
+		DAY_TO_MINUTES: 24*60,
+		DAY_TO_SECONDS: 24*60*60,
 		DAY_TO_MS: 24*60*60*1000,
+
 		HOUR_TO_MINUTES: 60,
+		HOUR_TO_SECONDS: 60*60,
 		HOUR_TO_MS: 60*60*1000,
+
 		MINUTES_TO_SECONDS: 60,
 		MINUTES_TO_MS: 60*1000,
+
 		SECONDS_TO_MS: 1000,
+
 		SECOND_MARGIN: 5,
 	};
 	/**
@@ -243,6 +250,12 @@ module.exports = function() {
 	/**
 	 * Units
 	 */
+	this.specialUnitsUID = {
+		SHIP_WEP_MINES: '00000000-0000-0000-0000-000000000001',
+		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
+		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003'
+	};
+
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
 		// Satelites shapes
@@ -586,6 +599,11 @@ module.exports = function() {
 	};
 
 	/**
+	 * Tactics
+	 */
+	this.TACTIC_MAX_ORDERS = 50;
+
+	/**
 	 * Tutorials
 	 */
 	this.tutorialsList = [
@@ -594,16 +612,170 @@ module.exports = function() {
 		'inhabitants',
 		'resources',
 		'research',
-		'units',
+		'unitsCreate',
+		'unitsBuild',
 		// 'buyAndSell',
 		'interplanetaryFlight',
 		'interstellarFlight',
-		'spy',
+		//'spy',
 		'battle',
 		// 'joinAlly',
 		// 'quests',
 		// 'secondPlanet',
 	];
+	this.tutorialsDependancies = {
+		'welcome': [],
+		'energy':
+			[{
+				type: 'tutorial',
+				tutorial: 'welcome',
+			}],
+		'inhabitants':
+			[{
+				type: 'tutorial',
+				tutorial: 'energy',
+			}],
+		'resources':
+			[{
+				type: 'tutorial',
+				tutorial: 'inhabitants',
+			}],
+		'research':
+			[{
+				type: 'tutorial',
+				tutorial: 'resources',
+			}],
+		'unitsCreate':[
+			{
+				type: 'oneOfManyResearch',
+				researchList: [
+					'figther_light_interceptor',
+					'figther_heavy_interceptor',
+					'figther_bomber',
+
+					'battlecruiser_small',
+					'cuirasse_small',
+
+					'corvet_small',
+
+					'carrier_small',
+					'carrier_medium',
+
+					'wep_sat_ag1',
+					'wep_sat_ag2',
+					'wep_sat_ag3',
+				]
+			}
+		],
+		'unitsBuild':
+			[{ //@TODO: prendre en compte les mines
+				type: 'tutorial',
+				tutorial: 'unitsCreate',
+			}],
+		// 'buyAndSell':[],
+		'interplanetaryFlight':[
+			{
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			},
+			{
+				type: 'oneOfManyResearch',
+				researchList: [
+					'prop_vSolaire',
+					'prop_ions',
+				]
+			}
+		],
+		'interstellarFlight':[
+			{
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			},
+			{
+				type: 'research',
+				research: 'prop_vsl',
+			}
+		],
+		/*'spy':
+			[{ //@TODO: prendre en compte corvette
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			}],*/
+		'battle':
+			[{
+				type: 'tutorial',
+				tutorial: 'interplanetaryFlight',
+			}],
+		// 'joinAlly':[],
+		// 'quests':[],
+		// 'secondPlanet':[],
+	};
+	this.tutorialObjectives ={
+		'welcome': [],
+		'energy':
+		[{
+			type: 'building',
+			building: 4,
+			level: 2,
+		}],
+		'inhabitants':
+		[{
+			type: 'building',
+			building: 2,
+			level: 2,
+		},{
+			type: 'building',
+			building: 3,
+			level: 2,
+		}],
+		'resources':
+		[{
+			type: 'building',
+			building: 0,
+			level: 2,
+		},{
+			type: 'building',
+			building: 1,
+			level: 2,
+		}],
+		'research':
+		[{
+			type: 'oneOfManyResearch',
+			researchList: [
+				'thermodynamique',
+				'phyContemporaine',
+				'industrialistion',
+			]
+		}],
+		'unitsCreate': [{
+			type: 'unitModel',
+			count: 1,
+		}],
+		'unitsBuild': [{
+			type: 'unitBuild',
+			count: 5,
+		}],
+		// 'buyAndSell': [],
+		'interplanetaryFlight': [{
+			type: 'move',
+			moveType: 'move',
+			location: 'all',
+		}],
+		'interstellarFlight': [{
+			type: 'move',
+			moveType: 'move',
+			location: 'outerSystem',
+		}],
+		//'spy': [],
+		'battle': [{
+			type: 'move',
+			moveType: 'attack',
+			location: 'all',
+		}],
+		// 'joinAlly': [],
+		// 'quests': [],
+		// 'secondPlanet': [],
+	};
 
 	/**
 	 * Char filters

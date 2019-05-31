@@ -28,7 +28,7 @@ module.exports = class Combat {
 	 * @param      {Fleet}   fleet   Fleet details
 	 */
 	joinTeam(team, fleet) {
-		if(fleet._id === undefined) {
+		if(!isset(fleet, 'object')) {
 			log('Fleet object misbuilded !','error');
 			return;
 		}
@@ -83,7 +83,7 @@ module.exports = class Combat {
 		}
 
 		function done(unit) {
-			this.unitCache[unit._id] = unit;
+			this.unitCache[unit.id] = unit;
 
 			if(unitIdList.size <= this.unitCache.length) {
 				callback();

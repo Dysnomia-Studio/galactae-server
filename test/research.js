@@ -12,27 +12,6 @@ let Research = require('../research');
 
 describe('• Research', function() {
 	/**
-	 * getResearch
-	 */
-	describe('# getResearch()', function() {
-
-		it('Get research (not found)', function() {
-			assert.equal(
-				Research.getResearch({ research: [ ["test", 1]] }, "test1"),
-				0
-			);
-		});
-		it('Get research (found)', function() {
-			assert.equal(
-				Research.getResearch({ research: [ ["test", 1]] }, "test"),
-				1
-			);
-		});
-
-
-	});
-
-	/**
 	 * getResearchProduction
 	 */
 	describe('# getResearchProduction()', function() {

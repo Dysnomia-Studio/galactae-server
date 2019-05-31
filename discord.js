@@ -18,15 +18,15 @@ module.exports = {
 		});
 
 		client.on('message', function(message) {
-			if(message.author.id===463990941473177600) { return; }
+			if(message.author.id === '463990941473177600') { return; }
 			if(message.channel.name.substr(0,globalCfg.serverName.length)===globalCfg.serverName) { // If it's a message for this server then send it to chat
-				let msg = message.cleanContent;
+				const msg = message.cleanContent;
 				if(msg!==msg.replace('http','')) { return; }
 				if(msg.length===0) { return; }
 
-				let channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
+				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
-				let data = {};
+				const data = {};
 				data.channel = channel;
 				data.username = '[Discord] <span class="username no-pm">' + message.author.username + ': </span>';
 				data.message = '<strong>'+ data.username +' :</strong> '+ msg;
@@ -51,7 +51,7 @@ module.exports = {
 	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
-		let channel = client.channels.find('name',channelName);
+		const channel = client.channels.find('name',channelName);
 		channel.send(unNormalizeText(message));
 	},
 	/**
@@ -60,8 +60,8 @@ module.exports = {
 	 * @param      {string}  message  The message
 	 */
 	alert: function(message) {
-		let channelName = globalCfg.serverName + '-global';
-		let channel = client.channels.find('name',channelName);
+		const channelName = globalCfg.serverName + '-global';
+		const channel = client.channels.find('name',channelName);
 		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
 	},
 };

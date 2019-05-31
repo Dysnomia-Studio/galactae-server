@@ -9,15 +9,15 @@ module.exports = class Planet {
 	 */
 	static find(user,pid,decalage,callback) {
 		db.player.searchById(user.id, function(userReturned) {
-			if(isset(userReturned) && isset(userReturned.planetlist) && isset(userReturned.planetlist[0])) {
-				let longueur = userReturned.planetlist.length;
+			if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
+				const nbPlanetes = userReturned.planetlist.length;
 				let valid = false;
 
-				for(let i=0; i<longueur; i++) {
+				for(let i=0; i<nbPlanetes; i++) {
 					if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
 						if(i===0 && decalage < 0) {
-							pid = userReturned.planetlist[longueur+decalage];
-						} else if(i>=(longueur-decalage) && decalage > 0) {
+							pid = userReturned.planetlist[nbPlanetes+decalage];
+						} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
 							pid = userReturned.planetlist[decalage-1];
 						} else {
 							pid = userReturned.planetlist[i+decalage];
@@ -32,7 +32,7 @@ module.exports = class Planet {
 					pid = userReturned.planetlist[0];
 				}
 				db.planet.find(pid,function(planetReturned) {
-					db.fleet.findByMotherPlanet(planetReturned._id, function(fleetReturned) {
+					db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
 						callback(planetReturned,userReturned,fleetReturned);
 					});
 				});
@@ -46,24 +46,53 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(data,decalage=0) {
-		Planet.find(data,data.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-			let newData = Planet.update(planetReturned,userReturned,fleetReturned);
+	static refresh(inputData, callback) {
+		db.player.searchById(inputData.id, (userReturned) => {
+			db.planet.findByOwner(inputData.id, (planetsReturned) => {
+				for(const currPlanet of planetsReturned) {
+					db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
+						const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
 
-			db.planet.update(newData);
+						db.planet.update(newPlanet);
 
-			Fleets.refresh(newData._id,data.sid);
+						Fleets.refresh(newPlanet.id,inputData.sid);
 
-			Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
+						if(inputData.pid === currPlanet.address) {
+							Tutorials.checkTutorials(userReturned, currPlanet);
+
+							if(!Tutorials.hasFinishedTutorials(userReturned)) {
+								const newUser = Tutorials.updateTutorialList(userReturned, newPlanet);
+
+								if(Object.keys(newUser.tutorials).length !== Object.keys(userReturned.tutorials).length) {
+									userReturned = newUser;
+
+									db.player.update({
+										id: userReturned.id,
+										tutorials: userReturned.tutorials
+									});
+								}
+							}
+
+							if(callback) {
+								callback(newPlanet);
+							} else {
+								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+							}
+
+
+						}
+					});
+				}
+			});
 		});
 	}
 
-	static getWholeSystem(data) {
-		db.planet.findBySystemWithOwners(data.systemAddress, function(planetList) {
-			let retour = {};
+	static getWholeSystem(inputData) {
+		db.planet.findBySystemWithOwners(inputData.systemAddress, function(planetList) {
+			const retour = {};
 
 			for(let i=0; i<planetList.length; i++) {
-				let p = planetList[i];
+				const p = planetList[i];
 
 				retour[p.address] = {
 					name: p.name,
@@ -77,9 +106,9 @@ module.exports = class Planet {
 				};
 			}
 
-			retour.systemAddress = data.systemAddress;
+			retour.systemAddress = inputData.systemAddress;
 
-			io.to(data.sid).emit('map-recieve-data', retour);
+			io.to(inputData.sid).emit('map-recieve-data', retour);
 		});
 	}
 
@@ -110,37 +139,40 @@ module.exports = class Planet {
 	static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
 		time = time/3600/1000; // Passage en heures
 
-		let ratio = Resources.GetRatiosPerPlanet(planetType);
-		let ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
+		const ratio = Resources.GetRatiosPerPlanet(planetType);
+		const ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
 
-		let mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
-		let metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
-		let heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
+		const mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
+		const metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
+		const heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
 
-		let mineralStorageBase, metalsStorageBase, storageHelium;
-		[ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
+		const [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
 
 		//Minerals
-		if(currentBuilding!==0) {
+		if(currentBuilding !== 0) {
 			resources[0] += mineralProdBase*time;
 		}
 
 		//Helium 3
-		if(buildings[13]!==0 && currentBuilding!==13) { resources[1] += heliumProdBase*time; }
+		if(buildings[13] !== 0 && currentBuilding !== 13) {
+			resources[1] += heliumProdBase*time;
+		}
 
 		//Metals
-		if(resources[0]-(metalProdBase*time)>0 && currentBuilding!==1) { //Verify if you can use basic ressources
-			for(let i=2; i<6; i++) {
-				resources[i] += (metalProdBase*time)*ratios[i-2];
-			}
+		if(currentBuilding !== 1) {
+			if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
+				for(let i=2; i<6; i++) {
+					resources[i] += (metalProdBase*time)*ratios[i-2];
+				}
 
-			resources[0] -= (metalProdBase*time); //Consomation Algorithm
-		} else if(currentBuilding!==1) { // Do the max we can
-			for(let i=2; i<6; i++) {
-				resources[i] += resources[0]*ratios[i-2];
-			}
+				resources[0] -= (metalProdBase*time); //Consomation Algorithm
+			} else { // Do the max we can
+				for(let i=2; i<6; i++) {
+					resources[i] += resources[0]*ratios[i-2];
+				}
 
-			resources[0] = 0;
+				resources[0] = 0;
+			}
 		}
 
 		// Si Max de tout les metaux
@@ -152,13 +184,14 @@ module.exports = class Planet {
 			let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
 
 			for(let i=3; i<6; i++) {
-				let temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
+				const temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
 
 				if(temp<min) {
 					min = temp;
 				}
 			}
 			resources[0]+=min;
+
 			for(let i=2; i<6; i++) {
 				resources[i] -= min*ratios[i-2];
 			}
@@ -168,16 +201,62 @@ module.exports = class Planet {
 		if(resources[0]>mineralStorageBase) {
 			resources[0] = mineralStorageBase;
 		}
+
 		if(resources[1]>storageHelium) {
 			resources[1] = storageHelium;
 		}
+
+		// On detruit tout ce qui est > au max
 		for(let i=2; i<6; i++) {
-			if(resources[i]>metalsStorageBase*ratios[i-2]) { // You can't have more iron than your storage capacity
+			if(resources[i]>metalsStorageBase*ratios[i-2]) {
 				resources[i] = metalsStorageBase*ratios[i-2];
 			}
 		}
 
+		// Arrondi
+		for(let i=0; i<resources.length; i++) {
+			resources[i] = Math.round(resources[i] * 1000)/1000;
+		}
+
 		return resources;
+	}
+
+	static checkIfCanBuild(planet, user, cost, building, currTime) {
+		let BlockBuild = false;
+		let errormsg = '';
+
+		// Cost verif
+		if(cost.iron>planet.resources[2] || cost.aluminium>planet.resources[3] || cost.copper>planet.resources[4] || cost.titanium>planet.resources[5] ) {
+			BlockBuild = true;
+			errormsg = 'BUILDING_ERROR_COST';
+		}
+		// Un bâtiment est déja en construction ?
+		if(planet.nextBuildingTime > currTime) {
+			BlockBuild = true;
+			errormsg = 'BUILDING_ERROR_ALREADY';
+		}
+		// Niveau maximum ?
+		if(planet.Buildings[building]>buildingMaxLvl[building]) {
+			BlockBuild = true;
+			errormsg = 'BUILDING_ERROR_MAXIMUM';
+		}
+		// Les requirements ?
+		if(!Buildings.HasRequirements(user, planet, building)) {
+			BlockBuild = true;
+			errormsg = 'BUILDING_ERROR_DEPENDENCIES';
+		}
+
+		planet.Buildings[building]++; // Only for calcs
+
+		// Energie ? Habitants ?
+		if(!BlockBuild) {
+			if(!Buildings.enoughEnergy(planet.Buildings) && building<=globalConst.groundBuildingNumber && building!==4) { // Only ground buildings affected by this
+				BlockBuild = true;
+				errormsg = 'BUILDING_ERROR_ENERGY';
+			}
+		}
+
+		return errormsg;
 	}
 
 	/**
@@ -188,10 +267,10 @@ module.exports = class Planet {
 	 */
 	static build(data) {
 		// Mauvais n° de batiment
-		if(data.building>14||data.building<0) { return; } // Stop Executing, it may create bugs;
+		if(data.building > globalConst.buildingNumber || data.building < 0) { return; } // Stop Executing, it may create bugs;
 
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
-			if(data.planet!==planetReturned.id) { // Stop if not belonging
+			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
 					' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
@@ -200,69 +279,43 @@ module.exports = class Planet {
 
 			let timeSpeed = 1;
 
-			let currTime = Date.now();
+			const currTime = Date.now();
 
 			// Calc new planet data
-			let newData = Planet.update(planetReturned,userReturned,fleetReturned);
+			const newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
 			// Vars for this building tes
-			let cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
-			let BlockBuild = false;
-			let errormsg = 'BUILD_ERROR'; // Message d'erreur par defaut
-				// Cost verif
-				if(cost.iron>newData.resources[2] || cost.aluminium>newData.resources[3] || cost.copper>newData.resources[4] || cost.titanium>newData.resources[5] ) {
-					BlockBuild = true;
-					errormsg = 'BUILDING_ERROR_COST';
-				}
-				// Un bâtiment est déja en construction ?
-				if(newData.nextBuildingTime > currTime) {
-					BlockBuild = true;
-					errormsg = 'BUILDING_ERROR_ALREADY';
-				}
-				// Niveau maximum ?
-				if(newData.Buildings[data.building]>buildingMaxLvl[data.building]) {
-					BlockBuild = true;
-					errormsg = 'BUILDING_ERROR_MAXIMUM';
-				}
-				// Les requirements ?
-				if(!Buildings.HasRequirements(userReturned, newData, data.building)) {
-					BlockBuild = true;
-					errormsg = 'BUILDING_ERROR_DEPENDENCIES';
-				}
+			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
+			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
-				newData.Buildings[data.building]++; // Only for calcs
-
-				// Energie ? Habitants ?
-				if(!BlockBuild) {
-					if(!Buildings.enoughEnergy(newData.Buildings) && data.building<=9 && data.building!==4) { // Only ground buildings affected by this
-						BlockBuild = true;
-						errormsg = 'BUILDING_ERROR_ENERGY';
-					}
-				}
+			if(errormsg !== '') { // We just update ressources
+				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
+				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
+			}
 
 			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
 				if(!enoughPeople) {
-					BlockBuild = true;
 					errormsg = 'BUILDING_ERROR_PEOPLE';
 				}
 				newData.Buildings[data.building]--; // Revert new building, it's not builded yet
 
-				if(!BlockBuild) {
+				if(errormsg === '') {
 					// Research bonus
-						if(Research.getResearch(userReturned,'cp_mecanisation') === -1) {
-							timeSpeed += researchBonus.cp_mecanisation;
+					if(Research.isSearched(userReturned,'cp_mecanisation')) {
+						timeSpeed += researchBonus.cp_mecanisation;
+					}
+
+					if(data.building >= globalConst.groundBuildingNumber) {
+						if(Research.isSearched(userReturned,'cp_tracteur')) {
+							timeSpeed += researchBonus.cp_tracteur;
 						}
-						if(data.building>8) {
-							if(Research.getResearch(userReturned,'cp_tracteur') === -1) {
-								timeSpeed += researchBonus.cp_tracteur;
-							}
-							if(Research.getResearch(userReturned,'cp_materielTp') === -1) {
-								timeSpeed += researchBonus.cp_materielTp;
-							}
+						if(Research.isSearched(userReturned,'cp_materielTp')) {
+							timeSpeed += researchBonus.cp_materielTp;
 						}
-						if(data.building > 8) { // Faster if shipyard have higher lvl
-							cost.time *= (1-(buildLvlUnitBuildingSpeedBonus*newData.Buildings[7]));
-						}
+
+						// Faster if shipyard have higher lvl
+						cost.time *= (1-(buildLvlUnitBuildingSpeedBonus*newData.Buildings[7]));
+					}
 
 					// We consume resources
 					newData.resources[2] -= cost.iron;
@@ -270,7 +323,7 @@ module.exports = class Planet {
 					newData.resources[4] -= cost.copper;
 					newData.resources[5] -= cost.titanium;
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*3600*1000/timeSpeed);
+					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS/timeSpeed);
 					newData.nextBuilding = data.building;
 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
@@ -295,70 +348,71 @@ module.exports = class Planet {
 	 * @param      {<type>}  user      The user
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
-		db.fleet.find(planetIn.unitBuildingFleetID, function(fleetReturned) {
-			let id = (planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':planetIn.unitBuildingID;
-			db.unit.find(id, function(unitReturned) {
-				if(planetIn.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
+		const newPlanet = Object.assign({}, planetIn);
+		newPlanet.unitBuildingEndTime = parseInt(newPlanet.unitBuildingEndTime);
+
+		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) { return; }
+
+		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
+			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
+
+			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
+				const key = Object.keys(specialUnitsUID).find(key => specialUnitsUID[key] === newPlanet.unitBuildingID);
+				if(key !== undefined) {
+					newPlanet.unitBuildingID = key;
+
 					unitReturned = {};
-					unitReturned._id = planetIn.unitBuildingID;
+					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
-					unitReturned.cost = shipCosts[planetIn.unitBuildingID];
+					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
 					unitReturned.ownerId = user.id;
 				}
 
 				let unitCount = 0;
-				let newFleet = fleetReturned.toJSON();
 
-				if(newFleet.maxFuel === undefined) {
-					newFleet.maxFuel = 0;
+				if(fleetReturned.maxFuel === undefined) {
+					fleetReturned.maxFuel = 0;
 				}
 
-				let timeCost = unitReturned.cost[4]*3600*1000;
-				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*planetIn.Buildings[7]));
+				let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
+				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
 
-				if(currTime>planetIn.unitBuildingEndTime) { // total add
-					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+				if(currTime>newPlanet.unitBuildingEndTime) { // total add
+					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro;
 
-					newFleet.inBuilding = false;
+					fleetReturned.inBuilding = false;
 
-					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: planetIn.unitBuildingCount });
+					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
 				} else { // Partial add
-					const restant = Math.ceil((planetIn.unitBuildingEndTime - currTime)/timeCost);
-					const restantDepuisSynchro = Math.ceil((planetIn.unitBuildingEndTime - planetIn.lastUnitUpdate)/timeCost);
+					const restant = Math.ceil((newPlanet.unitBuildingEndTime - currTime)/timeCost);
+					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro - restant;
 				}
 
 				if(unitCount === 0) { return; } // Prevent some bugs
 
-				if(unitCount > planetIn.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
-					unitCount = planetIn.unitBuildingCount;
+				if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
+					unitCount = newPlanet.unitBuildingCount;
 				}
 
-				let set = false;
-				for(let i=0; i<newFleet.units.length; i++) {
-					if(''+newFleet.units[i][0] === ''+planetIn.unitBuildingID) {
-						newFleet.units[i][1] += unitCount;
-
-						set=true;
-						break;
-					}
+				if(!fleetReturned.units[newPlanet.unitBuildingID]) {
+					fleetReturned.units[newPlanet.unitBuildingID] = 0;
 				}
-				if(!set) {
-					newFleet.units.push([planetIn.unitBuildingID,unitCount]);
-				}
+				fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
 
 				if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
-					newFleet.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
+					fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
 				}
 
 				const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
-				newFleet.points = parseFloat(newFleet.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
-				newFleet.points = '' + newFleet.points;
+				fleetReturned.points = parseFloat(fleetReturned.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
+				fleetReturned.points = '' + fleetReturned.points;
 
-				db.fleet.update(newFleet, function() {
+				db.fleet.update(fleetReturned, function() {
 					Units.refresh(user);
-					Fleets.refresh(planetIn._id,user.sid);
+					Fleets.refresh(newPlanet.id,user.sid);
+					Tactics.refresh(user.id, user.sid);
 				});
 			});
 		});
@@ -372,44 +426,43 @@ module.exports = class Planet {
 	 * @param      {<type>}  user      The user
 	 * @return     {<type>}  the updated data
 	 */
-	static update(planetIn,user,fleetList) {
-		let data = planetIn.toJSON();
-		let currTime = Date.now();
-
-		data.lastResourcesUpdate = currTime;
+	static update(planetData,user,fleetList) {
+		const currTime = Date.now();
 
 		// Update resources
-		data.resources = Planet.UpdateResources(planetIn,user);
+		planetData.resources = Planet.UpdateResources(planetData,user);
+		planetData.lastResourcesUpdate = currTime;
+
 		// Update points
-		data.points = Planet.calcPlanetPoints(planetIn);
-		data.points += parseFloat(Planet.calcFleetPoints(fleetList));
-		data.points = Math.round(data.points);
+		planetData.points = Planet.calcPlanetPoints(planetData);
+		planetData.points += parseFloat(Planet.calcFleetPoints(fleetList));
+		planetData.points = Math.round(planetData.points);
 
 		// Update buildings
-		if(currTime>data.nextBuildingTime && data.nextBuilding !== -1) {
-			data.Buildings[data.nextBuilding]++;
+		if(currTime>planetData.nextBuildingTime && planetData.nextBuilding !== -1) {
+			planetData.Buildings[planetData.nextBuilding]++;
 
-			Websocket.sendNotification(user.sid, 'building', { building: data.nextBuilding, lvl: data.Buildings[data.nextBuilding] });
+			Websocket.sendNotification(user.sid, 'building', { building: planetData.nextBuilding, lvl: planetData.Buildings[planetData.nextBuilding] });
 
-			data.nextBuildingTime = -1;
-			data.nextBuilding = -1;
+			planetData.nextBuildingTime = -1;
+			planetData.nextBuilding = -1;
 		}
 
 		// Update units
-		if(data.unitBuildingEndTime !== -1) {
-			Planet.UpdateUnits(planetIn,user,currTime);
+		if(planetData.unitBuildingEndTime !== -1) {
+			Planet.UpdateUnits(planetData,user,currTime);
 		}
 
-		if(currTime>data.unitBuildingEndTime) {
-			data.unitBuildingEndTime = -1;
-			data.unitBuildingID = '-1';
-			data.unitBuildingCount = 0;
-			data.unitBuildingFleetID = db.Schema.Types.ObjectId('-1');
+		if(currTime>planetData.unitBuildingEndTime) {
+			planetData.unitBuildingEndTime = -1;
+			planetData.unitBuildingID = null;
+			planetData.unitBuildingCount = 0;
+			planetData.unitBuildingFleetID = null;
 		}
 
-		data.lastUnitUpdate = currTime;
+		planetData.lastUnitUpdate = currTime;
 
-		return data;
+		return planetData;
 	}
 
 	/**
@@ -419,8 +472,8 @@ module.exports = class Planet {
 	 * @param      {Function}  callback  Function needed to called back
 	 */
 	static getPeople(planetData, fleets, callback) {
-		let buildings = planetData.Buildings;
-		let prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
+		const buildings = planetData.Buildings;
+		const prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
 		let cons = 0;
 
 		// Buildings
@@ -479,7 +532,7 @@ module.exports = class Planet {
 			}
 			if(empty) { return; }
 
-			let replace = [
+			const replace = [
 				['<',''],
 				['>',''],
 				['/',''],
@@ -493,10 +546,9 @@ module.exports = class Planet {
 
 			Planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
 
-			let newPlanetData = planetReturned.toJSON();
-			newPlanetData.name = data.name;
+			planetReturned.name = data.name;
 
-			db.planet.update(newPlanetData);
+			db.planet.update(planetReturned);
 		});
 	}
 	/**
@@ -506,10 +558,10 @@ module.exports = class Planet {
 	 * @param      {<type>}  dataIn  Input planet data
 	 */
 	static UpdateResources(dataIn,user) {
-		let Dtime = Date.now()-dataIn.nextBuildingTime;
+		const Dtime = Date.now()-dataIn.nextBuildingTime;
 		let resources = dataIn.resources;
 
-		if(Dtime<0 || dataIn.nextBuildingTime===-1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+		if(Dtime<0 || parseInt(dataIn.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
@@ -545,9 +597,9 @@ module.exports = class Planet {
 
 	static setPriorityFleet(planet, fleet, sid) {
 		db.planet.find(planet, function(planetData) {
-			db.planet.update({ _id: planetData._id, highPriorityFleet: fleet }, function() {
+			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
 				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData._id, sid);
+				Fleets.refresh(planetData.id, sid);
 			});
 		});
 	}

@@ -125,7 +125,7 @@ module.exports = class Units {
 				for(const i in ship) {
 					if(i==='name' || i==='type' || i==='shape') { continue; }
 
-					if(shipResearchDependencies[ship[i].value] !== undefined && Research.getResearch(userReturned,shipResearchDependencies[ship[i].value]) !== -1) {
+					if(shipResearchDependencies[ship[i].value] !== undefined && !Research.isSearched(userReturned,shipResearchDependencies[ship[i].value])) {
 						message = 'NEEDED_RESEARCH_MISSING';
 						break;
 					}
@@ -139,7 +139,6 @@ module.exports = class Units {
 						shipType: ship.type,
 						shipShape: ship.shape,
 						ownerId: data.id,
-						inBuilding: [],
 						cost: [],
 						parts: [],
 						armorType: 0, // None yet
@@ -195,10 +194,10 @@ module.exports = class Units {
 
 	static renameType(data) {
 		db.unit.find(data.shipId, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			const newUnit = {
-				_id: unitReturned._id,
+				id: unitReturned.id,
 				name: data.shipNewName,
 			};
 
@@ -211,7 +210,7 @@ module.exports = class Units {
 
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
 
 			if(unitReturned.owned !== 0) {
 				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
@@ -238,7 +237,7 @@ module.exports = class Units {
 	static build(inputData) {
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
-			if(!isset(planetReturned.owner) || ''+planetReturned.owner !== ''+inputData.id) { return; }
+			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) { return; }
 
 			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
@@ -248,23 +247,23 @@ module.exports = class Units {
 				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
-			const id = (inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
+			const id = (specialUnitsUID[inputData.unit] !== undefined)?specialUnitsUID[inputData.unit]:inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
+				if(specialUnitsUID[inputData.unit] !== undefined && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
-					unitReturned._id = inputData.unit;
+					unitReturned.id = specialUnitsUID[inputData.unit];
 					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
-				if(!isset(unitReturned) || !isset(unitReturned.ownerId) || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
+				if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
 				// Check defence fleet
 				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') { return; }
 				if(unitReturned.shipType === 'SHIP_DEF') { inputData.fleet = -2; }
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
-					if(fleet._id === inputData.fleet || fleet.id === inputData.fleet) {
+					if(fleet.id === inputData.fleet) {
 						choosenFleet = fleet;
 					}
 
@@ -307,14 +306,14 @@ module.exports = class Units {
 					// Check if you have required buildings
 
 					// Check fleet
-					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitReturned,totalCost,inputData) {
+					function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitData,totalCost,inputData) {
 						const currTime = Date.now();
 
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
-						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * 3600 * 1000);
+						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * TIME.HOUR_TO_MS);
 						newPlanet.unitBuildingCount = inputData.count;
-						newPlanet.unitBuildingFleetID = fleetReturned._id;
+						newPlanet.unitBuildingFleetID = fleetReturned.id;
 
 						newPlanet.lastUnitUpdate = currTime;
 
@@ -324,15 +323,18 @@ module.exports = class Units {
 						newPlanet.resources[4] -= totalCost[3];
 						newPlanet.resources[5] -= totalCost[2];
 
+						if(specialUnitsUID[inputData.unit] !== undefined) {
+							newPlanet.unitBuildingID = specialUnitsUID[inputData.unit];
+						}
+
 						// Update planet
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0, 'SHIP_WEP_MINES'.length) !== 'SHIP_WEP_MINES') {
+						if(specialUnitsUID[inputData.unit] === undefined) {
 							// Update unit
-							const newUnit = unitReturned.toJSON();
-							newUnit.owned += inputData.count;
+							unitData.owned += inputData.count;
 
-							db.unit.update(newUnit);
+							db.unit.update(unitData);
 						}
 
 						// Update fleet
@@ -347,7 +349,7 @@ module.exports = class Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'BUILDING_UNIT_OK' });
 					}
 
-					if(inputData.fleet === -1 && isset(inputData.fleetName)) {
+					if(inputData.fleet === -1 && isset(inputData.fleetName, 'string')) {
 						// Check if fleet max size is reached
 						if(totalCost[5] > globalConst.maxFleetSize) {
 							log(inputData.username +' failed to build units because fleet will be too big.');
@@ -364,7 +366,7 @@ module.exports = class Units {
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
-						if(''+choosenFleet.motherPlanetId !== ''+newPlanet._id) { return; }
+						if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) { return; }
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) {

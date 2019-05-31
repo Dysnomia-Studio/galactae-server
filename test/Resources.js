@@ -16,16 +16,14 @@ describe('• Resources', function() {
 	describe('# GetRatiosPerPlanet()', function() {
 		it('0', function() {
 			assert.deepEqual(
-				Resources.GetRatiosPerPlanet(
-				0),
+				Resources.GetRatiosPerPlanet(0),
 				Resources.planetRatios[0]
 			);
 		});
 
-		it('unkown (-1)', function() {
+		it('unknown (-1)', function() {
 			assert.deepEqual(
-				Resources.GetRatiosPerPlanet(
-				-1),
+				Resources.GetRatiosPerPlanet(-1),
 				Resources.planetRatios[0]
 			);
 		});
