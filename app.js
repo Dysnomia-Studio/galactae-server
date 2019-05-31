@@ -26,26 +26,26 @@ require('./console')();
  * Libs
  */
 // Include that before, instead, that could pose some problems
-global.db        = require('./database');
-global.Discord   = require('./discord');
+global.db         = require('./database');
+global.Discord    = require('./discord');
 // Then include other classes
-global.Buildings = require('./Buildings').Buildings;
-global.Chat      = require('./chat');
-global.Combat    = require('./combat');
-global.Fleet 	 = require('./Fleet').Fleet;
-global.Fleets 	 = require('./fleets');
-global.GameMap   = require('./GameMap').GameMap;
-global.Planet    = require('./planet');
-global.Player    = require('./player');
+global.Buildings  = require('./Buildings').Buildings;
+global.Chat       = require('./chat');
+global.Combat     = require('./combat');
+global.Fleet 	  = require('./Fleet').Fleet;
+global.Fleets 	  = require('./fleets');
+global.GameMap    = require('./GameMap').GameMap;
+global.Planet     = require('./planet');
+global.Player     = require('./player');
 global.Privileges = require('./privileges');
-global.Research  = require('./research');
-global.Resources = require('./Resources').Resources;
-global.Tactics   = require('./tactics');
-global.Tutorials = require('./tutorials');
-global.Units     = require('./units');
-global.Unit     = require('./Unit').Unit;
+global.Research   = require('./research');
+global.Resources  = require('./Resources').Resources;
+global.Tactics    = require('./tactics');
+global.Tutorials  = require('./Tutorials').Tutorials;
+global.Units      = require('./units');
+global.Unit       = require('./Unit').Unit;
 // And that's in last
-global.Websocket = require('./socket');
+global.Websocket  = require('./socket');
 
 /**
  * Launch server !

@@ -612,16 +612,170 @@ module.exports = function() {
 		'inhabitants',
 		'resources',
 		'research',
-		'units',
+		'unitsCreate',
+		'unitsBuild',
 		// 'buyAndSell',
 		'interplanetaryFlight',
 		'interstellarFlight',
-		'spy',
+		//'spy',
 		'battle',
 		// 'joinAlly',
 		// 'quests',
 		// 'secondPlanet',
 	];
+	this.tutorialsDependancies = {
+		'welcome': [],
+		'energy':
+			[{
+				type: 'tutorial',
+				tutorial: 'welcome',
+			}],
+		'inhabitants':
+			[{
+				type: 'tutorial',
+				tutorial: 'energy',
+			}],
+		'resources':
+			[{
+				type: 'tutorial',
+				tutorial: 'inhabitants',
+			}],
+		'research':
+			[{
+				type: 'tutorial',
+				tutorial: 'resources',
+			}],
+		'unitsCreate':[
+			{
+				type: 'oneOfManyResearch',
+				researchList: [
+					'figther_light_interceptor',
+					'figther_heavy_interceptor',
+					'figther_bomber',
+
+					'battlecruiser_small',
+					'cuirasse_small',
+
+					'corvet_small',
+
+					'carrier_small',
+					'carrier_medium',
+
+					'wep_sat_ag1',
+					'wep_sat_ag2',
+					'wep_sat_ag3',
+				]
+			}
+		],
+		'unitsBuild':
+			[{ //@TODO: prendre en compte les mines
+				type: 'tutorial',
+				tutorial: 'unitsCreate',
+			}],
+		// 'buyAndSell':[],
+		'interplanetaryFlight':[
+			{
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			},
+			{
+				type: 'oneOfManyResearch',
+				researchList: [
+					'prop_vSolaire',
+					'prop_ions',
+				]
+			}
+		],
+		'interstellarFlight':[
+			{
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			},
+			{
+				type: 'research',
+				research: 'prop_vsl',
+			}
+		],
+		/*'spy':
+			[{ //@TODO: prendre en compte corvette
+				type: 'tutorial',
+				tutorial: 'unitsBuild',
+			}],*/
+		'battle':
+			[{
+				type: 'tutorial',
+				tutorial: 'interplanetaryFlight',
+			}],
+		// 'joinAlly':[],
+		// 'quests':[],
+		// 'secondPlanet':[],
+	};
+	this.tutorialObjectives ={
+		'welcome': [],
+		'energy':
+		[{
+			type: 'building',
+			building: 4,
+			level: 2,
+		}],
+		'inhabitants':
+		[{
+			type: 'building',
+			building: 2,
+			level: 2,
+		},{
+			type: 'building',
+			building: 3,
+			level: 2,
+		}],
+		'resources':
+		[{
+			type: 'building',
+			building: 0,
+			level: 2,
+		},{
+			type: 'building',
+			building: 1,
+			level: 2,
+		}],
+		'research':
+		[{
+			type: 'oneOfManyResearch',
+			researchList: [
+				'thermodynamique',
+				'phyContemporaine',
+				'industrialistion',
+			]
+		}],
+		'unitsCreate': [{
+			type: 'unitModel',
+			count: 1,
+		}],
+		'unitsBuild': [{
+			type: 'unitBuild',
+			count: 5,
+		}],
+		// 'buyAndSell': [],
+		'interplanetaryFlight': [{
+			type: 'move',
+			moveType: 'move',
+			location: 'all',
+		}],
+		'interstellarFlight': [{
+			type: 'move',
+			moveType: 'move',
+			location: 'outerSystem',
+		}],
+		//'spy': [],
+		'battle': [{
+			type: 'move',
+			moveType: 'attack',
+			location: 'all',
+		}],
+		// 'joinAlly': [],
+		// 'quests': [],
+		// 'secondPlanet': [],
+	};
 
 	/**
 	 * Char filters

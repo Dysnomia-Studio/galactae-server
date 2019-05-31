@@ -46,7 +46,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(inputData) {
+	static refresh(inputData, callback) {
 		db.player.searchById(inputData.id, (userReturned) => {
 			db.planet.findByOwner(inputData.id, (planetsReturned) => {
 				for(const currPlanet of planetsReturned) {
@@ -58,10 +58,30 @@ module.exports = class Planet {
 						Fleets.refresh(newPlanet.id,inputData.sid);
 
 						if(inputData.pid === currPlanet.address) {
-							Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+							Tutorials.checkTutorials(userReturned, currPlanet);
+
+							if(!Tutorials.hasFinishedTutorials(userReturned)) {
+								const newUser = Tutorials.updateTutorialList(userReturned, newPlanet);
+
+								if(Object.keys(newUser.tutorials).length !== Object.keys(userReturned.tutorials).length) {
+									userReturned = newUser;
+
+									db.player.update({
+										id: userReturned.id,
+										tutorials: userReturned.tutorials
+									});
+								}
+							}
+
+							if(callback) {
+								callback(newPlanet);
+							} else {
+								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+							}
+
+
 						}
 					});
-
 				}
 			});
 		});

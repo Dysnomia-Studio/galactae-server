@@ -281,6 +281,34 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Tutorial Confirm
+			socket.on('tutorial-confirm', function(data) {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.tutorial, 'string')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, function(user) { // Verify identity
+					db.player.searchBySid(user.sid,function(userReturned) {
+						data.pid = userReturned.planetlist[0];
+
+						Planet.refresh(data, (planetReturned) => {
+							if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned)) {
+								return;
+							}
+
+							userReturned.tutorials[data.tutorial] = true;
+
+							db.player.update({
+								id: data.id,
+								tutorials: userReturned.tutorials
+							}, () => {
+								Planet.refresh(data);
+							});
+						});
+					});
+				});
+			});
+
 			// Admin panel
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.password, 'string')) { return; }
@@ -357,6 +385,10 @@ module.exports = class Websocket {
 	 */
 	static sendNotification(sid, type, args) {
 		io.to(sid).emit('notification', { type, args });
+	}
+
+	static sendTutorial(user, tutorial) {
+		io.to(user.sid).emit('tutorial', tutorial);
 	}
 
 	/**

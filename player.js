@@ -112,19 +112,11 @@ module.exports = class Player {
 
 		playerData.lastConnected = Date.now();
 
-		// Tutorials
-		if(!isset(playerData.currTutorial, 'number')) {
-			playerData.currTutorial = 0;
-		}
-		if(!Tutorials.hasFinishedTutorials(playerData)) {
-			// @ADD: Do stuff
-		}
-
 		io.to(data.sid).emit('player-recieve-data',{
 			planetlist: playerData.planetlist,
 			money: playerData.money,
 			gvt: playerData.gvt,
-			currTutorial: playerData.currTutorial,
+			tutorials: playerData.tutorials,
 		});
 
 		Units.refresh(data);
