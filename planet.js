@@ -59,18 +59,20 @@ module.exports = class Planet {
 
 						if(inputData.pid === currPlanet.address) {
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
-								const newUser = Tutorials.updateTutorialList(userReturned, newPlanet);
+								const oldCount = Object.keys(userReturned.tutorials).length;
 
-								if(Object.keys(newUser.tutorials).length !== Object.keys(userReturned.tutorials).length) {
-									userReturned = newUser;
+								if(userReturned.tutorials !== {}) {
+									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
+								}
 
+								if(Object.keys(userReturned.tutorials).length !== oldCount) {
 									db.player.update({
 										id: userReturned.id,
 										tutorials: userReturned.tutorials
 									});
-
-									Tutorials.checkTutorials(userReturned, newPlanet);
 								}
+
+								Tutorials.checkTutorials(userReturned, newPlanet);
 							}
 
 							if(callback) {
@@ -78,8 +80,6 @@ module.exports = class Planet {
 							} else {
 								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 							}
-
-
 						}
 					});
 				}
