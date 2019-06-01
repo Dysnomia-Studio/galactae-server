@@ -58,8 +58,6 @@ module.exports = class Planet {
 						Fleets.refresh(newPlanet.id,inputData.sid);
 
 						if(inputData.pid === currPlanet.address) {
-							Tutorials.checkTutorials(userReturned, currPlanet);
-
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
 								const newUser = Tutorials.updateTutorialList(userReturned, newPlanet);
 
@@ -70,6 +68,8 @@ module.exports = class Planet {
 										id: userReturned.id,
 										tutorials: userReturned.tutorials
 									});
+
+									Tutorials.checkTutorials(userReturned, newPlanet);
 								}
 							}
 

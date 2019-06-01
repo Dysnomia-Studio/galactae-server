@@ -426,7 +426,7 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 5;
+		let decompte = 10;
 
 		setInterval(function() {
 			if(decompte>0) {
