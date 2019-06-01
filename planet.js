@@ -61,15 +61,15 @@ module.exports = class Planet {
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
 								const oldCount = Object.keys(userReturned.tutorials).length;
 
-								if(userReturned.tutorials !== {}) {
+								if(!isset(userReturned.tutorials, 'object')) {
 									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
-								}
 
-								if(Object.keys(userReturned.tutorials).length !== oldCount) {
-									db.player.update({
-										id: userReturned.id,
-										tutorials: userReturned.tutorials
-									});
+									if(Object.keys(userReturned.tutorials).length !== oldCount) {
+										db.player.update({
+											id: userReturned.id,
+											tutorials: userReturned.tutorials
+										});
+									}
 								}
 
 								Tutorials.checkTutorials(userReturned, newPlanet);
