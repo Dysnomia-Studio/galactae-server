@@ -61,7 +61,7 @@ module.exports = class Planet {
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
 								const oldCount = Object.keys(userReturned.tutorials).length;
 
-								if(oldCount === 0) {
+								if(oldCount !== 0) {
 									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
 
 									if(Object.keys(userReturned.tutorials).length !== oldCount) {
