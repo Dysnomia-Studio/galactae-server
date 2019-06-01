@@ -59,18 +59,20 @@ module.exports = class Planet {
 
 						if(inputData.pid === currPlanet.address) {
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
-								const newUser = Tutorials.updateTutorialList(userReturned, newPlanet);
+								const oldCount = Object.keys(userReturned.tutorials).length;
+								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
+								console.log('updated');
+								console.log(Object.keys(userReturned.tutorials).length);
+								console.log(oldCount);
 
-								if(Object.keys(newUser.tutorials).length !== Object.keys(userReturned.tutorials).length) {
-									userReturned = newUser;
-
+								if(Object.keys(userReturned.tutorials).length !== oldCount) {
 									db.player.update({
 										id: userReturned.id,
 										tutorials: userReturned.tutorials
 									});
-
-									Tutorials.checkTutorials(userReturned, newPlanet);
 								}
+
+								Tutorials.checkTutorials(userReturned, newPlanet);
 							}
 
 							if(callback) {
