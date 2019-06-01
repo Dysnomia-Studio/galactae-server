@@ -60,10 +60,10 @@ module.exports = class Planet {
 						if(inputData.pid === currPlanet.address) {
 							if(!Tutorials.hasFinishedTutorials(userReturned)) {
 								const oldCount = Object.keys(userReturned.tutorials).length;
-								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
-								console.log('updated');
-								console.log(Object.keys(userReturned.tutorials).length);
-								console.log(oldCount);
+
+								if(userReturned.tutorials !== {}) {
+									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
+								}
 
 								if(Object.keys(userReturned.tutorials).length !== oldCount) {
 									db.player.update({
@@ -80,8 +80,6 @@ module.exports = class Planet {
 							} else {
 								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 							}
-
-
 						}
 					});
 				}
