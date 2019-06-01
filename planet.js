@@ -351,8 +351,6 @@ module.exports = class Planet {
 		const newPlanet = Object.assign({}, planetIn);
 		newPlanet.unitBuildingEndTime = parseInt(newPlanet.unitBuildingEndTime);
 
-		console.log(newPlanet.unitBuildingID);
-
 		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) { return; }
 
 		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
@@ -369,8 +367,6 @@ module.exports = class Planet {
 					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
 					unitReturned.ownerId = user.id;
 				}
-
-				console.log(newPlanet.unitBuildingID);
 
 				let unitCount = 0;
 
@@ -393,8 +389,6 @@ module.exports = class Planet {
 					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
 					unitCount = restantDepuisSynchro - restant;
 				}
-
-				console.log(unitCount);
 
 				if(unitCount === 0) { return; } // Prevent some bugs
 
