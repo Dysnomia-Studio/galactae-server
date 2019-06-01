@@ -1,6 +1,6 @@
 module.exports = class Privileges {
 	static isBannedFromChat(userId, callback) {
-		db.ban.find(data.game_id, 1, function(banObj) {
+		db.ban.find(userId, 1, function(banObj) {
 			if(isset(banObj, 'object')) {
 				for(let i=0; banObj.length; banObj++) {
 					if(banObj[i].ban_end < Date.now()) {
