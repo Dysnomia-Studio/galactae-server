@@ -612,6 +612,7 @@ module.exports = function() {
 		'inhabitants',
 		'resources',
 		'research',
+		'endFirstPart',
 		'unitsCreate',
 		'unitsBuild',
 		// 'buyAndSell',
@@ -644,6 +645,11 @@ module.exports = function() {
 			[{
 				type: 'tutorial',
 				tutorial: 'resources',
+			}],
+		'endFirstPart':
+			[{
+				type: 'tutorial',
+				tutorial: 'research',
 			}],
 		'unitsCreate':[
 			{
@@ -747,6 +753,7 @@ module.exports = function() {
 				'industrialistion',
 			]
 		}],
+		'endFirstPart': [],
 		'unitsCreate': [{
 			type: 'unitModel',
 			count: 1,
