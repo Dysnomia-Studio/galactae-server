@@ -88,7 +88,7 @@
 			return user;
 		}
 
-		static hasCompletedTutorial(currTuto, user, planet) {
+		static hasCompletedTutorial(currTuto, user, planet, manually=true) {
 			if(user.tutorials[currTuto]) {
 				return true;
 			}
@@ -100,6 +100,10 @@
 
 			if(!Tutorials.hasAllDependancies(currTuto, user, planet)) {
 				return false;
+			}
+
+			if(manually && tutorialObjectives[currTuto].length === 0) {
+				return false; // Must be completed manually
 			}
 
 			for(const objective of tutorialObjectives[currTuto]) {

@@ -292,7 +292,7 @@ module.exports = class Websocket {
 						data.pid = userReturned.planetlist[0];
 
 						Planet.refresh(data, (planetReturned) => {
-							if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned)) {
+							if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, false)) {
 								return;
 							}
 
@@ -304,7 +304,7 @@ module.exports = class Websocket {
 							}, () => {
 								Planet.refresh(data);
 							});
-						});
+						}, true);
 					});
 				});
 			});

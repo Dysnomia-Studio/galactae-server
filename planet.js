@@ -46,7 +46,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(inputData, callback) {
+	static refresh(inputData, callback, disableTutorials=false) {
 		db.player.searchById(inputData.id, (userReturned) => {
 			db.planet.findByOwner(inputData.id, (planetsReturned) => {
 				for(const currPlanet of planetsReturned) {
@@ -58,18 +58,16 @@ module.exports = class Planet {
 						Fleets.refresh(newPlanet.id,inputData.sid);
 
 						if(inputData.pid === currPlanet.address) {
-							if(!Tutorials.hasFinishedTutorials(userReturned)) {
+							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
 								const oldCount = Object.keys(userReturned.tutorials).length;
 
-								if(oldCount !== 0) {
-									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
+								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
 
-									if(Object.keys(userReturned.tutorials).length !== oldCount) {
-										db.player.update({
-											id: userReturned.id,
-											tutorials: userReturned.tutorials
-										});
-									}
+								if(Object.keys(userReturned.tutorials).length !== oldCount) {
+									db.player.update({
+										id: userReturned.id,
+										tutorials: userReturned.tutorials
+									});
 								}
 
 								Tutorials.checkTutorials(userReturned, newPlanet);
