@@ -59,18 +59,20 @@ module.exports = class Planet {
 
 						if(inputData.pid === currPlanet.address) {
 							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
-								const oldCount = Object.keys(userReturned.tutorials).length;
+								db.unit.findByOwner(userReturned.id, (unitsList) => {
+									const oldCount = Object.keys(userReturned.tutorials).length;
 
-								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet);
+									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
-								if(Object.keys(userReturned.tutorials).length !== oldCount) {
-									db.player.update({
-										id: userReturned.id,
-										tutorials: userReturned.tutorials
-									});
-								}
+									if(Object.keys(userReturned.tutorials).length !== oldCount) {
+										db.player.update({
+											id: userReturned.id,
+											tutorials: userReturned.tutorials
+										});
+									}
 
-								Tutorials.checkTutorials(userReturned, newPlanet);
+									Tutorials.checkTutorials(userReturned, newPlanet);
+								});
 							}
 
 							if(callback) {

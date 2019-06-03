@@ -292,17 +292,21 @@ module.exports = class Websocket {
 						data.pid = userReturned.planetlist[0];
 
 						Planet.refresh(data, (planetReturned) => {
-							if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, false)) {
-								return;
-							}
+							db.fleet.findByMotherPlanet(planetReturned.id, (fleetsList) => {
+								db.unit.findByOwner(userReturned.id, (unitsList) => {
+									if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
+										return;
+									}
 
-							userReturned.tutorials[data.tutorial] = true;
+									userReturned.tutorials[data.tutorial] = true;
 
-							db.player.update({
-								id: data.id,
-								tutorials: userReturned.tutorials
-							}, () => {
-								Planet.refresh(data);
+									db.player.update({
+										id: data.id,
+										tutorials: userReturned.tutorials
+									}, () => {
+										Planet.refresh(data);
+									});
+								});
 							});
 						}, true);
 					});

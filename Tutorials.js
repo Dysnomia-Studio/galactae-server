@@ -72,14 +72,14 @@
 			}
 		}
 
-		static updateTutorialList(user, planet) {
+		static updateTutorialList(user, planet, fleets, units) {
 			if(Tutorials.hasFinishedTutorials(user)) {
 				return user;
 			}
 
 			for(let currTuto=0; currTuto<tutorialsList.length; currTuto++) {
 				if( !user.tutorials[tutorialsList[currTuto]] &&
-					Tutorials.hasCompletedTutorial(tutorialsList[currTuto], user, planet)) {
+					Tutorials.hasCompletedTutorial(tutorialsList[currTuto], user, planet, fleets, units)) {
 
 					user.tutorials[tutorialsList[currTuto]] = true;
 				}
@@ -88,7 +88,7 @@
 			return user;
 		}
 
-		static hasCompletedTutorial(currTuto, user, planet, manually=true) {
+		static hasCompletedTutorial(currTuto, user, planet, fleets, units, manually=true) {
 			if(user.tutorials[currTuto]) {
 				return true;
 			}
@@ -133,10 +133,65 @@
 						}
 						break;
 					case 'tutorial':
-						if(!isset(user.tutorials[objective.tutorial])) {
+						if(!user.tutorials[objective.tutorial]) {
 							return false;
 						}
 						break;
+
+					case 'unitModel':
+						if(!units || units.length < objective.count) {
+							return false;
+						}
+						break;
+
+					case 'unitBuild':
+						const sum = units.reduce((total, elt) => total + (elt.owned || 0), 0);
+
+						if(!units || sum < objective.count) {
+							return false;
+						}
+						break;
+
+					case 'move':
+						// @TODO: improve this
+						let moveType = -1;
+						if(objective.moveType === 'move') {
+							moveType = 2;
+						} else if(objective.moveType === 'attack') {
+							moveType = 1;
+						}
+
+						if(moveType < 0) {
+							log('Invalid move type: ' + objective.moveType);
+							return false;
+						}
+
+						let index = -1;
+						for(let i=0; i<fleets.length; i++) {
+							if(fleets[i].endMoveTime > 0 && fleets[i].orbitPosition === moveType) {
+								index = i;
+							}
+						}
+
+						if(index === -1) {
+							return false;
+						}
+
+						if(objective.location === 'outerSystem') {
+							let origin = fleets[index].motherPlanetAddress;
+							origin = origin.substring(0, origin.lastIndexOf('-'));
+
+							let destination = fleets[index].position;
+							destination = destination.substring(0, destination.lastIndexOf('-'));
+
+							if(origin === destination) {
+
+								return false;
+							}
+						}
+
+						break;
+
 					default:
 						log('Invalid tutorial objective type: ' + objective.type, 'warn');
 						return false;
