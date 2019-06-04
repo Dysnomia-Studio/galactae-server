@@ -158,7 +158,13 @@ module.exports = class Fleets {
 				// Send new list to client
 				Fleets.refresh(planetData.id,data.sid);
 
-				if(callback) { callback(newFleet); }
+				if(callback) {
+					db.fleet.findByMotherPlanet(planetData.id, (fleetList) => {
+						const outFleet = fleetList.filter((f) => f.name === data.fleetName)[0];
+
+						callback(outFleet);
+					});
+				}
 			});
 		});
 	}
