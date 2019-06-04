@@ -235,6 +235,8 @@ module.exports = class Units {
 	 * @param      string  unitData  What need to build ?
 	 */
 	static build(inputData) {
+		if(inputData.count < 1) { return; }
+
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) { return; }
