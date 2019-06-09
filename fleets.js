@@ -26,7 +26,7 @@ module.exports = class Fleets {
 					}
 				}
 
-				io.to(sid).emit('fleet-recieve-data', FleetList);
+				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
 			}
 
 			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
