@@ -19,10 +19,10 @@ module.exports = {
 
 		client.on('message', function(message) {
 			if(message.author.id === '463990941473177600') { return; }
-			if(message.channel.name.substr(0,globalCfg.serverName.length)===globalCfg.serverName) { // If it's a message for this server then send it to chat
+			if(message.channel.name.substr(0,globalCfg.serverName.length) === globalCfg.serverName) { // If it's a message for this server then send it to chat
 				const msg = message.cleanContent;
-				if(msg!==msg.replace('http','')) { return; }
-				if(msg.length===0) { return; }
+				if(msg !== msg.replace('http','')) { return; }
+				if(msg.length === 0) { return; }
 
 				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
@@ -51,7 +51,7 @@ module.exports = {
 	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
-		const channel = client.channels.find('name',channelName);
+		const channel = client.channels.find(channel => channel.name === channelName);
 		channel.send(unNormalizeText(message));
 	},
 	/**
@@ -61,7 +61,7 @@ module.exports = {
 	 */
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
-		const channel = client.channels.find('name',channelName);
+		const channel = client.channels.find(channel => channel.name === channelName);
 		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
 	},
 };
