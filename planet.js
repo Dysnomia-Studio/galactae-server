@@ -256,6 +256,8 @@ module.exports = class Planet {
 			}
 		}
 
+		planet.Buildings[building]--; // Revert
+
 		return errormsg;
 	}
 
@@ -288,11 +290,7 @@ module.exports = class Planet {
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
 			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
-			if(errormsg !== '') { // We just update ressources
-				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
-				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
-			}
-
+			newData.Buildings[data.building]++;
 			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
 				if(!enoughPeople) {
 					errormsg = 'BUILDING_ERROR_PEOPLE';
