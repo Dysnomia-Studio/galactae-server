@@ -200,7 +200,7 @@ module.exports = class Fleets {
 		}
 
 		// Find next unit
-		db.unit.find(unitIdList[i][0], function(unitReturned) {
+		db.unit.find(unitIdList[i], function(unitReturned) {
 			if(isset(unitReturned, 'object')) {
 				unitList.push(unitReturned);
 			}
@@ -245,7 +245,7 @@ module.exports = class Fleets {
 			systemeArrivee.pop();
 			systemeArrivee = systemeArrivee.join('-');
 
-			Fleets.getUnitsList(fleetReturned.units, function(unitList) {
+			Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
 				if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
 					log(user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.');
 					Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_CARRIER' });
