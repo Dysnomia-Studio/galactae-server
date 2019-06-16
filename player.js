@@ -91,7 +91,7 @@ module.exports = class Player {
 		const oldSid = playerData.sid;
 		if(oldSid !== '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-			log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
+			//log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
 		playerData.sid = data.sid;

@@ -1,3 +1,5 @@
+const playerList = [];
+
 module.exports = class Websocket {
 	static init() {
 		io.on('connection', function(socket) {
@@ -18,6 +20,9 @@ module.exports = class Websocket {
 				user.sid = socket.id;
 				// Log
 				log(user.username + ' ('+socket.id+') connected');
+
+				playerList.push(socket.id);
+
 				// Execution du code
 				Player.connect(user);
 			});
@@ -25,9 +30,16 @@ module.exports = class Websocket {
 			socket.on('game-disconnect', function(user) {
 				// Vars
 				if(!isset(user, 'object') || !isset(user.username, 'string') || !isset(user.id, 'string')) { return; }
+
+				if(!playerList.includes(socket.id)) { return; }
+
 				// User
 				user.sid = socket.id;
 				Player.isValid(user,function(user) { // Verify identity
+					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
+
+					playerList.splice(playerList.indexOf(socket.id), 1);
+
 					// Log
 					log(user.username + ' (' + socket.id + ') disconnected');
 					Player.disconnect(user);
@@ -40,8 +52,14 @@ module.exports = class Websocket {
 			socket.on('disconnect', function() {
 				const data = {};
 				data.sid = socket.id;
+
+				if(!playerList.includes(socket.id)) { return; }
+
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
+
+					playerList.splice(playerList.indexOf(socket.id), 1);
+
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
 					Player.disconnect(user);
