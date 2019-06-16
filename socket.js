@@ -1,4 +1,4 @@
-const playerList = [];
+global.playerList = [];
 
 module.exports = class Websocket {
 	static init() {

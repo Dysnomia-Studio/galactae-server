@@ -124,8 +124,6 @@ module.exports = class Player {
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				db.player.update(userNewResearch, function() {
-					plCount++;
-
 					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
 						data.pid = userNewResearch.planetlist[0];
 					}
@@ -147,7 +145,6 @@ module.exports = class Player {
 			if(!isset(dataReturned, 'string')) { return; }
 			dataReturned.sid = '-1';
 			db.player.update(dataReturned);
-			plCount--;
 		});
 	}
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
