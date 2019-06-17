@@ -120,6 +120,10 @@ module.exports = class Planet {
 	static sendPlanetDataToUser(data) {
 		data.sNow = Date.now();
 
+		if(globalCfg.dev) {
+			log('Sending planet');
+		}
+
 		delete data.id;
 
 		io.to(data.sid).emit('planet-recieve-data', data );

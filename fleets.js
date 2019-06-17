@@ -7,6 +7,10 @@ module.exports = class Fleets {
 	 * @return     {socket}  units   list of units types
 	 */
 	static refresh(pid,sid) {
+		if(globalCfg.dev) {
+			log('Refresh fleets');
+		}
+
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
@@ -26,11 +30,15 @@ module.exports = class Fleets {
 					}
 				}
 
+				if(globalCfg.dev) {
+					log('Sending fleet');
+				}
+
 				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
 			}
 
 			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
-				if(!newPlanet || !newPlanet.unitBuildingFleetID) {
+				if(!newPlanet) {
 					sendtoPlayer(FleetList, newPlanet, sid, pid);
 					return;
 				}
@@ -96,13 +104,13 @@ module.exports = class Fleets {
 			}
 		}
 
-		if(!haveToUpdate) { callback(fleetList); return; }
-
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
+			if(!haveToUpdate) { callback(fleetList, planetData); return; }
+
 			let newPlanet, empty;
 			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList);
 
-			if(empty) { callback(fleetList); return; }
+			if(empty) { callback(fleetList, planetData); return; }
 
 			// Current in-orbit fleets
 			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {

@@ -88,6 +88,10 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
+					if(globalCfg.dev) {
+						log('Asking planet');
+					}
+
 					Planet.refresh(data);
 				});
 			});
@@ -99,6 +103,10 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
+					if(globalCfg.dev) {
+						log('Asking map');
+					}
+
 					Planet.getWholeSystem(data);
 				});
 			});
@@ -186,6 +194,10 @@ module.exports = class Websocket {
 				});
 			});
 			socket.on('units-ask-data', function(data) {
+				if(globalCfg.dev) {
+					log('Asking units');
+				}
+
 				// Vars
 				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string')) { return; }
 				// User
