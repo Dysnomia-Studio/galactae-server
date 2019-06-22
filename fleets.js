@@ -108,7 +108,7 @@ module.exports = class Fleets {
 			if(!haveToUpdate) { callback(fleetList, planetData); return; }
 
 			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, Object.assign({}, fleetList));
+			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList.slice(0));
 
 			if(empty) { callback(fleetList, planetData); return; }
 
