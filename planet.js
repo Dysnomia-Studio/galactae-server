@@ -120,6 +120,10 @@ module.exports = class Planet {
 	static sendPlanetDataToUser(data) {
 		data.sNow = Date.now();
 
+		if(globalCfg.dev) {
+			log('Sending planet');
+		}
+
 		delete data.id;
 
 		io.to(data.sid).emit('planet-recieve-data', data );
@@ -256,6 +260,8 @@ module.exports = class Planet {
 			}
 		}
 
+		planet.Buildings[building]--; // Revert
+
 		return errormsg;
 	}
 
@@ -288,11 +294,7 @@ module.exports = class Planet {
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
 			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
-			if(errormsg !== '') { // We just update ressources
-				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
-				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
-			}
-
+			newData.Buildings[data.building]++;
 			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
 				if(!enoughPeople) {
 					errormsg = 'BUILDING_ERROR_PEOPLE';
@@ -323,7 +325,7 @@ module.exports = class Planet {
 					newData.resources[4] -= cost.copper;
 					newData.resources[5] -= cost.titanium;
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS/timeSpeed);
+					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed);
 					newData.nextBuilding = data.building;
 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
