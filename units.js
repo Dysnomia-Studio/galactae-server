@@ -156,6 +156,10 @@ module.exports = class Units {
 						});
 					}
 
+					if(shipToSave.parts.length !== shipShapesDetails[ship.type][ship.shape].partCount) {
+						return;
+					}
+
 					shipToSave.cost = Unit.calcCost(ship.shape,shipToSave.parts);
 
 					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure

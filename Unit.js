@@ -75,7 +75,7 @@
 		 * @return     {Array}   Unit total cost
 		 */
 		static calcCost(shipShape,parts) {
-			const totalCost = shipCosts[shipShape];
+			const totalCost = shipCosts[shipShape].slice(); // ATTENTION: on clone, on ne garde pas l'array de config
 
 			for(let id=0; id<parts.length; id++) {
 				if(!isset(shipCosts[parts[id].tech])) { // If we do our work, this would never happend but that's a security measure ..
@@ -83,7 +83,7 @@
 					return [-1];
 				}
 
-				const addCost = shipCosts[parts[id].tech];
+				const addCost = shipCosts[parts[id].tech].slice(); // ATTENTION: on clone, on ne garde pas l'array de config
 
 				for(let i=0; i<6; i++) {
 					if(shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {

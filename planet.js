@@ -569,7 +569,9 @@ module.exports = class Planet {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 			// Calcul avec les nouveaux bâtiments
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
+			const tmpBuildings = dataIn.Buildings.slice();
+			tmpBuildings[dataIn.nextBuilding]++;
+			resources = Planet.CalcNewResources(resources,tmpBuildings,dataIn.planetType,Dtime,user,-1);
 		}
 
 		return resources;
