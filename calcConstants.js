@@ -452,7 +452,7 @@ module.exports = function() {
 					cloak: ['none'],
 					scanner: ['none'],
 					sub_propulsion: ['vsolaire','ion','pplasma'],
-					sup_propulsion: ['vsl','wd'],
+					sup_propulsion: ['none','vsl','wd'],
 				},
 				partCount: 5,
 			},
