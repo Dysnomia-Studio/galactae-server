@@ -342,16 +342,17 @@ module.exports = class Combat {
 	getAllUnits(callback) {
 		// Get units id list
 		const unitIdList = new Set();
-		for(const fleet of [].concat(this.atkFleets, this.defFleets)) {
-			for(const unit of fleet.units) {
+		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
+			for(const unit of currFleet.units) {
 				unitIdList.add(unit);
 			}
 		}
 
+		let added = 0;
 		function done(unit) {
 			this.unitCache[unit.id] = unit;
 
-			if(unitIdList.size <= this.unitCache.length) {
+			if(unitIdList.size <= ++added) {
 				callback();
 			}
 		}
@@ -389,6 +390,10 @@ module.exports = class Combat {
 				preventRestarts--;
 			});
 		});
+	}
+
+	addActionToBattleLog(action) {
+		this.battleLog.push(action);
 	}
 
 	/**
