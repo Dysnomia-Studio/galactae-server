@@ -27,16 +27,18 @@ module.exports = class Combat {
 	 * @param      {string}  team    Which team ?
 	 * @param      {Fleet}   fleet   Fleet details
 	 */
-	joinTeam(team, fleet) {
-		if(!isset(fleet, 'object')) {
+	joinTeam(team, currFleet) {
+		if(!isset(currFleet, 'object')) {
 			log('Fleet object misbuilded !','error');
 			return;
 		}
 
+		currFleet.unitsId = currFleet.units.keys();
+
 		if(team === 'atk') {
-			this.atkFleets.push(fleet);
+			this.atkFleets.push(currFleet);
 		} else if (team === 'def') {
-			this.defFleets.push(fleet);
+			this.defFleets.push(currFleet);
 		} else {
 			log('Team "' + team + '" not found !','error');
 		}
