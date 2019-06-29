@@ -1,24 +1,59 @@
 module.exports = class Combat {
 	/**
 	 * Constructs the object.
-	 *
-	 * @param      {<type>}  atk     Attack fleet
-	 * @param      {<type>}  def     Defence Fleet
 	 */
-	constructor() {
+	constructor(atkFleetId) {
 		// Flottes
 		this.atkFleets = [];
 		this.defFleets = [];
 
-		// Roles IA
-		this.atkAI = [];
-		this.defAI = [];
-
 		// Cache des types d'unités
 		this.unitCache = {};
 
+		// Cache des tactiques
+		this.tacticCache = {};
+
 		// Logs de bataille
 		this.battleLog = [];
+
+		this.atkFleetId = atkFleetId;
+	}
+
+	removeDuplicateFleets() {
+		const defFleetsId = this.defFleets.map((currFleet) => currFleet.id);
+		const tmpAtkFleets = this.atkFleets.filter((currFleet) => !defFleetsId.includes(currFleet.id));
+
+		const atkFleetsId = this.atkFleets.map((currFleet) => currFleet.id);
+		const tmpDefFleets = this.defFleets.filter((currFleet) => !atkFleetsId.includes(currFleet.id));
+
+		this.atkFleets = tmpAtkFleets;
+		this.defFleets = tmpDefFleets;
+	}
+
+	sortFleets() {
+		// Defense fleet attack first
+		this.defFleets.sort((a,b) => {
+			if(a.name === 'SHIP_DEF') {
+				return -1;
+			}
+			if(b.name === 'SHIP_DEF') {
+				return 1;
+			}
+
+			return 0;
+		});
+
+		// Attacking fleet first
+		this.atkFleets.sort((a,b) => {
+			if(a.id === this.atkFleetId) {
+				return -1;
+			}
+			if(b.id === this.atkFleetId) {
+				return 1;
+			}
+
+			return 0;
+		});
 	}
 
 	/**
@@ -66,8 +101,28 @@ module.exports = class Combat {
 	 *
 	 * @param      {Function}  callback  Function to call back after these calls
 	 */
-	getAllAI(callback) {
-		// @ADD: Get All AIs from db then call callback
+	getAllTactics(callback) {
+		// Get units id list
+		const tacticsIdList = new Set();
+		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
+			for(const unit of currFleet.units) {
+				tacticsIdList.add(unit.tactic);
+			}
+		}
+
+		let added = 0;
+		function done(tactic) {
+			this.tacticCache[tactic.id] = tactic;
+
+			if(tacticsIdList.size <= ++added) {
+				callback();
+			}
+		}
+
+		// Get all units from db
+		for(const tacticId of tacticsIdList) {
+			db.tactic.find(tacticId, done);
+		}
 	}
 
 	/**
@@ -102,10 +157,13 @@ module.exports = class Combat {
 	 * Simulate the whole fight
 	 */
 	fight() {
+		this.removeDuplicateFleets();
+		this.sortFleets();
+
 		if(this.atkFleets.length === 0 || this.defFleets.length === 0) { return; }
 
 		// Get all db data & Fight
-		this.getAllAI(function() {
+		this.getAllTactics(function() {
 			this.getAllUnits(function() {
 				while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
 					this.simulateTurn();
@@ -128,24 +186,27 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	saveLogs() {
-		// @ADD: Save report to database
+		// @TODO: Save report to database
 
-		// @ADD: Send report to client
+		// @TODO: Send report to client
 	}
 
-	static beginFight(data, pid) {
+	static beginFight(data, pid, atkUserId, atkFleetId) {
 		log('Begin of fight simulation - Planet: ' + pid, 'info');
 
-		// @ADD: check beginners protection
+		// @TODO: check beginners protection
 
 		db.fleet.findByPosition(pid, function(fleetList) {
-			const battle = new Combat();
+			const battle = new Combat(atkFleetId);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
+				if(fleetList[i].endMoveTime > 0) { continue; }
+
 				if(fleetList[i].orbitPosition === 0) {
 					battle.joinTeam('def', fleetList[i]);
-				} else if(fleetList[i].orbitPosition === 1) {
+				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUserId) {
+					// @TODO: Add ally check
 					battle.joinTeam('atk', fleetList[i]);
 				}
 			}
