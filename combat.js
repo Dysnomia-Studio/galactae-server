@@ -79,21 +79,230 @@ module.exports = class Combat {
 		}
 	}
 
+	findUnit(type, fleets) {
+		const compatibleUnits = [];
+		for(const unit of this.unitCache) {
+			if(unit.shipType === type || type === '') {
+				compatibleUnits.push(unit);
+			}
+		}
+
+		let i = 0;
+		do {
+			for(const unitId in Object.keys(fleets[i])) {
+				if(compatibleUnits.length === 0 || compatibleUnits.includes(unitId)) {
+					return [fleets[i].id, unitId];
+				}
+			}
+		} while(++i < fleets.length);
+
+		return [-1, -1];
+	}
+
 	/**
 	 * Choose an ennemy depending on units, fleets and AI settings
 	 *
 	 * @param      {<type>}  unit    The unit
 	 * @param      {<type>}  fleet   The fleet
 	 */
-	chooseEnemy(unit, fleet) {
-		// @ADD: Get targets order
+	getTarget(unit, fleet, ennemyFleets) {
+		let choosenFleet,
+			choosenUnit;
+
+		const currTactic = this.tacticCache[fleet.tactic];
+		const compatibleTactics = currTactic.orders.filter((t) => t.unit === unit).map().sort((a,b) => {
+			if(a.priority < b.priority) {
+				return -1;
+			}
+			if(a.priority === b.priority) {
+				return 0;
+			}
+
+			return 1;
+		});
+
+		let blocked = false;
+		do {
+			if(compatibleTactics.length === 0) {
+				blocked = true;
+				compatibleTactics.push({ target: '', priority: 1 });
+			}
+
+			[choosenFleet, choosenUnit] = this.findUnit(compatibleTactics[0].target, ennemyFleets);
+
+			compatibleTactics.splice(0,1);
+		} while(choosenFleet === -1 && !blocked);
+
+		return { fleet: choosenFleet, unit: choosenUnit };
+	}
+
+	getShieldAbsorption(weapon, shield) {
+		if(shield === 'none') { return 0; }
+
+		let weaponType = '';
+		switch(weapon) {
+			case 'railgun':
+			case 'plasma':
+			case 'laser':
+				weaponType = weapon;
+				break;
+			case 'explosive':
+			case 'iem':
+				weaponType = 'lightMissile';
+				break;
+			case 'nuke':
+			case 'antimater':
+				weaponType = 'heavyMissile';
+				break;
+			default:
+				log('Shield absorption not defined for part ' + cannon);
+				return 0;
+		}
+
+		return shieldAbsorption[shield][weapon];
+	}
+
+	simulateDamage(source, destination) {
+		const sourceUnit = this.unitCache[source];
+		const destinationUnit = this.unitCache[destination];
+
+		const sourceWepons = sourceUnit.parts.filter((part) => part.type === 'cannon' || part.type === 'rocketLauncher');
+		const destinationShield = destinationUnit.parts.filter((part) => part.type === 'shield');
+
+		let damage = 0;
+		const logs = [];
+
+		for(const weapon of sourceWepons) {
+			let originalDamage = weaponDamage[weapon];
+
+			// @TODO: Desactivation de systèmes pour le prochain tour
+
+			for(const shield of destinationShield) {
+				originalDamage *= (1-this.getShieldAbsorption(weapon, shield));
+			}
+
+			// @TODO: Gestion du système singularité et du projecteur à distance via distanceShieldAbsorption
+
+			// @TODO: Add miss chance
+
+			damage += (Math.round(originalDamage * 100)/100);
+		}
+
+		if(damage > 1) {
+			damage = 1;
+		}
+
+		return [damage, logs];
 	}
 
 	/**
 	 * Simulate a turn between both sides
 	 */
 	simulateTurn() {
-		// @ADD: simulate battle for each units
+		const currDefFleets = {
+			fleetCounter: 0,
+			unitTypeCounter: 0,
+			unitNbCounter: 0,
+		};
+		const currAtkFleets = {
+			fleetCounter: 0,
+			unitTypeCounter: 0,
+			unitNbCounter: 0,
+		};
+
+		let atk = true;
+
+		let action;
+
+		while( (currDefFleets.fleetCounter + currAtkFleets.fleetCounter) < (this.defFleets.length + this.atkFleets.length) ) {
+			if(currAtkFleets.fleetCounter >= this.atkFleets.length) {
+				atk = false;
+			}
+			if(currDefFleets.fleetCounter >= this.defFleets.length) {
+				atk = true;
+			}
+
+			// Then simulate alternate
+			if(atk) {
+				const currUnitId = this.atkFleets[currAtkFleets.fleetCounter].unitId[currAtkFleets.unitTypeCounter];
+
+				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= currAtkFleets.unitNbCounter) {
+					currAtkFleets.unitTypeCounter++;
+					currAtkFleets.unitNbCounter = 0;
+					continue; // Retry with new unit type
+				}
+				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
+					currAtkFleets.fleetCounter++;
+					currAtkFleets.unitTypeCounter = 0;
+					continue; // Retry with new fleet
+				}
+
+				const target = this.getTarget(currUnitId, this.atkFleets[currDefFleets.fleetCounter].id, this.defFleets);
+				if(target.fleet === -1) { continue; } // Security
+
+				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
+
+				// @TODO: apply research bonuses
+
+				this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] -= target.damage;
+
+				if(this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] < 0) {
+					this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] = 0;
+				}
+
+				action = {
+					fleetSource: this.atkFleets[currDefFleets.fleetCounter].id,
+					fleetDestination: target.fleet,
+					unitSource: currUnitId,
+					unitDestination: target.unit,
+					damage: target.damage,
+					details: logs,
+				};
+
+				++currAtkFleets.unitNbCounter;
+			} else {
+				const currUnitId = this.defFleets[currDefFleets.fleetCounter].unitId[currDefFleets.unitTypeCounter];
+
+				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= currDefFleets.unitNbCounter) {
+					currDefFleets.unitTypeCounter++;
+					currDefFleets.unitNbCounter = 0;
+					continue; // Retry with new unit type
+				}
+				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
+					currDefFleets.fleetCounter++;
+					currDefFleets.unitTypeCounter = 0;
+					continue; // Retry with new fleet
+				}
+
+				const target = this.getTarget(currUnitId, this.defFleets[currDefFleets.fleetCounter].id, this.atkFleets);
+				if(target.fleet === -1) { continue; } // Security
+
+				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
+
+				// @TODO: apply research bonuses
+
+				this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] -= target.damage;
+
+				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] < 0) {
+					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] = 0;
+				}
+
+				action = {
+					fleetSource: this.defFleets[currDefFleets.fleetCounter].id,
+					fleetDestination: target.fleet,
+					unitSource: currUnitId,
+					unitDestination: target.unit,
+					damage: target.damage,
+					details: logs,
+				};
+
+				++currDefFleets.unitNbCounter;
+			}
+
+			atk = !atk;
+
+			this.addActionToBattleLog(action);
+		}
 	}
 
 	/**
