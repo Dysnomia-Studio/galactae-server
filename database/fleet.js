@@ -85,5 +85,5 @@ module.exports = {
 			if(err) { log(err, 'error'); return; }
 			callback();
 		});
-	}
+	},
 };

@@ -47,21 +47,27 @@ describe('• misc', function() {
             assert.equal(isset('test', 'string'), true);
         });
 
-        // numbers
-        it('isset(0, \'number\')', () => {
-            assert.equal(isset(0, 'number'), true);
+        // booleans
+        it('isset(0, \'boolean\')', () => {
+            assert.equal(isset(0, 'boolean'), false);
         });
-        it('isset(1, \'number\')', () => {
-            assert.equal(isset(1, 'number'), true);
+        it('isset(1, \'boolean\')', () => {
+            assert.equal(isset(1, 'boolean'), false);
         });
-        it('isset({}, \'number\')', () => {
-            assert.equal(isset({}, 'number'), false);
+        it('isset({}, \'boolean\')', () => {
+            assert.equal(isset({}, 'boolean'), false);
         });
-        it('isset([], \'number\')', () => {
-            assert.equal(isset([], 'number'), false);
+        it('isset([], \'boolean\')', () => {
+            assert.equal(isset([], 'boolean'), false);
         });
-        it('isset(\'test\', \'number\')', () => {
-            assert.equal(isset('test', 'number'), false);
+        it('isset(\'test\', \'boolean\')', () => {
+            assert.equal(isset('test', 'boolean'), false);
+        });
+        it('isset(false, \'boolean\')', () => {
+            assert.equal(isset(false, 'boolean'), true);
+        });
+        it('isset(true, \'boolean\')', () => {
+            assert.equal(isset(true, 'boolean'), true);
         });
 
         // arrays
@@ -107,6 +113,22 @@ describe('• misc', function() {
             assert.equal(isset('test', 'object'), false);
         });
 
+        // numbers
+        it('isset(0, \'number\')', () => {
+            assert.equal(isset(0, 'number'), true);
+        });
+        it('isset(1, \'number\')', () => {
+            assert.equal(isset(1, 'number'), true);
+        });
+        it('isset({}, \'number\')', () => {
+            assert.equal(isset({}, 'number'), false);
+        });
+        it('isset([], \'number\')', () => {
+            assert.equal(isset([], 'number'), false);
+        });
+        it('isset(\'test\', \'number\')', () => {
+            assert.equal(isset('test', 'number'), false);
+        });
 
         // no type
         it('isset(0)', () => {
