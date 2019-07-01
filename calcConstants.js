@@ -253,7 +253,7 @@ module.exports = function() {
 	this.specialUnitsUID = {
 		SHIP_WEP_MINES: '00000000-0000-0000-0000-000000000001',
 		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
-		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003'
+		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003',
 	};
 
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
@@ -677,8 +677,8 @@ module.exports = function() {
 					'wep_sat_ag1',
 					'wep_sat_ag2',
 					'wep_sat_ag3',
-				]
-			}
+				],
+			},
 		],
 		'unitsBuild':
 			[{ //@TODO: prendre en compte les mines
@@ -696,8 +696,8 @@ module.exports = function() {
 				researchList: [
 					'prop_vSolaire',
 					'prop_ions',
-				]
-			}
+				],
+			},
 		],
 		'interstellarFlight':[
 			{
@@ -707,7 +707,7 @@ module.exports = function() {
 			{
 				type: 'research',
 				research: 'prop_vsl',
-			}
+			},
 		],
 		/*'spy':
 			[{ //@TODO: prendre en compte corvette
@@ -758,7 +758,7 @@ module.exports = function() {
 				'thermodynamique',
 				'phyContemporaine',
 				'industrialistion',
-			]
+			],
 		}],
 		'endFirstPart': [],
 		'unitsCreate': [{
