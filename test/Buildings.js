@@ -248,4 +248,30 @@ describe('• Buildings', function() {
 			);
 		});
 	});
+
+
+	/**
+	 * hasEnoughtStorage
+	 */
+	describe('# hasEnoughtStorage()', () => {
+		it('all lvl 1', () => {
+			assert(
+				Buildings.hasEnoughtStorage(
+					{ Buildings: [1,1,1,1,1,1,1,1,1,1,1,1,1,1] },
+					1,
+					false
+				)
+			);
+		});
+
+		it('all lvl 10 except storage', () => {
+			assert(
+				!Buildings.hasEnoughtStorage(
+					{ Buildings: [10,10,10,10,10,1,10,10,10,10,10,10,10,10] },
+					1,
+					false
+				)
+			);
+		});
+	});
 });
