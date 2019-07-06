@@ -290,8 +290,8 @@
 		 * @param      {<type>}   buildingId  The building number
 		 * @return     {boolean}  True if has enough storage, False otherwise.
 		 */
-		static hasEnoughtStorage(planet, buildingId) {
-			const metal = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'))[1];
+		static hasEnoughtStorage(planet, buildingId, cp_molecular_compression) {
+			const metal = Buildings.calcStorageCapacity(planet.Buildings[5], planet.Buildings[10], cp_molecular_compression)[1];
 
 			const ratio = Resources.GetRatiosPerPlanet(planet.planetType);
 			const cost = Buildings.GetCost(buildingId, planet.Buildings[buildingId] + 1);

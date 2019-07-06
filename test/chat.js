@@ -1,7 +1,7 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
@@ -21,26 +21,26 @@ const dataModel = {
 	sid: '',
 };
 
-describe('• Chat', function() {
+describe('• Chat', () => {
 	/**
 	 * getPlanetCoords
 	 */
-	describe('# protect()', function() {
-		it('Empty tests: protect("normal message")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="normal message";
+	describe('# protect()', () => {
+		it('Empty tests: protect("normal message")', () => {
+			const inData = JSON.parse(JSON.stringify(dataModel));
+			inData.message='normal message';
 
-			let data = Chat.protect(inData);
+			const data = Chat.protect(inData);
 
 			assert.equal(
 				data.send,
 				true
 			);
 		});
-		it('Empty tests: protect(" ")', function() {
+		it('Empty tests: protect(" ")', () => {
 			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message=" ";
-			
+			inData.message=' ';
+
 			let data = Chat.protect(inData);
 
 			assert.equal(
@@ -50,8 +50,7 @@ describe('• Chat', function() {
 
 
 			inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="    ";
-			
+			inData.message='    ';
 
 			data = Chat.protect(inData);
 
@@ -61,11 +60,11 @@ describe('• Chat', function() {
 			);
 		});
 
-		it('Empty tests: protect(" ")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
+		it('Empty tests: protect(" ")', () => {
+			const inData = JSON.parse(JSON.stringify(dataModel));
 			inData.message=undefined;
-			
-			let data = Chat.protect(inData);
+
+			const data = Chat.protect(inData);
 
 			assert.equal(
 				data.send,
@@ -73,38 +72,46 @@ describe('• Chat', function() {
 			);
 		});
 
-		it('Link tests: protect("without link")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="normal message";
+		it('Link tests: protect("without link")', () => {
+			const inData = JSON.parse(JSON.stringify(dataModel));
+			inData.message='normal message';
 
-			let data = Chat.protect(inData);
+			const data = Chat.protect(inData);
 
 			assert.equal(
 				data.send,
 				true
 			);
 		});
-		it('Link tests: protect("with link (http:// ... )")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="with link (http:// ... )";
+		it('Link tests: protect("with link (http:// ... )")', () => {
+			const inData = JSON.parse(JSON.stringify(dataModel));
+			inData.message='with link (http:// ... )';
 
-			let data = Chat.protect(inData);
-
-			assert.equal(
-				data.send,
-				false
-			);
-		});
-		it('Link tests: protect("with link (www.blabla.com)")', function() {
-			let inData = JSON.parse(JSON.stringify(dataModel));
-			inData.message="with link (www.blabla.com)";
-
-			let data = Chat.protect(inData);
+			const data = Chat.protect(inData);
 
 			assert.equal(
 				data.send,
 				false
 			);
 		});
+		it('Link tests: protect("with link (www.blabla.com)")', () => {
+			const inData = JSON.parse(JSON.stringify(dataModel));
+			inData.message='with link (www.blabla.com)';
+
+			const data = Chat.protect(inData);
+
+			assert.equal(
+				data.send,
+				false
+			);
+		});
+	});
+
+
+	/**
+	 * sendCommand
+	 */
+	describe('# sendCommand()', () => {
+		// TODO
 	});
 });
