@@ -113,5 +113,60 @@ describe('• Tactics', () => {
 				})
 			);
 		});
+
+		it('order contain mine', () => {
+			assert(
+				!Tactics.checkTactic({
+					'orders': [
+						{ 'unit': 'blabla', 'target': 'target', 'priority': 1 },
+						{ 'unit': 'SHIP_WEP_MINES' },
+					],
+				})
+			);
+		});
+
+		it('order invalid unit', () => {
+			assert(
+				!Tactics.checkTactic({
+					'orders': [
+						{ 'unit': 'blabla', 'target': 'target', 'priority': 1 },
+						{ 'unit': 1, 'target': 'target2', 'priority': 12 },
+					],
+				})
+			);
+		});
+
+		it('order invalid target', () => {
+			assert(
+				!Tactics.checkTactic({
+					'orders': [
+						{ 'unit': 'blabla', 'target': 'target', 'priority': 1 },
+						{ 'unit': 'blabla', 'target': 1, 'priority': 12 },
+					],
+				})
+			);
+		});
+
+		it('order invalid priority', () => {
+			assert(
+				!Tactics.checkTactic({
+					'orders': [
+						{ 'unit': 'blabla', 'target': 'target', 'priority': 1 },
+						{ 'unit': 'blabla', 'target': 'target2', 'priority': 'priority' },
+					],
+				})
+			);
+		});
+
+		it('order ok', () => {
+			assert(
+				Tactics.checkTactic({
+					'orders': [
+						{ 'unit': 'blabla', 'target': 'target', 'priority': 1 },
+						{ 'unit': 'blabla', 'target': 'target2', 'priority': 12 },
+					],
+				})
+			);
+		});
 	});
 });
