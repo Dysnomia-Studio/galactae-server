@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Fleet = class Fleet {
+	exports.Fleets = class Fleets {
 		/**
 		 * Gets an unit speed depending on a specific tech & speed created by other
 		 * parts.
@@ -36,14 +36,14 @@
 			let tech = '';
 			let count = 0;
 
-			if(unit === undefined) { console.error('Error: undefined unit in Fleet.calcSpeed()'); return { speed: [] }; }
+			if(unit === undefined) { console.error('Error: undefined unit in Fleets.calcSpeed()'); return { speed: [] }; }
 
 			for(const i in unit.parts) {
 				if(unit.parts[i].type === type) {
 					tech = unit.parts[i].tech;
 					count++;
 
-					speed = Fleet.getSpeed(speed, tech);
+					speed = Fleets.getSpeed(speed, tech);
 					if(speed[0] === undefined) {
 						return { speed: [] };
 					}
@@ -60,7 +60,7 @@
 		 * @return     {Object}  Subspeed
 		 */
 		static calcSubSpeed(unit) {
-			return Fleet.calcSpeed(unit, 'sub_propulsion');
+			return Fleets.calcSpeed(unit, 'sub_propulsion');
 		}
 
 		/**
@@ -70,7 +70,7 @@
 		 * @return     {Object}  Supraspeed
 		 */
 		static calcSupraSpeed(unit) {
-			return Fleet.calcSpeed(unit, 'sup_propulsion');
+			return Fleets.calcSpeed(unit, 'sup_propulsion');
 		}
 
 		/**
@@ -123,11 +123,11 @@
 			for(const key in fleetUnits) {
 				const currUnit = unitList[unitListId.indexOf(key)];
 
-				const curr = Fleet.calcSubSpeed(currUnit);
+				const curr = Fleets.calcSubSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
-				min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
+				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
@@ -162,11 +162,11 @@
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
-				const curr = Fleet.calcSupraSpeed(currUnit);
+				const curr = Fleets.calcSupraSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
-				min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
+				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;

@@ -12,7 +12,7 @@ require('../misc')();
 
 global.db = require('../database');
 
-global.Fleets = require('../fleets');
+global.Fleets = require('../Fleets');
 global.Units = require('../units');
 
 let gameDb;

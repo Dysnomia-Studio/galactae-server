@@ -1,4 +1,4 @@
-module.exports = class Fleets {
+module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 	/**
 	 * Get and send unit data to user
 	 *
@@ -108,7 +108,7 @@ module.exports = class Fleets {
 
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
 			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList.slice(0));
+			[newPlanet, fleetList, empty] = Fleets.distributeFuel(planetData, fleetList.slice(0));
 
 			if(empty) { callback(fleetList, planetData); return; }
 
@@ -262,9 +262,9 @@ module.exports = class Fleets {
 
 				let minSpeed;
 				if(systemeDepart === systemeArrivee) {
-					minSpeed = Fleet.getMinSubSpeed(unitList, fleetReturned.units);
+					minSpeed = Fleets.getMinSubSpeed(unitList, fleetReturned.units);
 				} else {
-					minSpeed = Fleet.getMinSupraSpeed(unitList, fleetReturned.units);
+					minSpeed = Fleets.getMinSupraSpeed(unitList, fleetReturned.units);
 				}
 
 				if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
@@ -291,7 +291,7 @@ module.exports = class Fleets {
 								planeteArrivee,
 								now/1000);
 							if(Number.isNaN(baseDist) || baseDist < 0) { return; }
-							const baseTravelTime = Fleet.calcMoveTime(baseDist, minSpeed.speed);
+							const baseTravelTime = Fleets.calcMoveTime(baseDist, minSpeed.speed);
 
 							const previewDist = GameMap.getPlanetDistance(
 								planeteDepart,
@@ -299,7 +299,7 @@ module.exports = class Fleets {
 								now/1000 + Math.round(baseTravelTime*360000)/100);
 
 							if(Number.isNaN(previewDist) || previewDist < 0) { return; }
-							const previewTime = Fleet.calcMoveTime(previewDist, minSpeed.speed);
+							const previewTime = Fleets.calcMoveTime(previewDist, minSpeed.speed);
 
 							/* Final travel time:
 								Average of ...
@@ -314,10 +314,10 @@ module.exports = class Fleets {
 								Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
 							);
 
-							time = Fleet.calcMoveTime(dist, minSpeed.speed);
+							time = Fleets.calcMoveTime(dist, minSpeed.speed);
 						}
 
-						const fuel = Fleet.calcFuelCost(minSpeed.engines);
+						const fuel = Fleets.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel, 'number') || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGH_FUEL' });
@@ -438,7 +438,7 @@ module.exports = class Fleets {
 
 			// TODO: move cargo
 
-			Fleet.removeEmptyUnits(from);
+			Fleets.removeEmptyUnits(from);
 
 			db.fleet.update(from, function() {
 				db.fleet.update(to, function() {
