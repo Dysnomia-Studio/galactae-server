@@ -1,3 +1,5 @@
+global.playerList = [];
+
 module.exports = class Websocket {
 	static init() {
 		io.on('connection', function(socket) {
@@ -18,6 +20,9 @@ module.exports = class Websocket {
 				user.sid = socket.id;
 				// Log
 				log(user.username + ' ('+socket.id+') connected');
+
+				playerList.push(socket.id);
+
 				// Execution du code
 				Player.connect(user);
 			});
@@ -25,9 +30,16 @@ module.exports = class Websocket {
 			socket.on('game-disconnect', function(user) {
 				// Vars
 				if(!isset(user, 'object') || !isset(user.username, 'string') || !isset(user.id, 'string')) { return; }
+
+				if(!playerList.includes(socket.id)) { return; }
+
 				// User
 				user.sid = socket.id;
 				Player.isValid(user,function(user) { // Verify identity
+					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
+
+					playerList.splice(playerList.indexOf(socket.id), 1);
+
 					// Log
 					log(user.username + ' (' + socket.id + ') disconnected');
 					Player.disconnect(user);
@@ -40,8 +52,14 @@ module.exports = class Websocket {
 			socket.on('disconnect', function() {
 				const data = {};
 				data.sid = socket.id;
+
+				if(!playerList.includes(socket.id)) { return; }
+
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
+
+					playerList.splice(playerList.indexOf(socket.id), 1);
+
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
 					Player.disconnect(user);
@@ -66,30 +84,15 @@ module.exports = class Websocket {
 			*/
 			socket.on('planet-ask-data', function(data) {
 				// Vars
-				if(!isset(data, 'object')) { return; }
+				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string') || !isset(data.pid, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,0);
-				});
-			});
-			// Next/Prev planet
-			socket.on('planet-ask-data-prev', function(data) {
-				// Vars
-				if(!isset(data, 'object')) { return; }
-				// User
-				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,-1);
-				});
-			});
-			socket.on('planet-ask-data-next', function(data) {
-				// Vars
-				if(!isset(data, 'object')) { return; }
-				// User
-				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Planet.refresh(data,1);
+					if(globalCfg.dev) {
+						log('Asking planet');
+					}
+
+					Planet.refresh(data);
 				});
 			});
 
@@ -100,6 +103,10 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
+					if(globalCfg.dev) {
+						log('Asking map');
+					}
+
 					Planet.getWholeSystem(data);
 				});
 			});
@@ -151,7 +158,7 @@ module.exports = class Websocket {
 			// Units
 			socket.on('unit-type-create', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.ship, 'string') || !isset(data.username, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.ship, 'object') || !isset(data.username, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data,function(data) { // Verify identity
@@ -178,7 +185,7 @@ module.exports = class Websocket {
 			});
 			socket.on('unit-build', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.unit, 'string') || !isset(data.count, 'number') || !isset(data.fleet, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.unit, 'string') || !isset(data.count, 'number') || !isset(data.fleet)) { return; }
 				// User
 				data.sid = socket.id;
 
@@ -187,6 +194,10 @@ module.exports = class Websocket {
 				});
 			});
 			socket.on('units-ask-data', function(data) {
+				if(globalCfg.dev) {
+					log('Asking units');
+				}
+
 				// Vars
 				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string')) { return; }
 				// User
@@ -210,12 +221,12 @@ module.exports = class Websocket {
 			});
 			socket.on('fleet-move', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.fleetId, 'string') || !isset(data.destination, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.fleetId, 'string') || !isset(data.destination, 'string') || !isset(data.moveType, 'number')) { return; }
 				// User
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
-					Fleets.moveTo(data, data.fleetId, data.destination);
+					Fleets.moveTo(data, data.fleetId, data.destination, data.moveType);
 				});
 			});
 			socket.on('fleet-rename', function(data) {
@@ -300,6 +311,38 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Tutorial Confirm
+			socket.on('tutorial-confirm', function(data) {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.tutorial, 'string')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, function(user) { // Verify identity
+					db.player.searchBySid(user.sid,function(userReturned) {
+						data.pid = userReturned.planetlist[0];
+
+						Planet.refresh(data, (planetReturned) => {
+							db.fleet.findByMotherPlanet(planetReturned.id, (fleetsList) => {
+								db.unit.findByOwner(userReturned.id, (unitsList) => {
+									if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
+										return;
+									}
+
+									userReturned.tutorials[data.tutorial] = true;
+
+									db.player.update({
+										id: data.id,
+										tutorials: userReturned.tutorials
+									}, () => {
+										Planet.refresh(data);
+									});
+								});
+							});
+						}, true);
+					});
+				});
+			});
+
 			// Admin panel
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.password, 'string')) { return; }
@@ -378,6 +421,10 @@ module.exports = class Websocket {
 		io.to(sid).emit('notification', { type, args });
 	}
 
+	static sendTutorial(user, tutorial) {
+		io.to(user.sid).emit('tutorial', tutorial);
+	}
+
 	/**
 	 * Begins a server maintenance
 	 */
@@ -413,7 +460,7 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 5;
+		let decompte = 10;
 
 		setInterval(function() {
 			if(decompte>0) {

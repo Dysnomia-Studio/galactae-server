@@ -7,6 +7,10 @@ module.exports = class Fleets {
 	 * @return     {socket}  units   list of units types
 	 */
 	static refresh(pid,sid) {
+		if(globalCfg.dev) {
+			log('Refresh fleets');
+		}
+
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
@@ -14,22 +18,28 @@ module.exports = class Fleets {
 		db.fleet.findByMotherPlanet(pid, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			function sendtoPlayer(FleetList, newPlanet, sid) {
+			function sendtoPlayer(FleetList, newPlanet, sid, pid) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
 						id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
-					Planet.sendPlanetDataToUser({data: {name: newPlanet.name}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					if(newPlanet.address === pid) {
+						Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+					}
 				}
 
-				io.to(sid).emit('fleet-recieve-data', FleetList);
+				if(globalCfg.dev) {
+					log('Sending fleet');
+				}
+
+				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
 			}
 
 			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
-				if(!newPlanet || !newPlanet.unitBuildingFleetID) {
-					sendtoPlayer(FleetList, newPlanet, sid);
+				if(!newPlanet) {
+					sendtoPlayer(FleetList, newPlanet, sid, pid);
 					return;
 				}
 
@@ -45,7 +55,7 @@ module.exports = class Fleets {
 					}
 
 					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
-					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
+					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime >= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
 					}
@@ -60,13 +70,13 @@ module.exports = class Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							sendtoPlayer(FleetList, newPlanet, sid);
+							sendtoPlayer(FleetList, newPlanet, sid, pid);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					sendtoPlayer(FleetList, newPlanet, sid);
+					sendtoPlayer(FleetList, newPlanet, sid, pid);
 				}
 			});
 		});
@@ -98,9 +108,9 @@ module.exports = class Fleets {
 
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
 			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList);
+			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList.slice(0));
 
-			if(empty) { callback(fleetList); return; }
+			if(empty) { callback(fleetList, planetData); return; }
 
 			// Current in-orbit fleets
 			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {
@@ -156,7 +166,13 @@ module.exports = class Fleets {
 				// Send new list to client
 				Fleets.refresh(planetData.id,data.sid);
 
-				if(callback) { callback(newFleet); }
+				if(callback) {
+					db.fleet.findByMotherPlanet(planetData.id, (fleetList) => {
+						const outFleet = fleetList.filter((f) => f.name === data.fleetName)[0];
+
+						callback(outFleet);
+					});
+				}
 			});
 		});
 	}
@@ -192,7 +208,7 @@ module.exports = class Fleets {
 		}
 
 		// Find next unit
-		db.unit.find(unitIdList[i][0], function(unitReturned) {
+		db.unit.find(unitIdList[i], function(unitReturned) {
 			if(isset(unitReturned, 'object')) {
 				unitList.push(unitReturned);
 			}
@@ -200,8 +216,12 @@ module.exports = class Fleets {
 		});
 	}
 
-	static moveTo(user, fleetId, destination) {
+	static moveTo(user, fleetId, destination, moveType) {
 		const now = Date.now();
+
+		moveType = Math.round(moveType);
+		if(moveType < 0 || moveType > 3) { return; }
+		if(moveType === 3) { return; } // @TODO: remove this when adding spying
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
@@ -233,7 +253,7 @@ module.exports = class Fleets {
 			systemeArrivee.pop();
 			systemeArrivee = systemeArrivee.join('-');
 
-			Fleets.getUnitsList(fleetReturned.units, function(unitList) {
+			Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
 				if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
 					log(user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.');
 					Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_CARRIER' });
@@ -314,7 +334,7 @@ module.exports = class Fleets {
 
 							fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
 							fleetReturned.position = destination;
-							fleetReturned.orbitPosition = 2;
+							fleetReturned.orbitPosition = moveType;
 							if(destination === fleetReturned.motherPlanetAddress) {
 								fleetReturned.orbitPosition = 0;
 							}

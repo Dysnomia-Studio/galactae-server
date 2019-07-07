@@ -156,6 +156,10 @@ module.exports = class Units {
 						});
 					}
 
+					if(shipToSave.parts.length !== shipShapesDetails[ship.type][ship.shape].partCount) {
+						return;
+					}
+
 					shipToSave.cost = Unit.calcCost(ship.shape,shipToSave.parts);
 
 					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure
@@ -235,6 +239,8 @@ module.exports = class Units {
 	 * @param      string  unitData  What need to build ?
 	 */
 	static build(inputData) {
+		if(inputData.count < 1) { return; }
+
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) { return; }
@@ -247,11 +253,11 @@ module.exports = class Units {
 				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
-			const id = (inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':inputData.unit;
+			const id = (specialUnitsUID[inputData.unit] !== undefined)?specialUnitsUID[inputData.unit]:inputData.unit;
 			db.unit.find(id, function(unitReturned) {
-				if(inputData.unit.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES' && shipCosts[inputData.unit] !== undefined) {
+				if(specialUnitsUID[inputData.unit] !== undefined && shipCosts[inputData.unit] !== undefined) {
 					unitReturned = {};
-					unitReturned.id = inputData.unit;
+					unitReturned.id = specialUnitsUID[inputData.unit];
 					unitReturned.shipType = 'SHIP_DEF';
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
@@ -323,10 +329,14 @@ module.exports = class Units {
 						newPlanet.resources[4] -= totalCost[3];
 						newPlanet.resources[5] -= totalCost[2];
 
+						if(specialUnitsUID[inputData.unit] !== undefined) {
+							newPlanet.unitBuildingID = specialUnitsUID[inputData.unit];
+						}
+
 						// Update planet
 						db.planet.update(newPlanet);
 
-						if(inputData.unit.substr(0, 'SHIP_WEP_MINES'.length) !== 'SHIP_WEP_MINES') {
+						if(specialUnitsUID[inputData.unit] === undefined) {
 							// Update unit
 							unitData.owned += inputData.count;
 

@@ -46,15 +46,44 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(inputData,decalage=0) {
-		Planet.find(inputData,inputData.pid,decalage,function(planetReturned,userReturned,fleetReturned) {
-			const newPlanet = Planet.update(planetReturned,userReturned,fleetReturned);
+	static refresh(inputData, callback, disableTutorials=false) {
+		db.player.searchById(inputData.id, (userReturned) => {
+			db.planet.findByOwner(inputData.id, (planetsReturned) => {
+				for(const currPlanet of planetsReturned) {
+					db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
+						const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
 
-			db.planet.update(newPlanet);
+						db.planet.update(newPlanet);
 
-			Fleets.refresh(newPlanet.id,inputData.sid);
+						Fleets.refresh(newPlanet.id,inputData.sid);
 
-			Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						if(inputData.pid === currPlanet.address) {
+							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
+								db.unit.findByOwner(userReturned.id, (unitsList) => {
+									const oldCount = Object.keys(userReturned.tutorials).length;
+
+									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
+
+									if(Object.keys(userReturned.tutorials).length !== oldCount) {
+										db.player.update({
+											id: userReturned.id,
+											tutorials: userReturned.tutorials
+										});
+									}
+
+									Tutorials.checkTutorials(userReturned, newPlanet);
+								});
+							}
+
+							if(callback) {
+								callback(newPlanet);
+							} else {
+								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+							}
+						}
+					});
+				}
+			});
 		});
 	}
 
@@ -90,6 +119,10 @@ module.exports = class Planet {
 	 */
 	static sendPlanetDataToUser(data) {
 		data.sNow = Date.now();
+
+		if(globalCfg.dev) {
+			log('Sending planet');
+		}
 
 		delete data.id;
 
@@ -130,7 +163,7 @@ module.exports = class Planet {
 		}
 
 		//Metals
-		if(currentBuilding !== -1) {
+		if(currentBuilding !== 1) {
 			if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
 				for(let i=2; i<6; i++) {
 					resources[i] += (metalProdBase*time)*ratios[i-2];
@@ -227,6 +260,8 @@ module.exports = class Planet {
 			}
 		}
 
+		planet.Buildings[building]--; // Revert
+
 		return errormsg;
 	}
 
@@ -259,11 +294,7 @@ module.exports = class Planet {
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
 			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
-			if(errormsg !== '') { // We just update ressources
-				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
-				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
-			}
-
+			newData.Buildings[data.building]++;
 			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
 				if(!enoughPeople) {
 					errormsg = 'BUILDING_ERROR_PEOPLE';
@@ -294,7 +325,7 @@ module.exports = class Planet {
 					newData.resources[4] -= cost.copper;
 					newData.resources[5] -= cost.titanium;
 
-					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS/timeSpeed);
+					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed);
 					newData.nextBuilding = data.building;
 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
@@ -327,9 +358,11 @@ module.exports = class Planet {
 		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
 			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
 
-			const id = (newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES')?'000000000000000000000000':newPlanet.unitBuildingID;
-			db.unit.find(id, function(unitReturned) {
-				if(newPlanet.unitBuildingID.substr(0,'SHIP_WEP_MINES'.length) === 'SHIP_WEP_MINES') {
+			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
+				const key = Object.keys(specialUnitsUID).find(key => specialUnitsUID[key] === newPlanet.unitBuildingID);
+				if(key !== undefined) {
+					newPlanet.unitBuildingID = key;
+
 					unitReturned = {};
 					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
@@ -536,7 +569,9 @@ module.exports = class Planet {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
 			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
 			// Calcul avec les nouveaux bâtiments
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,Dtime,user,dataIn.nextBuilding);
+			const tmpBuildings = dataIn.Buildings.slice();
+			tmpBuildings[dataIn.nextBuilding]++;
+			resources = Planet.CalcNewResources(resources,tmpBuildings,dataIn.planetType,Dtime,user,-1);
 		}
 
 		return resources;

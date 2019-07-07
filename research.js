@@ -72,10 +72,6 @@ module.exports = class Research {
 
 		db.planet.find(user.planetlist[i],function(planetData) {
 			if(isset(planetData.currResearch, 'string') && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost, 'number') && researchData[planetData.currResearch] !== -1) {
-				if(!isset(researchData[planetData.currResearch], 'object')) {
-					researchData[planetData.currResearch] = 0;
-				}
-
 				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
 
 				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
