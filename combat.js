@@ -81,15 +81,16 @@ module.exports = class Combat {
 
 	findUnit(type, fleets) {
 		const compatibleUnits = [];
-		for(const unit of this.unitCache) {
+		for(const id in this.unitCache) {
+			const unit = this.unitCache[id];
 			if(unit.shipType === type || type === '') {
-				compatibleUnits.push(unit);
+				compatibleUnits.push(unit.id);
 			}
 		}
 
 		let i = 0;
 		do {
-			for(const unitId in Object.keys(fleets[i])) {
+			for(const unitId in fleets[i].units) {
 				if(compatibleUnits.length === 0 || compatibleUnits.includes(unitId)) {
 					return [fleets[i].id, unitId];
 				}
@@ -109,8 +110,9 @@ module.exports = class Combat {
 		let choosenFleet,
 			choosenUnit;
 
-		const currTactic = this.tacticCache[fleet.tactic];
-		const compatibleTactics = currTactic.orders.filter((t) => t.unit === unit).map().sort((a,b) => {
+		const currTactic = Object.assign({}, this.tacticCache[fleet.tactic]);
+
+		const compatibleTactics = currTactic.orders.filter((t) => t.unit === unit).sort((a,b) => {
 			if(a.priority < b.priority) {
 				return -1;
 			}
@@ -155,11 +157,11 @@ module.exports = class Combat {
 				weaponType = 'heavyMissile';
 				break;
 			default:
-				log('Shield absorption not defined for part ' + cannon);
+				log('Shield absorption not defined for part ' + weapon);
 				return 0;
 		}
 
-		return shieldAbsorption[shield][weapon];
+		return shieldAbsorption[shield][weaponType];
 	}
 
 	simulateDamage(source, destination) {

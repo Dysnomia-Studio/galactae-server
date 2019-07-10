@@ -204,4 +204,224 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 0);
 		});
 	});
+
+	/**
+	 * findUnit
+	 */
+	describe('# findUnit()', () => {
+		const units = {
+			'u1': { shipType: 'BLAH', id: 'u1' },
+			'u2': { shipType: 'BLAH', id: 'u2' },
+			'u3': { shipType: 'BLEH', id: 'u3' },
+		};
+
+		const battleArena = new Combat('f1');
+		battleArena.unitCache = units;
+
+		it('findUnit(specficType,_) : OK', () => {
+			let fleets = [
+				{ id: 'f1', units: { 'u3': 42 } },
+				{ id: 'f2', units: { 'u4': 123, 'u3': 42 } },
+				{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('BLAH', fleets),
+				['f3', 'u1']
+			);
+
+			fleets = [
+				{ id: 'f1', units: { 'u3': 42 } },
+				{ id: 'f2', units: { 'u4': 123, 'u2': 42 } },
+				{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('BLAH', fleets),
+				['f2', 'u2']
+			);
+		});
+
+		it('findUnit(specficType,_) : NOT FOUND', () => {
+			const fleets = [
+				{ id: 'f1', units: { 'u2': 42 } },
+				{ id: 'f2', units: { 'u4': 123, 'u2': 42 } },
+				{ id: 'f3', units: { 'u1': 123, 'u2': 42 } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('BLEH', fleets),
+				[-1, -1]
+			);
+		});
+
+		it('findUnit(specficType,_) : NO COMPATIBLE UNIT => ALL', () => {
+			const fleets = [
+				{ id: 'f1', units: { 'u3': 42 } },
+				{ id: 'f2', units: { 'u4': 123, 'u3': 42 } },
+				{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('BRUH', fleets),
+				['f1', 'u3']
+			);
+		});
+
+		it('findUnit("",_) : OK', () => {
+			const fleets = [
+				{ id: 'f1', units: { 'u3': 42 } },
+				{ id: 'f2', units: { 'u4': 123, 'u3': 42 } },
+				{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('', fleets),
+				['f1', 'u3']
+			);
+		});
+
+		it('findUnit("",_) : NOT FOUND', () => {
+			const fleets = [
+				{ id: 'f1', units: { } },
+			];
+
+			assert.deepEqual(
+				battleArena.findUnit('', fleets),
+				[-1, -1]
+			);
+		});
+	});
+
+	/**
+	 * getTarget()
+	 */
+	describe('# getTarget()', () => {
+		const units = {
+			'u1': { shipType: 'BLAH', id: 'u1' },
+			'u2': { shipType: 'BLAH', id: 'u2' },
+			'u3': { shipType: 'BLEH', id: 'u3' },
+		};
+
+		const tactics = {
+			't1': { orders: [
+				{ unit: 'u1', priority: 1, target: 'BLAH' },
+				{ unit: 'u1', priority: 3, target: 'BLEH' },
+				{ unit: 'u2', priority: 1, target: 'BLAH' },
+			] }
+		};
+
+		const fleets = [
+			{ id: 'f1', units: { 'u3': 42 } },
+			{ id: 'f2', units: { 'u4': 123, 'u3': 42 } },
+			{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+		];
+
+		const battleArena = new Combat(fleets[0].id);
+		battleArena.unitCache = units;
+		battleArena.tacticCache = tactics;
+
+		it('getTarget(_, _, _) - compatible: 1', () => {
+			assert.deepEqual(
+				battleArena.getTarget(
+					'u1',
+					{ tactic: 't1' },
+					fleets
+				),
+				{
+					fleet: 'f3',
+					unit: 'u1',
+				}
+			);
+		});
+
+		it('getTarget(_, _, _) - compatible: 0', () => {
+			assert.deepEqual(
+				battleArena.getTarget(
+					'u4',
+					{ tactic: 't1' },
+					fleets
+				),
+				{
+					fleet: 'f1',
+					unit: 'u3',
+				}
+			);
+		});
+	});
+
+	/**
+	 * getShieldAbsorption
+	 */
+	describe('# getShieldAbsorption()', () => {
+		const battleArena = new Combat('f1');
+
+		const weapons = ['railgun', 'plasma', 'laser', 'explosive', 'iem', 'nuke', 'antimater'];
+		const shields = ['magnetic', 'turret', 'singularity', 'projector'];
+
+		const weaponToType = {
+			'explosive': 'lightMissile',
+			'iem': 'lightMissile',
+			'nuke': 'heavyMissile',
+			'antimater': 'heavyMissile',
+		};
+
+		for(const weapon of weapons) {
+			let weaponName = weapon;
+			if(weaponToType[weaponName]) {
+				weaponName = weaponToType[weaponName];
+			}
+
+			for(const shield of shields) {
+				it('getShieldAbsorption(' + weapon + ', ' + shield + ')', () => {
+					assert.equal(
+						battleArena.getShieldAbsorption(weapon, shield),
+						shieldAbsorption[shield][weaponName]
+					);
+				});
+			}
+		}
+
+		it('getShieldAbsorption(_, none)', () => {
+			assert.equal(
+				battleArena.getShieldAbsorption('blah', 'none'),
+				0
+			);
+		});
+
+		it('getShieldAbsorption(invalid, magnetic)', () => {
+			assert.equal(
+				battleArena.getShieldAbsorption('invalid', 'magnetic'),
+				0
+			);
+		});
+	});
+
+	/**
+	 * Full battle
+	 */
+	/*describe('# full battle', () => {
+		it('No defending units', () => {
+			const fleetList = [
+
+			];
+
+			const battle = new Combat(atkFleetId);
+
+			// Add all fleets to fight
+			/*for(const i in fleetList) {
+				if(fleetList[i].endMoveTime > 0) { continue; }
+
+				if(fleetList[i].orbitPosition === 0) {
+					battle.joinTeam('def', fleetList[i]);
+				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUserId) {
+					// @TODO: Add ally check
+					battle.joinTeam('atk', fleetList[i]);
+				}
+			}
+
+			battle.fight();*//*
+		});
+	});*/
+
 });
