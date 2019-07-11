@@ -306,7 +306,7 @@ module.exports = function() {
 		// Scanners
 
 		// Hangar
-		hangarDouble: 'hangar_double',
+		hangarDouble: 'hangarDouble',
 
 		// Propulsion
 		vsl: 'prop_vsl',
