@@ -574,28 +574,28 @@ module.exports = function() {
 			plasma: 0.75,
 			laser: 0.03,
 			lightMissile: 0.25,
-			heavyMissile: 0
+			heavyMissile: 0,
 		},
 		turret: {
 			railgun: 0,
 			plasma: 0,
 			laser: 0,
 			lightMissile: 0.45,
-			heavyMissile: 0.65
+			heavyMissile: 0.65,
 		},
 		singularity: {
 			railgun: 0,
 			plasma: 0,
 			laser: 0,
 			lightMissile: 0,
-			heavyMissile: 0
+			heavyMissile: 0,
 		},
 		projector: {
 			railgun: 0,
 			plasma: 0,
 			laser: 0,
 			lightMissile: 0,
-			heavyMissile: 0
+			heavyMissile: 0,
 		},
 	};
 
