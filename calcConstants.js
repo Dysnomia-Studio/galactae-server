@@ -568,6 +568,37 @@ module.exports = function() {
 		hyperespace: 	25492,
 	};
 
+	this.shieldAbsorption = {
+		magnetic: {
+			railgun: 0.65,
+			plasma: 0.75,
+			laser: 0.03,
+			lightMissile: 0.25,
+			heavyMissile: 0,
+		},
+		turret: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0.45,
+			heavyMissile: 0.65,
+		},
+		singularity: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
+		projector: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
+	};
+
 	this.fuelStorage = {
 		SHIP_BATTLECRUISER_SMALL: 250000,
 

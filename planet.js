@@ -67,7 +67,7 @@ module.exports = class Planet {
 									if(Object.keys(userReturned.tutorials).length !== oldCount) {
 										db.player.update({
 											id: userReturned.id,
-											tutorials: userReturned.tutorials
+											tutorials: userReturned.tutorials,
 										});
 									}
 
