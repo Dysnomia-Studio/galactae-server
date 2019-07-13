@@ -6,7 +6,7 @@ const assert = require('assert');
 /**
  * My libs
  */
-global.db = require('../database');
+//global.db = require('../database');
 
 /*let gameDb;
 let generalDb;

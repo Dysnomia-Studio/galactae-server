@@ -316,23 +316,19 @@ module.exports = class Combat {
 		// Get units id list
 		const tacticsIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
-			for(const unit of currFleet.units) {
-				tacticsIdList.add(unit.tactic);
-			}
+			tacticsIdList.add(currFleet.tactic);
 		}
 
 		let added = 0;
-		function done(tactic) {
-			this.tacticCache[tactic.id] = tactic;
-
-			if(tacticsIdList.size <= ++added) {
-				callback();
-			}
-		}
-
 		// Get all units from db
 		for(const tacticId of tacticsIdList) {
-			db.tactic.find(tacticId, done);
+			db.tactic.find(tacticId, (tactic) => {
+				this.tacticCache[tactic.id] = tactic;
+
+				if(tacticsIdList.size <= ++added) {
+					callback();
+				}
+			});
 		}
 	}
 
@@ -345,23 +341,22 @@ module.exports = class Combat {
 		// Get units id list
 		const unitIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
-			for(const unit of currFleet.units) {
+			for(const unit in currFleet.units) {
 				unitIdList.add(unit);
 			}
 		}
 
 		let added = 0;
-		function done(unit) {
-			this.unitCache[unit.id] = unit;
-
-			if(unitIdList.size <= ++added) {
-				callback();
-			}
-		}
 
 		// Get all units from db
 		for(const unitId of unitIdList) {
-			db.unit.find(unitId, done);
+			db.unit.find(unitId, (unit) => {
+				this.unitCache[unit.id] = unit;
+
+				if(unitIdList.size <= ++added) {
+					callback();
+				}
+			});
 		}
 	}
 

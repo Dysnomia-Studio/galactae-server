@@ -10,8 +10,6 @@ require('../calcConstants')();
 require('../config')();
 require('../misc')();
 
-global.db = require('../database');
-
 global.Fleet = require('../Fleet').Fleet;
 
 describe('• Fleet', function() {

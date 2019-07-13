@@ -280,4 +280,38 @@ describe('• Research', function() {
 			);
 		});
 	});
+
+	/**
+	 * sendResearchDataToUser
+	 */
+	describe('# sendResearchDataToUser', () => {
+		it('sendResearchDataToUser(_, _, _)', (done) => {
+			const user = {
+				research: {
+					researchCenter: -1,
+					phyContemporaine: -1,
+				}
+			};
+
+			const data = {
+				sid: '0123456789',
+			};
+
+			global.io = {
+				to: (sid) => {
+					return {
+						emit: (event, content) => {
+							assert.equal(event, 'player-recieve-data');
+							assert.deepEqual(content, { research: user.research });
+							assert.equal(sid, data.sid);
+
+							done();
+						}
+					};
+				}
+			};
+
+			Research.sendResearchDataToUser(data, {}, user);
+		});
+	});
 });

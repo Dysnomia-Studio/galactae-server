@@ -1,10 +1,13 @@
 module.exports = class Privileges {
 	static isBannedFromChat(userId, callback) {
-		db.ban.find(userId, 1, function(banObj) {
-			if(isset(banObj, 'object')) {
-				for(let i=0; banObj.length; banObj++) {
-					if(banObj[i].ban_end < Date.now()) {
+		db.ban.find(userId, 1, (banObj) => {
+
+			if(isset(banObj, 'array')) {
+				for(let i=0; i < banObj.length; i++) {
+
+					if(banObj[i].ban_end > Date.now()) {
 						callback(true);
+						return;
 					}
 				}
 			}

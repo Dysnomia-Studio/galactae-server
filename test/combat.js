@@ -4,7 +4,14 @@
 const assert = require('assert');
 
 // On a pas besoin de log ici
-global.log = function() {};
+global.log       = function() {};
+
+global.db        = global.db || {};
+global.db.logs   = global.db.logs || {};
+global.db.tactic = global.db.tactic || {};
+global.db.unit   = global.db.unit || {};
+
+global.io        = global.io || {};
 
 /**
  * My libs
@@ -393,6 +400,162 @@ describe('• Combat', function() {
 			assert.equal(
 				battleArena.getShieldAbsorption('invalid', 'magnetic'),
 				0
+			);
+		});
+	});
+
+	/**
+	 * getAllTactics
+	 */
+	describe('# getAllTactics()', () => {
+		it('getAllTactics(_)', () => {
+			const battleArena = new Combat('f1');
+			battleArena.atkFleets = [
+				{ tactic: 't1' },
+				{ tactic: 't2' },
+				{ tactic: 't1' },
+			];
+
+			const tactics = [
+				{
+					id: 't1',
+					orders: [
+						{ unit: 'u1', priority: 1, target: 'BLAH' },
+						{ unit: 'u1', priority: 3, target: 'BLEH' },
+						{ unit: 'u2', priority: 1, target: 'BLAH' },
+					]
+				},
+				{
+					id: 't2',
+					orders: [
+						{ unit: 'u1', priority: 1, target: 'BLAH' },
+						{ unit: 'u1', priority: 3, target: 'BLEH' },
+						{ unit: 'u2', priority: 1, target: 'BLAH' },
+					]
+				}
+			];
+
+			db.tactic.find = (id, callback) => {
+				callback(tactics[tactics.map((t) => t.id).indexOf(id)]);
+			};
+
+			const expected = {
+				't1': tactics[0],
+				't2': tactics[1],
+			};
+
+			battleArena.getAllTactics(() => {
+				assert.deepEqual(
+					battleArena.tacticCache,
+					expected
+				);
+			});
+		});
+	});
+
+	/**
+	 * getAllUnits
+	 */
+	describe('# getAllUnits()', () => {
+		it('getAllUnits(_)', (done) => {
+			const battleArena = new Combat('f1');
+			battleArena.atkFleets = [
+				{ units: {'u1': 12, 'u2': 89 } },
+				{ units: {'u3': 85, 'u2': 2 } },
+				{ units: {'u3': 24, 'u2': 78 } },
+			];
+
+			const units = [
+				{ shipType: 'BLAH', id: 'u1' },
+				{ shipType: 'BLAH', id: 'u2' },
+				{ shipType: 'BLEH', id: 'u3' },
+			];
+
+			global.db.unit.find = (id, callback) => {
+				callback(units[units.map((u) => u.id).indexOf(id)]);
+			};
+
+			const timeout = setTimeout(
+				() => { assert(false); done(); },
+				2500
+			);
+
+			const expected = {
+				'u1': units[0],
+				'u2': units[1],
+				'u3': units[2],
+			};
+
+			battleArena.getAllUnits(() => {
+				clearTimeout(timeout);
+
+				assert.deepEqual(
+					battleArena.unitCache,
+					expected
+				);
+
+				done();
+			});
+		});
+	});
+
+	/**
+	 * addActionToBattleLog
+	 */
+	describe('# addActionToBattleLog()', () => {
+		it('addActionToBattleLog()', () => {
+			const battleArena = new Combat('f1');
+
+			const action = {
+				'message': 'test'
+			};
+
+			battleArena.addActionToBattleLog(action);
+
+			assert.deepEqual(
+				battleArena.battleLog,
+				[action]
+			);
+		});
+	});
+
+	/**
+	 * saveLogs
+	 */
+	describe('# saveLogs()', () => {
+		it('saveLogs', (done) => {
+			const timeout = setTimeout(
+				() => { assert(false, 'Logs are not saved/transmitted to client.'); done(); },
+				500
+			);
+
+			let added = 0;
+			const doneIt = () => {
+				if(++added === 2) {
+					clearTimeout(timeout);
+					done();
+				}
+			};
+
+			global.db.logs.save = () => {
+				doneIt();
+			};
+
+			global.io.emit = () => {
+				doneIt();
+			};
+
+			const battleArena = new Combat('f1');
+
+			const action = {
+				'message': 'test'
+			};
+
+			battleArena.addActionToBattleLog(action);
+
+			assert.deepEqual(
+				battleArena.battleLog,
+				[action]
 			);
 		});
 	});
