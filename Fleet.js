@@ -98,8 +98,10 @@
 		 */
 		static slowerSpeed(curr, other) {
 			const testDist = 1000; // Total galaxy
-			if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
+			if(!curr ||
+				(Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
 				(Math.pow(testDist, 2)*other[0] + testDist*other[1] + other[2])) { // Compare polynoms, more time = slower
+
 				return other;
 			}
 
@@ -157,7 +159,7 @@
 
 			const unitListId = unitList.map((unit) => unit.id);
 
-			for(let i=0; i<fleetUnits.length; i++) {
+			for(const key in fleetUnits) {
 				const currUnit = unitList[unitListId.indexOf(key)];
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
