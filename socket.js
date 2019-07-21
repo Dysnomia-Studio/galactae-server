@@ -332,7 +332,7 @@ module.exports = class Websocket {
 
 									db.player.update({
 										id: data.id,
-										tutorials: userReturned.tutorials
+										tutorials: userReturned.tutorials,
 									}, () => {
 										Planet.refresh(data);
 									});

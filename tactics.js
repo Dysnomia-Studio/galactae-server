@@ -52,11 +52,11 @@ module.exports = class Tactics {
 
 		// Check orders content
 		for(const order of tactic.orders) {
-			if(order.unit.includes('SHIP_WEP_MINES')) { return false; }
-
 			if( !isset(order.unit, 'string') ||
 				!isset(order.target, 'string') ||
 				!isset(order.priority, 'number')) { return false; }
+
+			if(order.unit.includes('SHIP_WEP_MINES')) { return false; }
 		}
 
 		return true;

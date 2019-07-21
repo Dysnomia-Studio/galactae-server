@@ -253,7 +253,7 @@ module.exports = function() {
 	this.specialUnitsUID = {
 		SHIP_WEP_MINES: '00000000-0000-0000-0000-000000000001',
 		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
-		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003'
+		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003',
 	};
 
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
@@ -306,7 +306,7 @@ module.exports = function() {
 		// Scanners
 
 		// Hangar
-		hangarDouble: 'hangar_double',
+		hangarDouble: 'hangarDouble',
 
 		// Propulsion
 		vsl: 'prop_vsl',
@@ -568,6 +568,37 @@ module.exports = function() {
 		hyperespace: 	25492,
 	};
 
+	this.shieldAbsorption = {
+		magnetic: {
+			railgun: 0.65,
+			plasma: 0.75,
+			laser: 0.03,
+			lightMissile: 0.25,
+			heavyMissile: 0,
+		},
+		turret: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0.45,
+			heavyMissile: 0.65,
+		},
+		singularity: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
+		projector: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
+	};
+
 	this.fuelStorage = {
 		SHIP_BATTLECRUISER_SMALL: 250000,
 
@@ -677,8 +708,8 @@ module.exports = function() {
 					'wep_sat_ag1',
 					'wep_sat_ag2',
 					'wep_sat_ag3',
-				]
-			}
+				],
+			},
 		],
 		'unitsBuild':
 			[{ //@TODO: prendre en compte les mines
@@ -696,8 +727,8 @@ module.exports = function() {
 				researchList: [
 					'prop_vSolaire',
 					'prop_ions',
-				]
-			}
+				],
+			},
 		],
 		'interstellarFlight':[
 			{
@@ -707,7 +738,7 @@ module.exports = function() {
 			{
 				type: 'research',
 				research: 'prop_vsl',
-			}
+			},
 		],
 		/*'spy':
 			[{ //@TODO: prendre en compte corvette
@@ -758,7 +789,7 @@ module.exports = function() {
 				'thermodynamique',
 				'phyContemporaine',
 				'industrialistion',
-			]
+			],
 		}],
 		'endFirstPart': [],
 		'unitsCreate': [{

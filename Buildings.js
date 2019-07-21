@@ -186,14 +186,22 @@
 
 			for(let i=0; i<buildingParents[id].research.length; i++) {
 				if(!Research.isSearched(user, buildingParents[id].research[i])) {
-					requirements += ', ' + translate['research'][buildingParents[id].research[i]].name;
+					requirements += ', ';
+
+					if(typeof translate !== 'undefined') {
+						requirements += translate['research'][buildingParents[id].research[i]].name;
+					}
 				}
 			}
 
 			for(let i=0; i<buildingParents[id].building.length; i++) {
 				const currentBuilding = buildingParents[id].building[i];
 				if(currentBuilding[1] > planet.Buildings[currentBuilding[0]]) {
-					requirements += ', ' + translate['buildings'][currentBuilding[0]].name + ' ' + translate.messages['LEVEL'] + ' ' + currentBuilding[1];
+					requirements += ', ';
+
+					if(typeof translate !== 'undefined') {
+						requirements += translate['buildings'][currentBuilding[0]].name + ' ' + translate.messages['LEVEL'] + ' ' + currentBuilding[1];
+					}
 				}
 			}
 
@@ -282,8 +290,8 @@
 		 * @param      {<type>}   buildingId  The building number
 		 * @return     {boolean}  True if has enough storage, False otherwise.
 		 */
-		static hasEnoughtStorage(planet, buildingId) {
-			const metal = Buildings.calcStorageCapacity(planet.Buildings[5], buildings[10], research.isSearched('cp_molecular_compression'))[1];
+		static hasEnoughtStorage(planet, buildingId, cp_molecular_compression) {
+			const metal = Buildings.calcStorageCapacity(planet.Buildings[5], planet.Buildings[10], cp_molecular_compression)[1];
 
 			const ratio = Resources.GetRatiosPerPlanet(planet.planetType);
 			const cost = Buildings.GetCost(buildingId, planet.Buildings[buildingId] + 1);
