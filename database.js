@@ -103,7 +103,7 @@ module.exports = {
 
 	stat: {
 		submit: (currTime) => {
-			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, playerList.length], (err) => {
+			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, playerList.size], (err) => {
 				if(err) { log(err, 'error'); return; }
 			});
 		},

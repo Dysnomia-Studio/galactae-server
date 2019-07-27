@@ -14,31 +14,31 @@ require('../misc')();
 
 global.Buildings    = require('../Buildings').Buildings;
 
-describe('• Buildings', function() {
+describe('• Buildings', () => {
 	/**
 	 * GetCost
 	 */
-	describe('# GetCost()', function() {
-		it('build < 0', function() {
+	describe('# GetCost()', () => {
+		it('build < 0', () => {
 			assert.equal(
 				Buildings.GetCost(-1),
 				undefined
 			);
 		});
 
-		it('build = 0, level = 1', function() {
+		it('build = 0, level = 1', () => {
 			assert(
 				isset(Buildings.GetCost(0, 1), 'object')
 			);
 		});
 
-		it('build = max-1, level = 10', function() {
+		it('build = max-1, level = 10', () => {
 			assert(
 				isset(Buildings.GetCost(globalConst.buildingNumber-1, 10), 'object')
 			);
 		});
 
-		it('build >= max', function() {
+		it('build >= max', () => {
 			assert.equal(
 				Buildings.GetCost(globalConst.buildingNumber),
 				undefined
