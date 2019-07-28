@@ -2,7 +2,7 @@ module.exports = class Combat {
 	/**
 	 * Constructs the object.
 	 */
-	constructor(atkFleetId) {
+	constructor(atkFleetId, userId, sid) {
 		// Flottes
 		this.atkFleets = [];
 		this.defFleets = [];
@@ -15,6 +15,9 @@ module.exports = class Combat {
 
 		// Logs de bataille
 		this.battleLog = [];
+
+		this.plySid = sid;
+		this.userId = userId;
 
 		this.atkFleetId = atkFleetId;
 	}
@@ -367,26 +370,28 @@ module.exports = class Combat {
 		this.removeDuplicateFleets();
 		this.sortFleets();
 
-		if(this.atkFleets.length === 0 || this.defFleets.length === 0) { return; }
-
-		// Get all db data & Fight
-		this.getAllTactics(function() {
-			this.getAllUnits(function() {
-				while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
-					this.simulateTurn();
-				}
-
-				this.saveLogs();
-
-				if(this.atkFleets.length === 0) {
-					log('End of fight simulation - Planet: ' + pid + ' - Def wins', 'info');
-				} else {
-					log('End of fight simulation - Planet: ' + pid + ' - Atk wins', 'info');
-				}
-
-				preventRestarts--;
+		if(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
+			// Get all db data & Fight
+			this.getAllTactics(function() {
+				this.getAllUnits(function() {
+					while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
+						this.simulateTurn();
+					}
+				});
 			});
-		});
+		}
+
+		this.saveLogs();
+
+		if(this.atkFleets.length === 0) {
+			log('End of fight simulation - Planet: ' + pid + ' - Def wins', 'info');
+		} else {
+			log('End of fight simulation - Planet: ' + pid + ' - Atk wins', 'info');
+		}
+
+		// @TODO: save new fleet status (and delete empty fleets ofc)
+
+		preventRestarts--;
 	}
 
 	addActionToBattleLog(action) {
@@ -397,9 +402,16 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	saveLogs() {
-		// @TODO: Save report to database
+		const battleLog = {};
+		// @TODO: format battle log:
+		// - save units/fleet names instead of their ids if they are deleted
+		// - save atkFleet (id and name)
+		// - save date
+		// - save userId (attackers and defenders)
+		// - save location
 
-		// @TODO: Send report to client
+		io.to(this.plySid).emit('combat-battleLog-send', battleLog);
+		db.logs.save(battleLog);
 	}
 
 	static beginFight(data, pid, atkUserId, atkFleetId) {
@@ -407,12 +419,12 @@ module.exports = class Combat {
 
 		// @TODO: check beginners protection
 
-		db.fleet.findByPosition(pid, function(fleetList) {
-			const battle = new Combat(atkFleetId);
+		db.fleet.findByPosition(pid, (fleetList) => {
+			const battle = new Combat(atkFleetId, atkUserId, data.sid);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime > 0) { continue; }
+				if(fleetList[i].endMoveTime > Date.now()) { continue; }
 
 				if(fleetList[i].orbitPosition === 0) {
 					battle.joinTeam('def', fleetList[i]);
