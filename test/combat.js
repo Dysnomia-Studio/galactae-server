@@ -7,11 +7,14 @@ const assert = require('assert');
 global.log       = function() {};
 
 global.db        = global.db || {};
+global.db.fleet   = global.db.fleet || {};
 global.db.logs   = global.db.logs || {};
 global.db.tactic = global.db.tactic || {};
 global.db.unit   = global.db.unit || {};
 
 global.io        = global.io || {};
+
+global.preventRestarts = 0;
 
 /**
  * My libs
@@ -541,8 +544,15 @@ describe('• Combat', function() {
 				doneIt();
 			};
 
-			global.io.emit = () => {
-				doneIt();
+			global.io = {
+				to: (sid) => {
+					return {
+						emit: (event, content) => {
+							console.log('550');
+							doneIt();
+						}
+					};
+				}
 			};
 
 			const battleArena = new Combat('f1');
@@ -563,28 +573,49 @@ describe('• Combat', function() {
 	/**
 	 * Full battle
 	 */
-	/*describe('# full battle', () => {
-		it('No defending units', () => {
-			const fleetList = [
+	describe('# beginFight', () => {
+		it('No defending units', (done) => {
+			let doneSteps = 0;
+			let ioLogs = {};
+			let dbLogs = {};
+			const expectedLogs = {
+				'userId': 'P1',
+				'user_name': 'Player 1',
 
-			];
+				
+			}; // Real log content
+			const stepEnd = () => {
+				if(++doneSteps === 2) {
+					assert.deepEqual(ioLogs, dbLogs);
+					assert.deepEqual(expectedLogs, ioLogs);
 
-			const battle = new Combat(atkFleetId);
-
-			// Add all fleets to fight
-			/*for(const i in fleetList) {
-				if(fleetList[i].endMoveTime > 0) { continue; }
-
-				if(fleetList[i].orbitPosition === 0) {
-					battle.joinTeam('def', fleetList[i]);
-				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUserId) {
-					// @TODO: Add ally check
-					battle.joinTeam('atk', fleetList[i]);
+					done();
 				}
-			}
+			};
 
-			battle.fight();*//*
+			global.io = {
+				to: (sid) => {
+					return {
+						emit: (event, content) => {
+							ioLogs = content;
+							stepEnd();
+						}
+					};
+				}
+			};
+			global.db.logs.save = (content) => {
+				dbLogs = content;
+				stepEnd();
+			};
+			global.db.fleet.findByPosition = (pid, callback) => {
+				callback([
+					{ id: 'f1', units: { 'u3': 42 } },
+					{ id: 'f2', units: { 'u4': 123, 'u3': 42 } },
+					{ id: 'f3', units: { 'u1': 123, 'u3': 42 } },
+				]);
+			};
+
+			Combat.beginFight({}, 'P1', 'u2', 'f3');
 		});
-	});*/
-
+	});
 });

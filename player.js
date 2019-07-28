@@ -204,7 +204,7 @@ module.exports = class Player {
 			}
 		}
 
-		points*=pointsCoef.research;
+		points *= pointsCoef.research;
 
 		return points;
 	}
