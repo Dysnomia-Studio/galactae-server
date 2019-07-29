@@ -533,7 +533,8 @@ describe('• Combat', function() {
 			);
 
 			let added = 0;
-			const doneIt = () => {
+			const stepEnd = () => {
+				console.log('stepEnd');
 				if(++added === 2) {
 					clearTimeout(timeout);
 					done();
@@ -541,15 +542,15 @@ describe('• Combat', function() {
 			};
 
 			global.db.logs.save = () => {
-				doneIt();
+				stepEnd();
 			};
 
 			global.io = {
 				to: (sid) => {
 					return {
 						emit: (event, content) => {
-							console.log('550');
-							doneIt();
+							console.log("552");
+							stepEnd(sid, event, content);
 						}
 					};
 				}
@@ -579,10 +580,21 @@ describe('• Combat', function() {
 			let ioLogs = {};
 			let dbLogs = {};
 			const expectedLogs = {
-				'userId': 'P1',
-				'user_name': 'Player 1',
+				atk_user_id: 'P1',
+				atk_user_name: 'Player 1',
 
-				
+				atk_fleet_id: 'F1',
+				atk_fleet_name: 'Fleet 1',
+
+
+				def_user_id: 'P1',
+				def_user_name: 'Player 1',
+
+				//date: Date.now(),
+
+				location: '1-1-1-P1',
+
+				logs: [],
 			}; // Real log content
 			const stepEnd = () => {
 				if(++doneSteps === 2) {
@@ -597,8 +609,8 @@ describe('• Combat', function() {
 				to: (sid) => {
 					return {
 						emit: (event, content) => {
-							ioLogs = content;
-							stepEnd();
+							console.log("611");
+							stepEnd(sid, event, content);
 						}
 					};
 				}

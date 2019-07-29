@@ -297,15 +297,20 @@ describe('• Research', function() {
 				sid: '0123456789',
 			};
 
+			const stepEnd = (sid, event, content) => {
+				assert.equal(event, 'player-recieve-data');
+				assert.deepEqual(content, { research: user.research });
+				assert.equal(sid, data.sid);
+
+				done();
+			};
+
 			global.io = {
 				to: (sid) => {
 					return {
 						emit: (event, content) => {
-							assert.equal(event, 'player-recieve-data');
-							assert.deepEqual(content, { research: user.research });
-							assert.equal(sid, data.sid);
-
-							done();
+							console.log("312");
+							stepEnd(sid, event, content);
 						}
 					};
 				}
