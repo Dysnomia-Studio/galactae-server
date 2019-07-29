@@ -104,6 +104,8 @@ module.exports = class Fleets {
 			}
 		}
 
+		if(fleetList.length === 0) { callback(fleetList); return; }
+
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
 			if(!haveToUpdate) { callback(fleetList, planetData); return; }
 
