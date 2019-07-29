@@ -104,9 +104,9 @@ module.exports = class Fleets {
 			}
 		}
 
-		if(!haveToUpdate) { callback(fleetList); return; }
-
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
+			if(!haveToUpdate) { callback(fleetList, planetData); return; }
+
 			let newPlanet, empty;
 			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList.slice(0));
 
