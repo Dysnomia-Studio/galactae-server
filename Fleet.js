@@ -211,7 +211,7 @@
 				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
 
 				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
-					haveToUpdate.push(i);
+					haveToUpdate.push(fleetList[i].id);
 				}
 			}
 
@@ -236,7 +236,7 @@
 			// Current planet fleets
 			while(haveToUpdate.length > 0 && planet.resources[1] > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
-					const id = haveToUpdate[i];
+					const id = fleetList.map(f => f.id).indexOf(haveToUpdate[i]);
 
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
