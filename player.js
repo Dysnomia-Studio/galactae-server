@@ -65,13 +65,13 @@ module.exports = class Player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
+							if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
 							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
+						if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
 						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
