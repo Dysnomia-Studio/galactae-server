@@ -65,13 +65,13 @@ module.exports = class Player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
+							if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
 							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						if(dataReturned.length === 0) { console.error('User: ' + data.username + ' not found !'); return; }
+						if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
 						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
@@ -276,13 +276,13 @@ module.exports = class Player {
 
 			if(choice===2 && helium!==0) {
 				Planet.find(userData,userData.pid,0,function(planetReturned) {
-					if(userData.pid!==planetReturned.id) { // Stop if not belonging
+					if(userData.pid !== planetReturned.address) { // Stop if not belonging
 						Websocket.SendMessageToClient({ sid: userData.sid, message: 'ERROR_NOT_BELONGING' });
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !','fail');
 						return;
 					}
 
-					const newPlanetData = Planet.update(planetReturned);
+					const newPlanetData = Planet.update(planetReturned, data, []);
 
 					newPlanetData.resources[1]+=helium;
 
