@@ -105,5 +105,22 @@
 
 			return totalCost;
 		}
+
+		static get specialUnits() {
+			const units = {};
+
+			for(const name in specialUnitsUID) {
+				units[specialUnitsUID[name]] = {
+					id: [specialUnitsUID[name]],
+					name: fleetTranslate[name],
+					note: 0, // @ADD: Note
+					cost: shipCosts[name],
+					shipShape: name,
+					shipType: 'SHIP_DEF',
+				};
+			}
+
+			return units;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);
