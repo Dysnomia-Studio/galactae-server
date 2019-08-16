@@ -309,7 +309,6 @@ describe('• Research', function() {
 				to: (sid) => {
 					return {
 						emit: (event, content) => {
-							console.log("312");
 							stepEnd(sid, event, content);
 						}
 					};

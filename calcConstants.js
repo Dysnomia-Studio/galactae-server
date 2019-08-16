@@ -255,6 +255,7 @@ module.exports = function() {
 		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
 		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003',
 	};
+	this.fleetTranslate = {};
 
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
