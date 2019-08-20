@@ -637,6 +637,17 @@ module.exports = function() {
 		hangarDouble: -10,
 	};
 
+	this.weaponDamage = {
+		explosive: 		100,
+		nuke: 			400,
+		iem: 			80,
+		antimater: 		1000,
+		// Cannons
+		railgun: 		250,
+		laser: 			125,
+		plasma: 		500,
+	};
+
 	/**
 	 * Tactics
 	 */

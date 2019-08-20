@@ -5,17 +5,17 @@ const assert = require('assert');
 
 require('../calcConstants')();
 
-global.Unit       = require('../Unit').Unit;
+global.Unit			= require('../Unit').Unit;
 
-global.log       = function(txt) { console.log(txt); };
+global.log			= function(txt) { console.log(txt); };
 
-global.db        = global.db || {};
-global.db.fleet   = global.db.fleet || {};
-global.db.battleLog   = global.db.battleLog || {};
-global.db.tactic = global.db.tactic || {};
-global.db.unit   = global.db.unit || {};
+global.db			= global.db || {};
+global.db.fleet		= global.db.fleet || {};
+global.db.battleLog	= global.db.battleLog || {};
+global.db.tactic	= global.db.tactic || {};
+global.db.unit		= global.db.unit || {};
 
-global.io        = global.io || {};
+global.io			= global.io || {};
 
 global.preventRestarts = 0;
 
@@ -626,6 +626,14 @@ describe('• Combat', function() {
 			battleArena.atkFleets = [
 				{ id: 'f1', name: 'Fleet 1' },
 			];
+			battleArena.atkUser = {
+				id:'u2',
+				name:'User 2'
+			};
+			battleArena.defUser = {
+				id: 'u1',
+				name:'User 1',
+			};
 
 			const action = {
 				'message': 'test'
@@ -704,8 +712,13 @@ describe('• Combat', function() {
 				stepEnd();
 			};
 
-
-			Combat.beginFight({}, 'P1', 'u2', 'f3');
+			Combat.beginFight({}, 'P1', {
+				id:'u2',
+				name:'User 2'
+			}, {
+				id: 'u1',
+				name:'User 1',
+			}, 'f3');
 		});
 
 		it('Normal battle', (done) => {
@@ -713,13 +726,13 @@ describe('• Combat', function() {
 			let logs = {};
 
 			globalFleetList.push(
-				{ id: 'f4', name: 'Fleet 4', endMoveTime: -1, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
+				{ id: 'f4', name: 'Fleet 4', endMoveTime: -1, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
 			);
 			globalFleetList.push(
-				{ id: 'f5', name: 'Fleet 5', endMoveTime: -1, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, [specialUnitsUID.SHIP_WEP_MINES]: 54 } }
+				{ id: 'f5', name: 'Fleet 5', endMoveTime: -1, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 } }
 			);
 			globalFleetList.push(
-				{ id: 'f6', name: 'Fleet 6', endMoveTime: -1, tactic: 't3', ownerId: 'u3', orbitPosition: 0, units: { 'u1': 45, [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 12 } }
+				{ id: 'f6', name: 'Fleet 6', endMoveTime: -1, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
 			);
 
 			const stepEnd = () => {
@@ -728,6 +741,8 @@ describe('• Combat', function() {
 					assert(logs.logs.length > 0);
 
 					delete logs.date;
+					// TODO
+					logs.logs = [];
 
 					assert.deepEqual(logs, expectedLogs);
 
@@ -749,7 +764,13 @@ describe('• Combat', function() {
 				stepEnd();
 			};
 
-			Combat.beginFight({}, 'P1', 'u2', 'f3');
+			Combat.beginFight({}, 'P1', {
+				id:'u2',
+				name:'User 2'
+			}, {
+				id: 'u1',
+				name:'User 1',
+			}, 'f3');
 		});
 	});
 });

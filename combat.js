@@ -2,7 +2,7 @@ module.exports = class Combat {
 	/**
 	 * Constructs the object.
 	 */
-	constructor(atkFleetId, userId, sid, location) {
+	constructor(atkFleetId, atkUser, defUser, sid, location) {
 		// Flottes
 		this.atkFleets = [];
 		this.defFleets = [];
@@ -17,7 +17,8 @@ module.exports = class Combat {
 		this.battleLog = [];
 
 		this.plySid = sid;
-		this.userId = userId;
+		this.atkUser = atkUser;
+		this.defUser = defUser;
 
 		this.atkFleetId = atkFleetId;
 
@@ -180,27 +181,30 @@ module.exports = class Combat {
 		const sourceUnit = this.unitCache[source];
 		const destinationUnit = this.unitCache[destination];
 
-		console.log(sourceUnit);
-		console.log(destinationUnit);
-
-		const sourceWepons = sourceUnit.parts.filter((part) => part.type === 'cannon' || part.type === 'rocketLauncher');
-		const destinationShield = destinationUnit.parts.filter((part) => part.type === 'shield');
+		const sourceWepons = Unit.getWeapons(sourceUnit);
+		const destinationShield = Unit.getShields(destinationUnit);
 
 		let damage = 0;
 		const logs = [];
 
 		for(const weapon of sourceWepons) {
-			let originalDamage = weaponDamage[weapon];
+			let originalDamage = weaponDamage[weapon.tech];
+
+			if(fighterMult[this.unitCache[source].shipType]) {
+				originalDamage *= weaponDamage[weapon.tech];
+			}
 
 			// @TODO: Desactivation de systèmes pour le prochain tour
 
 			for(const shield of destinationShield) {
-				originalDamage *= (1-this.getShieldAbsorption(weapon, shield));
+				originalDamage *= (1-this.getShieldAbsorption(weapon.tech, shield.tech));
 			}
 
 			// @TODO: Gestion du système singularité et du projecteur à distance via distanceShieldAbsorption
 
 			// @TODO: Add miss chance
+
+			// @TODO: Add to logs
 
 			damage += (Math.round(originalDamage * 100)/100);
 		}
@@ -231,12 +235,6 @@ module.exports = class Combat {
 
 		let action;
 
-		console.log('simulateTurn');
-		console.log(currDefFleets);
-			console.log(this.defFleets);
-		console.log(currAtkFleets);
-			console.log(this.atkFleets);
-
 		while( (currDefFleets.fleetCounter + currAtkFleets.fleetCounter) < (this.defFleets.length + this.atkFleets.length) ) {
 			if(currAtkFleets.fleetCounter >= this.atkFleets.length) {
 				atk = false;
@@ -245,23 +243,24 @@ module.exports = class Combat {
 				atk = true;
 			}
 
-			console.log('New Turn');
-			console.log(currDefFleets);
-				console.log(this.defFleets);
-			console.log(currAtkFleets);
-				console.log(this.atkFleets);
-			console.log(atk);
-
 			// Then simulate alternate
 			if(atk) {
 				const currUnitId = this.atkFleets[currAtkFleets.fleetCounter].unitsId[currAtkFleets.unitTypeCounter];
 
-				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= currAtkFleets.unitNbCounter) {
+				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= currAtkFleets.unitNbCounter ||
+					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
+
 					currAtkFleets.unitTypeCounter++;
 					currAtkFleets.unitNbCounter = 0;
+
+					if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length === currAtkFleets.unitTypeCounter) {
+						currAtkFleets.fleetCounter++;
+						currAtkFleets.unitTypeCounter = 0;
+					}
+
 					continue; // Retry with new unit type
 				}
-				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
+				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length === currAtkFleets.unitTypeCounter) {
 					currAtkFleets.fleetCounter++;
 					currAtkFleets.unitTypeCounter = 0;
 					continue; // Retry with new fleet
@@ -271,12 +270,6 @@ module.exports = class Combat {
 				if(target.fleet === -1) { continue; } // Security
 
 				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
-
-				console.log("===== TURN SIM ATK ===");
-				console.log(target);
-				console.log(damage);
-				console.log(logs);
-				console.log("======================");
 
 				// @TODO: apply research bonuses
 
@@ -299,12 +292,20 @@ module.exports = class Combat {
 			} else {
 				const currUnitId = this.defFleets[currDefFleets.fleetCounter].unitsId[currDefFleets.unitTypeCounter];
 
-				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= currDefFleets.unitNbCounter) {
+				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= currDefFleets.unitNbCounter ||
+					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
+
 					currDefFleets.unitTypeCounter++;
 					currDefFleets.unitNbCounter = 0;
+
+					if(this.defFleets[currDefFleets.fleetCounter].unitsId.length === currDefFleets.unitTypeCounter) {
+						currDefFleets.fleetCounter++;
+						currDefFleets.unitTypeCounter = 0;
+					}
+
 					continue; // Retry with new unit type
 				}
-				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
+				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length === currDefFleets.unitTypeCounter) {
 					currDefFleets.fleetCounter++;
 					currDefFleets.unitTypeCounter = 0;
 					continue; // Retry with new fleet
@@ -315,18 +316,14 @@ module.exports = class Combat {
 
 				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
 
-				console.log("===== TURN SIM DEF ===");
-				console.log(target);
-				console.log(damage);
-				console.log(logs);
-				console.log("======================");
-
 				// @TODO: apply research bonuses
 
-				this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] -= damage;
+				const fleetIndex = this.atkFleets.map((f) => f.id).indexOf(target.fleet);
 
-				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] < 0) {
-					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] = 0;
+				this.atkFleets[fleetIndex].units[target.unit] -= damage;
+
+				if(this.atkFleets[fleetIndex].units[target.unit] < 0) {
+					this.atkFleets[fleetIndex].units[target.unit] = 0;
 				}
 
 				action = {
@@ -344,9 +341,6 @@ module.exports = class Combat {
 			atk = !atk;
 
 			this.addActionToBattleLog(action);
-
-			//TEMP
-			return;
 		}
 	}
 
@@ -423,9 +417,15 @@ module.exports = class Combat {
 			// Get all db data & Fight
 			this.getAllTactics(() => {
 				this.getAllUnits(() => {
-					//while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
+					let i = 0;
+					while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
 						this.simulateTurn();
-					//}
+
+						if(++i > 15) { break; }
+						console.log("fight: " + i);
+						console.log(this.atkFleets);
+						console.log(this.defFleets);
+					}
 				});
 			});
 		}
@@ -433,9 +433,9 @@ module.exports = class Combat {
 		this.saveLogs();
 
 		if(this.atkFleets.length === 0) {
-			log('End of fight simulation - Planet: ' + pid + ' - Def wins', 'info');
+			log('End of fight simulation - Planet: ' + this.location + ' - Def wins', 'info');
 		} else {
-			log('End of fight simulation - Planet: ' + pid + ' - Atk wins', 'info');
+			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins', 'info');
 		}
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
@@ -444,8 +444,8 @@ module.exports = class Combat {
 	}
 
 	addActionToBattleLog(action) {
-		console.log('Logging action:');
-		console.log(action);
+		/*console.log('Logging action:');
+		console.log(action);*/
 
 		this.battleLog.push(action);
 	}
@@ -458,15 +458,14 @@ module.exports = class Combat {
 
 		try {
 			finalBattleLog = {
-				atk_user_id: this.userId,
-				atk_user_name: 'TODO',
+				atk_user_id: this.atkUser.id,
+				atk_user_name: this.atkUser.name,
 
 				atk_fleet_id: this.atkFleetId,
 				atk_fleet_name: this.atkFleets.filter((f) => f.id === this.atkFleetId)[0].name,
 
-
-				def_user_id: 'TODO',
-				def_user_name: 'TODO',
+				def_user_id: this.defUser.id,
+				def_user_name: this.defUser.name,
 
 				date: Date.now(),
 
@@ -481,8 +480,8 @@ module.exports = class Combat {
 			log('Error while writing battle logs: ' + e, 'error');
 		}
 
-		console.log("Final BattleLog:");
-		console.log(finalBattleLog);
+		/*console.log("Final BattleLog:");
+		console.log(finalBattleLog);*/
 
 		if(isset(finalBattleLog, 'object')) {
 			io.to(this.plySid).emit('combat-battleLog-send', finalBattleLog);
@@ -490,13 +489,13 @@ module.exports = class Combat {
 		}
 	}
 
-	static beginFight(data, pid, atkUserId, atkFleetId) {
+	static beginFight(data, pid, atkUser, defUser, atkFleetId) {
 		log('Begin of fight simulation - Planet: ' + pid, 'info');
 
 		// @TODO: check beginners protection
 
 		db.fleet.findByPosition(pid, (fleetList) => {
-			const battle = new Combat(atkFleetId, atkUserId, data.sid, pid);
+			const battle = new Combat(atkFleetId, atkUser, defUser, data.sid, pid);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
@@ -504,7 +503,7 @@ module.exports = class Combat {
 
 				if(fleetList[i].orbitPosition === 0) {
 					battle.joinTeam('def', fleetList[i]);
-				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUserId) {
+				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUser.id) {
 					// @TODO: Add ally check
 					battle.joinTeam('atk', fleetList[i]);
 				}
