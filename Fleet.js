@@ -218,15 +218,15 @@
 			let addCount = 0;
 
 			// Priority fleet
-			if(planet.highPriorityFleet) {
+			if(isset(planet.highPriorityFleet, 'string')) {
 				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
 					fleetList[prioId].fuel += planet.resources[1];
 
 					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
-						planet.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
-						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
+						planet.resources[1] = (fleetList[prioId].fuel - fleetList[prioId].maxFuel);
+						fleetList[prioId].fuel = 0 + fleetList[prioId].maxFuel;
 					} else {
 						planet.resources[1] = 0;
 					}
@@ -241,14 +241,14 @@
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
 					if(fleetList[id].fuel > fleetList[id].maxFuel) {
-						planet.resources[1] -= (fleetList[id].maxFuel - fleetList[id].fuel);
-						fleetList[id].fuel = fleetList[id].maxFuel;
+						planet.resources[1] += (fleetList[id].fuel - fleetList[id].maxFuel);
+						fleetList[id].fuel = 0 + fleetList[id].maxFuel;
 
 						haveToUpdate[i] = -1;
 					}
 				}
 
-				haveToUpdate = haveToUpdate.filter(d => d>0);
+				haveToUpdate = haveToUpdate.filter(d => d !== -1);
 			}
 
 			return [
