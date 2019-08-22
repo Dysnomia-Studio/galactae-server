@@ -14,15 +14,15 @@ global.db = require('../database');
 
 global.Fleet = require('../Fleet').Fleet;
 
-describe('• Fleet', function() {
-	describe('# getSpeed()', function() {
-		it('One Ion', function() {
+describe('• Fleet', () => {
+	describe('# getSpeed()', () => {
+		it('One Ion', () => {
 			assert.deepEqual(Fleet.getSpeed([-1], 'ion'),
 				shipPartsSpeed['ion']
 			);
 		});
 
-		it('Two Ion', function() {
+		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
@@ -34,15 +34,15 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Part not existing', function() {
+		it('Part not existing', () => {
 			assert.deepEqual(Fleet.getSpeed([-1],'invalid'),
 				[]
 			);
 		});
 	});
 
-	describe('# calcSubSpeed()', function() {
-		it('One Ion', function() {
+	describe('# calcSubSpeed()', () => {
+		it('One Ion', () => {
 			assert.deepEqual(Fleet.calcSubSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
@@ -53,7 +53,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Two Ion', function() {
+		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
@@ -69,7 +69,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Part not existing', function() {
+		it('Part not existing', () => {
 			assert.deepEqual(Fleet.calcSubSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
@@ -81,8 +81,8 @@ describe('• Fleet', function() {
 		});
 	});
 
-	describe('# calcSupraSpeed()', function() {
-		it('One vsl', function() {
+	describe('# calcSupraSpeed()', () => {
+		it('One vsl', () => {
 			assert.deepEqual(Fleet.calcSupraSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
@@ -93,7 +93,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Two vsl', function() {
+		it('Two vsl', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['vsl']) {
 				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
@@ -109,7 +109,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Part not existing', function() {
+		it('Part not existing', () => {
 			assert.deepEqual(Fleet.calcSupraSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
@@ -124,8 +124,8 @@ describe('• Fleet', function() {
 	/**
 	 * Calc fuel Cost ?
  	 */
-	describe('# calcFuelCost()', function() {
-		it('Sub', function() {
+	describe('# calcFuelCost()', () => {
+		it('Sub', () => {
 			const engines = {
 				'vsolaire': 1, // 0
 				'ion': 2, // 21364
@@ -138,7 +138,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('Supra', function() {
+		it('Supra', () => {
 			const engines = {
 				'vsl': 1, // 32761
 				'wd': 2, // 58024
@@ -155,8 +155,8 @@ describe('• Fleet', function() {
 	/**
 	 * Slower speed ?
  	 */
-	describe('# slowerSpeed()', function() {
-		it('A slower than B', function() {
+	describe('# slowerSpeed()', () => {
+		it('A slower than B', () => {
 			const a = [1,2,3];
 			const b = [3,2,1];
 
@@ -166,7 +166,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('A equals to B', function() {
+		it('A equals to B', () => {
 			const a = [1,2,3];
 			const b = [1,2,3];
 
@@ -176,7 +176,7 @@ describe('• Fleet', function() {
 			);
 		});
 
-		it('A faster than B', function() {
+		it('A faster than B', () => {
 			const a = [3,2,1];
 			const b = [1,2,3];
 
@@ -190,20 +190,20 @@ describe('• Fleet', function() {
 	/**
 	 * Calc move time
 	 */
-	describe('# calcMoveTime()', function() {
-		it('1, 0 0 0 = 0', function() {
+	describe('# calcMoveTime()', () => {
+		it('1, 0 0 0 = 0', () => {
 			assert.equal(
 				Fleet.calcMoveTime(1, [0,0,0]),
 				0
 			);
 		});
-		it('1, 1 2 3 = 6', function() {
+		it('1, 1 2 3 = 6', () => {
 			assert.equal(
 				Fleet.calcMoveTime(1, [1,2,3]),
 				6
 			);
 		});
-		it('2, 3 2 1 = 17', function() { // 3*(2^2)* + 2*2 + 1 = 12 + 4 + 1
+		it('2, 3 2 1 = 17', () => { // 3*(2^2)* + 2*2 + 1 = 12 + 4 + 1
 			assert.equal(
 				Fleet.calcMoveTime(2, [3,2,1]),
 				17
