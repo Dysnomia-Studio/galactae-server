@@ -210,4 +210,70 @@ describe('• Fleet', () => {
 			);
 		});
 	});
+
+	/**
+	 * Distribute fuel
+	 */
+	describe('distributeFuel()', () => {
+		const DISTRIBUTE_FUEL_RANDOMTESTS_COUNT = 10000;
+		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXFLEETS = 5;
+		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL = 10000000;
+		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL = 5000000;
+		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL = 5000000;
+
+		it('Random tests (' + DISTRIBUTE_FUEL_RANDOMTESTS_COUNT + ')', () => {
+			for(let currentTest=1; currentTest<=DISTRIBUTE_FUEL_RANDOMTESTS_COUNT; currentTest++) {
+				// Prepare
+				const fleetCount = Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXFLEETS);
+				const fleetList = [];
+				let totalFuel = 0;
+
+				for(let currentFleet=0; currentFleet<fleetCount; currentFleet++) {
+					fleetList[currentFleet] = {
+						id: 'f' + currentFleet,
+						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
+						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
+					};
+
+					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
+
+					totalFuel += fleetList[currentFleet].fuel;
+				}
+
+				const planet = {
+					resources: [
+						0,
+						Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL),
+						0,0,0,0,
+					],
+					highPriorityFleet: 'f' + Math.round(Math.random() * fleetCount * 2),
+				};
+
+				totalFuel += planet.resources[1];
+
+				// Use
+				const [
+					newPlanet,
+					newFleetList,
+					noResourcesLeft
+				] = Fleet.distributeFuel(planet, fleetList);
+
+				// Check
+				let newTotalFuel = 0 + newPlanet.resources[1];
+				for(let i=0; i<newFleetList.length; i++) {
+
+					newTotalFuel += newFleetList[i].fuel;
+
+					if(newPlanet.highPriorityFleet === newFleetList[i]) {
+						assert(newFleetList[i].fuel === newFleetList[i].maxFuel || newPlanet.resources[1] === 0, 'Priority fleet');
+					}
+
+					assert(newFleetList[i].fuel >= 0, 'Positive or null fuel');
+					assert(newFleetList[i].fuel <= newFleetList[i].maxFuel, 'Fuel is less or equal than max');
+				}
+
+				assert.equal(totalFuel, newTotalFuel);
+			}
+		});
+	});
 });
