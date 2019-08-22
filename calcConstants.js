@@ -7,8 +7,8 @@ module.exports = function() {
 	};
 	this.pointsCoef = {
 		planet:				1,
-		research: 			0.08,
-		units: 				0.0003,
+		research: 			0.07,
+		units: 				0.0005,
 		money: 			    0.0001,
 	};
 	this.TIME = {

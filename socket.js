@@ -301,7 +301,7 @@ module.exports = class Websocket {
 			// Daily Bonus
 			socket.on('daily-bonus', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.choice, 'number')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.choice, 'number') || !isset(data.pid, 'string') ) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, function(user) { // Verify identity

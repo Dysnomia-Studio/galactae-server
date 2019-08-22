@@ -102,7 +102,7 @@ module.exports = class Player {
 		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 
-		if(data.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
+		if(playerData.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
 
 		if(dayStreak > bonusBest) { bonusBest = dayStreak; }
 
@@ -243,14 +243,16 @@ module.exports = class Player {
 
 		if(data.lastBonus < minuit) {
 			// Update player
-			const newPlayerData = data;
+			const newPlayerData = {};
+			newPlayerData.id = data.id;
 			newPlayerData.dayBonusStreak = data.dayBonusStreak+1;
+			newPlayerData.lastBonus = Date.now();
 
 			if(data.lastBonus < hierMinuit) { // Si pas hier
 				newPlayerData.dayBonusStreak = 1;
 			}
 
-			// Best score :p
+			// Best score
 			if(newPlayerData.dayBonusStreak > newPlayerData.dayBonusBest) {
 				newPlayerData.dayBonusBest = newPlayerData.dayBonusStreak;
 			}
@@ -276,13 +278,13 @@ module.exports = class Player {
 
 			if(choice===2 && helium!==0) {
 				Planet.find(userData,userData.pid,0,function(planetReturned) {
-					if(userData.pid!==planetReturned.id) { // Stop if not belonging
+					if(userData.pid !== planetReturned.address) { // Stop if not belonging
 						Websocket.SendMessageToClient({ sid: userData.sid, message: 'ERROR_NOT_BELONGING' });
 						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !','fail');
 						return;
 					}
 
-					const newPlanetData = Planet.update(planetReturned);
+					const newPlanetData = Planet.update(planetReturned, data, []);
 
 					newPlanetData.resources[1]+=helium;
 
@@ -290,17 +292,13 @@ module.exports = class Player {
 
 					log(userData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
-					newPlayerData.lastBonus = Date.now();
-
 					db.player.update(newPlayerData);
 
 					Planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
 				});
 			} else {
-				newPlayerData.money += credits;
+				newPlayerData.money = data.money + credits;
 				log(userData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
-
-				newPlayerData.lastBonus = Date.now();
 
 				db.player.update(newPlayerData);
 				io.to(userData.sid).emit('player-recieve-data',{
