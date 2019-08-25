@@ -5,17 +5,14 @@
  */
 const assert = require('assert');
 
-global.log = console.log;
-
 /**
  * My libs
  */
 require('../calcConstants')();
+require('../config')();
 require('../misc')();
 
-const Buildings		= require('../Buildings').Buildings;
-global.Resources	= require('../Resources').Resources;
-global.Research		= require('../research');
+global.Buildings    = require('../Buildings').Buildings;
 
 describe('• Buildings', () => {
 	/**
