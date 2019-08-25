@@ -1,0 +1,16 @@
+kind: pipeline
+name: galactae-server
+
+steps:
+- name: tests
+  image: node
+  commands:
+  - npm install
+  - npx istanbul cover --report lcovonly --dir reports/ node_modules/mocha/bin/_mocha -- --recursive test/ --color
+
+- name: sonarqube
+  image: aosapps/drone-sonar-plugin
+  settings:
+    sonar_host: ***REMOVED***
+    sonar_token: ***REMOVED***
+    level: DEBUG

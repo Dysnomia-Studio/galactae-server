@@ -12,7 +12,6 @@ global.Websocket = class Websocket {
  * My libs
  */
 require('../calcConstants')();
-require('../config')();
 require('../misc')();
 
 global.Tactics    = require('../tactics');

@@ -7,10 +7,7 @@ const assert = require('assert');
  * My libs
  */
 require('../calcConstants')();
-require('../config')();
 require('../misc')();
-
-global.db = require('../database');
 
 global.Fleets = require('../fleets');
 global.Units = require('../units');
