@@ -7,3 +7,11 @@ steps:
   commands:
   - npm install
   - istanbul cover --report lcovonly --dir server/reports/ ~/AppData/Roaming/npm/node_modules/mocha/bin/_mocha -- --recursive server/test/ --watch
+
+- name: sonarqube
+  image: aosapps/drone-sonar-plugin
+  settings:
+    sonar_host:
+      from_secret: ***REMOVED***
+    sonar_token:
+      from_secret: ***REMOVED***
