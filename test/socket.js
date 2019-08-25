@@ -8,5 +8,5 @@ let assert = require('assert');
  */
 global.Websocket = require('../socket');
 
-describe('• Websocket', function() {
+describe('• Websocket', () => {
 });

@@ -11,9 +11,9 @@ require('../misc')();
 const Fleet = require('../fleets');
 const Units = require('../units');
 
-describe('• Units', function() {
-	describe('# checkShipParts()', function() {
-		it('OK Ship', function() {
+describe('• Units', () => {
+	describe('# checkShipParts()', () => {
+		it('OK Ship', () => {
 			const ship = {
 				type: 'SHIP_CARRIER',
 				shape: 'SHIP_CARRIER_MEDIUM',
@@ -32,7 +32,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ invalid part type', function() {
+		it('Ship w/ invalid part type', () => {
 			const ship = {
 				type: 'SHIP_CARRIER',
 				shape: 'SHIP_CARRIER_MEDIUM',
@@ -51,7 +51,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ invalid part', function() {
+		it('Ship w/ invalid part', () => {
 			const ship = {
 				type: 'SHIP_CARRIER',
 				shape: 'SHIP_CARRIER_MEDIUM',
@@ -71,7 +71,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ invalid part name', function() {
+		it('Ship w/ invalid part name', () => {
 			const ship = {
 				type: 'SHIP_CARRIER',
 				shape: 'SHIP_CARRIER_MEDIUM',
@@ -90,7 +90,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ invalid part tech', function() {
+		it('Ship w/ invalid part tech', () => {
 			const ship = {
 				type: 'SHIP_CARRIER',
 				shape: 'SHIP_CARRIER_MEDIUM',
@@ -109,7 +109,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ same sub propulsion', function() {
+		it('Ship w/ same sub propulsion', () => {
 			const ship = {
 				type: 'SHIP_CORVET',
 				shape: 'SHIP_CORVET_SMALL',
@@ -123,7 +123,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ different sub propulsion', function() {
+		it('Ship w/ different sub propulsion', () => {
 			const ship = {
 				type: 'SHIP_CORVET',
 				shape: 'SHIP_CORVET_SMALL',
@@ -138,7 +138,7 @@ describe('• Units', function() {
 		});
 
 		/** @TODO: When a ship have multiple sup propulsions
-		it('Ship w/ same sup propulsion', function() {
+		it('Ship w/ same sup propulsion', () => {
 			const ship = { 
 				
 			};
@@ -149,7 +149,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Ship w/ different sub propulsion', function() {
+		it('Ship w/ different sub propulsion', () => {
 			const ship = { 
 			};
 

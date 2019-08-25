@@ -11,12 +11,12 @@ require('../misc')();
 const Tutorials = require('../Tutorials').Tutorials;
 global.Research = require('../research');
 
-describe('• Tutorials', function() {
+describe('• Tutorials', () => {
 	/**
 	 * Has finished tutorials ?
  	 */
-	describe('# hasFinishedTutorials()', function() {
-		it('0 tutorials done', function() {
+	describe('# hasFinishedTutorials()', () => {
+		it('0 tutorials done', () => {
 			assert.equal(
 				Tutorials.hasFinishedTutorials(
 					{ tutorials: {} }
@@ -24,7 +24,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('1 tutorials done', function() {
+		it('1 tutorials done', () => {
 			assert.equal(
 				Tutorials.hasFinishedTutorials(
 					{ tutorials: { welcome: true } }
@@ -32,7 +32,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('all tutorials done', function() {
+		it('all tutorials done', () => {
 			const user = { tutorials: {} };
 			for(const tuto of tutorialsList) {
 				user.tutorials[tuto] = true;
@@ -48,9 +48,9 @@ describe('• Tutorials', function() {
 	/**
 	 * Has all dependencies ?
  	 */
-	describe('# hasAllDependancies()', function() {
+	describe('# hasAllDependancies()', () => {
 		// Tutorial
-		it('Hasn\'t all dependencies', function() {
+		it('Hasn\'t all dependencies', () => {
 			assert.equal(
 				Tutorials.hasAllDependancies(
 					'energy',
@@ -60,7 +60,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check tutorials dependencies', function() {
+		it('Check tutorials dependencies', () => {
 			assert.equal(
 				Tutorials.hasAllDependancies(
 					'energy',
@@ -71,7 +71,7 @@ describe('• Tutorials', function() {
 		});
 
 		// Research
-		it('Check research dependencies: false', function() {
+		it('Check research dependencies: false', () => {
 			assert.equal(
 				Tutorials.hasAllDependancies(
 					'unitsCreate',
@@ -81,7 +81,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check research dependencies: true', function() {
+		it('Check research dependencies: true', () => {
 			assert.equal(
 				Tutorials.hasAllDependancies(
 					'unitsCreate',
@@ -99,8 +99,8 @@ describe('• Tutorials', function() {
 	/**
 	 * Has completed tutorial ?
  	 */
-	describe('# hasCompletedTutorial()', function() {
-		it('Has already done it', function() {
+	describe('# hasCompletedTutorial()', () => {
+		it('Has already done it', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'welcome',
@@ -110,7 +110,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Hasn\'t all dependencies', function() {
+		it('Hasn\'t all dependencies', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'energy',
@@ -121,7 +121,7 @@ describe('• Tutorials', function() {
 		});
 
 		// Building
-		it('Check building objective: true', function() {
+		it('Check building objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'energy',
@@ -131,7 +131,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check building objective: false', function() {
+		it('Check building objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'energy',
@@ -142,7 +142,7 @@ describe('• Tutorials', function() {
 		});
 
 		// One of many research
-		it('Check  One of many research objective: true', function() {
+		it('Check  One of many research objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'research',
@@ -156,7 +156,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check  One of many research objective: false', function() {
+		it('Check  One of many research objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'research',
@@ -171,7 +171,7 @@ describe('• Tutorials', function() {
 		//@TODO: check unique research objective
 
 		// unitModel
-		it('Check unitModel objective: true', function() {
+		it('Check unitModel objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'unitsCreate',
@@ -186,7 +186,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check unitModel objective: false', function() {
+		it('Check unitModel objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'unitsCreate',
@@ -202,7 +202,7 @@ describe('• Tutorials', function() {
 		});
 
 		// unitBuild
-		it('Check unitBuild objective: true', function() {
+		it('Check unitBuild objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'unitsBuild',
@@ -240,7 +240,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check unitBuild objective: false', function() {
+		it('Check unitBuild objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'unitsBuild',
@@ -279,7 +279,7 @@ describe('• Tutorials', function() {
 		});
 
 		// Move
-		it('Check move all objective: false', function() {
+		it('Check move all objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'interplanetaryFlight',
@@ -307,7 +307,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check move all objective: true', function() {
+		it('Check move all objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'interplanetaryFlight',
@@ -322,7 +322,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check move outerSystem objective: false', function() {
+		it('Check move outerSystem objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'interstellarFlight',
@@ -350,7 +350,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check move outerSystem objective: true', function() {
+		it('Check move outerSystem objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'interstellarFlight',
@@ -365,7 +365,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check move battle objective: false', function() {
+		it('Check move battle objective: false', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'battle',
@@ -379,7 +379,7 @@ describe('• Tutorials', function() {
 			);
 		});
 
-		it('Check move battle objective: true', function() {
+		it('Check move battle objective: true', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'battle',

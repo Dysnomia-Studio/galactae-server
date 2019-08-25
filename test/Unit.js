@@ -11,9 +11,9 @@ require('../misc')();
 
 const Unit = require('../Unit').Unit;
 
-describe('• Unit', function() {
-	describe('# checkIfSameParts()', function() {
-		it('Same Ships', function() {
+describe('• Unit', () => {
+	describe('# checkIfSameParts()', () => {
+		it('Same Ships', () => {
 			const ship1 = {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
@@ -33,7 +33,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('Same Ships (reverse order)', function() {
+		it('Same Ships (reverse order)', () => {
 			const ship1 = {
 				parts:  [
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
@@ -53,7 +53,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('Differents Ships', function() {
+		it('Differents Ships', () => {
 			const ship1 = {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
@@ -74,7 +74,7 @@ describe('• Unit', function() {
 		});
 	});
 
-	describe('# checkIfDuplicate()', function() {
+	describe('# checkIfDuplicate()', () => {
 		const ship1 = {
 			name: 'ship1',
 			parts:  [
@@ -90,14 +90,14 @@ describe('• Unit', function() {
 			]
 		};
 
-		it('different parts', function() {
+		it('different parts', () => {
 			assert.deepEqual(
 				Unit.checkIfDuplicate([	ship1 ], ship2),
 				[false, false]
 			);
 		});
 
-		it('different type', function() {
+		it('different type', () => {
 			const ship3 = JSON.parse(JSON.stringify(ship1));
 			const ship4 = JSON.parse(JSON.stringify(ship1));
 			ship3.shipType = '1';
@@ -111,7 +111,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('different shape', function() {
+		it('different shape', () => {
 			const ship3 = JSON.parse(JSON.stringify(ship1));
 			const ship4 = JSON.parse(JSON.stringify(ship1));
 			ship3.shipShape = '1';
@@ -125,7 +125,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('different parts length', function() {
+		it('different parts length', () => {
 			const ship3 = JSON.parse(JSON.stringify(ship1));
 			ship3.parts = [];
 			ship3.name = '1';
@@ -137,7 +137,7 @@ describe('• Unit', function() {
 		});
 
 
-		it('diff name same parts', function() {
+		it('diff name same parts', () => {
 			const ship3 = {
 				name: 'ship3',
 				parts: ship1.parts,
@@ -149,7 +149,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('same name same parts', function() {
+		it('same name same parts', () => {
 			assert.deepEqual(
 				Unit.checkIfDuplicate([	ship1, ship2 ], ship1),
 				[false, true]
@@ -157,8 +157,8 @@ describe('• Unit', function() {
 		});
 	});
 
-	describe('# calcCost()', function() {
-		it('Fighter', function() {
+	describe('# calcCost()', () => {
+		it('Fighter', () => {
 			const shipShape = 'SHIP_FIGHTER_SMALL'; // [45,25,40,20,0.35,5]
 			const parts = [
 				{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
@@ -171,7 +171,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('Not a Fighter', function() {
+		it('Not a Fighter', () => {
 			const shipShape = 'SHIP_CARRIER_MEDIUM'; //                            [500,420,190, 95,1.65,1200]
 			const parts = [
 				{ tech: 'none', type: 'hangar', name: 'hangar_1' }, //           [  0,  0,  0,  0,   0,   0]
@@ -189,7 +189,7 @@ describe('• Unit', function() {
 			);
 		});
 
-		it('Part not existing', function() {
+		it('Part not existing', () => {
 			const shipShape = 'SHIP_FIGHTER_SMALL';
 			const parts = [
 				{ tech: 'Not Existing' },
