@@ -129,12 +129,12 @@ require('../misc')();
 
 const Combat = require('../combat');
 
-describe('• Combat', function() {
+describe('• Combat', () => {
 	/**
 	 * constructor
 	 */
-	describe('# constructor()', function() {
-		it('constructor()', function() {
+	describe('# constructor()', () => {
+		it('constructor()', () => {
 			let errMsg = '';
 
 			try {
@@ -150,8 +150,8 @@ describe('• Combat', function() {
 	/**
 	 * removeDuplicateFleets
 	 */
-	describe('# removeDuplicateFleets()', function() {
-		it('removeDuplicateFleets(); [],[]', function() {
+	describe('# removeDuplicateFleets()', () => {
+		it('removeDuplicateFleets(); [],[]', () => {
 			const battleArena = new Combat();
 
 			battleArena.removeDuplicateFleets();
@@ -160,7 +160,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 0);
 		});
 
-		it('removeDuplicateFleets(); [x,y,z],[a,b,c]', function() {
+		it('removeDuplicateFleets(); [x,y,z],[a,b,c]', () => {
 			const battleArena = new Combat();
 
 			battleArena.atkFleets = [
@@ -181,7 +181,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 3);
 		});
 
-		it('removeDuplicateFleets(); [x,y,z,g],[a,b,c,g]', function() {
+		it('removeDuplicateFleets(); [x,y,z,g],[a,b,c,g]', () => {
 			const battleArena = new Combat();
 
 			battleArena.atkFleets = [
@@ -207,8 +207,8 @@ describe('• Combat', function() {
 	/**
 	 * sortFleets
 	 */
-	describe('# sortFleets()', function() {
-		it('sortFleets(); [],[]', function() {
+	describe('# sortFleets()', () => {
+		it('sortFleets(); [],[]', () => {
 			const battleArena = new Combat();
 
 			battleArena.sortFleets();
@@ -217,7 +217,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 0);
 		});
 
-		it('sortFleets() sort def', function() {
+		it('sortFleets() sort def', () => {
 			const battleArena = new Combat();
 
 			battleArena.atkFleets = [];
@@ -235,7 +235,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets[0].name, 'SHIP_DEF');
 		});
 
-		it('sortFleets(); sort atk', function() {
+		it('sortFleets(); sort atk', () => {
 			const battleArena = new Combat('g');
 
 			battleArena.atkFleets = [
@@ -253,7 +253,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.atkFleets[0].id, 'g');
 		});
 
-		it('sortFleets(); sort both', function() {
+		it('sortFleets(); sort both', () => {
 			const battleArena = new Combat('g');
 
 			battleArena.atkFleets = [
@@ -283,8 +283,8 @@ describe('• Combat', function() {
 	/**
 	 * joinTeam
 	 */
-	describe('# joinTeam()', function() {
-		it('joinTeam(..., {}) => No fleet added', function() {
+	describe('# joinTeam()', () => {
+		it('joinTeam(..., {}) => No fleet added', () => {
 			const battleArena = new Combat();
 
 			battleArena.joinTeam('def', {});
@@ -293,7 +293,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 0);
 		});
 
-		it('joinTeam(wrongTeam, {...}) => No fleet added', function() {
+		it('joinTeam(wrongTeam, {...}) => No fleet added', () => {
 			const battleArena = new Combat();
 
 			battleArena.joinTeam('test', { id: 'test', units: ['testUnit1', 'testUnit2'] });
@@ -302,7 +302,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 0);
 		});
 
-		it('joinTeam(def, {...}) => Def fleet added', function() {
+		it('joinTeam(def, {...}) => Def fleet added', () => {
 			const battleArena = new Combat();
 
 			battleArena.joinTeam('def', { id: 'test', units: ['testUnit1', 'testUnit2'] });
@@ -311,7 +311,7 @@ describe('• Combat', function() {
 			assert.equal(battleArena.defFleets.length, 1);
 		});
 
-		it('joinTeam(atk, {...}) => Atk fleet added', function() {
+		it('joinTeam(atk, {...}) => Atk fleet added', () => {
 			const battleArena = new Combat();
 
 			battleArena.joinTeam('atk', { id: 'test', units: ['testUnit1', 'testUnit2'] });

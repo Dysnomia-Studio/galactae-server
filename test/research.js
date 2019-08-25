@@ -10,7 +10,7 @@ require('../calcConstants')();
 require('../misc')();
 const Research = require('../research');
 
-describe('• Research', function() {
+describe('• Research', () => {
 	/**
 	 * isSearched
 	 */

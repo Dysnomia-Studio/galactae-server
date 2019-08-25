@@ -9,13 +9,13 @@ const assert = require('assert');
 global.Discord   = require('../discord');
 let discordClient;
 
-describe('• Discord', function() {
-	before(function(done) {
+describe('• Discord', () => {
+	before((done) => {
 		discordClient = Discord.connect();
 		done();
 	});
 
-	after(function(done) {
+	after((done) => {
 		discordClient.destroy();
 		done();
 	});

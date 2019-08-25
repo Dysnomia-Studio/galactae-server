@@ -1,16 +1,16 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
  */
 global.Planet    = require('../planet');
 
-describe('• Planet', function() {
-	describe('# calcPlanetPoints()', function() {
-		it('all lvl 1', function() {
+describe('• Planet', () => {
+	describe('# calcPlanetPoints()', () => {
+		it('all lvl 1', () => {
 			const buildings = [1,1,1,1,1,1,1,1,1,0,0,0,0,0];
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
@@ -18,7 +18,7 @@ describe('• Planet', function() {
 			);
 		});
 
-		it('no all lvl max', function() {
+		it('no all lvl max', () => {
 			const buildings = buildingMaxLvl;
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
@@ -27,8 +27,8 @@ describe('• Planet', function() {
 		});
 	});
 
-	describe('# calcFleetPoints()', function() {
-		it('all lvl 1', function() {
+	describe('# calcFleetPoints()', () => {
+		it('all lvl 1', () => {
 			const fleets = [
 				{ points: 2, },
 				{ points: 12, },

@@ -11,7 +11,7 @@ const assert = require('assert');
 /*let gameDb;
 let generalDb;
 
-describe('• db', function() {
+describe('• db', () => {
 	before(function(done) {
 		let count = 0;
 
@@ -22,7 +22,7 @@ describe('• db', function() {
 		});
 	});
 
-	describe('# player {}', function() {
+	describe('# player {}', () => {
 		it('findAll()', function(done) {
 			let ok = false;
 			db.player.findAll(function(users) {
@@ -34,7 +34,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -51,7 +51,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -65,7 +65,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -82,7 +82,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -96,7 +96,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -110,7 +110,7 @@ describe('• db', function() {
 		// clearList: that's not a good idea ...
 	});
 
-	describe('# planet {}', function() {
+	describe('# planet {}', () => {
 		it('find(ok)', function(done) {
 			let ok = false;
 			db.planet.find('4-5-659-P0', function(planet) {
@@ -122,7 +122,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -135,7 +135,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(true);
 				done();
@@ -155,7 +155,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -169,7 +169,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
@@ -177,7 +177,7 @@ describe('• db', function() {
 		});
 	});
 
-	describe('# unit {}', function() {
+	describe('# unit {}', () => {
 		// @TODO: create, then find, findByOwner, delete
 
 		it('findAll()', function(done) {
@@ -191,7 +191,7 @@ describe('• db', function() {
 				ok = true;
 				done();
 			});
-			setTimeout(function() {
+			setTimeout(() => {
 				if(ok) { return; }
 				assert(false);
 				done();
