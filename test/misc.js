@@ -9,11 +9,11 @@ const assert = require('assert');
 require('../calcConstants')();
 require('../misc')();
 
-describe('• misc', function() {
+describe('• misc', () => {
 	/**
 	 * isset
 	 */
-	describe('# isset()', function() {
+	describe('# isset()', () => {
         it('isset(undefined)', () => {
             assert.equal(isset(undefined), false);
         });
@@ -160,14 +160,14 @@ describe('• misc', function() {
 	/**
 	 * normalizeText
 	 */
-	describe('# normalizeText()', function() {
-		it('normalizeText (normal text)', function() {
+	describe('# normalizeText()', () => {
+		it('normalizeText (normal text)', () => {
 			assert.equal(
 				normalizeText('test a tester e'),
 				'test a tester e'
 			);
 		});
-		it('normalizeText (text to normalized)', function() {
+		it('normalizeText (text to normalized)', () => {
 			assert.equal(
 				normalizeText('test à tester é'),
 				'test &agrave; tester &eacute;'
@@ -178,14 +178,14 @@ describe('• misc', function() {
 	/**
 	 * unNormalizeText
 	 */
-	describe('# unNormalizeText()', function() {
-		it('unNormalizeText (normal text)', function() {
+	describe('# unNormalizeText()', () => {
+		it('unNormalizeText (normal text)', () => {
 			assert.equal(
 				unNormalizeText('test a tester e'),
 				'test a tester e'
 			);
 		});
-		it('unNormalizeText (normalized to text)', function() {
+		it('unNormalizeText (normalized to text)', () => {
 			assert.equal(
 				unNormalizeText('test &agrave; tester &eacute;'),
 				'test à tester é'
@@ -196,14 +196,14 @@ describe('• misc', function() {
 	/**
 	 * textToSmileys
 	 */
-	describe('# textToSmileys()', function() {
-		it('textToSmileys (normal text)', function() {
+	describe('# textToSmileys()', () => {
+		it('textToSmileys (normal text)', () => {
 			assert.equal(
 				textToSmileys(': test )'),
 				': test )'
 			);
 		});
-		it('textToSmileys (text to smiley)', function() {
+		it('textToSmileys (text to smiley)', () => {
 			assert.equal(
 				textToSmileys(':D test :)'),
 				'😃 test 🙂'
@@ -211,14 +211,14 @@ describe('• misc', function() {
 		});
 	});
 
-	describe('# filterUnwantedChars()', function() {
-		it('Blacklisted char/strings: filterUnwantedChars("normal message")', function() {
+	describe('# filterUnwantedChars()', () => {
+		it('Blacklisted char/strings: filterUnwantedChars("normal message")', () => {
 			assert.equal(
 				filterUnwantedChars('normal message'),
 				'normal message'
 			);
 		});
-		it('Blacklisted char/strings: filterUnwantedChars("< test")', function() {
+		it('Blacklisted char/strings: filterUnwantedChars("< test")', () => {
 			assert.equal(
 				filterUnwantedChars('< test'),
 				' test'
@@ -229,38 +229,38 @@ describe('• misc', function() {
 	/**
 	 * parseChatTime
 	 */
-	describe('# parseChatTime()', function() {
-		it('parseChatTime (error)', function() {
+	describe('# parseChatTime()', () => {
+		it('parseChatTime (error)', () => {
 			assert.equal(
 				parseChatTime('aaa'),
 				-1
 			);
 		});
-		it('parseChatTime (1 day)', function() {
+		it('parseChatTime (1 day)', () => {
 			assert.equal(
 				parseChatTime('1d'),
 				86400000
 			);
 		});
-		it('parseChatTime (2 hour)', function() {
+		it('parseChatTime (2 hour)', () => {
 			assert.equal(
 				parseChatTime('2h'),
 				7200000
 			);
 		});
-		it('parseChatTime (3 minutes)', function() {
+		it('parseChatTime (3 minutes)', () => {
 			assert.equal(
 				parseChatTime('3m'),
 				180000
 			);
 		});
-		it('parseChatTime (4 minutes)', function() {
+		it('parseChatTime (4 minutes)', () => {
 			assert.equal(
 				parseChatTime('4s'),
 				4000
 			);
 		});
-		it('parseChatTime (5 odd unit)', function() {
+		it('parseChatTime (5 odd unit)', () => {
 			assert.equal(
 				parseChatTime('5g'),
 				-1
@@ -272,14 +272,14 @@ describe('• misc', function() {
 	 * getDateTime
 	 * /!\ les mois vont de 0 a 11 dans le constructeur de Date()
 	 */
-	describe('# getDateTime()', function() {
-		it('getDateTime(01/01/2001 01:01:01)', function() {
+	describe('# getDateTime()', () => {
+		it('getDateTime(01/01/2001 01:01:01)', () => {
 			assert.equal(
 				getDateTime(new Date(2001,0,1,1,1,1)),
 				'01/01/2001 01:01:01'
 			);
 		});
-		it('getDateTime(10/10/2010 10:10:10)', function() {
+		it('getDateTime(10/10/2010 10:10:10)', () => {
 			assert.equal(
 				getDateTime(new Date(2010,9,10,10,10,10)),
 				'10/10/2010 10:10:10'
