@@ -11,7 +11,6 @@ steps:
 - name: sonarqube
   image: aosapps/drone-sonar-plugin
   settings:
-    sonar_host:
-      url: ***REMOVED***
+    sonar_host: ***REMOVED***
     sonar_token:
       from_secret: ***REMOVED***
