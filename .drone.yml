@@ -2,11 +2,11 @@ kind: pipeline
 name: galactae-server
 
 steps:
-- name: test
+- name: tests
   image: node
   commands:
   - npm install
-  - istanbul cover --report lcovonly --dir server/reports/ ~/AppData/Roaming/npm/node_modules/mocha/bin/_mocha -- --recursive server/test/ --watch
+  - npx istanbul cover --report lcovonly --dir server/reports/ "npx mocha" -- --recursive server/test/ --watch
 
 - name: sonarqube
   image: aosapps/drone-sonar-plugin
