@@ -1,13 +1,12 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
  */
 require('../calcConstants')();
-require('../config')();
 require('../misc')();
 
 global.Resources    = require('../Resources').Resources;
