@@ -13,3 +13,4 @@ steps:
   settings:
     sonar_host: ***REMOVED***
     sonar_token: ***REMOVED***
+  level: DEBUG
