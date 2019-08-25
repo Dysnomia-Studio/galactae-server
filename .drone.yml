@@ -6,7 +6,7 @@ steps:
   image: node
   commands:
   - npm install
-  - npx istanbul cover --report lcovonly --dir server/reports/ node_modules/mocha/bin/_mocha -- --recursive test/ --color
+  - npx istanbul cover --report lcovonly --dir reports/ node_modules/mocha/bin/_mocha -- --recursive test/ --color
 
 - name: sonarqube
   image: aosapps/drone-sonar-plugin
