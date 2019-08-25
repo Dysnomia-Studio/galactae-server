@@ -1,7 +1,7 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs

@@ -1,14 +1,14 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
  */
 require('../misc')();
 
-let Player = require('../player');
+const Player = require('../player');
 
 describe('• Player', () => {
 	/**
