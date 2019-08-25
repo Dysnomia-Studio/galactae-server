@@ -12,6 +12,6 @@ steps:
   image: aosapps/drone-sonar-plugin
   settings:
     sonar_host:
-      from_secret: ***REMOVED***
+      url: ***REMOVED***
     sonar_token:
       from_secret: ***REMOVED***
