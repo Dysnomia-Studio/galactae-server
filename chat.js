@@ -217,7 +217,7 @@ module.exports = class Chat {
 				});
 				break;
 			case '!maintenance':
-				if(data.lvl<4) { return data; } // Admin only
+				if(data.lvl<4) { break; } // Admin only
 				websocket.beginMaintenance();
 				data.send = true;
 				break;
