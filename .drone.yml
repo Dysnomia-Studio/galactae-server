@@ -14,3 +14,18 @@ steps:
     sonar_host: ***REMOVED***
     sonar_token: ***REMOVED***
     level: DEBUG
+
+- name: discord
+  pull: default
+  image: appleboy/drone-discord
+  webhook_id: ***REMOVED***
+  webhook_token: ***REMOVED***
+  when:
+    event: [ push ]
+    status: [ changed, failure, success ]
+  message: >
+    {{#success build.status}}
+      build {{repo.name}} {{build.branch}} {{build.number}} succeeded.
+    {{else}}
+      build {{repo.name}} {{build.branch}} {{build.number}} failed.
+    {{/success}}
