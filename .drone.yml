@@ -29,7 +29,7 @@ steps:
         build {{repo.name}} {{build.branch}} {{build.number}} succeeded.
       {{else}}
         build {{repo.name}} {{build.branch}} {{build.number}} failed.
-    {{/success}}
+      {{/success}}
   when:
     event:
     - push
