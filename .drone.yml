@@ -26,9 +26,9 @@ steps:
     webhook_token: ***REMOVED***
     message: >
       {{#success build.status}}
-        [{{build.started}}] Build **{{repo.name}}** on branch **{{build.branch}}** (*{{build.message}}*) succeeded.
+        [{{datetime build.started}}] Build **{{repo.name}}** on branch **{{build.branch}}** ({{truncate build.sha 8}}) succeeded.
       {{else}}
-        [{{build.started}}] Build **{{repo.name}}** on branch **{{build.branch}}** (*{{build.message}}*) failed.
+        [{{datetime build.started}}] Build **{{repo.name}}** on branch **{{build.branch}}** ({{truncate build.sha 8}}) failed.
       {{/success}}
   when:
     event:
