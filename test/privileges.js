@@ -8,9 +8,9 @@ const assert = require('assert');
  */
 const Privileges = require('../privileges');
 
-describe('• Units', function() {
-	describe('# getChatRank()', function() {
-		it('Member/Error return empty string', function() {
+describe('• Units', () => {
+	describe('# getChatRank()', () => {
+		it('Member/Error return empty string', () => {
 			assert.equal(
 				Privileges.getChatRank(0),
 				''
@@ -27,7 +27,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Staff', function() {
+		it('Staff', () => {
 			assert.equal(
 				Privileges.getChatRank(2),
 				'[STAFF] '
@@ -39,7 +39,7 @@ describe('• Units', function() {
 			);
 		});
 
-		it('Admin', function() {
+		it('Admin', () => {
 			assert.equal(
 				Privileges.getChatRank(4),
 				'[ADMIN] '

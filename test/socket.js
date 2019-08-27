@@ -1,12 +1,12 @@
 /**
  * Libs
  */
-let assert = require('assert');
+const assert = require('assert');
 
 /**
  * My libs
  */
 global.Websocket = require('../socket');
 
-describe('• Websocket', function() {
+describe('• Websocket', () => {
 });

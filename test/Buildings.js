@@ -91,8 +91,8 @@ describe('• Buildings', () => {
 	/**
 	 * getEnergyProd
 	 */
-	describe('# getEnergyProd()', function() {
-		it('level 1', function() {
+	describe('# getEnergyProd()', () => {
+		it('level 1', () => {
 			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyProd(buildings),
@@ -100,7 +100,7 @@ describe('• Buildings', () => {
 			);
 		});
 
-		it('level 30', function() {
+		it('level 30', () => {
 			const buildings = [1,1,1,1,30,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyProd(buildings),
@@ -112,8 +112,8 @@ describe('• Buildings', () => {
 	/**
 	 * getEnergyCons
 	 */
-	describe('# getEnergyCons()', function() {
-		it('level 1', function() {
+	describe('# getEnergyCons()', () => {
+		it('level 1', () => {
 			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.getEnergyCons(buildings),
@@ -121,7 +121,7 @@ describe('• Buildings', () => {
 			);
 		});
 
-		it('level 5 total', function() {
+		it('level 5 total', () => {
 			const buildings = [5,5,5,5,5,5,5,5,5];
 			assert.equal(
 				Buildings.getEnergyCons(buildings),
@@ -133,8 +133,8 @@ describe('• Buildings', () => {
 	/**
 	 * enoughEnergy
 	 */
-	describe('# enoughEnergy()', function() {
-		it('enough', function() {
+	describe('# enoughEnergy()', () => {
+		it('enough', () => {
 			const buildings = [1,1,1,1,1,1,1,1,1];
 			assert.equal(
 				Buildings.enoughEnergy(buildings),
@@ -142,7 +142,7 @@ describe('• Buildings', () => {
 			);
 		});
 
-		it('no enough', function() {
+		it('no enough', () => {
 			const buildings = [30,30,30,30,1,1,1,1,1];
 			assert.equal(
 				Buildings.enoughEnergy(buildings),
