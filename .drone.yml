@@ -14,6 +14,10 @@ steps:
     sonar_host: ***REMOVED***
     sonar_token: ***REMOVED***
     level: DEBUG
+    ver: 1.0
+    timeout: 20
+    sources: .
+    showProfiling: true
   when:
     branch:
     - master
