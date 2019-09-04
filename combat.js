@@ -418,7 +418,7 @@ module.exports = class Combat {
 			this.getAllTactics(() => {
 				this.getAllUnits(() => {
 					let i = 0;
-					while(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
+					while(Fleet.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleet.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
 						this.simulateTurn();
 
 						if(++i > 15) { break; }
@@ -432,7 +432,7 @@ module.exports = class Combat {
 
 		this.saveLogs();
 
-		if(this.atkFleets.length === 0) {
+		if(this.atkFleets.length === 0 || !Fleet.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)) {
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins', 'info');
 		} else {
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins', 'info');
