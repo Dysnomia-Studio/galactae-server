@@ -273,4 +273,121 @@ describe('• Fleet', () => {
 			}
 		});
 	});
+
+	describe('hasOffensiveCapacity', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleet.hasOffensiveCapacity(
+					{ units: {} },
+					{}
+				), false
+			);
+		});
+
+		it('No offensive unit', () => {
+			assert.equal(
+				Fleet.hasOffensiveCapacity(
+					{ units: { 'u1': 10 } },
+					{ u1: { parts: [] }}
+				), false
+			);
+		});
+
+		it('No offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleet.hasOffensiveCapacity(
+					{ units: { 'u1': 10, 'u2': 100 } },
+					{
+						u1: { parts: [{ type: 'hangar' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), false
+			);
+		});
+
+		it('Offensive unit', () => {
+			assert.equal(
+				Fleet.hasOffensiveCapacity(
+					{ units: { 'u1': 10 } },
+					{ u1: { parts: [{ type: 'cannon'}] }}
+				), true
+			);
+		});
+
+		it('Offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleet.hasOffensiveCapacity(
+					{ units: { 'u1': 10, 'u2': 100 } },
+					{
+						u1: { parts: [{ type: 'cannon' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), true
+			);
+		});
+	});
+
+	describe('groupHasOffensiveCapacity', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: {} }],
+					{}
+				), false
+			);
+		});
+
+		it('Empty fleet (multiple fleets)', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: {} }, { units: {} }],
+					{}
+				), false
+			);
+		});
+
+		it('No offensive unit', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10 } }],
+					{ u1: { parts: [] }}
+				), false
+			);
+		});
+
+		it('No offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10, 'u2': 100 } },
+						{ units: { 'u2': 100 } }],
+					{
+						u1: { parts: [{ type: 'hangar' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), false
+			);
+		});
+
+		it('Offensive unit', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10 } }, { units: {} }],
+					{ u1: { parts: [{ type: 'cannon'}] }}
+				), true
+			);
+		});
+
+		it('Offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleet.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10, 'u2': 100 } },
+						{ units: { 'u2': 100 } }],
+					{
+						u1: { parts: [{ type: 'cannon' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), true
+			);
+		});
+	});
 });
