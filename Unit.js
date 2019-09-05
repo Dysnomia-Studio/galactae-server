@@ -115,9 +115,10 @@
 					name: fleetTranslate[name],
 					note: 0, // @ADD: Note
 					cost: shipCosts[name],
-					parts: [],
+					parts: specialUnitsParts[name],
 					shipShape: name,
 					shipType: 'SHIP_DEF',
+					oneShot: true,
 				};
 			}
 

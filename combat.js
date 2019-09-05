@@ -247,40 +247,48 @@ module.exports = class Combat {
 			if(atk) {
 				const currUnitId = this.atkFleets[currAtkFleets.fleetCounter].unitsId[currAtkFleets.unitTypeCounter];
 
-				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= currAtkFleets.unitNbCounter ||
+				if(!this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] ||
+					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId].length <= currAtkFleets.unitNbCounter ||
 					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
 
 					currAtkFleets.unitTypeCounter++;
 					currAtkFleets.unitNbCounter = 0;
 
-					if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length === currAtkFleets.unitTypeCounter) {
+					if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
 						currAtkFleets.fleetCounter++;
 						currAtkFleets.unitTypeCounter = 0;
 					}
 
 					continue; // Retry with new unit type
 				}
-				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length === currAtkFleets.unitTypeCounter) {
+				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
 					currAtkFleets.fleetCounter++;
 					currAtkFleets.unitTypeCounter = 0;
 					continue; // Retry with new fleet
 				}
 
-				const target = this.getTarget(currUnitId, this.atkFleets[currDefFleets.fleetCounter].id, this.defFleets);
+				const target = this.getTarget(currUnitId, this.atkFleets[currAtkFleets.fleetCounter].id, this.defFleets);
 				if(target.fleet === -1) { continue; } // Security
 
 				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
 
 				// @TODO: apply research bonuses
 
-				this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] -= damage;
+				if(!!this.unitCache[currUnitId].oneShot) {
+					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId]--;
+				}
 
-				if(this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] < 0) {
-					this.defFleets[currAtkFleets.fleetCounter].units[currUnitId] = 0;
+				const fleetIndex = this.defFleets.map((f) => f.id).indexOf(target.fleet);
+
+				this.defFleets[fleetIndex].units[target.unit] -= damage;
+
+				if(this.defFleets[fleetIndex].units[target.unit] < 0) {
+					delete this.defFleets[fleetIndex].units[target.unit];
+					this.defFleets[fleetIndex].unitsId = Object.keys(this.defFleets[fleetIndex].units);
 				}
 
 				action = {
-					fleetSource: this.atkFleets[currDefFleets.fleetCounter].id,
+					fleetSource: this.atkFleets[currAtkFleets.fleetCounter].id,
 					fleetDestination: target.fleet,
 					unitSource: currUnitId,
 					unitDestination: target.unit,
@@ -292,20 +300,21 @@ module.exports = class Combat {
 			} else {
 				const currUnitId = this.defFleets[currDefFleets.fleetCounter].unitsId[currDefFleets.unitTypeCounter];
 
-				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= currDefFleets.unitNbCounter ||
+				if(!this.defFleets[currDefFleets.fleetCounter].units[currUnitId] ||
+					this.defFleets[currDefFleets.fleetCounter].units[currUnitId].length <= currDefFleets.unitNbCounter ||
 					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
 
 					currDefFleets.unitTypeCounter++;
 					currDefFleets.unitNbCounter = 0;
 
-					if(this.defFleets[currDefFleets.fleetCounter].unitsId.length === currDefFleets.unitTypeCounter) {
+					if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
 						currDefFleets.fleetCounter++;
 						currDefFleets.unitTypeCounter = 0;
 					}
 
 					continue; // Retry with new unit type
 				}
-				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length === currDefFleets.unitTypeCounter) {
+				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
 					currDefFleets.fleetCounter++;
 					currDefFleets.unitTypeCounter = 0;
 					continue; // Retry with new fleet
@@ -318,12 +327,17 @@ module.exports = class Combat {
 
 				// @TODO: apply research bonuses
 
+				if(!!this.unitCache[currUnitId].oneShot) {
+					this.defFleets[currDefFleets.fleetCounter].units[currUnitId]--;
+				}
+
 				const fleetIndex = this.atkFleets.map((f) => f.id).indexOf(target.fleet);
 
 				this.atkFleets[fleetIndex].units[target.unit] -= damage;
 
-				if(this.atkFleets[fleetIndex].units[target.unit] < 0) {
-					this.atkFleets[fleetIndex].units[target.unit] = 0;
+				if(this.atkFleets[fleetIndex].units[target.unit] <= 0) {
+					delete this.atkFleets[fleetIndex].units[target.unit];
+					this.atkFleets[fleetIndex].unitsId = Object.keys(this.atkFleets[fleetIndex].units);
 				}
 
 				action = {
@@ -420,11 +434,6 @@ module.exports = class Combat {
 					let i = 0;
 					while(Fleet.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleet.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
 						this.simulateTurn();
-
-						if(++i > 15) { break; }
-						console.log("fight: " + i);
-						console.log(this.atkFleets);
-						console.log(this.defFleets);
 					}
 				});
 			});
