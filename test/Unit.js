@@ -201,4 +201,85 @@ describe('• Unit', () => {
 			);
 		});
 	});
+
+	describe('specialUnits()', () => {
+		it('No empty object',() => {
+			assert(
+				isset(
+					Unit.specialUnits
+				),
+				'object'
+			);	
+		});
+	});
+
+	describe('getWeapons()', () => {
+		it('undefined unit', () => {
+			try {
+				Unit.getWeapons(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Unit.getWeapons({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no weapons', () => {
+			assert.deepEqual(
+				Unit.getWeapons({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('weapons', () => {
+			assert.deepEqual(
+				Unit.getWeapons({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }
+				] }),
+				[{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }]
+			);
+		});
+	});
+
+	describe('getShields()', () => {
+		it('undefined unit', () => {
+			try {
+				Unit.getShields(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Unit.getShields({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no shield', () => {
+			assert.deepEqual(
+				Unit.getShields({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('shield', () => {
+			assert.deepEqual(
+				Unit.getShields({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'magnetic', type: 'shield', name: 'shield_1' }
+				] }),
+				[{ tech: 'magnetic', type: 'shield', name: 'shield_1' }]
+			);
+		});
+	});
 });
