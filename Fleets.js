@@ -55,7 +55,7 @@ module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 					}
 
 					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
-					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime >= Date.now()) {
+					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
 					}
@@ -104,9 +104,11 @@ module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 			}
 		}
 
-		if(!haveToUpdate) { callback(fleetList); return; }
+		if(fleetList.length === 0) { callback(fleetList); return; }
 
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
+			if(!haveToUpdate) { callback(fleetList, planetData); return; }
+
 			let newPlanet, empty;
 			[newPlanet, fleetList, empty] = Fleets.distributeFuel(planetData, fleetList.slice(0));
 

@@ -73,7 +73,7 @@ db.connect(function(success,general=false) {
 			/**
 			 * Stats Auto Submit to db
 			 */
-			const statsInterval = 5 * TIME.MINUTES_TO_MS;
+			const statsInterval = 0.5 * TIME.MINUTES_TO_MS;
 
 			setTimeout(function() {
 				db.stat.submit(Date.now() - Date.now()%statsInterval);

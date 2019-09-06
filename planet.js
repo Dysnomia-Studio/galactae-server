@@ -67,7 +67,7 @@ module.exports = class Planet {
 									if(Object.keys(userReturned.tutorials).length !== oldCount) {
 										db.player.update({
 											id: userReturned.id,
-											tutorials: userReturned.tutorials
+											tutorials: userReturned.tutorials,
 										});
 									}
 
@@ -452,7 +452,7 @@ module.exports = class Planet {
 
 		// Update units
 		if(planetData.unitBuildingEndTime !== -1) {
-			Planet.UpdateUnits(planetData,user,currTime);
+			Planet.UpdateUnits(Object.assign({}, planetData),user,currTime);
 		}
 
 		if(currTime>planetData.unitBuildingEndTime) {

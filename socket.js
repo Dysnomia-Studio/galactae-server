@@ -1,4 +1,4 @@
-global.playerList = [];
+global.playerList = new Set();
 
 module.exports = class Websocket {
 	static init() {
@@ -21,7 +21,7 @@ module.exports = class Websocket {
 				// Log
 				log(user.username + ' ('+socket.id+') connected');
 
-				playerList.push(socket.id);
+				playerList.add(user.username);
 
 				// Execution du code
 				Player.connect(user);
@@ -29,16 +29,16 @@ module.exports = class Websocket {
 
 			socket.on('game-disconnect', function(user) {
 				// Vars
-				if(!isset(user, 'object') || !isset(user.username, 'string') || !isset(user.id, 'string')) { return; }
+				if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id, 'string')) { return; }
 
-				if(!playerList.includes(socket.id)) { return; }
+				if(!playerList.has(user.name)) { return; }
 
 				// User
 				user.sid = socket.id;
 				Player.isValid(user,function(user) { // Verify identity
 					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
 
-					playerList.splice(playerList.indexOf(socket.id), 1);
+					playerList.delete(user.name);
 
 					// Log
 					log(user.username + ' (' + socket.id + ') disconnected');
@@ -53,12 +53,12 @@ module.exports = class Websocket {
 				const data = {};
 				data.sid = socket.id;
 
-				if(!playerList.includes(socket.id)) { return; }
-
 				db.player.searchBySid(data.sid, function(user) {
 					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) { return; }
 
-					playerList.splice(playerList.indexOf(socket.id), 1);
+					if(!playerList.has(user.name)) { return; }
+
+					playerList.delete(user.name);
 
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
@@ -301,7 +301,7 @@ module.exports = class Websocket {
 			// Daily Bonus
 			socket.on('daily-bonus', function(data) {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.choice, 'number')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.choice, 'number') || !isset(data.pid, 'string') ) { return; }
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, function(user) { // Verify identity
@@ -332,7 +332,7 @@ module.exports = class Websocket {
 
 									db.player.update({
 										id: data.id,
-										tutorials: userReturned.tutorials
+										tutorials: userReturned.tutorials,
 									}, () => {
 										Planet.refresh(data);
 									});

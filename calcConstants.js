@@ -7,8 +7,8 @@ module.exports = function() {
 	};
 	this.pointsCoef = {
 		planet:				1,
-		research: 			0.08,
-		units: 				0.0003,
+		research: 			0.07,
+		units: 				0.0005,
 		money: 			    0.0001,
 	};
 	this.TIME = {
@@ -306,7 +306,7 @@ module.exports = function() {
 		// Scanners
 
 		// Hangar
-		hangarDouble: 'hangar_double',
+		hangarDouble: 'hangarDouble',
 
 		// Propulsion
 		vsl: 'prop_vsl',
@@ -566,6 +566,37 @@ module.exports = function() {
 		vsl: 			32761,
 		wd: 			29012,
 		hyperespace: 	25492,
+	};
+
+	this.shieldAbsorption = {
+		magnetic: {
+			railgun: 0.65,
+			plasma: 0.75,
+			laser: 0.03,
+			lightMissile: 0.25,
+			heavyMissile: 0,
+		},
+		turret: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0.45,
+			heavyMissile: 0.65,
+		},
+		singularity: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
+		projector: {
+			railgun: 0,
+			plasma: 0,
+			laser: 0,
+			lightMissile: 0,
+			heavyMissile: 0,
+		},
 	};
 
 	this.fuelStorage = {

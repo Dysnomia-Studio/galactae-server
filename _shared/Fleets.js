@@ -98,8 +98,10 @@
 		 */
 		static slowerSpeed(curr, other) {
 			const testDist = 1000; // Total galaxy
-			if((Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
+			if(!curr ||
+				(Math.pow(testDist, 2)*curr[0] + testDist*curr[1] + curr[2]) >
 				(Math.pow(testDist, 2)*other[0] + testDist*other[1] + other[2])) { // Compare polynoms, more time = slower
+
 				return other;
 			}
 
@@ -157,7 +159,7 @@
 
 			const unitListId = unitList.map((unit) => unit.id);
 
-			for(let i=0; i<fleetUnits.length; i++) {
+			for(const key in fleetUnits) {
 				const currUnit = unitList[unitListId.indexOf(key)];
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
@@ -209,22 +211,22 @@
 				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
 
 				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
-					haveToUpdate.push(i);
+					haveToUpdate.push(fleetList[i].id);
 				}
 			}
 
 			let addCount = 0;
 
 			// Priority fleet
-			if(planet.highPriorityFleet) {
+			if(isset(planet.highPriorityFleet, 'string')) {
 				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
 					fleetList[prioId].fuel += planet.resources[1];
 
 					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
-						planet.resources[1] += fleetList[prioId].maxFuel - fleetList[prioId].fuel;
-						fleetList[prioId].fuel = fleetList[prioId].maxFuel;
+						planet.resources[1] = (fleetList[prioId].fuel - fleetList[prioId].maxFuel);
+						fleetList[prioId].fuel = 0 + fleetList[prioId].maxFuel;
 					} else {
 						planet.resources[1] = 0;
 					}
@@ -232,22 +234,21 @@
 			}
 
 			// Current planet fleets
-			while(haveToUpdate.length > 0 && planet.resources[1] > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
+			while(haveToUpdate.length > 0 && Math.floor(planet.resources[1]) > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
-					const id = haveToUpdate[i];
+					const id = fleetList.map(f => f.id).indexOf(haveToUpdate[i]);
 
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
-
 					if(fleetList[id].fuel > fleetList[id].maxFuel) {
-						planet.resources[1] += fleetList[id].maxFuel - fleetList[id].fuel;
-						fleetList[id].fuel = fleetList[id].maxFuel;
+						planet.resources[1] += (fleetList[id].fuel - fleetList[id].maxFuel);
+						fleetList[id].fuel = 0 + fleetList[id].maxFuel;
 
 						haveToUpdate[i] = -1;
 					}
 				}
 
-				haveToUpdate = haveToUpdate.filter(d => d>0);
+				haveToUpdate = haveToUpdate.filter(d => d !== -1);
 			}
 
 			return [
@@ -258,7 +259,13 @@
 		}
 
 		static removeEmptyUnits(fleet) {
-			return fleet.units.filter((unitCount) => unitCount > 0);
+			for(const unit in fleet.units) {
+				if(fleet.units <= 0) {
+					delete fleet.units[unit];
+				}
+			}
+
+			return fleet;
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

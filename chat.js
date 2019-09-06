@@ -160,7 +160,7 @@ module.exports = class Chat {
 
 		switch(args[0]) {
 			case '!asay':
-				websocket.SendGeneralMessage(str.substr(6));
+				Websocket.SendGeneralMessage(str.substr(6));
 				break;
 			case '!ban':
 				if(data.lvl<3) { return data; } // Admin & Operators only
@@ -217,12 +217,12 @@ module.exports = class Chat {
 				});
 				break;
 			case '!maintenance':
-				if(data.lvl<4) { return data; } // Admin only
+				if(data.lvl<4) { break; } // Admin only
 				websocket.beginMaintenance();
 				data.send = true;
 				break;
 			case '!help':
-				Chat.sendSM(data.sid,'HELP');
+				Chat.sendSM(data.sid,'HELP'); // TODO (admin/staff), no translation to be safe
 				break;
 			default:
 				Chat.sendSM(data.sid,'COMMAND_NOT_FOUND');

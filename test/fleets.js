@@ -7,17 +7,14 @@ const assert = require('assert');
  * My libs
  */
 require('../calcConstants')();
-require('../config')();
 require('../misc')();
 
-global.db = require('../database');
-
-global.Fleets = require('../Fleets');
+global.Fleets = require('../fleets');
 global.Units = require('../units');
 
 let gameDb;
 
-describe('• Fleets', function() {
+describe('• Fleets', () => {
 	/*before(function(done) {
 		let count = 0;
 
@@ -31,8 +28,8 @@ describe('• Fleets', function() {
 	/**
 	 * Has enough carrier capacity ?
  	 */
-	describe('# hasEnoughCarrier()', function() {
-		it('Enought', function() {
+	describe('# hasEnoughCarrier()', () => {
+		it('Enought', () => {
 			const fleetUnits = {
 				'fighter': 1,
 				'carrier': 1
@@ -66,7 +63,7 @@ describe('• Fleets', function() {
 			);
 		});
 
-		it('No Enought', function() {
+		it('No Enought', () => {
 			const fleetUnits = {
 				'fighter': 80,
 				'carrier': 1
@@ -100,7 +97,7 @@ describe('• Fleets', function() {
 	/**
 	 * Get units list
 	 */
-	/*describe('# getUnitsList()', function() {
+	/*describe('# getUnitsList()', () => {
 		it('Existing', function(done) {
 			const unitIdList = [
 				['eee16ad8-5777-11e9-ae80-67804909a59f',1]
