@@ -10,7 +10,7 @@ require('../calcConstants')();
 require('../misc')();
 
 global.Fleets = require('../Fleets');
-global.Units = require('../units');
+global.Units = require('../Units');
 
 let gameDb;
 
