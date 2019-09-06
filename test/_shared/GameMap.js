@@ -6,9 +6,9 @@ const assert = require('assert');
 /**
  * My libs
  */
-global.GameMap   = require('../GameMap').GameMap;
+global.GameMap   = require('../../GameMap');
 
-describe('• GameMap', () => {
+describe('• GameMap (shared)', () => {
 	/**
 	 * getPlanetCoords
 	 */

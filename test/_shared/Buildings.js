@@ -8,12 +8,13 @@ const assert = require('assert');
 /**
  * My libs
  */
-require('../calcConstants')();
-require('../misc')();
+require('../../calcConstants')();
+require('../../config')();
+require('../../misc')();
 
-global.Buildings    = require('../Buildings').Buildings;
+global.Buildings    = require('../../Buildings');
 
-describe('• Buildings', () => {
+describe('• Buildings (shared)', () => {
 	/**
 	 * GetCost
 	 */
