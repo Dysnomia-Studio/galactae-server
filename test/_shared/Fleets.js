@@ -6,15 +6,17 @@ const assert = require('assert');
 /**
  * My libs
  */
-require('../calcConstants')();
-require('../misc')();
+require('../../calcConstants')();
+require('../../misc')();
 
-global.Fleet = require('../Fleet').Fleet;
+global.db = require('../../database');
 
-describe('• Fleet', () => {
+global.Fleets = require('../../Fleets');
+
+describe('• Fleets (shared)', () => {
 	describe('# getSpeed()', () => {
 		it('One Ion', () => {
-			assert.deepEqual(Fleet.getSpeed([-1], 'ion'),
+			assert.deepEqual(Fleets.getSpeed([-1], 'ion'),
 				shipPartsSpeed['ion']
 			);
 		});
@@ -24,15 +26,17 @@ describe('• Fleet', () => {
 			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
 			}
-			assert.deepEqual(Fleet.getSpeed(
-				shipPartsSpeed['ion'],
-				'ion'),
+			assert.deepEqual(
+				Fleets.getSpeed(
+					shipPartsSpeed['ion'],
+					'ion'
+				),
 				expected
 			);
 		});
 
 		it('Part not existing', () => {
-			assert.deepEqual(Fleet.getSpeed([-1],'invalid'),
+			assert.deepEqual(Fleets.getSpeed([-1],'invalid'),
 				[]
 			);
 		});
@@ -40,7 +44,7 @@ describe('• Fleet', () => {
 
 	describe('# calcSubSpeed()', () => {
 		it('One Ion', () => {
-			assert.deepEqual(Fleet.calcSubSpeed({
+			assert.deepEqual(Fleets.calcSubSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
@@ -55,7 +59,7 @@ describe('• Fleet', () => {
 			for(const i in shipPartsSpeed['ion']) {
 				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
 			}
-			assert.deepEqual(Fleet.calcSubSpeed({
+			assert.deepEqual(Fleets.calcSubSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
@@ -67,7 +71,7 @@ describe('• Fleet', () => {
 		});
 
 		it('Part not existing', () => {
-			assert.deepEqual(Fleet.calcSubSpeed({
+			assert.deepEqual(Fleets.calcSubSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'myFalsePropulsion', type: 'sub_propulsion', name: 'prop_1' },
@@ -80,7 +84,7 @@ describe('• Fleet', () => {
 
 	describe('# calcSupraSpeed()', () => {
 		it('One vsl', () => {
-			assert.deepEqual(Fleet.calcSupraSpeed({
+			assert.deepEqual(Fleets.calcSupraSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
@@ -95,7 +99,7 @@ describe('• Fleet', () => {
 			for(const i in shipPartsSpeed['vsl']) {
 				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
 			}
-			assert.deepEqual(Fleet.calcSupraSpeed({
+			assert.deepEqual(Fleets.calcSupraSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
@@ -107,7 +111,7 @@ describe('• Fleet', () => {
 		});
 
 		it('Part not existing', () => {
-			assert.deepEqual(Fleet.calcSupraSpeed({
+			assert.deepEqual(Fleets.calcSupraSpeed({
 					parts: [
 						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
 						{ tech: 'myFalsePropulsion', type: 'sup_propulsion', name: 'prop_1' },
@@ -130,7 +134,7 @@ describe('• Fleet', () => {
 			};
 
 			assert.equal(
-				Fleet.calcFuelCost(engines),
+				Fleets.calcFuelCost(engines),
 				43096
 			);
 		});
@@ -143,7 +147,7 @@ describe('• Fleet', () => {
 			};
 
 			assert.equal(
-				Fleet.calcFuelCost(engines),
+				Fleets.calcFuelCost(engines),
 				167261
 			);
 		});
@@ -158,7 +162,7 @@ describe('• Fleet', () => {
 			const b = [3,2,1];
 
 			assert.equal(
-				Fleet.slowerSpeed(a, b),
+				Fleets.slowerSpeed(a, b),
 				a
 			);
 		});
@@ -168,7 +172,7 @@ describe('• Fleet', () => {
 			const b = [1,2,3];
 
 			assert.equal(
-				Fleet.slowerSpeed(a, b),
+				Fleets.slowerSpeed(a, b),
 				a
 			);
 		});
@@ -178,7 +182,7 @@ describe('• Fleet', () => {
 			const b = [1,2,3];
 
 			assert.equal(
-				Fleet.slowerSpeed(a, b),
+				Fleets.slowerSpeed(a, b),
 				b
 			);
 		});
@@ -190,19 +194,19 @@ describe('• Fleet', () => {
 	describe('# calcMoveTime()', () => {
 		it('1, 0 0 0 = 0', () => {
 			assert.equal(
-				Fleet.calcMoveTime(1, [0,0,0]),
+				Fleets.calcMoveTime(1, [0,0,0]),
 				0
 			);
 		});
 		it('1, 1 2 3 = 6', () => {
 			assert.equal(
-				Fleet.calcMoveTime(1, [1,2,3]),
+				Fleets.calcMoveTime(1, [1,2,3]),
 				6
 			);
 		});
 		it('2, 3 2 1 = 17', () => { // 3*(2^2)* + 2*2 + 1 = 12 + 4 + 1
 			assert.equal(
-				Fleet.calcMoveTime(2, [3,2,1]),
+				Fleets.calcMoveTime(2, [3,2,1]),
 				17
 			);
 		});
@@ -253,7 +257,7 @@ describe('• Fleet', () => {
 					newPlanet,
 					newFleetList,
 					noResourcesLeft
-				] = Fleet.distributeFuel(planet, fleetList);
+				] = Fleets.distributeFuel(planet, fleetList);
 
 				// Check
 				let newTotalFuel = 0 + newPlanet.resources[1];

@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Unit = class Unit {
+	exports.Units = class Units {
 		/**
 		 * Check if two ships have the same parts
 		 *
@@ -58,7 +58,7 @@
 					unitList[currObj].shipShape === ship.shipShape &&
 					unitList[currObj].parts.length === ship.parts.length) {
 
-					duplicate = Unit.checkIfSameParts(unitList[currObj], ship);
+					duplicate = Units.checkIfSameParts(unitList[currObj], ship);
 					if(duplicate) {
 						break;
 					}

@@ -6,12 +6,12 @@ const assert = require('assert');
 /**
  * My libs
  */
-require('../calcConstants')();
-require('../misc')();
-const Tutorials = require('../Tutorials').Tutorials;
-global.Research = require('../research');
+require('../../calcConstants')();
+require('../../misc')();
+const Tutorials = require('../../Tutorials');
+global.Research = require('../../research');
 
-describe('• Tutorials', () => {
+describe('• Tutorials (shared)', () => {
 	/**
 	 * Has finished tutorials ?
  	 */

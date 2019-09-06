@@ -9,22 +9,12 @@ const assert = require('assert');
 require('../calcConstants')();
 require('../misc')();
 
-global.Fleets = require('../fleets');
+global.Fleets = require('../Fleets');
 global.Units = require('../units');
 
 let gameDb;
 
 describe('• Fleets', () => {
-	/*before(function(done) {
-		let count = 0;
-
-		db.connect(function(success,general,database) {
-			if(++count === 2) {
-				done();
-			}
-		});
-	});
-
 	/**
 	 * Has enough carrier capacity ?
  	 */
@@ -131,13 +121,6 @@ describe('• Fleets', () => {
 
 				done();
 			});
-		});
-	});
-
-
-	after(function(done) {
-		db.closeConnections(() => {
-			done();
 		});
 	});*/
 });

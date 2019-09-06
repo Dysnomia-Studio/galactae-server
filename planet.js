@@ -452,7 +452,7 @@ module.exports = class Planet {
 
 		// Update units
 		if(planetData.unitBuildingEndTime !== -1) {
-			Planet.UpdateUnits(planetData,user,currTime);
+			Planet.UpdateUnits(Object.assign({}, planetData),user,currTime);
 		}
 
 		if(currTime>planetData.unitBuildingEndTime) {

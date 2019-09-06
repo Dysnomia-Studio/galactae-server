@@ -6,12 +6,12 @@ const assert = require('assert');
 /**
  * My libs
  */
-require('../calcConstants')();
-require('../misc')();
+require('../../calcConstants')();
+require('../../misc')();
 
-const Unit = require('../Unit').Unit;
+const Units = require('../../Units');
 
-describe('• Unit', () => {
+describe('• Units (shared)', () => {
 	describe('# checkIfSameParts()', () => {
 		it('Same Ships', () => {
 			const ship1 = {
@@ -28,7 +28,7 @@ describe('• Unit', () => {
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				true
 			);
 		});
@@ -48,7 +48,7 @@ describe('• Unit', () => {
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				true
 			);
 		});
@@ -68,7 +68,7 @@ describe('• Unit', () => {
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				false
 			);
 		});
@@ -92,7 +92,7 @@ describe('• Unit', () => {
 
 		it('different parts', () => {
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1 ], ship2),
+				Units.checkIfDuplicate([	ship1 ], ship2),
 				[false, false]
 			);
 		});
@@ -106,7 +106,7 @@ describe('• Unit', () => {
 			ship4.name = '2';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship4 ], ship3),
+				Units.checkIfDuplicate([	ship4 ], ship3),
 				[false, false]
 			);
 		});
@@ -120,7 +120,7 @@ describe('• Unit', () => {
 			ship4.name = '2';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship4 ], ship3),
+				Units.checkIfDuplicate([	ship4 ], ship3),
 				[false, false]
 			);
 		});
@@ -131,7 +131,7 @@ describe('• Unit', () => {
 			ship3.name = '1';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1 ], ship3),
+				Units.checkIfDuplicate([	ship1 ], ship3),
 				[false, false]
 			);
 		});
@@ -144,14 +144,14 @@ describe('• Unit', () => {
 			};
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1, ship2 ], ship3),
+				Units.checkIfDuplicate([	ship1, ship2 ], ship3),
 				[true, false]
 			);
 		});
 
 		it('same name same parts', () => {
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1, ship2 ], ship1),
+				Units.checkIfDuplicate([	ship1, ship2 ], ship1),
 				[false, true]
 			);
 		});
@@ -166,7 +166,7 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[64,32,46,23,0.41,5]
 			);
 		});
@@ -184,7 +184,7 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[687,755,356,152,4.45,1301]
 			);
 		});
@@ -196,7 +196,7 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[-1]
 			);
 		});

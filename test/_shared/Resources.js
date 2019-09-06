@@ -6,12 +6,12 @@ const assert = require('assert');
 /**
  * My libs
  */
-require('../calcConstants')();
-require('../misc')();
+require('../../calcConstants')();
+require('../../misc')();
 
-global.Resources    = require('../Resources').Resources;
+global.Resources    = require('../../Resources');
 
-describe('• Resources', () => {
+describe('• Resources (shared)', () => {
 	describe('# GetRatiosPerPlanet()', () => {
 		it('0', () => {
 			assert.deepEqual(

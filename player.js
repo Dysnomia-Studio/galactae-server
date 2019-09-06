@@ -235,76 +235,91 @@ module.exports = class Player {
 			callback(newUserData);
 		},0,0);
 	}
-	/* dayBonus */
-	static dayBonus(data,userData,choice) {
+
+	static getDayBonus(userData, choice) {
 		const jour = 24*60*60*1000;
 		const minuit = Date.now() - (Date.now()%jour);
 		const hierMinuit = minuit - jour;
 
-		if(data.lastBonus < minuit) {
-			// Update player
-			const newPlayerData = {};
-			newPlayerData.id = data.id;
-			newPlayerData.dayBonusStreak = data.dayBonusStreak+1;
-			newPlayerData.lastBonus = Date.now();
+		const bonus = {
+			credits: 0,
+			helium: 0,
+			newPlayerData: {},
+		};
 
-			if(data.lastBonus < hierMinuit) { // Si pas hier
-				newPlayerData.dayBonusStreak = 1;
+		if(userData.lastBonus < minuit) {
+			// Update player
+			bonus.newPlayerData.id = userData.id;
+			bonus.newPlayerData.dayBonusStreak = userData.dayBonusStreak+1;
+			bonus.newPlayerData.dayBonusBest = userData.dayBonusBest;
+			bonus.newPlayerData.lastBonus = Date.now();
+
+			if(userData.lastBonus < hierMinuit) { // Si pas hier
+				bonus.newPlayerData.dayBonusStreak = 1;
 			}
 
 			// Best score
-			if(newPlayerData.dayBonusStreak > newPlayerData.dayBonusBest) {
-				newPlayerData.dayBonusBest = newPlayerData.dayBonusStreak;
+			if(bonus.newPlayerData.dayBonusStreak > bonus.newPlayerData.dayBonusBest) {
+				bonus.newPlayerData.dayBonusBest = bonus.newPlayerData.dayBonusStreak;
 			}
 
-			let credits;
-			let helium = 0;
-			const streak = newPlayerData.dayBonusStreak%30; // Bonus is periodic
+			const streak = bonus.newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
-			if(streak===1) { credits = 15; }
-			else if(streak===2) { credits = 25; }
-			else if(streak===3) { credits = 50; }
-			else if(streak===4) { credits = 80; }
-			else if(streak<10) { credits = 100; }
+			if(streak===1) { bonus.credits = 15; }
+			else if(streak===2) { bonus.credits = 25; }
+			else if(streak===3) { bonus.credits = 50; }
+			else if(streak===4) { bonus.credits = 80; }
+			else if(streak<10) { bonus.credits = 100; }
 			else if(streak<20) {
-				credits = 10*(streak + 1); // 110 to 200
-				helium = 1750 * streak; // 15000 is about 45 min of ion propulsion for 1 vessel - 15000 to 33250
+				bonus.credits = 10*(streak + 1); // 110 to 200
+				bonus.helium = 1750 * streak; // 15000 is about 45 min of ion propulsion for 1 vessel - 15000 to 33250
 			} else if(streak<30) {
-				credits = 15*streak; // 300 to 435
-				helium = 2000 * streak; // 40000 to 58000
+				bonus.credits = 15*streak; // 300 to 435
+				bonus.helium = 2000 * streak; // 40000 to 58000
 			} else {
-				credits = 1000;
+				bonus.credits = 1000;
 			} // @ADD: generate random special bonus
+		}
 
-			if(choice===2 && helium!==0) {
-				Planet.find(userData,userData.pid,0,function(planetReturned) {
-					if(userData.pid !== planetReturned.address) { // Stop if not belonging
-						Websocket.SendMessageToClient({ sid: userData.sid, message: 'ERROR_NOT_BELONGING' });
-						log(userData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+userData.pid+') because he doesn\'t own it !','fail');
-						return;
-					}
+		return bonus;
+	}
 
-					const newPlanetData = Planet.update(planetReturned, data, []);
+	/* dayBonus */
+	static dayBonus(data,inputData,choice) {
+		const {
+			credits,
+			helium,
+			newPlayerData,
+		} = Player.getDayBonus(data, choice);
 
-					newPlanetData.resources[1]+=helium;
+		if(choice===2 && helium!==0) {
+			Planet.find(inputData,inputData.pid,0,function(planetReturned) {
+				if(inputData.pid !== planetReturned.address) { // Stop if not belonging
+					Websocket.SendMessageToClient({ sid: inputData.sid, message: 'ERROR_NOT_BELONGING' });
+					log(inputData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+inputData.pid+') because he doesn\'t own it !','fail');
+					return;
+				}
 
-					db.planet.update(newPlanetData);
+				const newPlanetData = Planet.update(planetReturned, data, []);
 
-					log(userData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
+				newPlanetData.resources[1]+=helium;
 
-					db.player.update(newPlayerData);
+				db.planet.update(newPlanetData);
 
-					Planet.sendPlanetDataToUser({data: newPlanetData, planet: userData.pid, id: userData.id, sid: userData.sid });
-				});
-			} else {
-				newPlayerData.money = data.money + credits;
-				log(userData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
+				log(inputData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
 				db.player.update(newPlayerData);
-				io.to(userData.sid).emit('player-recieve-data',{
-					money: newPlayerData.money,
-				});
-			}
+
+				Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid });
+			});
+		} else {
+			newPlayerData.money = data.money + credits;
+			log(inputData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
+
+			db.player.update(newPlayerData);
+			io.to(inputData.sid).emit('player-recieve-data',{
+				money: newPlayerData.money,
+			});
 		}
 	}
 };
