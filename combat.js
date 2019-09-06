@@ -8,7 +8,7 @@ module.exports = class Combat {
 		this.defFleets = [];
 
 		// Cache des types d'unités
-		this.unitCache = Object.assign({}, Unit.specialUnits);
+		this.unitCache = Object.assign({}, Units.specialUnits);
 
 		// Cache des tactiques
 		this.tacticCache = {};
@@ -89,9 +89,9 @@ module.exports = class Combat {
 		const compatibleUnits = [];
 		if(type !== '') {
 			for(const id in this.unitCache) {
-				const unit = this.unitCache[id];
-				if(unit.shipType === type) {
-					compatibleUnits.push(unit.id);
+				const currUnit = this.unitCache[id];
+				if(currUnit.shipType === type) {
+					compatibleUnits.push(currUnit.id);
 				}
 			}
 		}
@@ -114,11 +114,11 @@ module.exports = class Combat {
 	 * @param      {<type>}  unit    The unit
 	 * @param      {<type>}  fleet   The fleet
 	 */
-	getTarget(unit, fleet, ennemyFleets) {
+	getTarget(unit, currFleet, ennemyFleets) {
 		let choosenFleet,
 			choosenUnit;
 
-		let currTactic = Object.assign({}, this.tacticCache[fleet.tactic]);
+		let currTactic = Object.assign({}, this.tacticCache[currFleet.tactic]);
 		if(!isset(currTactic, 'object')) {
 			currTactic = {
 				orders: []
@@ -181,8 +181,8 @@ module.exports = class Combat {
 		const sourceUnit = this.unitCache[source];
 		const destinationUnit = this.unitCache[destination];
 
-		const sourceWepons = Unit.getWeapons(sourceUnit);
-		const destinationShield = Unit.getShields(destinationUnit);
+		const sourceWepons = Units.getWeapons(sourceUnit);
+		const destinationShield = Units.getShields(destinationUnit);
 
 		let damage = 0;
 		const logs = [];
@@ -249,7 +249,7 @@ module.exports = class Combat {
 
 				if(!this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] ||
 					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId].length <= currAtkFleets.unitNbCounter ||
-					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
+					Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
 
 					currAtkFleets.unitTypeCounter++;
 					currAtkFleets.unitNbCounter = 0;
@@ -302,7 +302,7 @@ module.exports = class Combat {
 
 				if(!this.defFleets[currDefFleets.fleetCounter].units[currUnitId] ||
 					this.defFleets[currDefFleets.fleetCounter].units[currUnitId].length <= currDefFleets.unitNbCounter ||
-					Unit.getWeapons(this.unitCache[currUnitId]).length === 0) {
+					Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
 
 					currDefFleets.unitTypeCounter++;
 					currDefFleets.unitNbCounter = 0;
@@ -393,8 +393,8 @@ module.exports = class Combat {
 		// Get units id list
 		const unitIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
-			for(const unit in currFleet.units) {
-				unitIdList.add(unit);
+			for(const currUnit in currFleet.units) {
+				unitIdList.add(currUnit);
 			}
 		}
 
@@ -410,8 +410,8 @@ module.exports = class Combat {
 				continue;
 			}
 
-			db.unit.find(unitId, (unit) => {
-				this.unitCache[unit.id] = unit;
+			db.unit.find(unitId, (currUnit) => {
+				this.unitCache[currUnit.id] = currUnit;
 
 				if(unitIdList.size === ++added) {
 					callback();
@@ -431,8 +431,7 @@ module.exports = class Combat {
 			// Get all db data & Fight
 			this.getAllTactics(() => {
 				this.getAllUnits(() => {
-					let i = 0;
-					while(Fleet.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleet.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
+					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
 						this.simulateTurn();
 					}
 				});
@@ -441,7 +440,7 @@ module.exports = class Combat {
 
 		this.saveLogs();
 
-		if(this.atkFleets.length === 0 || !Fleet.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)) {
+		if(this.atkFleets.length === 0 || !Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)) {
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins', 'info');
 		} else {
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins', 'info');

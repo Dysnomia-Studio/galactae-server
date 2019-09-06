@@ -5,8 +5,8 @@ const assert = require('assert');
 
 require('../calcConstants')();
 
-global.Fleet			= require('../Fleet').Fleet;
-global.Unit			= require('../Unit').Unit;
+global.Fleets			= require('../Fleets');
+global.Units			= require('../Units');
 
 global.log			= function(txt) { console.log(txt); };
 
@@ -563,7 +563,7 @@ describe('• Combat', () => {
 
 				assert.deepEqual(
 					battleArena.unitCache,
-					Object.assign({}, Unit.specialUnits, expected)
+					Object.assign({}, Units.specialUnits, expected)
 				);
 
 				done();

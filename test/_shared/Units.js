@@ -206,7 +206,7 @@ describe('• Units (shared)', () => {
 		it('No empty object',() => {
 			assert(
 				isset(
-					Unit.specialUnits
+					Units.specialUnits
 				),
 				'object'
 			);	
@@ -216,7 +216,7 @@ describe('• Units (shared)', () => {
 	describe('getWeapons()', () => {
 		it('undefined unit', () => {
 			try {
-				Unit.getWeapons(undefined);
+				Units.getWeapons(undefined);
 				assert(false);
 			} catch(e) {
 				assert(true);
@@ -225,21 +225,21 @@ describe('• Units (shared)', () => {
 
 		it('no parts', () => {
 			assert.deepEqual(
-				Unit.getWeapons({ parts: [] }),
+				Units.getWeapons({ parts: [] }),
 				[]
 			);
 		});
 
 		it('no weapons', () => {
 			assert.deepEqual(
-				Unit.getWeapons({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				Units.getWeapons({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
 				[]
 			);
 		});
 
 		it('weapons', () => {
 			assert.deepEqual(
-				Unit.getWeapons({ parts: [
+				Units.getWeapons({ parts: [
 					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }
 				] }),
@@ -251,7 +251,7 @@ describe('• Units (shared)', () => {
 	describe('getShields()', () => {
 		it('undefined unit', () => {
 			try {
-				Unit.getShields(undefined);
+				Units.getShields(undefined);
 				assert(false);
 			} catch(e) {
 				assert(true);
@@ -260,21 +260,21 @@ describe('• Units (shared)', () => {
 
 		it('no parts', () => {
 			assert.deepEqual(
-				Unit.getShields({ parts: [] }),
+				Units.getShields({ parts: [] }),
 				[]
 			);
 		});
 
 		it('no shield', () => {
 			assert.deepEqual(
-				Unit.getShields({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				Units.getShields({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
 				[]
 			);
 		});
 
 		it('shield', () => {
 			assert.deepEqual(
-				Unit.getShields({ parts: [
+				Units.getShields({ parts: [
 					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
 					{ tech: 'magnetic', type: 'shield', name: 'shield_1' }
 				] }),

@@ -270,7 +270,7 @@
 
 		static hasOffensiveCapacity(currFleet, unitCache) {
 			for(const currUnit in currFleet.units) {
-				if(Unit.getWeapons(unitCache[currUnit]).length > 0) {
+				if(Units.getWeapons(unitCache[currUnit]).length > 0) {
 					return true;
 				}
 			}
@@ -280,7 +280,7 @@
 
 		static groupHasOffensiveCapacity(fleetList, unitCache) {
 			for(const currFleet of fleetList) {
-				if(Fleet.hasOffensiveCapacity(currFleet, unitCache)) {
+				if(Fleets.hasOffensiveCapacity(currFleet, unitCache)) {
 					return true;
 				}
 			}

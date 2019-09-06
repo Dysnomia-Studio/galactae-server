@@ -9,8 +9,6 @@ const assert = require('assert');
 require('../../calcConstants')();
 require('../../misc')();
 
-global.db = require('../../database');
-
 global.Fleets = require('../../Fleets');
 
 describe('• Fleets (shared)', () => {
@@ -281,7 +279,7 @@ describe('• Fleets (shared)', () => {
 	describe('hasOffensiveCapacity', () => {
 		it('Empty fleet', () => {
 			assert.equal(
-				Fleet.hasOffensiveCapacity(
+				Fleets.hasOffensiveCapacity(
 					{ units: {} },
 					{}
 				), false
@@ -290,7 +288,7 @@ describe('• Fleets (shared)', () => {
 
 		it('No offensive unit', () => {
 			assert.equal(
-				Fleet.hasOffensiveCapacity(
+				Fleets.hasOffensiveCapacity(
 					{ units: { 'u1': 10 } },
 					{ u1: { parts: [] }}
 				), false
@@ -299,7 +297,7 @@ describe('• Fleets (shared)', () => {
 
 		it('No offensive unit (multiple units)', () => {
 			assert.equal(
-				Fleet.hasOffensiveCapacity(
+				Fleets.hasOffensiveCapacity(
 					{ units: { 'u1': 10, 'u2': 100 } },
 					{
 						u1: { parts: [{ type: 'hangar' }] },
@@ -311,7 +309,7 @@ describe('• Fleets (shared)', () => {
 
 		it('Offensive unit', () => {
 			assert.equal(
-				Fleet.hasOffensiveCapacity(
+				Fleets.hasOffensiveCapacity(
 					{ units: { 'u1': 10 } },
 					{ u1: { parts: [{ type: 'cannon'}] }}
 				), true
@@ -320,7 +318,7 @@ describe('• Fleets (shared)', () => {
 
 		it('Offensive unit (multiple units)', () => {
 			assert.equal(
-				Fleet.hasOffensiveCapacity(
+				Fleets.hasOffensiveCapacity(
 					{ units: { 'u1': 10, 'u2': 100 } },
 					{
 						u1: { parts: [{ type: 'cannon' }] },
@@ -334,7 +332,7 @@ describe('• Fleets (shared)', () => {
 	describe('groupHasOffensiveCapacity', () => {
 		it('Empty fleet', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: {} }],
 					{}
 				), false
@@ -343,7 +341,7 @@ describe('• Fleets (shared)', () => {
 
 		it('Empty fleet (multiple fleets)', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: {} }, { units: {} }],
 					{}
 				), false
@@ -352,7 +350,7 @@ describe('• Fleets (shared)', () => {
 
 		it('No offensive unit', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: { 'u1': 10 } }],
 					{ u1: { parts: [] }}
 				), false
@@ -361,7 +359,7 @@ describe('• Fleets (shared)', () => {
 
 		it('No offensive unit (multiple units)', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: { 'u1': 10, 'u2': 100 } },
 						{ units: { 'u2': 100 } }],
 					{
@@ -374,7 +372,7 @@ describe('• Fleets (shared)', () => {
 
 		it('Offensive unit', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: { 'u1': 10 } }, { units: {} }],
 					{ u1: { parts: [{ type: 'cannon'}] }}
 				), true
@@ -383,7 +381,7 @@ describe('• Fleets (shared)', () => {
 
 		it('Offensive unit (multiple units)', () => {
 			assert.equal(
-				Fleet.groupHasOffensiveCapacity(
+				Fleets.groupHasOffensiveCapacity(
 					[{ units: { 'u1': 10, 'u2': 100 } },
 						{ units: { 'u2': 100 } }],
 					{
