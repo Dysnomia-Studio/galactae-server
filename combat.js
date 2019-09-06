@@ -488,19 +488,18 @@ module.exports = class Combat {
 			log('Error while writing battle logs: ' + e, 'error');
 		}
 
-		/*console.log("Final BattleLog:");
-		console.log(finalBattleLog);*/
-
 		if(isset(finalBattleLog, 'object')) {
-			io.to(this.plySid).emit('combat-battleLog-send', finalBattleLog);
+			io.to(atkUser.sid).emit('combat-battleLog-send', finalBattleLog);
+			io.to(defUser.sid).emit('combat-battleLog-send', finalBattleLog);
+
+			// @TODO: Save notification if sid is -1
+
 			db.battleLog.save(finalBattleLog);
 		}
 	}
 
 	static beginFight(data, pid, atkUser, defUser, atkFleetId) {
 		log('Begin of fight simulation - Planet: ' + pid, 'info');
-
-		// @TODO: check beginners protection
 
 		db.fleet.findByPosition(pid, (fleetList) => {
 			const battle = new Combat(atkFleetId, atkUser, defUser, data.sid, pid);
