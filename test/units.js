@@ -8,8 +8,8 @@ const assert = require('assert');
  */
 require('../calcConstants')();
 require('../misc')();
-const Fleet = require('../fleets');
-const Units = require('../units');
+const Fleet = require('../Fleets');
+const Units = require('../Units');
 
 describe('• Units', () => {
 	describe('# checkShipParts()', () => {
