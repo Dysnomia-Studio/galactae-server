@@ -5,6 +5,7 @@ const assert = require('assert');
 
 require('../calcConstants')();
 
+global.Fleet			= require('../Fleet').Fleet;
 global.Unit			= require('../Unit').Unit;
 
 global.log			= function(txt) { console.log(txt); };
