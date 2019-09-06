@@ -9,7 +9,7 @@ const assert = require('assert');
 require('../../calcConstants')();
 require('../../misc')();
 
-const Units = require('../../_shared/Units').Units;
+const Units = require('../../Units');
 
 describe('• Units (shared)', () => {
 	describe('# checkIfSameParts()', () => {

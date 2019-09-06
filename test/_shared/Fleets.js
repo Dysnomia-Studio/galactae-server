@@ -12,7 +12,7 @@ require('../../misc')();
 
 global.db = require('../../database');
 
-global.Fleets = require('../../_shared/Fleets').Fleets;
+global.Fleets = require('../../Fleets');
 
 describe('• Fleets (shared)', function() {
 	describe('# getSpeed()', function() {

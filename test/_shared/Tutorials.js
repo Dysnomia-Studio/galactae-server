@@ -8,7 +8,7 @@ const assert = require('assert');
  */
 require('../../calcConstants')();
 require('../../misc')();
-const Tutorials = require('../../_shared/Tutorials').Tutorials;
+const Tutorials = require('../../Tutorials');
 global.Research = require('../../research');
 
 describe('• Tutorials (shared)', function() {

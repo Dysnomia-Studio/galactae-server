@@ -10,7 +10,7 @@ require('../../calcConstants')();
 require('../../config')();
 require('../../misc')();
 
-global.Resources    = require('../../_shared/Resources').Resources;
+global.Resources    = require('../../Resources');
 
 describe('• Resources (shared)', function() {
 	describe('# GetRatiosPerPlanet()', function() {

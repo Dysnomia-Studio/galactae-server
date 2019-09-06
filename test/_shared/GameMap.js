@@ -6,7 +6,7 @@ const assert = require('assert');
 /**
  * My libs
  */
-global.GameMap   = require('../../_shared/GameMap').GameMap;
+global.GameMap   = require('../../GameMap');
 
 describe('• GameMap (shared)', () => {
 	/**

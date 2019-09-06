@@ -12,7 +12,7 @@ require('../../calcConstants')();
 require('../../config')();
 require('../../misc')();
 
-global.Buildings    = require('../../_shared/Buildings').Buildings;
+global.Buildings    = require('../../Buildings');
 
 describe('• Buildings (shared)', () => {
 	/**
