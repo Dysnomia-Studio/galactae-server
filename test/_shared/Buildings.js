@@ -49,7 +49,7 @@ describe('• Buildings (shared)', () => {
 	/**
 	 * GetRequirements/HasRequirements
 	 */
-	describe('GetRequirements/HasRequirements()', () => {
+	describe('# GetRequirements/HasRequirements()', () => {
 		it('Building is already > 0', () => {
 			assert(
 				Buildings.HasRequirements({}, { Buildings: [1] }, 0),

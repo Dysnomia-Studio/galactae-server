@@ -202,18 +202,18 @@ describe('• Units (shared)', () => {
 		});
 	});
 
-	describe('specialUnits()', () => {
+	describe('# specialUnits()', () => {
 		it('No empty object',() => {
 			assert(
 				isset(
 					Units.specialUnits
 				),
 				'object'
-			);	
+			);
 		});
 	});
 
-	describe('getWeapons()', () => {
+	describe('# getWeapons()', () => {
 		it('undefined unit', () => {
 			try {
 				Units.getWeapons(undefined);
@@ -248,7 +248,7 @@ describe('• Units (shared)', () => {
 		});
 	});
 
-	describe('getShields()', () => {
+	describe('# getShields()', () => {
 		it('undefined unit', () => {
 			try {
 				Units.getShields(undefined);

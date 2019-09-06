@@ -213,7 +213,7 @@ describe('• Fleets (shared)', () => {
 	/**
 	 * Distribute fuel
 	 */
-	describe('distributeFuel()', () => {
+	describe('# distributeFuel()', () => {
 		const DISTRIBUTE_FUEL_RANDOMTESTS_COUNT = 10000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXFLEETS = 5;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL = 10000000;
@@ -276,7 +276,7 @@ describe('• Fleets (shared)', () => {
 		});
 	});
 
-	describe('hasOffensiveCapacity', () => {
+	describe('# hasOffensiveCapacity()', () => {
 		it('Empty fleet', () => {
 			assert.equal(
 				Fleets.hasOffensiveCapacity(
@@ -329,7 +329,7 @@ describe('• Fleets (shared)', () => {
 		});
 	});
 
-	describe('groupHasOffensiveCapacity', () => {
+	describe('# groupHasOffensiveCapacity()', () => {
 		it('Empty fleet', () => {
 			assert.equal(
 				Fleets.groupHasOffensiveCapacity(
