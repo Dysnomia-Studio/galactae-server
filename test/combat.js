@@ -666,7 +666,7 @@ describe('• Combat', () => {
 			def_user_id: 'u1',
 			def_user_name: 'User 1',
 
-			//date: Date.now(),
+			date: Date.now(),
 
 			location: 'P1',
 
@@ -688,10 +688,9 @@ describe('• Combat', () => {
 			let logs = {};
 
 			const stepEnd = () => {
-				if(++doneSteps === 2) {
+				if(++doneSteps === 3) {
 					assert(typeof logs.date === 'number');
-
-					delete logs.date;
+					expectedLogs.date = logs.date;
 
 					assert.deepEqual(logs, expectedLogs);
 
@@ -737,12 +736,11 @@ describe('• Combat', () => {
 			);
 
 			const stepEnd = () => {
-				if(++doneSteps === 2) {
+				if(++doneSteps === 3) {
 					assert(typeof logs.date === 'number');
 					assert(logs.logs.length > 0);
 
-					delete logs.date;
-					// TODO
+					expectedLogs.date = logs.date;
 					logs.logs = [];
 
 					assert.deepEqual(logs, expectedLogs);

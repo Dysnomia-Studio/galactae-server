@@ -489,8 +489,8 @@ module.exports = class Combat {
 		}
 
 		if(isset(finalBattleLog, 'object')) {
-			io.to(atkUser.sid).emit('combat-battleLog-send', finalBattleLog);
-			io.to(defUser.sid).emit('combat-battleLog-send', finalBattleLog);
+			io.to(this.atkUser.sid).emit('combat-battleLog-send', finalBattleLog);
+			io.to(this.defUser.sid).emit('combat-battleLog-send', finalBattleLog);
 
 			// @TODO: Save notification if sid is -1
 
