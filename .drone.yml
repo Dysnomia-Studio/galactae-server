@@ -18,6 +18,7 @@ steps:
   when:
     branch:
     - dev
+    - feature/combats
 
 - name: discord
   pull: default
