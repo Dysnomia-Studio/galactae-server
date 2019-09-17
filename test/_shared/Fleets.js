@@ -41,6 +41,13 @@ describe('• Fleets (shared)', () => {
 	});
 
 	describe('# calcSubSpeed()', () => {
+		it('Undefined unit', () => {
+			assert.deepEqual(
+				Fleets.calcSubSpeed(undefined),
+				{ speed: [] }
+			);
+		});
+
 		it('One Ion', () => {
 			assert.deepEqual(Fleets.calcSubSpeed({
 					parts: [
@@ -81,6 +88,13 @@ describe('• Fleets (shared)', () => {
 	});
 
 	describe('# calcSupraSpeed()', () => {
+		it('Undefined unit', () => {
+			assert.deepEqual(
+				Fleets.calcSupraSpeed(undefined),
+				{ speed: [] }
+			);
+		});
+
 		it('One vsl', () => {
 			assert.deepEqual(Fleets.calcSupraSpeed({
 					parts: [
@@ -236,7 +250,13 @@ describe('• Fleets (shared)', () => {
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
 
-					totalFuel += fleetList[currentFleet].fuel;
+					if(Math.random() < 0.01) {
+						fleetList[currentFleet].fuel = undefined;
+					}
+
+					if(typeof fleetList[currentFleet].fuel !== 'undefined') {
+						totalFuel += fleetList[currentFleet].fuel;
+					}
 				}
 
 				const planet = {
@@ -247,6 +267,10 @@ describe('• Fleets (shared)', () => {
 					],
 					highPriorityFleet: 'f' + Math.round(Math.random() * fleetCount * 2),
 				};
+
+				if(planet.highPriorityFleet === ('f' + fleetCount * 2)) {
+					planet.highPriorityFleet = undefined;
+				}
 
 				totalFuel += planet.resources[1];
 
@@ -267,7 +291,7 @@ describe('• Fleets (shared)', () => {
 						assert(newFleetList[i].fuel === newFleetList[i].maxFuel || newPlanet.resources[1] === 0, 'Priority fleet');
 					}
 
-					assert(newFleetList[i].fuel >= 0, 'Positive or null fuel');
+					assert(newFleetList[i].fuel >= 0, 'Positive or null fuel ' + fleetList[i].fuel + ' ' + newFleetList[i].fuel);
 					assert(newFleetList[i].fuel <= newFleetList[i].maxFuel, 'Fuel is less or equal than max');
 				}
 
