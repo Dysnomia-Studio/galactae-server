@@ -47,7 +47,6 @@ describe('• Player', () => {
 			const {
 				credits,
 				helium,
-				outputPlayer,
 			} = Player.getDayBonus(inputPlayer, 1);
 
 			assert.equal(credits, 0);
@@ -129,11 +128,7 @@ describe('• Player', () => {
 			inputPlayer.lastBonus = Date.now() - TIME.DAY_TO_MS;
 			inputPlayer.dayBonusStreak = 19;
 
-			const {
-				credits,
-				helium,
-				newPlayerData,
-			} = Player.getDayBonus(inputPlayer, 1);
+			const helium = Player.getDayBonus(inputPlayer, 1).helium;
 
 			assert.equal(helium, 40000);
 		});
@@ -142,11 +137,7 @@ describe('• Player', () => {
 			inputPlayer.lastBonus = Date.now() - TIME.DAY_TO_MS;
 			inputPlayer.dayBonusStreak = 0;
 
-			const {
-				credits,
-				helium,
-				newPlayerData,
-			} = Player.getDayBonus(inputPlayer, 1);
+			const helium = Player.getDayBonus(inputPlayer, 1).helium;
 
 			assert.equal(helium, 0);
 		});

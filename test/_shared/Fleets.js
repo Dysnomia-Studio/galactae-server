@@ -277,8 +277,7 @@ describe('• Fleets (shared)', () => {
 				// Use
 				const [
 					newPlanet,
-					newFleetList,
-					noResourcesLeft
+					newFleetList
 				] = Fleets.distributeFuel(planet, fleetList);
 
 				// Check

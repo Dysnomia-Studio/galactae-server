@@ -139,8 +139,8 @@ describe('• Units', () => {
 
 		/** @TODO: When a ship have multiple sup propulsions
 		it('Ship w/ same sup propulsion', () => {
-			const ship = { 
-				
+			const ship = {
+
 			};
 
 			assert.equal(
@@ -150,7 +150,7 @@ describe('• Units', () => {
 		});
 
 		it('Ship w/ different sub propulsion', () => {
-			const ship = { 
+			const ship = {
 			};
 
 			assert.equal(

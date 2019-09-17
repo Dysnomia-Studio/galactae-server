@@ -290,7 +290,7 @@ describe('• Research', () => {
 				research: {
 					researchCenter: -1,
 					phyContemporaine: -1,
-				}
+				},
 			};
 
 			const data = {
@@ -310,9 +310,9 @@ describe('• Research', () => {
 					return {
 						emit: (event, content) => {
 							stepEnd(sid, event, content);
-						}
+						},
 					};
-				}
+				},
 			};
 
 			Research.sendResearchDataToUser(data, {}, user);

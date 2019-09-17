@@ -121,7 +121,7 @@ module.exports = class Combat {
 		let currTactic = Object.assign({}, this.tacticCache[currFleet.tactic]);
 		if(!isset(currTactic, 'object')) {
 			currTactic = {
-				orders: []
+				orders: [],
 			};
 		}
 

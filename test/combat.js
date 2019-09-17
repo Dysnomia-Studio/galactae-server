@@ -27,7 +27,7 @@ const tactics = [
 			{ unit: 'u1', priority: 1, target: 'SHIP_CORVET' },
 			{ unit: 'u1', priority: 3, target: 'SHIP_BATTLECRUISER' },
 			{ unit: 'u2', priority: 1, target: 'SHIP_CORVET' },
-		]
+		],
 	},
 	{
 		id: 't2',
@@ -35,7 +35,7 @@ const tactics = [
 			{ unit: 'u1', priority: 1, target: 'SHIP_CORVET' },
 			{ unit: 'u1', priority: 3, target: 'SHIP_BATTLECRUISER' },
 			{ unit: 'u2', priority: 1, target: 'SHIP_CORVET' },
-		]
+		],
 	},
 	{
 		id: 't3',
@@ -43,8 +43,8 @@ const tactics = [
 			{ unit: 'u1', priority: 3, target: 'SHIP_DEF' },
 			{ unit: 'u2', priority: 1, target: 'SHIP_DEF' },
 			{ unit: 'u2', priority: 2, target: 'SHIP_CORVET' },
-		]
-	}
+		],
+	},
 ];
 
 db.tactic.find = (id, callback) => {
@@ -61,27 +61,27 @@ global.unitsList = [{
 	'parts': [{
 		'type': 'cloak',
 		'name': 'cloak_1',
-		'tech': 'none'
+		'tech': 'none',
 	}, {
 		'type': 'scanner',
 		'name': 'scanner_1',
-		'tech': 'none'
+		'tech': 'none',
 	}, {
 		'type': 'sub_propulsion',
 		'name': 'prop_1',
-		'tech': 'vsolaire'
+		'tech': 'vsolaire',
 	}, {
 		'type': 'sub_propulsion',
 		'name': 'prop_2',
-		'tech': 'vsolaire'
+		'tech': 'vsolaire',
 	}, {
 		'type': 'sup_propulsion',
 		'name': 'prop_3',
-		'tech': 'vsl'
+		'tech': 'vsl',
 	}],
 	'armorType': '0',
 	'note': 0,
-	'owned': 2
+	'owned': 2,
 }, {
 	'id': 'u2',
 	'name': 'croiseur',
@@ -92,31 +92,31 @@ global.unitsList = [{
 	'parts': [{
 		'type': 'cannon',
 		'name': 'cannon_1',
-		'tech': 'railgun'
+		'tech': 'railgun',
 	}, {
 		'type': 'rocketLauncher',
 		'name': 'rocket_1',
-		'tech': 'explosive'
+		'tech': 'explosive',
 	}, {
 		'type': 'shield',
 		'name': 'shield_1',
-		'tech': 'none'
+		'tech': 'none',
 	}, {
 		'type': 'sup_propulsion',
 		'name': 'prop_1',
-		'tech': 'vsl'
+		'tech': 'vsl',
 	}, {
 		'type': 'sub_propulsion',
 		'name': 'prop_2',
-		'tech': 'ion'
+		'tech': 'ion',
 	}, {
 		'type': 'sub_propulsion',
 		'name': 'prop_3',
-		'tech': 'ion'
+		'tech': 'ion',
 	}],
 	'armorType': '0',
 	'note': 0,
-	'owned': 1
+	'owned': 1,
 }];
 
 db.unit.find = (id, callback) => {
@@ -139,7 +139,7 @@ describe('• Combat', () => {
 			let errMsg = '';
 
 			try {
-				const battleArena = new Combat();
+				new Combat();
 			} catch(e) {
 				errMsg = e.message;
 			}
@@ -409,11 +409,13 @@ describe('• Combat', () => {
 	 */
 	describe('# getTarget()', () => {
 		const tactics = {
-			't1': { orders: [
-				{ unit: 'u1', priority: 1, target: 'SHIP_DEF' },
-				{ unit: 'u1', priority: 3, target: 'SHIP_CORVET' },
-				{ unit: 'u2', priority: 1, target: 'SHIP_CORVET' },
-			] }
+			't1': {
+				orders: [
+					{ unit: 'u1', priority: 1, target: 'SHIP_DEF' },
+					{ unit: 'u1', priority: 3, target: 'SHIP_CORVET' },
+					{ unit: 'u2', priority: 1, target: 'SHIP_CORVET' },
+				],
+			}
 		};
 
 		const fleets = [
@@ -579,7 +581,7 @@ describe('• Combat', () => {
 			const battleArena = new Combat('f1');
 
 			const action = {
-				'message': 'test'
+				'message': 'test',
 			};
 
 			battleArena.addActionToBattleLog(action);
@@ -617,10 +619,10 @@ describe('• Combat', () => {
 				to: (sid) => {
 					return {
 						emit: (event, content) => {
-							stepEnd(sid, event, content);
-						}
+							stepEnd();
+						},
 					};
-				}
+				},
 			};
 
 			const battleArena = new Combat('f1');
@@ -629,7 +631,7 @@ describe('• Combat', () => {
 			];
 			battleArena.atkUser = {
 				id:'u2',
-				name:'User 2'
+				name:'User 2',
 			};
 			battleArena.defUser = {
 				id: 'u1',
@@ -637,7 +639,7 @@ describe('• Combat', () => {
 			};
 
 			const action = {
-				'message': 'test'
+				'message': 'test',
 			};
 
 			battleArena.addActionToBattleLog(action);
@@ -703,9 +705,9 @@ describe('• Combat', () => {
 					return {
 						emit: () => {
 							stepEnd();
-						}
+						},
 					};
-				}
+				},
 			};
 			global.db.battleLog.save = (content) => {
 				logs = content;
@@ -714,7 +716,7 @@ describe('• Combat', () => {
 
 			Combat.beginFight({}, 'P1', {
 				id:'u2',
-				name:'User 2'
+				name:'User 2',
 			}, {
 				id: 'u1',
 				name:'User 1',
@@ -754,9 +756,9 @@ describe('• Combat', () => {
 					return {
 						emit: () => {
 							stepEnd();
-						}
+						},
 					};
-				}
+				},
 			};
 			global.db.battleLog.save = (content) => {
 				logs = content;
@@ -765,7 +767,7 @@ describe('• Combat', () => {
 
 			Combat.beginFight({}, 'P1', {
 				id:'u2',
-				name:'User 2'
+				name:'User 2',
 			}, {
 				id: 'u1',
 				name:'User 1',

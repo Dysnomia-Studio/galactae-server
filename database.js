@@ -222,6 +222,6 @@ module.exports = {
 	battleLog: {
 		save: (battleLog) => {
 			// TODO
-		}
-	}
+		},
+	},
 };

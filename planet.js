@@ -226,36 +226,30 @@ module.exports = class Planet {
 	}
 
 	static checkIfCanBuild(planet, user, cost, building, currTime) {
-		let BlockBuild = false;
 		let errormsg = '';
 
 		// Cost verif
 		if(cost.iron>planet.resources[2] || cost.aluminium>planet.resources[3] || cost.copper>planet.resources[4] || cost.titanium>planet.resources[5] ) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_COST';
 		}
 		// Un bâtiment est déja en construction ?
 		if(planet.nextBuildingTime > currTime) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_ALREADY';
 		}
 		// Niveau maximum ?
 		if(planet.Buildings[building]>buildingMaxLvl[building]) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_MAXIMUM';
 		}
 		// Les requirements ?
 		if(!Buildings.HasRequirements(user, planet, building)) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 		}
 
 		planet.Buildings[building]++; // Only for calcs
 
 		// Energie ? Habitants ?
-		if(!BlockBuild) {
+		if(errormsg !== '') {
 			if(!Buildings.enoughEnergy(planet.Buildings) && building<=globalConst.groundBuildingNumber && building!==4) { // Only ground buildings affected by this
-				BlockBuild = true;
 				errormsg = 'BUILDING_ERROR_ENERGY';
 			}
 		}
@@ -359,7 +353,7 @@ module.exports = class Planet {
 			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
 
 			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
-				const key = Object.keys(specialUnitsUID).find(key => specialUnitsUID[key] === newPlanet.unitBuildingID);
+				const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
 				if(key !== undefined) {
 					newPlanet.unitBuildingID = key;
 
