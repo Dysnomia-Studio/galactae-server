@@ -8,8 +8,8 @@ const assert = require('assert');
  */
 require('../calcConstants')();
 require('../misc')();
-const Fleet = require('../fleets');
-const Units = require('../units');
+const Fleet = require('../Fleets');
+const Units = require('../Units');
 
 describe('• Units', () => {
 	describe('# checkShipParts()', () => {
@@ -139,8 +139,8 @@ describe('• Units', () => {
 
 		/** @TODO: When a ship have multiple sup propulsions
 		it('Ship w/ same sup propulsion', () => {
-			const ship = { 
-				
+			const ship = {
+
 			};
 
 			assert.equal(
@@ -150,7 +150,7 @@ describe('• Units', () => {
 		});
 
 		it('Ship w/ different sub propulsion', () => {
-			const ship = { 
+			const ship = {
 			};
 
 			assert.equal(

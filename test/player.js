@@ -47,7 +47,6 @@ describe('• Player', () => {
 			const {
 				credits,
 				helium,
-				outputPlayer,
 			} = Player.getDayBonus(inputPlayer, 1);
 
 			assert.equal(credits, 0);
@@ -129,11 +128,7 @@ describe('• Player', () => {
 			inputPlayer.lastBonus = Date.now() - TIME.DAY_TO_MS;
 			inputPlayer.dayBonusStreak = 19;
 
-			const {
-				credits,
-				helium,
-				newPlayerData,
-			} = Player.getDayBonus(inputPlayer, 1);
+			const helium = Player.getDayBonus(inputPlayer, 1).helium;
 
 			assert.equal(helium, 40000);
 		});
@@ -142,13 +137,42 @@ describe('• Player', () => {
 			inputPlayer.lastBonus = Date.now() - TIME.DAY_TO_MS;
 			inputPlayer.dayBonusStreak = 0;
 
-			const {
-				credits,
-				helium,
-				newPlayerData,
-			} = Player.getDayBonus(inputPlayer, 1);
+			const helium = Player.getDayBonus(inputPlayer, 1).helium;
 
 			assert.equal(helium, 0);
+		});
+	});
+
+	/**
+	 * calcResearchPoints
+	 */
+	describe('# calcResearchPoints()', () => {
+		it('calcResearchPoints(no research)', () => {
+			assert.equal(
+				Player.calcResearchPoints({ research: {} }),
+				0
+			);
+		});
+
+		it('calcResearchPoints(some research)', () => {
+			assert.equal(
+				Player.calcResearchPoints({ research: { researchCenter: -1, industrialistion: -1, phyContemporaine: -1, thermodynamique: -1 } }),
+				pointsCoef.research * (0 + 8 + 20 + 13)
+			);
+		});
+
+		it('calcResearchPoints(all research)', () => {
+			const research = {};
+			let total = 0;
+			for(const researchName in researchList) {
+				research[researchName] = -1;
+				total += researchList[researchName].cost;
+			}
+
+			assert.equal(
+				Player.calcResearchPoints({ research: research }),
+				pointsCoef.research * total
+			);
 		});
 	});
 });

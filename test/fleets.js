@@ -10,7 +10,7 @@ require('../calcConstants')();
 require('../misc')();
 
 global.Fleets = require('../Fleets');
-global.Units = require('../units');
+global.Units = require('../Units');
 
 let gameDb;
 
@@ -22,14 +22,14 @@ describe('• Fleets', () => {
 		it('Enought', () => {
 			const fleetUnits = {
 				'fighter': 1,
-				'carrier': 1
+				'carrier': 1,
 			};
 
 			const unitList = [
 				{
 					id: 'fighter',
 					shipType: 'SHIP_FIGHTER',
-					shipShape: 'SHIP_FIGHTER_SMALL'
+					shipShape: 'SHIP_FIGHTER_SMALL',
 				},
 				{
 					id: 'carrier',
@@ -37,20 +37,13 @@ describe('• Fleets', () => {
 					parts: [
 						{ type: 'hangar', tech: 'hangarDouble' },
 						{ type: 'sub_propulsion', tech: 'vsolaire' },
-					]
+					],
 				},
 				{
 					id: 'other',
 					shipType: 'SHIP_OTHER',
 				},
 			];
-
-			console.log(Fleets);
-			console.log(Object.keys(Fleets));
-			console.log(Object.values(Fleets));
-			console.log(JSON.stringify(Fleets));
-			console.log(Fleets.hasEnoughCarrier);
-			console.log(JSON.stringify(Fleets.hasEnoughCarrier));
 
 			assert.equal(
 				Fleets.hasEnoughCarrier(
@@ -63,14 +56,14 @@ describe('• Fleets', () => {
 		it('No Enought', () => {
 			const fleetUnits = {
 				'fighter': 80,
-				'carrier': 1
+				'carrier': 1,
 			};
 
 			const unitList = [
 				{
 					id: 'fighter',
 					shipType: 'SHIP_FIGHTER',
-					shipShape: 'SHIP_FIGHTER_SMALL'
+					shipShape: 'SHIP_FIGHTER_SMALL',
 				},
 				{
 					id: 'carrier',
@@ -78,7 +71,7 @@ describe('• Fleets', () => {
 					parts: [
 						{ type: 'hangar', tech: 'hangarDouble' },
 						{ type: 'sub_propulsion', tech: 'vsolaire' },
-					]
+					],
 				},
 			];
 

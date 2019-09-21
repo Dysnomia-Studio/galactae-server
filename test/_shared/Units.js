@@ -18,13 +18,13 @@ describe('• Units (shared)', () => {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
@@ -38,13 +38,13 @@ describe('• Units (shared)', () => {
 				parts:  [
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
@@ -58,13 +58,13 @@ describe('• Units (shared)', () => {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
@@ -87,7 +87,7 @@ describe('• Units (shared)', () => {
 			parts:  [
 				{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 				{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-			]
+			],
 		};
 
 		it('different parts', () => {
@@ -198,6 +198,87 @@ describe('• Units (shared)', () => {
 			assert.deepEqual(
 				Units.calcCost(shipShape, parts),
 				[-1]
+			);
+		});
+	});
+
+	describe('# specialUnits()', () => {
+		it('No empty object',() => {
+			assert(
+				isset(
+					Units.specialUnits
+				),
+				'object'
+			);
+		});
+	});
+
+	describe('# getWeapons()', () => {
+		it('undefined unit', () => {
+			try {
+				Units.getWeapons(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no weapons', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('weapons', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+				] }),
+				[{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }]
+			);
+		});
+	});
+
+	describe('# getShields()', () => {
+		it('undefined unit', () => {
+			try {
+				Units.getShields(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no shield', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('shield', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'magnetic', type: 'shield', name: 'shield_1' },
+				] }),
+				[{ tech: 'magnetic', type: 'shield', name: 'shield_1' }]
 			);
 		});
 	});

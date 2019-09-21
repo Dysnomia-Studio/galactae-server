@@ -255,6 +255,12 @@ module.exports = function() {
 		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
 		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003',
 	};
+	this.specialUnitsParts = {
+		SHIP_WEP_MINES:			[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'explosive' }],
+		SHIP_WEP_MINES_IEM:		[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'iem' }],
+		SHIP_WEP_MINES_NUKE:	[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'nuke' }],
+	};
+	this.fleetTranslate = {};
 
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
@@ -634,6 +640,17 @@ module.exports = function() {
 	this.hangarMiss = {
 		hangarSimple:  -2,
 		hangarDouble: -10,
+	};
+
+	this.weaponDamage = {
+		explosive: 		100,
+		nuke: 			400,
+		iem: 			80,
+		antimater: 		1000,
+		// Cannons
+		railgun: 		250,
+		laser: 			125,
+		plasma: 		500,
 	};
 
 	/**

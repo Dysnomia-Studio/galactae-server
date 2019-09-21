@@ -205,7 +205,7 @@
 		static distributeFuel(planet, fleetList) {
 			let haveToUpdate = [];
 			for(let i=0; i<fleetList.length; i++) {
-				if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
+				if(typeof fleetList[i].fuel === 'undefined') { fleetList[i].fuel = 0; }
 
 				fleetList[i].fuel = parseInt(fleetList[i].fuel);
 				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
@@ -219,7 +219,7 @@
 
 			// Priority fleet
 			if(isset(planet.highPriorityFleet, 'string')) {
-				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
+				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
 					fleetList[prioId].fuel += planet.resources[1];
@@ -236,7 +236,7 @@
 			// Current planet fleets
 			while(haveToUpdate.length > 0 && Math.floor(planet.resources[1]) > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
-					const id = fleetList.map(f => f.id).indexOf(haveToUpdate[i]);
+					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
 
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
@@ -248,7 +248,7 @@
 					}
 				}
 
-				haveToUpdate = haveToUpdate.filter(d => d !== -1);
+				haveToUpdate = haveToUpdate.filter((d) => d !== -1);
 			}
 
 			return [
@@ -266,6 +266,26 @@
 			}
 
 			return fleet;
+		}
+
+		static hasOffensiveCapacity(currFleet, unitCache) {
+			for(const currUnit in currFleet.units) {
+				if(Units.getWeapons(unitCache[currUnit]).length > 0) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static groupHasOffensiveCapacity(fleetList, unitCache) {
+			for(const currFleet of fleetList) {
+				if(Fleets.hasOffensiveCapacity(currFleet, unitCache)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

@@ -9,8 +9,6 @@ const assert = require('assert');
 require('../../calcConstants')();
 require('../../misc')();
 
-global.db = require('../../database');
-
 global.Fleets = require('../../Fleets');
 
 describe('• Fleets (shared)', () => {
@@ -43,6 +41,13 @@ describe('• Fleets (shared)', () => {
 	});
 
 	describe('# calcSubSpeed()', () => {
+		it('Undefined unit', () => {
+			assert.deepEqual(
+				Fleets.calcSubSpeed(undefined),
+				{ speed: [] }
+			);
+		});
+
 		it('One Ion', () => {
 			assert.deepEqual(Fleets.calcSubSpeed({
 					parts: [
@@ -83,6 +88,13 @@ describe('• Fleets (shared)', () => {
 	});
 
 	describe('# calcSupraSpeed()', () => {
+		it('Undefined unit', () => {
+			assert.deepEqual(
+				Fleets.calcSupraSpeed(undefined),
+				{ speed: [] }
+			);
+		});
+
 		it('One vsl', () => {
 			assert.deepEqual(Fleets.calcSupraSpeed({
 					parts: [
@@ -215,7 +227,7 @@ describe('• Fleets (shared)', () => {
 	/**
 	 * Distribute fuel
 	 */
-	describe('distributeFuel()', () => {
+	describe('# distributeFuel()', () => {
 		const DISTRIBUTE_FUEL_RANDOMTESTS_COUNT = 10000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXFLEETS = 5;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL = 10000000;
@@ -238,7 +250,13 @@ describe('• Fleets (shared)', () => {
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
 
-					totalFuel += fleetList[currentFleet].fuel;
+					if(Math.random() < 0.01) {
+						fleetList[currentFleet].fuel = undefined;
+					}
+
+					if(typeof fleetList[currentFleet].fuel !== 'undefined') {
+						totalFuel += fleetList[currentFleet].fuel;
+					}
 				}
 
 				const planet = {
@@ -250,13 +268,16 @@ describe('• Fleets (shared)', () => {
 					highPriorityFleet: 'f' + Math.round(Math.random() * fleetCount * 2),
 				};
 
+				if(planet.highPriorityFleet === ('f' + fleetCount * 2)) {
+					planet.highPriorityFleet = undefined;
+				}
+
 				totalFuel += planet.resources[1];
 
 				// Use
 				const [
 					newPlanet,
-					newFleetList,
-					noResourcesLeft
+					newFleetList
 				] = Fleets.distributeFuel(planet, fleetList);
 
 				// Check
@@ -269,12 +290,129 @@ describe('• Fleets (shared)', () => {
 						assert(newFleetList[i].fuel === newFleetList[i].maxFuel || newPlanet.resources[1] === 0, 'Priority fleet');
 					}
 
-					assert(newFleetList[i].fuel >= 0, 'Positive or null fuel');
+					assert(newFleetList[i].fuel >= 0, 'Positive or null fuel ' + fleetList[i].fuel + ' ' + newFleetList[i].fuel);
 					assert(newFleetList[i].fuel <= newFleetList[i].maxFuel, 'Fuel is less or equal than max');
 				}
 
 				assert.equal(totalFuel, newTotalFuel);
 			}
+		});
+	});
+
+	describe('# hasOffensiveCapacity()', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: {} },
+					{}
+				), false
+			);
+		});
+
+		it('No offensive unit', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: { 'u1': 10 } },
+					{ u1: { parts: [] }}
+				), false
+			);
+		});
+
+		it('No offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: { 'u1': 10, 'u2': 100 } },
+					{
+						u1: { parts: [{ type: 'hangar' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), false
+			);
+		});
+
+		it('Offensive unit', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: { 'u1': 10 } },
+					{ u1: { parts: [{ type: 'cannon'}] }}
+				), true
+			);
+		});
+
+		it('Offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: { 'u1': 10, 'u2': 100 } },
+					{
+						u1: { parts: [{ type: 'cannon' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), true
+			);
+		});
+	});
+
+	describe('# groupHasOffensiveCapacity()', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: {} }],
+					{}
+				), false
+			);
+		});
+
+		it('Empty fleet (multiple fleets)', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: {} }, { units: {} }],
+					{}
+				), false
+			);
+		});
+
+		it('No offensive unit', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10 } }],
+					{ u1: { parts: [] }}
+				), false
+			);
+		});
+
+		it('No offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10, 'u2': 100 } },
+						{ units: { 'u2': 100 } }],
+					{
+						u1: { parts: [{ type: 'hangar' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), false
+			);
+		});
+
+		it('Offensive unit', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10 } }, { units: {} }],
+					{ u1: { parts: [{ type: 'cannon'}] }}
+				), true
+			);
+		});
+
+		it('Offensive unit (multiple units)', () => {
+			assert.equal(
+				Fleets.groupHasOffensiveCapacity(
+					[{ units: { 'u1': 10, 'u2': 100 } },
+						{ units: { 'u2': 100 } }],
+					{
+						u1: { parts: [{ type: 'cannon' }] },
+						u2: { parts: [{ type: 'shield' }] },
+					}
+				), true
+			);
 		});
 	});
 });

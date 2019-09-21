@@ -57,6 +57,12 @@ module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
+
+						if(FleetList[id].orbitPosition === 1) {
+							Combat.beginFight(data, pid, atkUser, defUser, atkFleetId);
+							continue;
+						}
+
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
 					}
 
@@ -285,6 +291,9 @@ module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_NOT_EXISTS' });
 							return;
 						}
+
+						// TODO: Check beginner protection end
+						// if(defUser.beginnerProtectEnd > Date.Now()) ...
 
 						let time;
 						if(systemeDepart === systemeArrivee) {
