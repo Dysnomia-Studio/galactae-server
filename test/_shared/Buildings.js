@@ -85,6 +85,28 @@ describe('• Buildings (shared)', () => {
 				Buildings.HasRequirements({ research: { misc_telemetrie: -1, misc_em: -1 } }, { Buildings: [0,0,0,0,0,0,0,3,0,0,0,0,0] }, 9),
 			);
 		});
+
+		global.translate = {};
+
+		it('[Translation failed] Parents not OK (building)', () => {
+			try {
+				Buildings.HasRequirements({ research: { misc_telemetrie: -1, misc_em: -1 } }, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0] }, 9);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('[Translation failed] Parents not OK (research)', () => {
+			try {
+				Buildings.HasRequirements({ research: {} }, { Buildings: [0,0,0,0,0,0,0,3,0,0,0,0,0] }, 9);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		delete translate;
 	});
 
 
