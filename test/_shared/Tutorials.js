@@ -36,6 +36,16 @@ describe('• Tutorials (shared)', () => {
 	 * Has all dependencies ?
  	 */
 	describe('# hasAllDependancies()', () => {
+		it('No dependency for tutorial', () => {
+			assert.equal(
+				Tutorials.hasAllDependancies(
+					'foo',
+					{},
+					{}
+				), true
+			);
+		});
+
 		// Tutorial
 		it('Hasn\'t all dependencies', () => {
 			assert.equal(
@@ -87,6 +97,16 @@ describe('• Tutorials (shared)', () => {
 	 * Has completed tutorial ?
  	 */
 	describe('# hasCompletedTutorial()', () => {
+		it('Has already done it', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
+					'foo',
+					{ tutorials: { welcome: true } },
+					{}
+				), true
+			);
+		});
+
 		it('Has already done it', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
