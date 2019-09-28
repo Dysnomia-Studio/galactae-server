@@ -293,14 +293,12 @@ describe('• Research', () => {
 				done();
 			};
 
-			global.io = {
-				to: (sid) => {
-					return {
-						emit: (event, content) => {
-							stepEnd(sid, event, content);
-						},
-					};
-				},
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						stepEnd(sid, event, content);
+					},
+				};
 			};
 
 			Research.sendResearchDataToUser(data, {}, user);

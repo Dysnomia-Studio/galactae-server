@@ -1,21 +1,6 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-global.Websocket = require('../socket');
-
 describe('• Websocket', () => {
 	describe('# init()', () => {
 		it('init() should define events', () => {
-			console.log(Websocket);
-			console.log(io.toString());
-			console.log(JSON.stringify(io));
-			console.log(Websocket.init);
-
 			Websocket.init();
 
 			assert(isset(socketEvents['game-connect']), true);
@@ -34,7 +19,7 @@ describe('• Websocket', () => {
 			assert(isset(socketEvents['unit-type-rename']), true);
 			assert(isset(socketEvents['unit-type-delete']), true);
 			assert(isset(socketEvents['unit-build']), true);
-			assert(isset(socketEvents['unit-ask-data']), true);
+			assert(isset(socketEvents['units-ask-data']), true);
 
 			assert(isset(socketEvents['fleet-set-priority']), true);
 			assert(isset(socketEvents['fleet-move']), true);
@@ -53,6 +38,98 @@ describe('• Websocket', () => {
 
 			assert(isset(socketEvents['server-monitore-connect']), true);
 			assert(isset(socketEvents['admin-request-cmd']), true);
+		});
+	});
+
+	describe('# SendMessageToClient', () => {
+		it('SendMessageToClient(normal data)', () => {
+			const payload = {
+				sid: 'MyAmazingSid',
+				message: 'Hello there',
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						assert.equal(sid, payload.sid);
+						assert.equal(event, 'server-alert');
+						assert.equal(data, payload.message);
+					}
+				};
+			};
+
+			Websocket.SendMessageToClient(payload);
+		});
+	});
+
+	// Temp:
+	Discord.alert = () => {};
+
+	describe('# SendGeneralMessage', () => {
+		it('SendGeneralMessage(normal data)', () => {
+			const payload = 'Hello there';
+
+			io.emit = (event, data) => {
+				assert.equal(event, 'server-general-alert');
+				assert.equal(data, payload);
+			};
+
+			Websocket.SendGeneralMessage(payload);
+		});
+	});
+
+	describe('# sendNotification', () => {
+		it('sendNotification(normal data)', () => {
+			const sid = 'MyAmazingSid';
+
+			const payload = {
+				type: 'NotifType',
+				args: 'NotifArgs',
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						assert.equal(sid, sid);
+						assert.equal(event, 'notification');
+						assert.deepEqual(data, payload);
+					}
+				};
+			};
+
+			Websocket.sendNotification(
+				sid,
+				payload.type,
+				payload.args
+			);
+		});
+	});
+
+	describe('# sendTutorial', () => {
+		it('sendTutorial(normal data)', () => {
+			const user = {
+				sid: 'MyAmazingSid'
+			};
+
+			const payload = {
+				type: 'NotifType',
+				args: 'NotifArgs',
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						assert.equal(sid, user.sid);
+						assert.equal(event, 'tutorial');
+						assert.deepEqual(data, payload);
+					}
+				};
+			};
+
+			Websocket.sendTutorial(
+				user,
+				payload
+			);
 		});
 	});
 });

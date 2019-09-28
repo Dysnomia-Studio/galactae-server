@@ -76,6 +76,14 @@ describe('• Tactics', () => {
 				orders.push({ 'test': 'test' });
 			}
 
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						// Do nothing here
+					},
+				};
+			};
+
 			assert(
 				!Tactics.checkTactic({
 					'orders': orders,

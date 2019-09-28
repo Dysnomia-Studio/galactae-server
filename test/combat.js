@@ -582,18 +582,16 @@ describe('• Combat', () => {
 				}
 			};
 
-			global.db.battleLog.save = () => {
+			db.battleLog.save = () => {
 				stepEnd();
 			};
 
-			global.io = {
-				to: (sid) => {
-					return {
-						emit: (event, content) => {
-							stepEnd();
-						},
-					};
-				},
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						stepEnd();
+					},
+				};
 			};
 
 			const battleArena = new Combat('f1');
@@ -671,16 +669,15 @@ describe('• Combat', () => {
 				}
 			};
 
-			global.io = {
-				to: (sid) => {
-					return {
-						emit: () => {
-							stepEnd();
-						},
-					};
-				},
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						stepEnd();
+					},
+				};
 			};
-			global.db.battleLog.save = (content) => {
+
+			db.battleLog.save = (content) => {
 				logs = content;
 				stepEnd();
 			};
@@ -722,16 +719,15 @@ describe('• Combat', () => {
 				}
 			};
 
-			global.io = {
-				to: (sid) => {
-					return {
-						emit: () => {
-							stepEnd();
-						},
-					};
-				},
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						stepEnd();
+					},
+				};
 			};
-			global.db.battleLog.save = (content) => {
+
+			db.battleLog.save = (content) => {
 				logs = content;
 				stepEnd();
 			};

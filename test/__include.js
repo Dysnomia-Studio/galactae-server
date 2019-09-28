@@ -30,24 +30,18 @@ global.log = (data) => console.log(data);
 /**
  * DB & IO
  */
-global.io = class {
-	static to() { return new io(); }
-	emit() { return 0; }
-	static on(event, func) {
-		func(event);
-	}
-};
-
 global.socketEvents = {};
-global.socket = {
-	on: (event, func) => {
+global.SocketMngr = class SocketMngr {
+	on(event, func) {
 		socketEvents[event] = func;
 	}
 };
 
-global.io = {
-	on: (event, func) => {
-		func();
+global.io = class io {
+	static to() { return new io(); }
+	emit() { return 0; }
+	static on(event, func) {
+		func(new SocketMngr());
 	}
 };
 
