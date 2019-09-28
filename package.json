@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
-    "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ --require ./test/__include mocha test/**/*.js -- --color",
+    "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ --require ./test/__include mocha test/**/*.js -- --recursive --color",
     "test-watch": "mocha test/**/*.js --color --watch"
   },
   "dependencies": {
