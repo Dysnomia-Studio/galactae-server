@@ -1,19 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Fleets = require('../Fleets');
-global.Units = require('../Units');
-
-let gameDb;
-
 describe('• Fleets', () => {
 	/**
 	 * Has enough carrier capacity ?

@@ -1,15 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-const Research = require('../research');
-
 describe('• Research', () => {
 	/**
 	 * isSearched

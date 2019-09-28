@@ -1,18 +1,5 @@
 /* eslint-disable no-magic-numbers */
 
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../../calcConstants')();
-require('../../misc')();
-
-global.Buildings    = require('../../Buildings');
-
 describe('• Buildings (shared)', () => {
 	/**
 	 * GetCost

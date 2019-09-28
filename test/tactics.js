@@ -1,21 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-global.Websocket = class Websocket {
-	static SendMessageToClient() {
-		// Do nothing
-	}
-};
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Tactics    = require('../tactics');
-
 describe('• Tactics', () => {
 	describe('# checkTactic()', () => {
 		it('wrong name type', () => {

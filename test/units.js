@@ -1,16 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-const Fleet = require('../Fleets');
-const Units = require('../Units');
-
 describe('• Units', () => {
 	describe('# checkShipParts()', () => {
 		it('OK Ship', () => {

@@ -1,16 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../../calcConstants')();
-require('../../misc')();
-
-const Units = require('../../Units');
-
 describe('• Units (shared)', () => {
 	describe('# checkIfSameParts()', () => {
 		it('Same Ships', () => {

@@ -1,13 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-global.GameMap   = require('../../GameMap');
-
 describe('• GameMap (shared)', () => {
 	/**
 	 * getPlanetCoords

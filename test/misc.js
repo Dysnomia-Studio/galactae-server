@@ -1,14 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
 describe('• misc', () => {
 	/**
 	 * isset

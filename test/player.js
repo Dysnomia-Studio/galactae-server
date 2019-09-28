@@ -1,16 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../misc')();
-require('../calcConstants')();
-
-const Player = require('../player');
-
 describe('• Player', () => {
 	/**
 	 * canAct

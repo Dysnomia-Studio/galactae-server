@@ -1,16 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../../calcConstants')();
-require('../../misc')();
-const Tutorials = require('../../Tutorials');
-global.Research = require('../../research');
-
 describe('• Tutorials (shared)', () => {
 	/**
 	 * Has finished tutorials ?

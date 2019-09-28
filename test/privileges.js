@@ -1,17 +1,4 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-global.db = global.db || {};
-global.db.ban = global.db.ban || {};
-
-/**
- * My libs
- */
-const Privileges = require('../privileges');
-
-describe('• Units', () => {
+describe('• Privileges', () => {
 	describe('# isBannedFromChat', () => {
 		const bans = [
 			{ user_id: 'u1', ban_end: Date.now() + 100000 },
@@ -20,7 +7,7 @@ describe('• Units', () => {
 			{ user_id: 'u4', ban_end: Date.now() + 100000 },
 		];
 
-		global.db.ban.find = (userId, type, callback) => {
+		db.ban.find = (userId, type, callback) => {
 			callback(bans.filter((b) => b.user_id === userId));
 		};
 

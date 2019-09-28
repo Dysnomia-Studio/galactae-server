@@ -1,0 +1,62 @@
+/**
+ * Libs
+ */
+global.assert = require('assert');
+
+/**
+ * My libs
+ */
+require('../calcConstants')();
+require('../misc')();
+
+global.Buildings    = require('../Buildings');
+global.Combat 		= require('../combat');
+global.Chat 		= require('../chat');
+global.Discord   	= require('../discord');
+global.Fleets		= require('../Fleets');
+global.GameMap   	= require('../GameMap');
+global.Planet    	= require('../planet');
+global.Player 		= require('../player');
+global.Privileges 	= require('../privileges');
+global.Research 	= require('../research');
+global.Resources    = require('../Resources');
+global.Tactics    	= require('../tactics');
+global.Tutorials 	= require('../Tutorials');
+global.Units		= require('../Units');
+global.Websocket 	= require('../socket');
+
+global.log = (data) => console.log(data);
+
+/**
+ * DB & IO
+ */
+global.io = class {
+	static to() { return new io(); }
+	emit() { return 0; }
+	static on(event, func) {
+		func(event);
+	}
+};
+
+global.socketEvents = {};
+global.socket = {
+	on: (event, func) => {
+		socketEvents[event] = func;
+	}
+};
+
+global.io = {
+	on: (event, func) => {
+		func();
+	}
+};
+
+global.db = {
+	ban: {},
+	battleLog: {},
+	fleet: {},
+	tactic: {},
+	unit: {},
+};
+
+global.preventRestarts = 0;

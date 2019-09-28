@@ -1,12 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-global.Discord   = require('../discord');
 let discordClient;
 
 describe('• Discord', () => {

@@ -1,16 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../../calcConstants')();
-require('../../misc')();
-
-global.Fleets = require('../../Fleets');
-
 describe('• Fleets (shared)', () => {
 	describe('# getSpeed()', () => {
 		it('One Ion', () => {

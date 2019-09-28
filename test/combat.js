@@ -1,25 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-require('../calcConstants')();
-
-global.Fleets			= require('../Fleets');
-global.Units			= require('../Units');
-
-global.log			= function(txt) { console.log(txt); };
-
-global.db			= global.db || {};
-global.db.fleet		= global.db.fleet || {};
-global.db.battleLog	= global.db.battleLog || {};
-global.db.tactic	= global.db.tactic || {};
-global.db.unit		= global.db.unit || {};
-
-global.io			= global.io || {};
-
-global.preventRestarts = 0;
-
 const tactics = [
 	{
 		id: 't1',
@@ -46,10 +24,6 @@ const tactics = [
 		],
 	},
 ];
-
-db.tactic.find = (id, callback) => {
-	callback(tactics.filter((t) => t.id === id)[0]);
-};
 
 global.unitsList = [{
 	'id': 'u1',
@@ -119,18 +93,15 @@ global.unitsList = [{
 	'owned': 1,
 }];
 
-db.unit.find = (id, callback) => {
-	callback(unitsList.filter((u) => u.id === id)[0]);
-};
-
-/**
- * My libs
- */
-require('../misc')();
-
-const Combat = require('../combat');
-
 describe('• Combat', () => {
+	db.tactic.find = (id, callback) => {
+		callback(tactics.filter((t) => t.id === id)[0]);
+	};
+
+	db.unit.find = (id, callback) => {
+		callback(unitsList.filter((u) => u.id === id)[0]);
+	};
+
 	/**
 	 * constructor
 	 */
