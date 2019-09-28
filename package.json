@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "start": "pm2 start ecosystem.config.js",
-    "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ mocha test/**/*.js -- --color",
-    "test-watch": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ --require test/__include.js mocha test/**/*.js -- --color --watch"
+    "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ --require ./test/__include mocha test/**/*.js -- --color",
+    "test-watch": "mocha test/**/*.js --color --watch"
   },
   "dependencies": {
     "discord.js": "^11.5.1",
