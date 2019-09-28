@@ -4,7 +4,9 @@
   "author": "Elanis",
   "main": "app.js",
   "scripts": {
-    "start": "pm2 start ecosystem.config.js"
+    "start": "pm2 start ecosystem.config.js",
+    "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ mocha test/**/*.js -- --color",
+    "test-watch": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ mocha test/**/*.js -- --color --watch"
   },
   "dependencies": {
     "discord.js": "^11.5.1",
@@ -13,7 +15,7 @@
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5",
-    "mocha": "^6.2.0"
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1"
   }
 }
