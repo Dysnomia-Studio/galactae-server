@@ -22,7 +22,7 @@ describe('• GameMap (shared)', () => {
 	 * getPlanetDistance
 	 */
 	describe('# getPlanetDistance()', () => {
-		describe('getPlanetDistance(undefined orbitDist/orbitDuration)', () => {
+		it('getPlanetDistance(undefined orbitDist/orbitDuration)', () => {
 			const from = {};
 			const to = {};
 
@@ -40,5 +40,39 @@ describe('• GameMap (shared)', () => {
 		});
 
 		//  @TODO
+	});
+
+	/**
+	 * getSystemFromAdress
+	 */
+	describe('# getSystemFromAdress()', () => {
+		it('Should work', () => {
+			assert.equal(
+				GameMap.getSystemFromAdress('01-01-01-P1'),
+				'01-01-01'
+			);
+
+			assert.equal(
+				GameMap.getSystemFromAdress('12-01-2-S1'),
+				'12-01-2'
+			);
+		});
+	});
+
+	/**
+	 * getSectorFromAdress
+	 */
+	describe('# getSectorFromAdress()', () => {
+		it('Should work', () => {
+			assert.equal(
+				GameMap.getSectorFromAdress('01-01-01-P1'),
+				'01-01'
+			);
+
+			assert.equal(
+				GameMap.getSectorFromAdress('12-01-2-S1'),
+				'12-01'
+			);
+		});
 	});
 });

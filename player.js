@@ -160,8 +160,8 @@ module.exports = class Player {
 
 			i++;
 
-			let sectorAddress = planetReturned.address.split('-');
-			sectorAddress = [sectorAddress[0],sectorAddress[1]].join('-');
+			const sectorAddress = GameMap.getSectorFromAdress(planetReturned.address);
+
 			if(sector.points[sectorAddress] === undefined) {
 				sector.points[sectorAddress] = 0;
 			}

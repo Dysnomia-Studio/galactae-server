@@ -253,13 +253,8 @@ module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
 				return;
 			}
 
-			let systemeDepart = fleetReturned.position.split('-');
-			systemeDepart.pop();
-			systemeDepart = systemeDepart.join('-');
-
-			let systemeArrivee = destination.split('-');
-			systemeArrivee.pop();
-			systemeArrivee = systemeArrivee.join('-');
+			const systemeDepart = GameMap.getSystemFromAdress(fleetReturned.position);
+			const systemeArrivee = GameMap.getSystemFromAdress(destination);
 
 			Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
 				if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {

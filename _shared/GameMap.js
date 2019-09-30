@@ -45,5 +45,18 @@
 				Math.pow(coordsDepart[1] - coordsArrivee[1],2)
 			);
 		}
+
+		static getSystemFromAdress(address) {
+			const system = address.split('-');
+			system.pop();
+
+			return system.join('-');
+		}
+
+		static getSectorFromAdress(address) {
+			const sectorAddress = address.split('-');
+
+			return [sectorAddress[0],sectorAddress[1]].join('-');
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);
