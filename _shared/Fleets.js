@@ -260,7 +260,7 @@
 
 		static removeEmptyUnits(fleet) {
 			for(const unit in fleet.units) {
-				if(fleet.units <= 0) {
+				if(fleet.units[unit] <= 0) {
 					delete fleet.units[unit];
 				}
 			}

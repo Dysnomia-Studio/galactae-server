@@ -286,6 +286,39 @@ describe('• Fleets (shared)', () => {
 		});
 	});
 
+	/**
+	 * removeEmptyUnits
+	 */
+	describe('# removeEmptyUnits()', () => {
+		it('Empty fleet', () => {
+			const fleet = { units: {} };
+
+			assert.deepEqual(
+				Fleets.removeEmptyUnits(fleet),
+				fleet
+			);
+		});
+
+		it('No remove', () => {
+			const fleet = { units: { test: 1, fdfd: 5, fgfggf: 12 } };
+
+			assert.deepEqual(
+				Fleets.removeEmptyUnits(fleet),
+				fleet
+			);
+		});
+
+		it('Some remove', () => {
+			assert.deepEqual(
+				Fleets.removeEmptyUnits({ units: { test: 0, fdfd: 5, fgfggf: 12 } }),
+				{ units: { fdfd: 5, fgfggf: 12 } }
+			);
+		});
+	});
+
+	/**
+	 * hasOffensiveCapacity
+	 */
 	describe('# hasOffensiveCapacity()', () => {
 		it('Empty fleet', () => {
 			assert.equal(
