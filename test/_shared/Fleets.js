@@ -9,7 +9,7 @@ describe('• Fleets (shared)', () => {
 		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] / 1.5;
+				expected[i] = Math.round(shipPartsSpeed['ion'][i] / 1.5 * 1000000)/1000000;
 			}
 			assert.deepEqual(
 				Fleets.getSpeed(
@@ -49,7 +49,7 @@ describe('• Fleets (shared)', () => {
 		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] / 1.5;
+				expected[i] = Math.round(shipPartsSpeed['ion'][i] / 1.5 * 1000000)/1000000;
 			}
 			assert.deepEqual(Fleets.calcSubSpeed({
 				parts: [
@@ -96,7 +96,7 @@ describe('• Fleets (shared)', () => {
 		it('Two vsl', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['vsl']) {
-				expected[i] = shipPartsSpeed['vsl'][i] / 1.5;
+				expected[i] = Math.round(shipPartsSpeed['vsl'][i] / 1.5 * 1000000)/1000000;
 			}
 			assert.deepEqual(Fleets.calcSupraSpeed({
 				parts: [
@@ -183,6 +183,130 @@ describe('• Fleets (shared)', () => {
 			assert.equal(
 				Fleets.slowerSpeed(a, b),
 				b
+			);
+		});
+	});
+
+	/**
+	 * Get Min Subspeed
+	 */
+	describe('# getMinSubSpeed()', () => {
+		it('No units', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					[],
+					{},
+				),
+				{
+					speed: [],
+					engines: {},
+				}
+			);
+		});
+
+		const unitList = [
+			{
+				id: 'u1',
+				shipShape: 'SHIP_CARRIER_SMALL',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'rocketLauncher', name: 'rocket_1', tech: 'explosive'},
+					{type: 'shield', name: 'shield_1', tech: 'none'},
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'vsl'},
+					{type: 'sub_propulsion', name: 'prop_2', tech: 'ion'},
+					{type: 'sub_propulsion', name: 'prop_3', tech: 'ion'},
+				],
+			},
+			{
+				id: 'u2',
+				shipShape: 'SHIP_CARRIER_SMALL',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'rocketLauncher', name: 'rocket_1', tech: 'explosive'},
+					{type: 'shield', name: 'shield_1', tech: 'none'},
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'vsl'},
+					{type: 'sub_propulsion', name: 'prop_2', tech: 'pplasma'},
+					{type: 'sub_propulsion', name: 'prop_3', tech: 'pplasma'},
+				],
+			},
+			{
+				id: 'u3',
+				shipShape: 'SHIP_FIGHTER_MEDIUM',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+				],
+			},
+		];
+
+		it('One unit', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					unitList,
+					{ 'u1': 1 },
+				),
+				{
+					speed: Fleets.calcSubSpeed(unitList[0]).speed,
+					engines: { ion: 2 },
+				}
+			);
+		});
+
+		it('Multiple same unit', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					unitList,
+					{ 'u1': 1000 },
+				),
+				{
+					speed: Fleets.calcSubSpeed(unitList[0]).speed,
+					engines: { ion: 2000 },
+				}
+			);
+		});
+
+		it('Multiple units', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					unitList,
+					{ 'u1': 1000, 'u2': 100 },
+				),
+				{
+					speed: Fleets.calcSubSpeed(unitList[1]).speed,
+					engines: { ion: 2000, pplasma: 200 },
+				}
+			);
+		});
+
+		it('Multiple with fighter', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					unitList,
+					{ 'u1': 1000, 'u2': 100, 'u3': 10 },
+				),
+				{
+					speed: Fleets.calcSubSpeed(unitList[2]).speed,
+					engines: { ion: 2000 + 10 * fighterMult[unitList[2].shipShape], pplasma: 200 },
+				}
+			);
+		});
+	});
+
+	/**
+	 * Get Min Supraspeed
+	 */
+	describe('# getMinSupraSpeed()', () => {
+		it('No units', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					[],
+					{},
+				),
+				{
+					speed: [],
+					engines: {},
+				}
 			);
 		});
 	});

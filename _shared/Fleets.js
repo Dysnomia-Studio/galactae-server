@@ -18,6 +18,8 @@
 			} else {
 				for(let i=0; i<speed.length; i++) {
 					speed[i] /= 1.5;
+
+					speed[i] = Math.round(speed[i] * 1000000)/1000000;
 				}
 			}
 
