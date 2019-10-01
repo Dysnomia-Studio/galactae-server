@@ -116,7 +116,7 @@
 		 */
 		static getMinSubSpeed(unitList, fleetUnits) {
 			const min = {
-				speed: 0,
+				speed: [],
 				engines: {},
 			};
 

@@ -9,7 +9,7 @@ describe('• Fleets (shared)', () => {
 		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
+				expected[i] = shipPartsSpeed['ion'][i] / 1.5;
 			}
 			assert.deepEqual(
 				Fleets.getSpeed(
@@ -37,39 +37,39 @@ describe('• Fleets (shared)', () => {
 
 		it('One Ion', () => {
 			assert.deepEqual(Fleets.calcSubSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
-					],
-				}).speed,
-				shipPartsSpeed['ion']
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
+				],
+			}).speed,
+			shipPartsSpeed['ion']
 			);
 		});
 
 		it('Two Ion', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['ion']) {
-				expected[i] = shipPartsSpeed['ion'][i] * 1.5;
+				expected[i] = shipPartsSpeed['ion'][i] / 1.5;
 			}
 			assert.deepEqual(Fleets.calcSubSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
-						{ tech: 'ion', type: 'sub_propulsion', name: 'prop_2' },
-					],
-				}).speed,
-				expected
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' },
+					{ tech: 'ion', type: 'sub_propulsion', name: 'prop_2' },
+				],
+			}).speed,
+			expected
 			);
 		});
 
 		it('Part not existing', () => {
 			assert.deepEqual(Fleets.calcSubSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'myFalsePropulsion', type: 'sub_propulsion', name: 'prop_1' },
-					],
-				}),
-				{ speed: [] }
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'myFalsePropulsion', type: 'sub_propulsion', name: 'prop_1' },
+				],
+			}),
+			{ speed: [] }
 			);
 		});
 	});
@@ -84,39 +84,39 @@ describe('• Fleets (shared)', () => {
 
 		it('One vsl', () => {
 			assert.deepEqual(Fleets.calcSupraSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
-					],
-				}).speed,
-				shipPartsSpeed['vsl']
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
+				],
+			}).speed,
+			shipPartsSpeed['vsl']
 			);
 		});
 
 		it('Two vsl', () => {
 			const expected = [];
 			for(const i in shipPartsSpeed['vsl']) {
-				expected[i] = shipPartsSpeed['vsl'][i] * 1.5;
+				expected[i] = shipPartsSpeed['vsl'][i] / 1.5;
 			}
 			assert.deepEqual(Fleets.calcSupraSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
-						{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_2' },
-					],
-				}).speed,
-				expected
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_1' },
+					{ tech: 'vsl', type: 'sup_propulsion', name: 'prop_2' },
+				],
+			}).speed,
+			expected
 			);
 		});
 
 		it('Part not existing', () => {
 			assert.deepEqual(Fleets.calcSupraSpeed({
-					parts: [
-						{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
-						{ tech: 'myFalsePropulsion', type: 'sup_propulsion', name: 'prop_1' },
-					],
-				}),
-				{ speed: [] }
+				parts: [
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+					{ tech: 'myFalsePropulsion', type: 'sup_propulsion', name: 'prop_1' },
+				],
+			}),
+			{ speed: [] }
 			);
 		});
 	});

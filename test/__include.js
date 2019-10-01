@@ -25,7 +25,7 @@ global.Tutorials 	= require('../Tutorials');
 global.Units		= require('../Units');
 global.Websocket 	= require('../socket');
 
-global.log = (data) => console.log(data);
+global.log = (data) => console.log('\t > ' + data);
 
 /**
  * DB & IO
