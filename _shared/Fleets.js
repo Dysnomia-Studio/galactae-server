@@ -17,7 +17,7 @@
 				speed = shipPartsSpeed[tech].slice(0);
 			} else {
 				for(let i=0; i<speed.length; i++) {
-					speed[i] *= 1.5;
+					speed[i] /= 1.5;
 				}
 			}
 
