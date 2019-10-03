@@ -231,11 +231,20 @@ describe('• Fleets (shared)', () => {
 			},
 			{
 				id: 'u3',
+				shipType: 'SHIP_FIGHTER',
 				shipShape: 'SHIP_FIGHTER_MEDIUM',
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
 					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+				],
+			},
+			{
+				id: 'u4',
+				shipType: 'SHIP_TEST',
+				shipShape: 'SHIP_TEST',
+				parts: [
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'unknown'},
 				],
 			},
 		];
@@ -291,6 +300,18 @@ describe('• Fleets (shared)', () => {
 				}
 			);
 		});
+
+		it('Catch invalid ship', () => {
+			assert.deepEqual(
+				Fleets.getMinSubSpeed(
+					unitList,
+					{ 'u4': 1 },
+				),
+				{
+					speed: []
+				}
+			);
+		});
 	});
 
 	/**
@@ -306,6 +327,128 @@ describe('• Fleets (shared)', () => {
 				{
 					speed: [],
 					engines: {},
+				}
+			);
+		});
+
+		const unitList = [
+			{
+				id: 'u1',
+				shipShape: 'SHIP_CARRIER_SMALL',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'rocketLauncher', name: 'rocket_1', tech: 'explosive'},
+					{type: 'shield', name: 'shield_1', tech: 'none'},
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'vsl'},
+					{type: 'sub_propulsion', name: 'prop_2', tech: 'ion'},
+					{type: 'sub_propulsion', name: 'prop_3', tech: 'ion'},
+				],
+			},
+			{
+				id: 'u2',
+				shipShape: 'SHIP_CARRIER_SMALL',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'rocketLauncher', name: 'rocket_1', tech: 'explosive'},
+					{type: 'shield', name: 'shield_1', tech: 'none'},
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'wd'},
+					{type: 'sub_propulsion', name: 'prop_2', tech: 'pplasma'},
+					{type: 'sub_propulsion', name: 'prop_3', tech: 'pplasma'},
+				],
+			},
+			{
+				id: 'u3',
+				shipType: 'SHIP_FIGHTER',
+				shipShape: 'SHIP_FIGHTER_MEDIUM',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+				],
+			},
+			{
+				id: 'u4',
+				shipType: 'SHIP_TEST',
+				shipShape: 'SHIP_TEST',
+				parts: [
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'unknown'},
+				],
+			},
+			{
+				id: 'u5',
+				shipShape: 'SHIP_CARRIER_SMALL',
+				parts: [
+					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
+					{type: 'rocketLauncher', name: 'rocket_1', tech: 'explosive'},
+					{type: 'shield', name: 'shield_1', tech: 'none'},
+					{type: 'sup_propulsion', name: 'prop_1', tech: 'vsl'},
+					{type: 'sub_propulsion', name: 'prop_2', tech: 'ion'},
+					{type: 'sub_propulsion', name: 'prop_3', tech: 'ion'},
+				],
+			},
+		];
+
+		it('One unit', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					unitList,
+					{ 'u1': 1 },
+				),
+				{
+					speed: Fleets.calcSupraSpeed(unitList[0]).speed,
+					engines: { vsl: 1 },
+				}
+			);
+		});
+
+		it('Multiple same unit', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					unitList,
+					{ 'u1': 1000 },
+				),
+				{
+					speed: Fleets.calcSupraSpeed(unitList[0]).speed,
+					engines: { vsl: 1000 },
+				}
+			);
+		});
+
+		it('Multiple units', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					unitList,
+					{ 'u1': 1000, 'u2': 100, 'u5': 100 },
+				),
+				{
+					speed: Fleets.calcSupraSpeed(unitList[0]).speed,
+					engines: { vsl: 1100, wd: 100 },
+				}
+			);
+		});
+
+		it('Multiple with fighter', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					unitList,
+					{ 'u1': 1000, 'u2': 100, 'u3': 10 },
+				),
+				{
+					speed: Fleets.calcSupraSpeed(unitList[0]).speed,
+					engines: { vsl: 1000, wd: 100 },
+				}
+			);
+		});
+
+
+		it('Catch invalid ship', () => {
+			assert.deepEqual(
+				Fleets.getMinSupraSpeed(
+					unitList,
+					{ 'u4': 1 },
+				),
+				{
+					speed: []
 				}
 			);
 		});

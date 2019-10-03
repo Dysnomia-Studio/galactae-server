@@ -39,6 +39,23 @@ describe('• GameMap (shared)', () => {
 			assert.equal(to.orbitDuration, 0);
 		});
 
+		it('getPlanetDistance(defined orbitDist/orbitDuration)', () => {
+			const from = { orbitDist: 1, orbitDuration: 1 };
+			const to = { orbitDist: 1, orbitDuration: 1 };
+
+			assert.equal(from.orbitDist, 1);
+			assert.equal(from.orbitDuration, 1);
+			assert.equal(to.orbitDist, 1);
+			assert.equal(to.orbitDuration, 1);
+
+			GameMap.getPlanetDistance(from, to, 1);
+
+			assert.equal(from.orbitDist, 1);
+			assert.equal(from.orbitDuration, 1);
+			assert.equal(to.orbitDist, 1);
+			assert.equal(to.orbitDuration, 1);
+		});
+
 		//  @TODO
 	});
 

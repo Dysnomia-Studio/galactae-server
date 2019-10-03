@@ -138,7 +138,7 @@
 				}
 
 				let count = curr.count;
-				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
+				if(currUnit.shipType === 'SHIP_FIGHTER') {
 					count *= fighterMult[currUnit.shipShape];
 				}
 				min.engines[curr.tech] += count * fleetUnits[key];
@@ -176,12 +176,10 @@
 					min.engines[curr.tech] = 0;
 				}
 
-				let count = curr.count;
-				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
-					count *= fighterMult[currUnit.shipShape];
-				}
-				min.engines[curr.tech] += count * fleetUnits[key];
+				min.engines[curr.tech] += curr.count * fleetUnits[key];
 			}
+
+			delete min.engines['']; // Moteurs vides, on les compte pas
 
 			return min;
 		}
