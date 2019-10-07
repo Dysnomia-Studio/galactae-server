@@ -1,3 +1,3 @@
-module.exports = class Buildings extends require('./_shared/Buildings').Buildings {
+module.exports = class Buildings extends require('./_shared/Buildings')._Buildings {
 
 };

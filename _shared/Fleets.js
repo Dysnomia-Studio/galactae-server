@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Fleets = class Fleets {
+	exports._Fleets = class Fleets {
 		/**
 		 * Gets an unit speed depending on a specific tech & speed created by other
 		 * parts.

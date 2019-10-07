@@ -1,4 +1,4 @@
-module.exports = class Units extends require('./_shared/Units').Units {
+module.exports = class Units extends require('./_shared/Units')._Units {
 	/**
 	 * Get and send unit data to user
 	 *

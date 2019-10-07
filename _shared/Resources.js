@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Resources = class Resources {
+	exports._Resources = class Resources {
 		/**
 		 * Config planet ratio
 		 */

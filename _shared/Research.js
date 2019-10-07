@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Research = class Research {
+	exports._Research = class Research {
 
 	};
 })(typeof exports === 'undefined'? window : exports);

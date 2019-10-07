@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Units = class Units {
+	exports._Units = class Units {
 		/**
 		 * Check if two ships have the same parts
 		 *

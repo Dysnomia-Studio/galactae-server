@@ -1,3 +1,3 @@
-module.exports = class GameMap extends require('./_shared/GameMap').GameMap {
+module.exports = class GameMap extends require('./_shared/GameMap')._GameMap {
 
 };

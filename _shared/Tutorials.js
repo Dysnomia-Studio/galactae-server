@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Tutorials = class Tutorials {
+	exports._Tutorials = class Tutorials {
 		/**
 		 * Determines if the user has finished tutorials.
 		 *

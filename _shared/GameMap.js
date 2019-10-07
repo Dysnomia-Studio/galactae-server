@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.GameMap = class GameMap {
+	exports._GameMap = class GameMap {
 		/**
 		 * Gets the planet coordinates depending on angle & circle diameter
 		 *

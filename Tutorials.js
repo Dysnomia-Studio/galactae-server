@@ -1,3 +1,3 @@
-module.exports = class Tutorials extends require('./_shared/Tutorials').Tutorials {
+module.exports = class Tutorials extends require('./_shared/Tutorials')._Tutorials {
 
 };

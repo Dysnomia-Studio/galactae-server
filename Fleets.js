@@ -1,4 +1,4 @@
-module.exports = class Fleets extends require('./_shared/Fleets').Fleets {
+module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	/**
 	 * Get and send unit data to user
 	 *

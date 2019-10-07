@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Buildings = class Buildings {
+	exports._Buildings = class Buildings {
 		/**
 		 * Build costs config
 		 */
