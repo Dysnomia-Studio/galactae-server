@@ -1,4 +1,4 @@
-module.exports = class Research {
+module.exports = class Research extends require('./_shared/Research').Research {
 	static refreshUserResearch(data,callback) {
 		Research.recalc(data, data.research, function(user) {
 			user.lastAction = Date.now();
