@@ -1,23 +1,5 @@
 describe('• Research', () => {
 	/**
-	 * getResearchProduction
-	 */
-	describe('# getResearchProduction()', () => {
-		it('Get research production (lvl 1)', () => {
-			assert.equal(
-				Research.getResearchProduction(1),
-				4
-			);
-		});
-		it('Get research production (lvl 30)', () => {
-			assert.equal(
-				Research.getResearchProduction(30),
-				307
-			);
-		});
-	});
-
-	/**
 	 * researchedParent
 	 */
 	describe('# researchedParent((_,_,_,false)', () => {
