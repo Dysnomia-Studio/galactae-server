@@ -7,10 +7,6 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 		});
 	}
 
-	static isSearched(data,researchName) {
-		return isset(data.research[researchName], 'number') && data.research[researchName] < 0;
-	}
-
 	static getResearchProduction(lvl) {
 		return Math.round(researchProduction[0]*Math.pow(lvl,2) + researchProduction[1]*lvl + researchProduction[2]);
 	}
