@@ -235,14 +235,18 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object')) { log('fleet not found'); return; } // Does this fleet exists
+			if(!isset(fleetReturned, 'object')) { log('fleet not found'); return; } // Does this fleet exists ?
+
 			if('' + fleetReturned.ownerId !== '' + user.id) { log('user doesn\'t own ths fleet'); return; }
+
 			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
+
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' });
 				return;
 			}
+
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
 				log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' });
@@ -282,15 +286,30 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				}
 
 				db.planet.find(fleetReturned.position, function(planeteDepart) {
-					db.planet.find(destination, function(planeteArrivee) {
+					db.planet.find(destination, async (planeteArrivee) => {
 						if(!isset(planeteArrivee, 'object')) {
 							log(user.username + ' failed to move fleet because destination ('+destination+') does not exists.');
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_NOT_EXISTS' });
 							return;
 						}
 
-						// TODO: Check beginner protection end
-						// if(defUser.beginnerProtectEnd > Date.Now()) ...
+						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+							const defUser = await db.player.find(planeteArrivee.owner);
+
+							if(isset(defUser, 'object') && defUser.beginnerProtectEnd > Date.now()) {
+								log(user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.');
+								Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_IS_PROTECTED' });
+								return;
+							}
+
+							if(isset(defUser, 'object') && defUser.id === user.id) {
+								log(user.username + ' failed to move fleet because defender is the same player as attacker.');
+								Websocket.SendMessageToClient({ sid: user.sid, message: 'DEFENDER_IS_ATTACKER' });
+								return;
+							}
+						}
+
+						return; // TEMPORARY
 
 						let time;
 						if(systemeDepart === systemeArrivee) {
