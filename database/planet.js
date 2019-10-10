@@ -31,35 +31,26 @@ module.exports = {
 			}
 		});
 	},
-	findBySystemWithOwners: (systemAddr, callback) => {
-		serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'], (err, planetList) => {
-			if(err) { log(err, 'error'); return; }
-			planetList = planetList.rows;
+	findBySystemWithOwners: async (systemAddr, callback) => {
+		let planetList;
+		try {
+			planetList =  (await serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'])).rows;
+		} catch(err) {
+			log(err, 'error');
+			planetList = [];
+		}
 
-			let ended = 0;
-			for(let i=0; i<planetList.length; i++) {
-				const id = i;
+		for(let i=0; i<planetList.length; i++) {
+			const user = await db.player.find(planetList[i].owner);
 
-				db.player.searchById(planetList[id].owner, (user) => {
-					if(isset(user, 'object') && !user.name.includes('Colonisable')) {
-						planetList[id].ownerName = user.name;
-						planetList[id].ally = user.ally;
-					} else {
-						planetList[id].ownerName = null;
-						planetList[id].ally = null;
-					}
-
-					ended++;
-
-					if(ended === planetList.length) {
-						callback(planetList);
-					}
-				});
+			if(isset(user, 'object') && !user.name.includes('Colonisable')) {
+				planetList[i].ownerName = user.name;
+				planetList[i].ally = user.ally;
+			} else {
+				planetList[i].ownerName = null;
+				planetList[i].ally = null;
 			}
-
-			if(planetList.length === 0) {
-				callback(planetList);
-			}
-		});
+		}
+		callback(planetList);
 	},
 };

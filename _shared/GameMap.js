@@ -48,9 +48,8 @@
 
 		static getSystemFromAdress(address) {
 			const system = address.split('-');
-			system.pop();
 
-			return system.join('-');
+			return [system[0],system[1],system[2]].join('-');
 		}
 
 		static getSectorFromAdress(address) {
