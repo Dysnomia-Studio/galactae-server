@@ -309,8 +309,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 							}
 						}
 
-						return; // TEMPORARY
-
 						let time;
 						if(systemeDepart === systemeArrivee) {
 							const baseDist = GameMap.getPlanetDistance(
@@ -353,33 +351,36 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 						fleetReturned.fuel -= fuel * time;
 
-						db.player.searchById(user.id, function(foundUser) {
-							let instability = time * 0.001 * (Math.random() - 0.5);
-							if(Research.isSearched(foundUser, 'prop_suprastability')) {
-								instability /= 2;
-							}
+						const atkUser = await db.player.find(user.id);
+						if(!isset(atkUser, 'object')) { return; }
 
-							fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
-							fleetReturned.position = destination;
-							fleetReturned.orbitPosition = moveType;
-							if(destination === fleetReturned.motherPlanetAddress) {
-								fleetReturned.orbitPosition = 0;
-							}
+						let instability = time * 0.001 * (Math.random() - 0.5);
+						if(Research.isSearched(atkUser, 'prop_suprastability')) {
+							instability /= 2;
+						}
 
-							let textDestination = destination;
-							if(planeteArrivee.name !== undefined) {
-								textDestination = planeteArrivee.name + ' (' + destination + ')';
-							}
+						fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
+						fleetReturned.position = destination;
+						fleetReturned.orbitPosition = moveType;
+						if(destination === fleetReturned.motherPlanetAddress) {
+							fleetReturned.orbitPosition = 0;
+						}
 
-							const endTime = new Date(fleetReturned.endMoveTime);
+						let textDestination = destination;
+						if(planeteArrivee.name !== undefined) {
+							textDestination = planeteArrivee.name + ' (' + destination + ')';
+						}
 
-							log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
-								'. ETA: ' + getDateTime(endTime));
+						const endTime = new Date(fleetReturned.endMoveTime);
 
-							db.fleet.update(fleetReturned, function() {
-								Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-								Fleets.refresh(fleetReturned.motherPlanetId, user.sid);
-							});
+						log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
+							'. ETA: ' + getDateTime(endTime));
+
+						// TODO: notifiy defender on attack
+
+						db.fleet.update(fleetReturned, function() {
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
+							Fleets.refresh(fleetReturned.motherPlanetId, user.sid);
 						});
 					});
 				});
