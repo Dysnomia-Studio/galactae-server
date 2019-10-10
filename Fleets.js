@@ -227,9 +227,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static moveTo(user, fleetId, destination, moveType) {
 		const now = Date.now();
 
-		moveType = Math.round(moveType);
-		if(moveType < 0 || moveType > 3) { return; }
-		if(moveType === 3) { return; } // @TODO: remove this when adding spying
+		if(moveType !== Math.round(moveType)) {
+			moveType = -1;
+		}
+		if(moveType < FLEET_MOVE_TYPE.DEFEND || moveType > FLEET_MOVE_TYPE.SPY) { return; }
+		if(moveType === FLEET_MOVE_TYPE.SPY) { return; } // @TODO: remove this when adding spying
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {

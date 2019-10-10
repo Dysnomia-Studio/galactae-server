@@ -654,6 +654,16 @@ module.exports = function() {
 	};
 
 	/**
+	 * Fleets move type
+	 */
+	this.FLEET_MOVE_TYPE = {
+		DEFEND: 0,
+		ATTACK: 1,
+		MOVE: 2,
+		SPY: 3,
+	};
+
+	/**
 	 * Tactics
 	 */
 	this.TACTIC_MAX_ORDERS = 50;
