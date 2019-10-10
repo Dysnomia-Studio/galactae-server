@@ -58,7 +58,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
 
-						if(FleetList[id].orbitPosition === 1) {
+						if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
 							Combat.beginFight(data, pid, atkUser, defUser, atkFleetId);
 							continue;
 						}
@@ -160,7 +160,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				motherPlanetId: planetData.id,
 				motherPlanetAddress: planetData.address,
 				position: planetData.address,
-				orbitPosition: 0,
+				orbitPosition: FLEET_MOVE_TYPE.DEFEND,
 				points: 0,
 				endMoveTime: -1,
 				units: [],
@@ -363,11 +363,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						fleetReturned.position = destination;
 						fleetReturned.orbitPosition = moveType;
 						if(destination === fleetReturned.motherPlanetAddress) {
-							fleetReturned.orbitPosition = 0;
+							fleetReturned.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
 						}
 
 						let textDestination = destination;
-						if(planeteArrivee.name !== undefined) {
+						if(typeof planeteArrivee.name !== 'undefined') {
 							textDestination = planeteArrivee.name + ' (' + destination + ')';
 						}
 
