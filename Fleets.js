@@ -37,7 +37,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
 			}
 
-			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
+			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
 					sendtoPlayer(FleetList, newPlanet, sid, pid);
 					return;
@@ -59,7 +59,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						FleetList[id].endMoveTime = -1;
 
 						if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
-							Combat.beginFight(data, pid, atkUser, defUser, atkFleetId);
+							const atkUser = await db.player.find(newPlanet.owner);
+
+							const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
+							const defUser = await db.player.find(defPlanet.owner);
+
+							Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
 							continue;
 						}
 

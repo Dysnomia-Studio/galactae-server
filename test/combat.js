@@ -1,4 +1,4 @@
-const tactics = [
+let tactics = [
 	{
 		id: 't1',
 		orders: [
@@ -94,7 +94,7 @@ global.unitsList = [{
 }];
 
 describe('• Combat', () => {
-	db.tactic.find = (id, callback) => {
+	db.tactics.find = (id, callback) => {
 		callback(tactics.filter((t) => t.id === id)[0]);
 	};
 
@@ -545,26 +545,6 @@ describe('• Combat', () => {
 	});
 
 	/**
-	 * addActionToBattleLog
-	 */
-	describe('# addActionToBattleLog()', () => {
-		it('addActionToBattleLog()', () => {
-			const battleArena = new Combat('f1');
-
-			const action = {
-				'message': 'test',
-			};
-
-			battleArena.addActionToBattleLog(action);
-
-			assert.deepEqual(
-				battleArena.battleLog,
-				[action]
-			);
-		});
-	});
-
-	/**
 	 * saveLogs
 	 */
 	describe('# saveLogs()', () => {
@@ -611,7 +591,7 @@ describe('• Combat', () => {
 				'message': 'test',
 			};
 
-			battleArena.addActionToBattleLog(action);
+			battleArena.battleLog.push(action);
 
 			battleArena.saveLogs();
 
@@ -633,6 +613,7 @@ describe('• Combat', () => {
 			atk_fleet_id: 'f3',
 			atk_fleet_name: 'Fleet 3',
 
+			defWins: false,
 
 			def_user_id: 'u1',
 			def_user_name: 'User 1',
@@ -644,7 +625,7 @@ describe('• Combat', () => {
 			logs: [],
 		}; // Real log content
 
-		const globalFleetList = [
+		let globalFleetList = [
 			{ id: 'f1', name: 'Fleet 1', endMoveTime: -1, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
 			{ id: 'f2', name: 'Fleet 2', endMoveTime: -1, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
 			{ id: 'f3', name: 'Fleet 3', endMoveTime: -1, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
@@ -655,34 +636,27 @@ describe('• Combat', () => {
 		};
 
 		it('No defending units', (done) => {
-			let doneSteps = 0;
-			let logs = {};
-
-			const stepEnd = () => {
-				if(++doneSteps === 3) {
-					assert(typeof logs.date === 'number');
-					expectedLogs.date = logs.date;
-
-					assert.deepEqual(logs, expectedLogs);
-
-					done();
-				}
-			};
-
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {
-						stepEnd();
+						// Do nothing
 					},
 				};
 			};
 
-			db.battleLog.save = (content) => {
-				logs = content;
-				stepEnd();
+			db.battleLog.save = (logs) => {
+				assert(typeof logs.date === 'object');
+				assert(logs.date instanceof Date);
+
+				expectedLogs.date = logs.date;
+				expectedLogs.defWins = false;
+
+				assert.deepEqual(logs, expectedLogs);
+
+				done();
 			};
 
-			Combat.beginFight({}, 'P1', {
+			Combat.beginFight('-1', { address: 'P1' }, {
 				id:'u2',
 				name:'User 2',
 			}, {
@@ -691,10 +665,7 @@ describe('• Combat', () => {
 			}, 'f3');
 		});
 
-		it('Normal battle', (done) => {
-			let doneSteps = 0;
-			let logs = {};
-
+		it('Normal battle n°1', (done) => {
 			globalFleetList.push(
 				{ id: 'f4', name: 'Fleet 4', endMoveTime: -1, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
 			);
@@ -705,40 +676,141 @@ describe('• Combat', () => {
 				{ id: 'f6', name: 'Fleet 6', endMoveTime: -1, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
 			);
 
-			const stepEnd = () => {
-				if(++doneSteps === 3) {
-					assert(typeof logs.date === 'number');
-					assert(logs.logs.length > 0);
-
-					expectedLogs.date = logs.date;
-					logs.logs = [];
-
-					assert.deepEqual(logs, expectedLogs);
-
-					done();
-				}
-			};
-
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {
-						stepEnd();
+						// Do nothing
 					},
 				};
 			};
 
-			db.battleLog.save = (content) => {
-				logs = content;
-				stepEnd();
+			db.battleLog.save = (logs) => {
+				assert(typeof logs.date === 'object');
+				assert(logs.date instanceof Date);
+				assert(logs.logs.length > 0);
+
+				expectedLogs.date = logs.date;
+				expectedLogs.defWins = false;
+				logs.logs = [];
+
+				assert.deepEqual(logs, expectedLogs);
+
+				done();
 			};
 
-			Combat.beginFight({}, 'P1', {
+			Combat.beginFight('-1', { address: 'P1' }, {
 				id:'u2',
 				name:'User 2',
 			}, {
 				id: 'u1',
 				name:'User 1',
 			}, 'f3');
+		});
+
+		it('Normal battle n°2', (done) => {
+			globalFleetList = [
+				{
+					'id': '62716d0e-586d-11e9-86fb-b30be47b62e1',
+					'name': 'Alpha',
+					'ownerId': '80655df0-5775-11e9-99e3-8b79cb37567b',
+					'position': '5-4-189-P6',
+					'motherPlanetAddress': '4-5-659-P0',
+					'orbitPosition': 1,
+					'points': 18.8751,
+					'endMoveTime': -1,
+					'units': {
+						'ee6b3f3e-5777-11e9-922f-d365dca99a37': 92,
+						'eea78f48-5777-11e9-b8d8-5ff5b53be6fe': 18,
+						'eecf7d5a-5777-11e9-9ab2-7b0982fa893d': 33,
+						'eee15d72-5777-11e9-9314-3b4ca862fbb5': 201,
+						'4c398c06-abe2-11e9-9e42-a794d80d06e4': 1
+					},
+					'population': 62917,
+					'inBuilding': false,
+					'motherPlanetId': 'ce2802b2-5776-11e9-88de-cf5ab62b4afb',
+					'maxFuel': 58545000,
+					'fuel': 56110700,
+					'tactic': null
+				},
+				{
+					'id': '6272e472-586d-11e9-b743-2bbdb01acdd3',
+					'name': 'Phalanx',
+					'ownerId': '80661808-5775-11e9-82cb-7b8f6e03caec',
+					'position': '5-4-189-P6',
+					'motherPlanetAddress': '5-4-189-P6',
+					'orbitPosition': 0,
+					'points': 58.344,
+					'endMoveTime': '-1',
+					'units': {
+						'eeaa0034-5777-11e9-a8a8-236ac8528781': 50,
+						'ee8b842e-5777-11e9-922f-ff30780dc725': 1300,
+						'eee14472-5777-11e9-922f-bb01ac379634': 250,
+						'eed49844-5777-11e9-90a3-fb96350cb065': 650,
+						'eed4da70-5777-11e9-922f-2b0c40175cd7': 140
+					},
+					'population': 192565,
+					'inBuilding': false,
+					'motherPlanetId': 'cb795124-5776-11e9-88de-ef6bfaf53683',
+					'maxFuel': 123000000,
+					'fuel': 122562000,
+					'tactic': '9923a48e-71ae-11e9-b1b6-0f0a67399da5',
+					'unitsId': [
+						'eeaa0034-5777-11e9-a8a8-236ac8528781',
+						'ee8b842e-5777-11e9-922f-ff30780dc725',
+						'eee14472-5777-11e9-922f-bb01ac379634',
+						'eed49844-5777-11e9-90a3-fb96350cb065',
+						'eed4da70-5777-11e9-922f-2b0c40175cd7'
+					]
+				}
+			];
+
+			unitsList = Object.values({'00000000-0000-0000-0000-000000000001':{'id':'00000000-0000-0000-0000-000000000001','note':0,'cost':[2,15,5,4,0.08,0],'parts':[{'type':'rocketLauncher','name':'rocket_1','tech':'explosive'}],'shipShape':'SHIP_WEP_MINES','shipType':'SHIP_DEF','oneShot':true},'00000000-0000-0000-0000-000000000002':{'id':'00000000-0000-0000-0000-000000000002','note':0,'cost':[15,25,6,15,0.2,0],'parts':[{'type':'rocketLauncher','name':'rocket_1','tech':'iem'}],'shipShape':'SHIP_WEP_MINES_IEM','shipType':'SHIP_DEF','oneShot':true},'00000000-0000-0000-0000-000000000003':{'id':'00000000-0000-0000-0000-000000000003','note':0,'cost':[4,20,7,6,0.1,0],'parts':[{'type':'rocketLauncher','name':'rocket_1','tech':'nuke'}],'shipShape':'SHIP_WEP_MINES_NUKE','shipType':'SHIP_DEF','oneShot':true},'ee6b3f3e-5777-11e9-922f-d365dca99a37':{'id':'ee6b3f3e-5777-11e9-922f-d365dca99a37','name':'F-121','shipType':'SHIP_FIGHTER','shipShape':'SHIP_FIGHTER_SMALL','ownerId':'80655df0-5775-11e9-99e3-8b79cb37567b','cost':[58,34,47,22,0.4,5],'parts':[{'type':'cannon','name':'cannon_1','tech':'railgun'},{'type':'sub_propulsion','name':'prop_1','tech':'ion'}],'armorType':'0','note':0,'owned':86},'eea78f48-5777-11e9-b8d8-5ff5b53be6fe':{'id':'eea78f48-5777-11e9-b8d8-5ff5b53be6fe','name':'F-122','shipType':'SHIP_FIGHTER','shipShape':'SHIP_FIGHTER_SMALL','ownerId':'80655df0-5775-11e9-99e3-8b79cb37567b','cost':[58,35,46,22,0.41,5],'parts':[{'type':'cannon','name':'cannon_1','tech':'laser'},{'type':'sub_propulsion','name':'prop_1','tech':'ion'}],'armorType':'0','note':0,'owned':12},'eecf7d5a-5777-11e9-9ab2-7b0982fa893d':{'id':'eecf7d5a-5777-11e9-9ab2-7b0982fa893d','name':'Cu-12010','shipType':'SHIP_CUIRASSE','shipShape':'SHIP_CUIRASSE_SMALL','ownerId':'80655df0-5775-11e9-99e3-8b79cb37567b','cost':[549,591,328,135,2.6,301],'parts':[{'type':'cannon','name':'cannon_1','tech':'railgun'},{'type':'shield','name':'shield_1','tech':'none'},{'type':'shield','name':'shield_2','tech':'none'},{'type':'sup_propulsion','name':'prop_1','tech':'vsl'},{'type':'sub_propulsion','name':'prop_2','tech':'ion'},{'type':'sub_propulsion','name':'prop_3','tech':'ion'}],'armorType':'0','note':0,'owned':31},'eee15d72-5777-11e9-9314-3b4ca862fbb5':{'id':'eee15d72-5777-11e9-9314-3b4ca862fbb5','name':'Bc-12011','shipType':'SHIP_BATTLECRUISER','shipShape':'SHIP_BATTLECRUISER_SMALL','ownerId':'80655df0-5775-11e9-99e3-8b79cb37567b','cost':[480,501,271,103,2.32,241],'parts':[{'type':'cannon','name':'cannon_1','tech':'railgun'},{'type':'rocketLauncher','name':'rocket_1','tech':'explosive'},{'type':'shield','name':'shield_1','tech':'none'},{'type':'sup_propulsion','name':'prop_1','tech':'vsl'},{'type':'sub_propulsion','name':'prop_2','tech':'ion'},{'type':'sub_propulsion','name':'prop_3','tech':'ion'}],'armorType':'0','note':0,'owned':196},'4c398c06-abe2-11e9-9e42-a794d80d06e4':{'id':'4c398c06-abe2-11e9-9e42-a794d80d06e4','name':'CV-2322221','shipType':'SHIP_CARRIER','shipShape':'SHIP_CARRIER_MEDIUM','ownerId':'80655df0-5775-11e9-99e3-8b79cb37567b','cost':[778,885,415,173,6.1,1361],'parts':[{'type':'hangar','name':'hangar_1','tech':'hangarDouble'},{'type':'hangar','name':'hangar_2','tech':'hangarDouble'},{'type':'hangar','name':'hangar_3','tech':'hangarDouble'},{'type':'hangar','name':'hangar_4','tech':'hangarDouble'},{'type':'shield','name':'shield_1','tech':'magnetic'},{'type':'sub_propulsion','name':'prop_1','tech':'pplasma'},{'type':'sup_propulsion','name':'prop_2','tech':'wd'}],'armorType':'0','note':0,'owned':1},'eeaa0034-5777-11e9-a8a8-236ac8528781':{'id':'eeaa0034-5777-11e9-a8a8-236ac8528781','name':'Ark Royal CVL','shipType':'SHIP_CARRIER','shipShape':'SHIP_CARRIER_MEDIUM','ownerId':'80661808-5775-11e9-82cb-7b8f6e03caec','cost':[730,780,385,150,4.75,1301],'parts':[{'type':'hangar','name':'hangar_1','tech':'hangarSimple'},{'type':'hangar','name':'hangar_2','tech':'hangarSimple'},{'type':'hangar','name':'hangar_3','tech':'hangarSimple'},{'type':'hangar','name':'hangar_4','tech':'hangarSimple'},{'type':'shield','name':'shield_1','tech':'turret'},{'type':'sub_propulsion','name':'prop_1','tech':'pplasma'},{'type':'sup_propulsion','name':'prop_2','tech':'vsl'}],'armorType':'0','note':0,'owned':50},'ee8b842e-5777-11e9-922f-ff30780dc725':{'id':'ee8b842e-5777-11e9-922f-ff30780dc725','name':'Viper MK1','shipType':'SHIP_FIGHTER','shipShape':'SHIP_FIGHTER_SMALL','ownerId':'80661808-5775-11e9-82cb-7b8f6e03caec','cost':[58,34,47,22,0.4,5],'parts':[{'type':'cannon','name':'cannon_1','tech':'railgun'},{'type':'sub_propulsion','name':'prop_1','tech':'ion'}],'armorType':'0','note':0,'owned':1291},'eee14472-5777-11e9-922f-bb01ac379634':{'id':'eee14472-5777-11e9-922f-bb01ac379634','name':'Kirov CA','shipType':'SHIP_BATTLECRUISER','shipShape':'SHIP_BATTLECRUISER_SMALL','ownerId':'80661808-5775-11e9-82cb-7b8f6e03caec','cost':[613,632,317,132,2.9,242],'parts':[{'type':'cannon','name':'cannon_1','tech':'plasma'},{'type':'rocketLauncher','name':'rocket_1','tech':'nuke'},{'type':'shield','name':'shield_1','tech':'magnetic'},{'type':'sup_propulsion','name':'prop_1','tech':'vsl'},{'type':'sub_propulsion','name':'prop_2','tech':'pplasma'},{'type':'sub_propulsion','name':'prop_3','tech':'pplasma'}],'armorType':'0','note':0,'owned':250},'eed49844-5777-11e9-90a3-fb96350cb065':{'id':'eed49844-5777-11e9-90a3-fb96350cb065','name':'F-222','shipType':'SHIP_FIGHTER','shipShape':'SHIP_FIGHTER_MEDIUM','ownerId':'80661808-5775-11e9-82cb-7b8f6e03caec','cost':[91,54,77,35,0.66,11],'parts':[{'type':'cannon','name':'cannon_1','tech':'railgun'},{'type':'cannon','name':'cannon_2','tech':'railgun'},{'type':'sub_propulsion','name':'prop_1','tech':'ion'}],'armorType':'0','note':0,'owned':650},'eed4da70-5777-11e9-922f-2b0c40175cd7':{'id':'eed4da70-5777-11e9-922f-2b0c40175cd7','name':'KongoBC','shipType':'SHIP_CUIRASSE','shipShape':'SHIP_CUIRASSE_SMALL','ownerId':'80661808-5775-11e9-82cb-7b8f6e03caec','cost':[695,750,375,168,3.3,303],'parts':[{'type':'cannon','name':'cannon_1','tech':'plasma'},{'type':'shield','name':'shield_1','tech':'turret'},{'type':'shield','name':'shield_2','tech':'magnetic'},{'type':'sup_propulsion','name':'prop_1','tech':'vsl'},{'type':'sub_propulsion','name':'prop_2','tech':'pplasma'},{'type':'sub_propulsion','name':'prop_3','tech':'pplasma'}],'armorType':'0','note':0,'owned':140}});
+			tactics = Object.values({'9923a48e-71ae-11e9-b1b6-0f0a67399da5':{'id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','name':'basique','owner':'80661808-5775-11e9-82cb-7b8f6e03caec','orders':[{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'ee8b842e-5777-11e9-922f-ff30780dc725','target':'SHIP_FIGHTER','priority':1},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eee14472-5777-11e9-922f-bb01ac379634','target':'SHIP_BATTLECRUISER','priority':1},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eed4da70-5777-11e9-922f-2b0c40175cd7','target':'SHIP_CUIRASSE','priority':1},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eed49844-5777-11e9-90a3-fb96350cb065','target':'SHIP_CUIRASSE','priority':1},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eed4da70-5777-11e9-922f-2b0c40175cd7','target':'SHIP_BATTLECRUISER','priority':2},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eed49844-5777-11e9-90a3-fb96350cb065','target':'SHIP_DEF','priority':2},{'tactic_id':'9923a48e-71ae-11e9-b1b6-0f0a67399da5','unit':'eee14472-5777-11e9-922f-bb01ac379634','target':'SHIP_CARRIER','priority':2}]}});
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						// Do nothing
+					},
+				};
+			};
+
+			db.battleLog.save = (logs) => {
+				assert(typeof logs.date === 'object');
+				assert(logs.date instanceof Date);
+				assert(logs.logs.length > 0);
+
+				logs.logs = [];
+
+				assert.deepEqual(logs, {
+					atk_user_id: '80655df0-5775-11e9-99e3-8b79cb37567b',
+					atk_user_name: 'Elanis',
+
+					atk_fleet_id: '62716d0e-586d-11e9-86fb-b30be47b62e1',
+					atk_fleet_name: 'Alpha',
+
+					defWins: true,
+
+					def_user_id: '80661808-5775-11e9-82cb-7b8f6e03caec',
+					def_user_name: 'Firestorm',
+
+					date: logs.date,
+
+					location: '5-4-189-P6',
+
+					logs: [],
+				});
+
+				done();
+			};
+
+			Combat.beginFight('-1', { address: '5-4-189-P6' }, {
+				id:'80655df0-5775-11e9-99e3-8b79cb37567b',
+				name:'Elanis',
+			}, {
+				id: '80661808-5775-11e9-82cb-7b8f6e03caec',
+				name:'Firestorm',
+			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
 		});
 	});
 });

@@ -1,4 +1,11 @@
 module.exports = {
+	findbyAddress: async (addr) => {
+		try {
+			return (await serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr])).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	find: (addr,callback) => {
 		serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
 			if(err) { log(err, 'error'); return; }

@@ -220,8 +220,33 @@ module.exports = {
 	},
 
 	battleLog: {
-		save: (battleLog) => {
-			// TODO
+		save: async (battleLog) => {
+			try {
+				await serverClient.query('BEGIN');
+
+				let battleLogId = await serverClient.query('INSERT INTO "battleLog" ' +
+					'(atk_user_id, atk_user_name, def_user_id, def_user_name, atk_fleet_id, atk_fleet_name, date, location, "defWins") ' +
+					'VALUES($1,$2,$3,$4,$5,$6,$7,$8, $9) ' +
+					'RETURNING "battleLog_id"',
+				[battleLog.atk_user_id, battleLog.atk_user_name, battleLog.def_user_id, battleLog.def_user_name, battleLog.atk_fleet_id, battleLog.atk_fleet_name, battleLog.date, battleLog.location, battleLog.defWins]
+				);
+				battleLogId = battleLogId.rows[0].battleLog_id;
+
+				for(const currLogId in battleLog.logs) {
+					const currLog = battleLog.logs[currLogId];
+
+					// TODO: merge insert
+					await serverClient.query('INSERT INTO "battleLogActions" ' +
+						'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "unitSource", "unitDestination", "playerSource", "playerDestination", damage, details) ' +
+						'VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+					[battleLogId, currLogId, currLog.fleetSource, currLog.fleetDestination, currLog.unitSource, currLog.unitDestination, currLog.playerSource, currLog.playerDestination, currLog.damage, currLog.details]);
+				}
+
+				await serverClient.query('COMMIT');
+			} catch(err) {
+				log(err, 'error');
+				await serverClient.query('ROLLBACK');
+			}
 		},
 	},
 };

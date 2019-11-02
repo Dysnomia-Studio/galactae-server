@@ -254,6 +254,7 @@ module.exports = class Combat {
 					currAtkFleets.unitTypeCounter++;
 					currAtkFleets.unitNbCounter = 0;
 
+					// Retry with new fleet
 					if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
 						currAtkFleets.fleetCounter++;
 						currAtkFleets.unitTypeCounter = 0;
@@ -261,14 +262,9 @@ module.exports = class Combat {
 
 					continue; // Retry with new unit type
 				}
-				if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
-					currAtkFleets.fleetCounter++;
-					currAtkFleets.unitTypeCounter = 0;
-					continue; // Retry with new fleet
-				}
 
 				const target = this.getTarget(currUnitId, this.atkFleets[currAtkFleets.fleetCounter].id, this.defFleets);
-				if(target.fleet === -1) { continue; } // Security
+				if(target.fleet === -1) { break; } // Security
 
 				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
 
@@ -288,10 +284,12 @@ module.exports = class Combat {
 				}
 
 				action = {
-					fleetSource: this.atkFleets[currAtkFleets.fleetCounter].id,
-					fleetDestination: target.fleet,
-					unitSource: currUnitId,
-					unitDestination: target.unit,
+					fleetSource: this.atkFleets[currAtkFleets.fleetCounter].name,
+					fleetDestination: this.defFleets[fleetIndex].name,
+					unitSource: this.unitCache[currUnitId].name,
+					unitDestination: this.unitCache[target.unit].name,
+					playerSource: '', // TODO
+					playerDestination: '', // TODO
 					damage: damage,
 					details: logs,
 				};
@@ -307,6 +305,7 @@ module.exports = class Combat {
 					currDefFleets.unitTypeCounter++;
 					currDefFleets.unitNbCounter = 0;
 
+					// Retry with new fleet
 					if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
 						currDefFleets.fleetCounter++;
 						currDefFleets.unitTypeCounter = 0;
@@ -314,14 +313,9 @@ module.exports = class Combat {
 
 					continue; // Retry with new unit type
 				}
-				if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
-					currDefFleets.fleetCounter++;
-					currDefFleets.unitTypeCounter = 0;
-					continue; // Retry with new fleet
-				}
 
 				const target = this.getTarget(currUnitId, this.defFleets[currDefFleets.fleetCounter].id, this.atkFleets);
-				if(target.fleet === -1) { continue; } // Security
+				if(target.fleet === -1) { break; } // Security
 
 				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
 
@@ -341,10 +335,12 @@ module.exports = class Combat {
 				}
 
 				action = {
-					fleetSource: this.defFleets[currDefFleets.fleetCounter].id,
-					fleetDestination: target.fleet,
-					unitSource: currUnitId,
-					unitDestination: target.unit,
+					fleetSource: this.defFleets[currDefFleets.fleetCounter].name,
+					fleetDestination: this.atkFleets[fleetIndex].name,
+					unitSource: this.unitCache[currUnitId].name,
+					unitDestination: this.unitCache[target.unit].name,
+					playerSource: '', // TODO
+					playerDestination: '', // TODO
 					damage: damage,
 					details: logs,
 				};
@@ -354,7 +350,7 @@ module.exports = class Combat {
 
 			atk = !atk;
 
-			this.addActionToBattleLog(action);
+			this.battleLog.push(action);
 		}
 	}
 
@@ -374,7 +370,7 @@ module.exports = class Combat {
 		let added = 0;
 		// Get all units from db
 		for(const tacticId of tacticsIdList) {
-			db.tactic.find(tacticId, (tactic) => {
+			db.tactics.find(tacticId, (tactic) => {
 				this.tacticCache[tactic.id] = tactic;
 
 				if(tacticsIdList.size <= ++added) {
@@ -431,16 +427,27 @@ module.exports = class Combat {
 			// Get all db data & Fight
 			this.getAllTactics(() => {
 				this.getAllUnits(() => {
+
 					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
+						log('new turn ...');
+
 						this.simulateTurn();
 					}
+
+					this.endFight();
 				});
 			});
+		} else {
+			this.endFight();
 		}
+	}
 
-		this.saveLogs();
+	endFight() {
+		const defWins = (this.atkFleets.length === 0 || (this.defFleets.length !== 0 && !Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)));
 
-		if(this.atkFleets.length === 0 || !Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)) {
+		this.saveLogs(defWins);
+
+		if(defWins) {
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins', 'info');
 		} else {
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins', 'info');
@@ -448,20 +455,15 @@ module.exports = class Combat {
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
 
+		// @TODO
+
 		preventRestarts--;
-	}
-
-	addActionToBattleLog(action) {
-		/*console.log('Logging action:');
-		console.log(action);*/
-
-		this.battleLog.push(action);
 	}
 
 	/**
 	 * Saves logs & send it to client
 	 */
-	saveLogs() {
+	async saveLogs(defWins) {
 		let finalBattleLog;
 
 		try {
@@ -475,34 +477,34 @@ module.exports = class Combat {
 				def_user_id: this.defUser.id,
 				def_user_name: this.defUser.name,
 
-				date: Date.now(),
+				defWins,
+
+				date: new Date(),
 
 				location: this.location,
 
 				logs: this.battleLog,
 			};
-
-			// @TODO: format battle log:
-			// - save units/fleet names instead of their ids if they are deleted
 		} catch(e) {
 			log('Error while writing battle logs: ' + e, 'error');
+			return;
 		}
 
-		if(isset(finalBattleLog, 'object')) {
-			io.to(this.atkUser.sid).emit('combat-battleLog-send', finalBattleLog);
-			io.to(this.defUser.sid).emit('combat-battleLog-send', finalBattleLog);
+		const id = db.battleLog.save(finalBattleLog);
+		io.to(this.atkUser.sid).emit('battleLog-available', { battleLogId: id });
+		io.to(this.defUser.sid).emit('battleLog-available', { battleLogId: id });
+		// @TODO: notify ALL Players
 
-			// @TODO: Save notification if sid is -1
-
-			db.battleLog.save(finalBattleLog);
-		}
+		// @TODO: Create access tables: battleLogId / userId / read
 	}
 
-	static beginFight(data, pid, atkUser, defUser, atkFleetId) {
-		log('Begin of fight simulation - Planet: ' + pid, 'info');
+	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
+		log('Begin of fight simulation - Planet: ' + defPlanet.address, 'info');
+		log('Attacking fleet leader: ' + atkUser.name, 'info');
+		log('Defensing planet leader: ' + defUser.name, 'info');
 
-		db.fleet.findByPosition(pid, (fleetList) => {
-			const battle = new Combat(atkFleetId, atkUser, defUser, data.sid, pid);
+		db.fleet.findByPosition(defPlanet.address, (fleetList) => {
+			const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
