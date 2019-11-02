@@ -16,6 +16,8 @@ module.exports = class Combat {
 		// Logs de bataille
 		this.battleLog = [];
 
+		this.simulationBeginTime = Date.now();
+
 		this.plySid = sid;
 		this.atkUser = atkUser;
 		this.defUser = defUser;
@@ -442,15 +444,15 @@ module.exports = class Combat {
 		}
 	}
 
-	endFight() {
+	async endFight() {
 		const defWins = (this.atkFleets.length === 0 || (this.defFleets.length !== 0 && !Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache)));
 
-		this.saveLogs(defWins);
+		await this.saveLogs(defWins);
 
 		if(defWins) {
-			log('End of fight simulation - Planet: ' + this.location + ' - Def wins', 'info');
+			log('End of fight simulation - Planet: ' + this.location + ' - Def wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		} else {
-			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins', 'info');
+			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
@@ -490,7 +492,7 @@ module.exports = class Combat {
 			return;
 		}
 
-		const id = db.battleLog.save(finalBattleLog);
+		const id = await db.battleLog.save(finalBattleLog);
 		io.to(this.atkUser.sid).emit('battleLog-available', { battleLogId: id });
 		io.to(this.defUser.sid).emit('battleLog-available', { battleLogId: id });
 		// @TODO: notify ALL Players
