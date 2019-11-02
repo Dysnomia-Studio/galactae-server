@@ -232,15 +232,35 @@ module.exports = {
 				);
 				battleLogId = battleLogId.rows[0].battleLog_id;
 
+				let battleLogActions = 'INSERT INTO "battleLogActions" ' +
+					'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "unitSource", "unitDestination", "playerSource", "playerDestination", damage, details) ' +
+					'VALUES';
+
+				let battleLogActionsParameters = [];
+				let battleLogActionsId = 0;
+
 				for(const currLogId in battleLog.logs) {
 					const currLog = battleLog.logs[currLogId];
 
-					// TODO: merge insert
-					await serverClient.query('INSERT INTO "battleLogActions" ' +
-						'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "unitSource", "unitDestination", "playerSource", "playerDestination", damage, details) ' +
-						'VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
-					[battleLogId, currLogId, currLog.fleetSource, currLog.fleetDestination, currLog.unitSource, currLog.unitDestination, currLog.playerSource, currLog.playerDestination, currLog.damage, currLog.details]);
+					battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
+
+					battleLogActionsParameters = battleLogActionsParameters.concat([
+						battleLogId,
+						currLogId,
+						currLog.fleetSource,
+						currLog.fleetDestination,
+						currLog.unitSource,
+						currLog.unitDestination,
+						currLog.playerSource,
+						currLog.playerDestination,
+						currLog.damage,
+						currLog.details
+					]);
 				}
+
+				battleLogActions = battleLogActions.substring(0, battleLogActions.length - 1);
+
+				await serverClient.query(battleLogActions, battleLogActionsParameters);
 
 				await serverClient.query('COMMIT');
 			} catch(err) {
