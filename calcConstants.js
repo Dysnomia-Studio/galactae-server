@@ -650,7 +650,31 @@ module.exports = function() {
 		// Cannons
 		railgun: 		250,
 		laser: 			125,
-		plasma: 		500,
+		plasma: 		400,
+	};
+
+	this.shipHealth = {
+		SHIP_WEP_MINES: 			1,
+		SHIP_WEP_MINES_NUKE: 		1,
+		SHIP_WEP_MINES_IEM: 		1,
+		SHIP_WEP_MINES_AM: 			1,
+
+		SHIP_SAT_AG1: 				50,
+		SHIP_SAT_AG2: 				75,
+		SHIP_SAT_AG3:				100,
+
+		SHIP_BATTLECRUISER_SMALL: 	550,
+
+		SHIP_CUIRASSE_SMALL: 		950,
+
+		SHIP_FIGHTER_SMALL: 		100,
+		SHIP_FIGHTER_MEDIUM: 		175,
+		SHIP_FIGHTER_BOMBER: 		250,
+
+		SHIP_CORVET_SMALL: 			175,
+
+		SHIP_CARRIER_SMALL: 		500,
+		SHIP_CARRIER_MEDIUM: 		800,
 	};
 
 	/**

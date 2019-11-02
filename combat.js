@@ -211,6 +211,8 @@ module.exports = class Combat {
 			damage += (Math.round(originalDamage * 100)/100);
 		}
 
+		damage /= shipHealth[destinationUnit.shipShape];
+
 		if(damage > 1) {
 			damage = 1;
 		}
