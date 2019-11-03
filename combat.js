@@ -391,29 +391,21 @@ module.exports = class Combat {
 	 */
 	getAllUnits(callback) {
 		// Get units id list
-		const unitIdList = new Set();
+		const ownerList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
-			for(const currUnit in currFleet.units) {
-				unitIdList.add(currUnit);
-			}
+			ownerList.add(currFleet.ownerId);
 		}
 
 		let added = 0;
 
 		// Get all units from db
-		for(const unitId of unitIdList) {
-			if(isset(this.unitCache[unitId])) {
-				if(unitIdList.size === ++added) {
-					callback();
+		for(const ownerId of ownerList) {
+			db.unit.findByOwner(ownerId, (unitList) => {
+				for(const currUnit of unitList) {
+					this.unitCache[currUnit.id] = currUnit;
 				}
 
-				continue;
-			}
-
-			db.unit.find(unitId, (currUnit) => {
-				this.unitCache[currUnit.id] = currUnit;
-
-				if(unitIdList.size === ++added) {
+				if(ownerList.size === ++added) {
 					callback();
 				}
 			});

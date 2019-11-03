@@ -98,8 +98,8 @@ describe('• Combat', () => {
 		callback(tactics.filter((t) => t.id === id)[0]);
 	};
 
-	db.unit.find = (id, callback) => {
-		callback(unitsList.filter((u) => u.id === id)[0]);
+	db.unit.findByOwner = (id, callback) => {
+		callback(unitsList);
 	};
 
 	/**
@@ -690,7 +690,7 @@ describe('• Combat', () => {
 				assert(logs.logs.length > 0);
 
 				expectedLogs.date = logs.date;
-				expectedLogs.defWins = false;
+				expectedLogs.defWins = true;
 				logs.logs = [];
 
 				assert.deepEqual(logs, expectedLogs);
