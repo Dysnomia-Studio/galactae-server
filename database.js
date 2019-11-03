@@ -220,7 +220,7 @@ module.exports = {
 	},
 
 	battleLog: {
-		save: async (battleLog) => {
+		save: async (battleLog, players) => {
 			try {
 				await serverClient.query('BEGIN');
 
@@ -262,11 +262,39 @@ module.exports = {
 
 				await serverClient.query(battleLogActions, battleLogActionsParameters);
 
+
+				await db.battleLogAccess.add(
+					battleLogId,
+					players
+				);
+
 				await serverClient.query('COMMIT');
+
+				return battleLogId;
+
 			} catch(err) {
 				log(err, 'error');
 				await serverClient.query('ROLLBACK');
 			}
 		},
 	},
+
+	battleLogAccess: {
+		add: async (battleLogId, players) => {
+			let query = 'INSERT INTO public."battleLogAccess"' +
+				'("battleLogId", "userId", "read") VALUES ';
+
+			let i = 1;
+			for(const player of players) {
+				query += '($1,$' + ++i + ',true),';
+			}
+
+			query = query.substring(0, query.length - 1);
+
+			await serverClient.query(
+				query,
+				[battleLogId, ...players],
+			);
+		}
+	}
 };

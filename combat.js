@@ -425,8 +425,6 @@ module.exports = class Combat {
 				this.getAllUnits(() => {
 
 					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
-						log('new turn ...');
-
 						this.simulateTurn();
 					}
 
@@ -486,12 +484,10 @@ module.exports = class Combat {
 			return;
 		}
 
-		const id = await db.battleLog.save(finalBattleLog);
+		const id = await db.battleLog.save(finalBattleLog, [this.atkUser.id, this.defUser.id]);
 		io.to(this.atkUser.sid).emit('battleLog-available', { battleLogId: id });
 		io.to(this.defUser.sid).emit('battleLog-available', { battleLogId: id });
 		// @TODO: notify ALL Players
-
-		// @TODO: Create access tables: battleLogId / userId / read
 	}
 
 	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
