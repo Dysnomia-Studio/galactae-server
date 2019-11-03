@@ -95,6 +95,6 @@ describe('• Chat', () => {
 	 * sendCommand
 	 */
 	describe('# sendCommand()', () => {
-		// TODO
+		// @TODO
 	});
 });

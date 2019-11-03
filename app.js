@@ -9,7 +9,7 @@ global.fs = require('fs');
 global.preventConnection = false;
 global.preventConnectionMsg = '';
 global.maintenance = false;
-global.preventRestarts = 0; //@ADD: Really prevent restarting server until this is set to 0
+global.preventRestarts = 0; //@TODO: Really prevent restarting server until this is set to 0
 global.adminSid = '';
 
 /**

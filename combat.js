@@ -292,8 +292,8 @@ module.exports = class Combat {
 					fleetDestination: this.defFleets[fleetIndex].name,
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
-					playerSource: '', // TODO
-					playerDestination: '', // TODO
+					playerSource: '', // @TODO
+					playerDestination: '', // @TODO
 					damage: damage,
 					details: logs,
 				};
@@ -343,8 +343,8 @@ module.exports = class Combat {
 					fleetDestination: this.atkFleets[fleetIndex].name,
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
-					playerSource: '', // TODO
-					playerDestination: '', // TODO
+					playerSource: '', // @TODO
+					playerDestination: '', // @TODO
 					damage: damage,
 					details: logs,
 				};
@@ -451,7 +451,7 @@ module.exports = class Combat {
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
 
-		// @TODO
+		// @TODO: update unit count
 
 		preventRestarts--;
 	}

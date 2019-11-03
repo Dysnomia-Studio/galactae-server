@@ -48,7 +48,7 @@ module.exports = class Player {
 					for(let i=0; i<banObj.length; i++) {
 						if(banObj[i].ban_end > now) {
 							log('Error: ' + data.username + ' is banned.');
-							// @ADD: Kick & Message
+							// @TODO: Kick & Message
 							return;
 						}
 					}
@@ -60,7 +60,7 @@ module.exports = class Player {
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
-							// @ADD: Kick & Message
+							// @TODO: Kick & Message
 							return;
 						}
 
@@ -278,7 +278,7 @@ module.exports = class Player {
 				bonus.helium = 2000 * streak; // 40000 to 58000
 			} else {
 				bonus.credits = 1000;
-			} // @ADD: generate random special bonus
+			} // @TODO: generate random special bonus
 		}
 
 		return bonus;

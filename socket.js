@@ -380,10 +380,10 @@ module.exports = class Websocket {
 							Websocket.restart();
 							break;
 						case 'start':
-							// Can't do this now ... Waiting a way (@ADD)
+							// Can't do this now ... Waiting a way (@TODO)
 							break;
 						case 'stop':
-							// Can't do this now ... Waiting a way (@ADD)
+							// Can't do this now ... Waiting a way (@TODO)
 							break;
 						default:
 							log('Command ' + data.cmd + ' not found !');

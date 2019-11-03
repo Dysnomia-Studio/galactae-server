@@ -381,7 +381,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
 							'. ETA: ' + getDateTime(endTime));
 
-						// TODO: notifiy defender on attack
+						// @TODO: notifiy defender on attack
 
 						db.fleet.update(fleetReturned, function() {
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
@@ -450,7 +450,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		// TODO: check people limit for fleet & planet
+		// @TODO: check people limit for fleet & planet
 
 		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
 
@@ -469,7 +469,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			from.fuel -= transferFuel;
 			to.fuel += transferFuel;
 
-			// TODO: move cargo
+			// @TODO: move cargo
 
 			Fleets.removeEmptyUnits(from);
 
@@ -506,7 +506,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		// TODO: check people limit for fleet & planet
+		// @TODO: check people limit for fleet & planet
 
 		for(const key in from.units) {
 			[from, to] = Fleets.moveUnits(key, from.units[key], from, to);
@@ -519,7 +519,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		to.fuel += from.fuel;
 		to.maxFuel += from.maxFuel;
 
-		// TODO: move cargo
+		// @TODO: move cargo
 
 		db.fleet.update(from, function() {
 			db.fleet.update(to, function() {

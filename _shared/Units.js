@@ -113,7 +113,7 @@
 				units[specialUnitsUID[name]] = {
 					id: specialUnitsUID[name],
 					name: fleetTranslate[name],
-					note: 0, // @ADD: Note
+					note: 0, // @TODO: Note
 					cost: shipCosts[name],
 					parts: specialUnitsParts[name],
 					shipShape: name,

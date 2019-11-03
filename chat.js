@@ -83,7 +83,7 @@ module.exports = class Chat {
 						Discord.sendChatMessage(data.channel,discordmsg);
 					} else if(data.ally !== undefined) { // Allies messages
 						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-						// @ADD : Ally messages
+						// @TODO : Ally messages
 					}
 
 				});
@@ -222,7 +222,7 @@ module.exports = class Chat {
 				data.send = true;
 				break;
 			case '!help':
-				Chat.sendSM(data.sid,'HELP'); // TODO (admin/staff), no translation to be safe
+				Chat.sendSM(data.sid,'HELP'); // @TODO (admin/staff), no translation to be safe
 				break;
 			default:
 				Chat.sendSM(data.sid,'COMMAND_NOT_FOUND');
