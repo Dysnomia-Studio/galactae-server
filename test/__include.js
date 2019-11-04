@@ -50,6 +50,7 @@ global.db = {
 	ban: {},
 	battleLog: {},
 	fleet: {},
+	player: {},
 	tactics: {},
 	unit: {},
 };

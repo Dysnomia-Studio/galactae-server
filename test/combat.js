@@ -102,6 +102,16 @@ describe('• Combat', () => {
 		callback(unitsList);
 	};
 
+	db.player.find = async(id) => {
+		return [
+			{ id: 'u1', name: 'User 1' },
+			{ id: 'u2', name: 'User 2' },
+			{ id: 'u3', name: 'User 3' },
+			{ id: 'u4', name: 'User 4' },
+			{ id: 'u5', name: 'User 5' },
+		].filter((elt) => elt.id === id)[0];
+	}
+
 	/**
 	 * constructor
 	 */

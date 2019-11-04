@@ -13,6 +13,9 @@ module.exports = class Combat {
 		// Cache des tactiques
 		this.tacticCache = {};
 
+		// Cache des utilisateurs
+		this.playerList = {};
+
 		// Logs de bataille
 		this.battleLog = [];
 
@@ -390,7 +393,7 @@ module.exports = class Combat {
 	 * @param      {Function}  callback  Function to call back after these calls
 	 */
 	getAllUnits(callback) {
-		// Get units id list
+		// Get owner id list
 		const ownerList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
 			ownerList.add(currFleet.ownerId);
@@ -412,6 +415,21 @@ module.exports = class Combat {
 		}
 	}
 
+	async getAllPlayers() {
+		// Get owner id list
+		const ownerList = new Set();
+		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
+			ownerList.add(currFleet.ownerId);
+		}
+
+		let added = 0;
+
+		// Get all units from db
+		for(const ownerId of ownerList) {
+			this.playerList[ownerId] = await db.player.find(ownerId);
+		}
+	}
+
 	/**
 	 * Simulate the whole fight
 	 */
@@ -422,7 +440,8 @@ module.exports = class Combat {
 		if(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
 			// Get all db data & Fight
 			this.getAllTactics(() => {
-				this.getAllUnits(() => {
+				this.getAllUnits(async() => {
+					await this.getAllPlayers();
 
 					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
 						this.simulateTurn();
