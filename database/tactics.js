@@ -5,6 +5,19 @@ function rollback() {
 }
 
 module.exports = {
+	findAll: async() => {
+		try {
+			const tacticList = (await serverClient.query('SELECT * FROM tactics')).rows;
+
+			for(const tactic of tacticList) {
+				tactic.orders = (await serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1', [tactics.id])).rows;
+			}
+
+			return tacticList;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	find: (tid, callback) => {
 		if(tid === '') {
 			callback();

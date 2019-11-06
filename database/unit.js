@@ -23,11 +23,12 @@ module.exports = {
 			callback(obj.rows);
 		});
 	},
-	findAll: (callback) => {
-		serverClient.query('SELECT * FROM units', [], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
-			callback(obj.rows);
-		});
+	findAll: async() => {
+		try {
+			return (await serverClient.query('SELECT * FROM units')).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	update: (inputUser, callback) => {
 		const unit = Object.assign({}, inputUser);

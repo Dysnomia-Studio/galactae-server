@@ -8,6 +8,7 @@ global.assert = require('assert');
  */
 require('../calcConstants')();
 require('../misc')();
+require('../config')();
 
 global.Buildings    = require('../Buildings');
 global.Combat 		= require('../combat');

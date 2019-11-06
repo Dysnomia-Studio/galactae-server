@@ -822,5 +822,69 @@ describe('• Combat', () => {
 				name:'Firestorm',
 			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
 		});
+
+		/*it('Normal battle n°3 (BDD)', (done) => {
+			const tempDb = require('../database');
+
+			tempDb.connect(async(ok, general) => {
+				if(!general) { return; }
+				if(!ok) {
+					assert(false, 'Error while connecting to database');
+				}
+
+				globalFleetList = await tempDb.fleet.findAll();
+
+				unitsList = await tempDb.unit.findAll();
+				tactics = await tempDb.tactics.findAll();
+
+				io.to = (sid) => {
+					return {
+						emit: (event, content) => {
+							// Do nothing
+						},
+					};
+				};
+
+				const planetList = {};
+				// TODO
+
+				db.battleLog.save = (logs) => {
+					assert(typeof logs.date === 'object');
+					assert(logs.date instanceof Date);
+					assert(logs.logs.length > 0);
+
+					logs.logs = [];
+
+					assert.deepEqual(logs, {
+						atk_user_id: '80655df0-5775-11e9-99e3-8b79cb37567b',
+						atk_user_name: 'Elanis',
+
+						atk_fleet_id: '62716d0e-586d-11e9-86fb-b30be47b62e1',
+						atk_fleet_name: 'Alpha',
+
+						defWins: true,
+
+						def_user_id: '80661808-5775-11e9-82cb-7b8f6e03caec',
+						def_user_name: 'Firestorm',
+
+						date: logs.date,
+
+						location: '5-4-189-P6',
+
+						logs: [],
+					});
+
+					done();
+				};
+
+				Combat.beginFight('-1', { address: '5-4-189-P6' }, {
+					id:'80655df0-5775-11e9-99e3-8b79cb37567b',
+					name:'Elanis',
+				}, {
+					id: '80661808-5775-11e9-82cb-7b8f6e03caec',
+					name:'Firestorm',
+				}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
+			});
+		});*/
 	});
 });

@@ -123,6 +123,8 @@ module.exports = class Combat {
 		let choosenFleet,
 			choosenUnit;
 
+		// @TODO: Gestion du système singularité qui rends les cibles prioritaires
+
 		let currTactic = Object.assign({}, this.tacticCache[currFleet.tactic]);
 		if(!isset(currTactic, 'object')) {
 			currTactic = {
@@ -199,17 +201,18 @@ module.exports = class Combat {
 				originalDamage *= weaponDamage[weapon.tech];
 			}
 
-			// @TODO: Desactivation de systèmes pour le prochain tour
+			// @TODO: Desactivation de systèmes pour le prochain tour, liste d'unités avec compteur, si compteur = 0, getTarget() sinon on passe son tour
 
 			for(const shield of destinationShield) {
 				originalDamage *= (1-this.getShieldAbsorption(weapon.tech, shield.tech));
 			}
 
-			// @TODO: Gestion du système singularité et du projecteur à distance via distanceShieldAbsorption
+			// @TODO: Gestion du projecteur à distance via distanceShieldAbsorption
 
 			// @TODO: Add miss chance
 
-			// @TODO: Add to logs
+
+			// @TODO: Add details to logs: original damage, shield absorption, miss (or not)
 
 			damage += (Math.round(originalDamage * 100)/100);
 		}
@@ -468,7 +471,7 @@ module.exports = class Combat {
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
 
-		// @TODO: update unit count
+		// @TODO: update unit count, tableau global qui associe l'id d'unité au nombre detruit et qui soustrait via SQL a la fin
 
 		preventRestarts--;
 	}

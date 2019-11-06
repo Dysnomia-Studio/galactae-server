@@ -19,11 +19,12 @@ module.exports = {
 			}
 		});
 	},
-	findAll: (callback) => {
-		serverClient.query('SELECT * FROM fleets', [], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
-			callback(obj.rows);
-		});
+	findAll: async(callback) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets')).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	findByOwner: (id,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE "ownerId"=$1', [id], (err, obj) => {
