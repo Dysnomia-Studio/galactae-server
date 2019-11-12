@@ -390,4 +390,13 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 			});
 		});
 	}
+
+	static extractPublicInfo(unit) {
+		return {
+			id: unit.id,
+			name: unit.name,
+			shipType: unit.shipType,
+			shipShape: unit.shipShape,
+		};
+	}
 };

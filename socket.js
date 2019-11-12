@@ -343,6 +343,22 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Ask a report
+			socket.on('player-report-ask', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.reportId, 'string')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					const result = await db.battleLog.getFullBattleLog(data.reportId, data.id);
+
+					io.to(data.sid).emit(
+						'player-report-full',
+						result
+					);
+				});
+			});
+
 			// Admin panel
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.password, 'string')) { return; }

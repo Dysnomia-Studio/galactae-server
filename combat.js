@@ -19,6 +19,8 @@ module.exports = class Combat {
 		// Logs de bataille
 		this.battleLog = [];
 
+		this.finalBattleLog = {};
+
 		this.simulationBeginTime = Date.now();
 
 		this.plySid = sid;
@@ -211,7 +213,6 @@ module.exports = class Combat {
 
 			// @TODO: Add miss chance
 
-
 			// @TODO: Add details to logs: original damage, shield absorption, miss (or not)
 
 			damage += (Math.round(originalDamage * 100)/100);
@@ -296,8 +297,10 @@ module.exports = class Combat {
 				action = {
 					fleetSource: this.atkFleets[currAtkFleets.fleetCounter].name,
 					fleetDestination: this.defFleets[fleetIndex].name,
+					fleetDestinationId: this.defFleets[fleetIndex].id,
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
+					unitDestinationId: this.unitCache[target.unit].id,
 					playerSource: '', // @TODO
 					playerDestination: '', // @TODO
 					damage: damage,
@@ -347,8 +350,10 @@ module.exports = class Combat {
 				action = {
 					fleetSource: this.defFleets[currDefFleets.fleetCounter].name,
 					fleetDestination: this.atkFleets[fleetIndex].name,
+					fleetDestinationId: this.atkFleets[fleetIndex].id,
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
+					unitDestinationId: this.unitCache[target.unit].id,
 					playerSource: '', // @TODO
 					playerDestination: '', // @TODO
 					damage: damage,
@@ -446,6 +451,8 @@ module.exports = class Combat {
 				this.getAllUnits(async() => {
 					await this.getAllPlayers();
 
+					this.saveFleetsBeforeSimulation();
+
 					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
 						this.simulateTurn();
 					}
@@ -471,19 +478,44 @@ module.exports = class Combat {
 
 		// @TODO: save new fleet status (and delete empty fleets ofc)
 
+		// @TODO: steal resources
+
+		// @TODO: downgrade a building
+
 		// @TODO: update unit count, tableau global qui associe l'id d'unité au nombre detruit et qui soustrait via SQL a la fin
 
 		preventRestarts--;
+	}
+
+	saveFleetsBeforeSimulation() {
+		this.finalBattleLog = {
+			...this.finalBattleLog,
+
+			atkFleets: [],
+			defFleets: [],
+		};
+
+		for(const fleet of this.atkFleets) {
+			this.finalBattleLog.atkFleets.push(
+				Fleets.extractPublicInfo(fleet, this.playerList[fleet.ownerId].name, this.unitCache)
+			);
+		}
+
+		for(const fleet of this.defFleets) {
+			this.finalBattleLog.defFleets.push(
+				Fleets.extractPublicInfo(fleet, this.playerList[fleet.ownerId].name, this.unitCache)
+			);
+		}
 	}
 
 	/**
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
-		let finalBattleLog;
-
 		try {
-			finalBattleLog = {
+			this.finalBattleLog = {
+				...this.finalBattleLog,
+
 				atk_user_id: this.atkUser.id,
 				atk_user_name: this.atkUser.name,
 
@@ -498,6 +530,7 @@ module.exports = class Combat {
 				date: new Date(),
 
 				location: this.location,
+				// @TODO: save planet name
 
 				logs: this.battleLog,
 			};
@@ -506,9 +539,10 @@ module.exports = class Combat {
 			return;
 		}
 
-		const id = await db.battleLog.save(finalBattleLog, [this.atkUser.id, this.defUser.id]);
-		io.to(this.atkUser.sid).emit('battleLog-available', { battleLogId: id });
-		io.to(this.defUser.sid).emit('battleLog-available', { battleLogId: id });
+		const id = await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
+
+		Reports.refresh(this.atkUser.id, this.atkUser.sid);
+		Reports.refresh(this.defUser.id, this.defUser.sid);
 		// @TODO: notify ALL Players
 	}
 

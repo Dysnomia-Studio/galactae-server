@@ -80,7 +80,7 @@ module.exports = class Player {
 		}); // Gamedata db query
 	}
 
-	static traitementsConnexion(data, playerData) {
+	static async traitementsConnexion(data, playerData) {
 		if(data.id !== playerData.id) {
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
@@ -127,6 +127,8 @@ module.exports = class Player {
 					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
 						data.pid = userNewResearch.planetlist[0];
 					}
+
+					Reports.refresh(playerData.id, data.sid);
 
 					db.planet.find(data.pid, function(planetReturned) {
 						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);

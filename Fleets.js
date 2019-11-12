@@ -572,4 +572,22 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			});
 		});
 	}
+
+	static extractPublicInfo(fleet, playerName, unitsList) {
+		const outputFleet = {
+			id: fleet.id,
+			name: fleet.name,
+			owner: playerName,
+			units: [],
+		};
+
+		for(const unitId in fleet.units) {
+			outputFleet.units.push({
+				...Units.extractPublicInfo(unitsList[unitId]),
+				count: fleet.units[unitId],
+			});
+		}
+
+		return outputFleet;
+	}
 };
