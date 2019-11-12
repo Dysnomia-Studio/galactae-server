@@ -360,6 +360,7 @@ module.exports = class Planet {
 					unitReturned = {};
 					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
+					unitReturned.name = key;
 					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
 					unitReturned.ownerId = user.id;
 				}
