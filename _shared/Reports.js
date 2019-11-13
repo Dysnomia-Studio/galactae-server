@@ -14,15 +14,15 @@
 			const fleetLosts = {};
 
 			for(const action of report.logs) {
-				if(!fleetLosts[action.fleetDestination]) {
-					fleetLosts[action.fleetDestination] = {};
+				if(!fleetLosts[action.fleetDestinationId]) {
+					fleetLosts[action.fleetDestinationId] = {};
 				}
 
-				if(!fleetLosts[action.fleetDestination][action.unitDestionation]) {
-					fleetLosts[action.fleetDestination][action.unitDestionation] = 0;
+				if(!fleetLosts[action.fleetDestinationId][action.unitDestinationId]) {
+					fleetLosts[action.fleetDestinationId][action.unitDestinationId] = 0;
 				}
 
-				fleetLosts[action.fleetDestination][action.unitDestionation] += action.damage;
+				fleetLosts[action.fleetDestinationId][action.unitDestinationId] += action.damage;
 			}
 
 			return fleetLosts;

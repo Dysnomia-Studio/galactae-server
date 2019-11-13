@@ -92,7 +92,28 @@ module.exports = class Combat {
 		}
 	}
 
-	findUnit(type, fleets) {
+	findUnit(type, fleetList) {
+		if(type === '') {
+			let i = 0;
+			while(i++ < Object.values(this.unitCache).length) {
+				const currFleet = Math.round(Math.random() * (fleetList.length - 1));
+
+				const currUnit = Math.round(Math.random() * (fleetList[currFleet].unitsId.length - 1));
+
+				if(currUnit < 0) { continue; }
+
+				const unitCount = fleetList[currFleet].units[fleetList[currFleet].unitsId[currUnit]];
+				if(typeof unitCount !== 'undefined' && unitCount > 0) {
+					return [
+						fleetList[currFleet].id,
+						fleetList[currFleet].unitsId[currUnit]
+					];
+				}
+			}
+
+			return [-1 , -1];
+		}
+
 		const compatibleUnits = [];
 		if(type !== '') {
 			for(const id in this.unitCache) {
@@ -105,12 +126,12 @@ module.exports = class Combat {
 
 		let i = 0;
 		do {
-			for(const unitId in fleets[i].units) {
-				if(type === '' || compatibleUnits.includes(unitId)) {
-					return [fleets[i].id, unitId];
+			for(const unitId in fleetList[i].units) {
+				if(compatibleUnits.includes(unitId)) {
+					return [fleetList[i].id, unitId];
 				}
 			}
-		} while(++i < fleets.length);
+		} while(++i < fleetList.length);
 
 		return [-1, -1];
 	}
@@ -289,9 +310,14 @@ module.exports = class Combat {
 
 				this.defFleets[fleetIndex].units[target.unit] -= damage;
 
-				if(this.defFleets[fleetIndex].units[target.unit] < 0) {
+				if(this.defFleets[fleetIndex].units[target.unit] <= 0) {
 					delete this.defFleets[fleetIndex].units[target.unit];
 					this.defFleets[fleetIndex].unitsId = Object.keys(this.defFleets[fleetIndex].units);
+				}
+
+				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= 0) {
+					delete this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId];
+					this.atkFleets[currAtkFleets.fleetCounter].unitsId = Object.keys(this.atkFleets[currAtkFleets.fleetCounter].units);
 				}
 
 				action = {
@@ -345,6 +371,11 @@ module.exports = class Combat {
 				if(this.atkFleets[fleetIndex].units[target.unit] <= 0) {
 					delete this.atkFleets[fleetIndex].units[target.unit];
 					this.atkFleets[fleetIndex].unitsId = Object.keys(this.atkFleets[fleetIndex].units);
+				}
+
+				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= 0) {
+					delete this.atkFleets[fleetIndex].units[currUnitId];
+					this.defFleets[currDefFleets.fleetCounter].unitsId = Object.keys(this.defFleets[currDefFleets.fleetCounter].units);
 				}
 
 				action = {
@@ -430,8 +461,6 @@ module.exports = class Combat {
 			ownerList.add(currFleet.ownerId);
 		}
 
-		let added = 0;
-
 		// Get all units from db
 		for(const ownerId of ownerList) {
 			this.playerList[ownerId] = await db.player.find(ownerId);
@@ -512,6 +541,15 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
+		if(!this.finalBattleLog.atkFleets) {
+			this.finalBattleLog = {
+				...this.finalBattleLog,
+
+				atkFleets: [], // @TODO: save fleets when there's no defense
+				defFleets: [],
+			};
+		}
+
 		try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
