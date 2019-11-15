@@ -326,6 +326,8 @@ module.exports = class Planet {
 					log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level','success');
 
 				} else { // We just update ressources
+					delete newData.Buildings;
+
 					Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
 					log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
 				}
