@@ -335,6 +335,51 @@ module.exports = {
 			} catch(err) {
 				log(err, 'error');
 			}
-		}
+		},
+		deleteReport: async(playerId, battleLogIdList) => {
+			try {
+				let battleLogIdsStr = '(';
+				const sqlParameters = [playerId];
+				for(const battleLogId of battleLogIdList) {
+					sqlParameters.push(battleLogId);
+
+					battleLogIdsStr += '$' + sqlParameters.length + ',';
+				}
+				battleLogIdsStr = battleLogIdsStr.substring(0, battleLogIdsStr.length-1) + ')';
+
+				await serverClient.query(
+					'DELETE FROM "battleLogAccess" ' +
+					'WHERE "userId" = $1' +
+					'AND "battleLogId" IN ' + battleLogIdsStr,
+					sqlParameters
+				);
+			} catch(err) {
+				log(err, 'error');
+			}
+		},
+		setReadStatus: async(playerId, battleLogIdList, read) => {
+			try {
+				let battleLogIdsStr = '(';
+				const sqlParameters = [playerId];
+				for(const battleLogId of battleLogIdList) {
+					sqlParameters.push(battleLogId);
+
+					battleLogIdsStr += '$' + sqlParameters.length + ',';
+				}
+				battleLogIdsStr = battleLogIdsStr.substring(0, battleLogIdsStr.length-1) + ')';
+
+				sqlParameters.push(read);
+
+				await serverClient.query(
+					'UPDATE "battleLogAccess" ' +
+					'SET "read"=$' + (sqlParameters.length) + ' ' +
+					'WHERE "userId" = $1' +
+					'AND "battleLogId" IN ' + battleLogIdsStr,
+					sqlParameters
+				);
+			} catch(err) {
+				log(err, 'error');
+			}
+		},
 	}
 };
