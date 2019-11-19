@@ -609,4 +609,16 @@ module.exports = class Combat {
 			preventRestarts++;
 		});
 	}
+
+	static async getAttacksAgainstPlayer(plyId, plySid) {
+		const fleetList = await db.getAttacksAgainstPlayer(plyId);
+
+		for(const fleet of fleetList) {
+			console.log(fleet);
+			fleet.arriveTime = new Date(parseInt(fleet.endMoveTime));
+			delete fleet.endMoveTime;
+
+			Websocket.sendNotification(plySid, 'attack', fleet);
+		}
+	}
 };

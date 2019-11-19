@@ -120,6 +120,7 @@ module.exports = class Player {
 		});
 
 		Units.refresh(data);
+		Combat.getAttacksAgainstPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {

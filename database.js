@@ -381,5 +381,20 @@ module.exports = {
 				log(err, 'error');
 			}
 		},
+	},
+	getAttacksAgainstPlayer: async(playerId) => {
+		try {
+			return (await serverClient.query(
+				'SELECT users.name as "player", fleets."motherPlanetAddress" as "origin", fleets.position as "destination", fleets."endMoveTime" as "endMoveTime" ' +
+				'FROM fleets ' +
+				'INNER JOIN planets ON planets.address = fleets.position ' +
+				'INNER JOIN users ON users.id = fleets."ownerId" ' +
+				'WHERE "orbitPosition" = 1 ' +
+				'AND planets.owner = $1 ',
+				[playerId]
+			)).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	}
 };
