@@ -238,6 +238,11 @@
 				for(let i=0; i<haveToUpdate.length; i++) {
 					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
 
+					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime < 0) {
+						haveToUpdate[i] = -1;
+						continue;
+					}
+
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
 					if(fleetList[id].fuel > fleetList[id].maxFuel) {
