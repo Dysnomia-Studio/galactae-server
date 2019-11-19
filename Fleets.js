@@ -6,7 +6,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	 * @param      {object}  sid     user socket id
 	 * @return     {socket}  units   list of units types
 	 */
-	static refresh(pid,sid) {
+	static refresh(address,sid) {
 		if(globalCfg.dev) {
 			log('Refresh fleets');
 		}
@@ -15,17 +15,17 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(pid, function(originalFList) {
+		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			function sendtoPlayer(FleetList, newPlanet, sid, pid) {
+			function sendtoPlayer(FleetList, newPlanet, sid, address) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
 						id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
-					if(newPlanet.address === pid) {
+					if(newPlanet.address === address) {
 						Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
 					}
 				}
@@ -34,12 +34,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					log('Sending fleet');
 				}
 
-				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
+				io.to(sid).emit('fleet-recieve-data', { FleetList });
 			}
 
 			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
-					sendtoPlayer(FleetList, newPlanet, sid, pid);
+					sendtoPlayer(FleetList, newPlanet, sid, address);
 					return;
 				}
 
@@ -81,13 +81,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							sendtoPlayer(FleetList, newPlanet, sid, pid);
+							sendtoPlayer(FleetList, newPlanet, sid, address);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					sendtoPlayer(FleetList, newPlanet, sid, pid);
+					sendtoPlayer(FleetList, newPlanet, sid, address);
 				}
 			});
 		});
@@ -101,7 +101,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		db.fleet.find(fleetId, (obj) => {
 			if(obj.ownerId === uid) {
-				callback();
+				callback(obj);
 			}
 		});
 	}
@@ -177,7 +177,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
-				Fleets.refresh(planetData.id,data.sid);
+				Fleets.refresh(planetData.address,data.sid);
 
 				if(callback) {
 					db.fleet.findByMotherPlanet(planetData.id, (fleetList) => {
@@ -385,7 +385,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 						db.fleet.update(fleetReturned, function() {
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-							Fleets.refresh(fleetReturned.motherPlanetId, user.sid);
+							Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
 						});
 					});
 				});
@@ -405,7 +405,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			db.fleet.update(newFleet, function() {
 				log(data.username + ' has succed to rename fleet type old:' + fleetReturned.name + ', new: ' + data.fleetNewName,'success');
-				Fleets.refresh(fleetReturned.motherPlanetId, data.sid);
+				Fleets.refresh(fleetReturned.motherPlanetAddress, data.sid);
 			});
 		});
 	}
@@ -477,7 +477,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				db.fleet.update(to, function() {
 					log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 					Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-					Fleets.refresh(from.motherPlanetId, data.sid);
+					Fleets.refresh(from.motherPlanetAddress, data.sid);
 				});
 			});
 		});
@@ -525,7 +525,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			db.fleet.update(to, function() {
 				log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetId, data.sid);
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
 	}
@@ -568,7 +568,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			db.fleet.update(to, function() {
 				log(data.username + ' has tranfered fuel from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FUEL_TRANSFER_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetId, data.sid);
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
 	}

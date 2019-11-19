@@ -55,7 +55,7 @@ module.exports = class Planet {
 
 						db.planet.update(newPlanet);
 
-						Fleets.refresh(newPlanet.id,inputData.sid);
+						Fleets.refresh(newPlanet.address,inputData.sid);
 
 						if(inputData.pid === currPlanet.address) {
 							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
@@ -410,7 +410,7 @@ module.exports = class Planet {
 
 				db.fleet.update(fleetReturned, function() {
 					Units.refresh(user);
-					Fleets.refresh(newPlanet.id,user.sid);
+					Fleets.refresh(newPlanet.address,user.sid);
 					Tactics.refresh(user.id, user.sid);
 				});
 			});
@@ -600,7 +600,7 @@ module.exports = class Planet {
 		db.planet.find(planet, function(planetData) {
 			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
 				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData.id, sid);
+				Fleets.refresh(planetData.address, sid);
 			});
 		});
 	}

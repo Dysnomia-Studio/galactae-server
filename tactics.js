@@ -109,13 +109,13 @@ module.exports = class Tactics {
 
 	static assign(user, fleetId, tacticId) {
 		Tactics.checkOwner(user.id, tacticId, () => {
-			Fleets.checkOwner(user.id, fleetId, () => {
+			Fleets.checkOwner(user.id, fleetId, (fleet) => {
 				if(tacticId === '-1') { tacticId = null; }
 
 				db.fleet.assignFleet(fleetId, tacticId, () => {
 					log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
 					Websocket.SendMessageToClient('TACTIC_ASSIGNED');
-					Fleets.refresh(user.pid, user.sid);
+					Fleets.refresh(fleet.position, user.sid);
 				});
 			});
 		});

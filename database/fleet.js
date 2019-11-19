@@ -38,8 +38,14 @@ module.exports = {
 			callback(obj.rows);
 		});
 	},
-	findByPosition: (planetId,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE position=$1', [planetId], (err, obj) => {
+	findByPosition: (address,callback) => {
+		serverClient.query('SELECT * FROM fleets WHERE position=$1', [address], (err, obj) => {
+			if(err) { log(err, 'error'); return; }
+			callback(obj.rows);
+		});
+	},
+	findAllFleetReferingToPosition: (address,callback) => {
+		serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address], (err, obj) => {
 			if(err) { log(err, 'error'); return; }
 			callback(obj.rows);
 		});

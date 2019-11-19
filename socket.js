@@ -199,13 +199,13 @@ module.exports = class Websocket {
 				}
 
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.address, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
 					Units.refresh(data);
-					Fleets.refresh(data.planet,data.sid);
+					Fleets.refresh(data.address,data.sid);
 					Tactics.refresh(data.id, data.sid);
 				});
 			});
