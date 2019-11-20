@@ -153,12 +153,20 @@
 						break;
 
 					case 'move':
-						// @TODO: improve this
 						let moveType = -1;
-						if(objective.moveType === 'move') {
-							moveType = 2;
-						} else if(objective.moveType === 'attack') {
-							moveType = 1;
+						switch(objective.moveType) {
+							case 'attack':
+								moveType = FLEET_MOVE_TYPE.ATTACK;
+								break;
+							case 'defend':
+								moveType = FLEET_MOVE_TYPE.DEFEND;
+								break;
+							case 'move':
+								moveType = FLEET_MOVE_TYPE.MOVE;
+								break;
+							case 'spy':
+								moveType = FLEET_MOVE_TYPE.SPY;
+								break;
 						}
 
 						if(moveType < 0) {
