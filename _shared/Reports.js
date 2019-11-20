@@ -1,15 +1,5 @@
 (function (exports) {
 	exports._Reports = class Reports {
-		static getAllLostUnits(report) {
-			const units = {};
-
-			for(const action of report.logs) {
-				// @TODO
-			}
-
-			return units;
-		}
-
 		static getAllLostUnitsInFleets(report) {
 			const fleetLosts = {};
 
