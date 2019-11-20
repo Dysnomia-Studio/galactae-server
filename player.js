@@ -48,7 +48,7 @@ module.exports = class Player {
 					for(let i=0; i<banObj.length; i++) {
 						if(banObj[i].ban_end > now) {
 							log('Error: ' + data.username + ' is banned.');
-							// @TODO: Kick & Message
+							io.to(data.sid).emit('server-kick','ERR_BANNED');
 							return;
 						}
 					}
@@ -60,7 +60,7 @@ module.exports = class Player {
 							!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
 							log('Error: ' + data.username + ' isn\'t whitelisted.');
-							// @TODO: Kick & Message
+							io.to(data.sid).emit('server-kick','ERR_WHITELIST');
 							return;
 						}
 
