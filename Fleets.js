@@ -378,10 +378,17 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 						const endTime = new Date(fleetReturned.endMoveTime);
 
-						log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
+						log(user.username + ' began to move fleet (type: ' + moveType + ') ' + fleetReturned.name + ' to ' + textDestination +
 							'. ETA: ' + getDateTime(endTime));
 
-						// @TODO: notifiy defender on attack
+						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+							Websocket.sendNotification(defUser.sid, 'attack', {
+								player: atkUser.name,
+								origin: planeteDepart,
+								destination: planeteArrivee,
+								arriveTime: endTime,
+							});
+						}
 
 						db.fleet.update(fleetReturned, function() {
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
