@@ -604,9 +604,9 @@ module.exports = class Combat {
 				}
 			}
 
-			battle.fight();
-
 			preventRestarts++;
+
+			battle.fight();
 		});
 	}
 

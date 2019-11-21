@@ -515,10 +515,14 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 10;
+		let decompte = 5;
 
 		setInterval(function() {
-			if(decompte>0) {
+			if(preventRestarts > 0) {
+				log('Wating simulations to end ...');
+			}
+
+			if(decompte > 0) {
 				log('Restarting server in ' + decompte-- + ' seconds');
 			} else {
 				log('Restarting now !');
