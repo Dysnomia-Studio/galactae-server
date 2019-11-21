@@ -232,38 +232,39 @@ module.exports = {
 				);
 				battleLogId = battleLogId.rows[0].battleLog_id;
 
-				let battleLogActions = 'INSERT INTO "battleLogActions" ' +
-					'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", "playerSource", "playerDestination", damage, details) ' +
-					'VALUES';
+				if(battleLog.logs.length > 0) {
+					let battleLogActions = 'INSERT INTO "battleLogActions" ' +
+						'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", "playerSource", "playerDestination", damage, details) ' +
+						'VALUES';
 
-				let battleLogActionsParameters = [];
-				let battleLogActionsId = 0;
+					let battleLogActionsParameters = [];
+					let battleLogActionsId = 0;
 
-				for(const currLogId in battleLog.logs) {
-					const currLog = battleLog.logs[currLogId];
+					for(const currLogId in battleLog.logs) {
+						const currLog = battleLog.logs[currLogId];
 
-					battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
+						battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
 
-					battleLogActionsParameters = battleLogActionsParameters.concat([
-						battleLogId,
-						currLogId,
-						currLog.fleetSource,
-						currLog.fleetDestination,
-						currLog.fleetDestinationId,
-						currLog.unitSource,
-						currLog.unitDestination,
-						currLog.unitDestinationId,
-						currLog.playerSource,
-						currLog.playerDestination,
-						currLog.damage,
-						currLog.details
-					]);
+						battleLogActionsParameters = battleLogActionsParameters.concat([
+							battleLogId,
+							currLogId,
+							currLog.fleetSource,
+							currLog.fleetDestination,
+							currLog.fleetDestinationId,
+							currLog.unitSource,
+							currLog.unitDestination,
+							currLog.unitDestinationId,
+							currLog.playerSource,
+							currLog.playerDestination,
+							currLog.damage,
+							currLog.details
+						]);
+					}
+
+					battleLogActions = battleLogActions.substring(0, battleLogActions.length - 1);
+
+					await serverClient.query(battleLogActions, battleLogActionsParameters);
 				}
-
-				battleLogActions = battleLogActions.substring(0, battleLogActions.length - 1);
-
-				await serverClient.query(battleLogActions, battleLogActionsParameters);
-
 
 				await db.battleLogAccess.add(
 					battleLogId,
