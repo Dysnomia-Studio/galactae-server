@@ -391,7 +391,8 @@ module.exports = {
 				'INNER JOIN planets ON planets.address = fleets.position ' +
 				'INNER JOIN users ON users.id = fleets."ownerId" ' +
 				'WHERE "orbitPosition" = 1 ' +
-				'AND planets.owner = $1 ',
+				'AND planets.owner = $1 ' +
+				'AND fleets."endMoveTime" > 0',
 				[playerId]
 			)).rows;
 		} catch(err) {
