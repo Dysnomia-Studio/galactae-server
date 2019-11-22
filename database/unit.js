@@ -46,6 +46,30 @@ module.exports = {
 			}
 		});
 	},
+	bulkUpdate: async(units) => {
+		let query = 'UPDATE units SET ' +
+			'owned = newUnits.owned, ' +
+			'FROM (VALUES ';
+
+		let i = 0;
+		const queryParameters = [];
+		for(const unit of units) {
+			query += '($' + (++i) + ', $' + (++i) + '), ';
+
+			queryParameters.push(unit.owned);
+			queryParameters.push(unit.id);
+		}
+		query = query.substring(0, query.length - 1);
+
+		query += ') as newUnits(points, id) ';
+		query += 'WHERE units.id = newUnits.id';
+
+		try {
+			await serverClient.query(query, queryParameters);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	delete: (id,callback) => {
 		serverClient.query('DELETE FROM units WHERE id=$1',[id], (err) => {
 			if(err) { log(err, 'error'); return; }

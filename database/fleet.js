@@ -72,6 +72,37 @@ module.exports = {
 			}
 		});
 	},
+	bulkUpdate: async(fleets) => {
+		let query = 'UPDATE fleets SET ' +
+			'endMoveTime = -1, ' +
+			'points = newFleets.points, ' +
+			'population = newFleets.population, ' +
+			'units = newFleets.units ' +
+			'FROM (VALUES ';
+
+		let i = 0;
+		const queryParameters = [];
+		for(const fleet of fleets) {
+			query += '($' + (++i) + ', $' + (++i) + ', $' + (++i) + ', $' + (++i) + '), ';
+
+			queryParameters.push(fleet.points);
+			queryParameters.push(fleet.population);
+			queryParameters.push(fleet.units);
+			queryParameters.push(fleet.id);
+		}
+		query = query.substring(0, query.length - 1);
+
+		query += ') as newFleets(points, population, units, id) ';
+		query += 'WHERE fleets.id = newFleets.id';
+
+		try {
+			await serverClient.query(query, queryParameters);
+
+			await serverClient.query('DELETE FROM fleets WHERE points = 0 AND "inBuilding" = false');
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	create: (fleet,callback) => {
 		const [query, values] = db.buildInsertQuery('fleets', fleet);
 

@@ -327,8 +327,6 @@ module.exports = class Combat {
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
 					unitDestinationId: this.unitCache[target.unit].id,
-					playerSource: '', // @TODO
-					playerDestination: '', // @TODO
 					damage: damage,
 					details: logs,
 				};
@@ -385,14 +383,18 @@ module.exports = class Combat {
 					unitSource: this.unitCache[currUnitId].name,
 					unitDestination: this.unitCache[target.unit].name,
 					unitDestinationId: this.unitCache[target.unit].id,
-					playerSource: '', // @TODO
-					playerDestination: '', // @TODO
 					damage: damage,
 					details: logs,
 				};
 
 				++currDefFleets.unitNbCounter;
 			}
+
+			// @TODO: recalc fleet points
+
+			// @TODO: recalc fleet population
+
+			// @TODO: recalc unit owned
 
 			atk = !atk;
 
@@ -505,13 +507,13 @@ module.exports = class Combat {
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
 
-		// @TODO: save new fleet status (and delete empty fleets ofc)
+		db.fleets.bulkUpdate([...this.atkFleets, ...this.defFleets]);
 
 		// @TODO: steal resources
 
 		// @TODO: downgrade a building
 
-		// @TODO: update unit count, tableau global qui associe l'id d'unité au nombre detruit et qui soustrait via SQL a la fin
+		db.units.bulkUpdate(this.unitCache);
 
 		preventRestarts--;
 	}
