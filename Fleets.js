@@ -18,7 +18,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			function sendtoPlayer(FleetList, newPlanet, sid, address) {
+			async function sendtoPlayer(FleetList, newPlanet, sid, address) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
 						id: newPlanet.id,
@@ -32,6 +32,14 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 				if(globalCfg.dev) {
 					log('Sending fleet');
+				}
+
+				for(const fleetId in FleetList) {
+					if(FleetList[fleetId].ownerId !== newPlanet.owner) {
+						const player = await db.player.find(FleetList[fleetId].ownerId);
+
+						FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+					}
 				}
 
 				io.to(sid).emit('fleet-recieve-data', { FleetList });
@@ -596,5 +604,16 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		}
 
 		return outputFleet;
+	}
+
+	static extractOrbitPublicInfo(fleet, playerName) {
+		return {
+			id: fleet.id,
+			name: fleet.name,
+			owner: playerName,
+			position: fleet.position,
+			endMoveTime: fleet.endMoveTime,
+			units: [], // @TODO
+		};
 	}
 };

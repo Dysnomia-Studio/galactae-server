@@ -274,7 +274,7 @@ module.exports = class Combat {
 
 		// @TODO: apply research bonuses
 
-		if(!!this.unitCache[currUnitId].oneShot) {
+		if(this.unitCache[currUnitId].oneShot) {
 			sourceFleets[fleetIterator.fleetCounter].units[currUnitId]--;
 		}
 
