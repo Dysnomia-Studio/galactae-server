@@ -293,7 +293,7 @@ module.exports = class Combat {
 			sourceFleets[fleetIterator.fleetCounter].unitsId = Object.keys(sourceFleets[fleetIterator.fleetCounter].units);
 		}
 
-		action = {
+		const action = {
 			fleetSource: sourceFleets[fleetIterator.fleetCounter].name,
 			fleetDestination: destinationFleets[fleetIndex].name,
 			fleetDestinationId: destinationFleets[fleetIndex].id,
@@ -446,24 +446,20 @@ module.exports = class Combat {
 		this.removeDuplicateFleets();
 		this.sortFleets();
 
-		if(this.atkFleets.length !== 0 && this.defFleets.length !== 0) {
-			// Get all db data & Fight
-			this.getAllTactics(() => {
-				this.getAllUnits(async() => {
-					await this.getAllPlayers();
+		// Get all db data & Fight
+		this.getAllTactics(() => {
+			this.getAllUnits(async() => {
+				await this.getAllPlayers();
 
-					this.saveFleetsBeforeSimulation();
+				this.saveFleetsBeforeSimulation();
 
-					while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
-						this.simulateTurn();
-					}
+				while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
+					this.simulateTurn();
+				}
 
-					this.endFight();
-				});
+				this.endFight();
 			});
-		} else {
-			this.endFight();
-		}
+		});
 	}
 
 	async endFight() {
@@ -586,7 +582,6 @@ module.exports = class Combat {
 		const fleetList = await db.getAttacksAgainstPlayer(plyId);
 
 		for(const fleet of fleetList) {
-			console.log(fleet);
 			fleet.arriveTime = new Date(parseInt(fleet.endMoveTime));
 			delete fleet.endMoveTime;
 

@@ -666,6 +666,19 @@ describe('• Combat', () => {
 				assert(typeof logs.date === 'object');
 				assert(logs.date instanceof Date);
 
+				const units = {
+					[specialUnitsUID.SHIP_WEP_MINES]: Units.specialUnits[specialUnitsUID.SHIP_WEP_MINES],
+					[specialUnitsUID.SHIP_WEP_MINES_NUKE]: Units.specialUnits[specialUnitsUID.SHIP_WEP_MINES_NUKE],
+					'u1': unitsList[0],
+					'u2': unitsList[1],
+				};
+
+				expectedLogs.atkFleets = [
+					Fleets.extractPublicInfo(globalFleetList[2], 'User 2',  units),
+					Fleets.extractPublicInfo(globalFleetList[0], 'User 2',  units),
+					Fleets.extractPublicInfo(globalFleetList[1], 'User 2',  units),
+				];
+
 				expectedLogs.date = logs.date;
 				expectedLogs.defWins = false;
 
@@ -846,9 +859,6 @@ describe('• Combat', () => {
 
 					logs: [],
 				});
-
-				console.log(JSON.stringify(logs));
-				console.log(JSON.stringify(expectedLogs));
 
 				assert.deepEqual(logs, expectedLogs);
 
