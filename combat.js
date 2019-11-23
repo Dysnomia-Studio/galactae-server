@@ -508,15 +508,6 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
-		if(!this.finalBattleLog.atkFleets) {
-			this.finalBattleLog = {
-				...this.finalBattleLog,
-
-				atkFleets: [], // @TODO: save fleets when there's no defense
-				defFleets: [],
-			};
-		}
-
 		try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
