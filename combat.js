@@ -248,16 +248,90 @@ module.exports = class Combat {
 		return [damage, logs];
 	}
 
+	simulateSide(sourceFleets, destinationFleets, fleetIterator) {
+		const currUnitId = sourceFleets[fleetIterator.fleetCounter].unitsId[fleetIterator.unitTypeCounter];
+
+		if(!sourceFleets[fleetIterator.fleetCounter].units[currUnitId] ||
+			sourceFleets[fleetIterator.fleetCounter].units[currUnitId].length <= fleetIterator.unitNbCounter ||
+			Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
+
+			fleetIterator.unitTypeCounter++;
+			fleetIterator.unitNbCounter = 0;
+
+			// Retry with new fleet
+			if(sourceFleets[fleetIterator.fleetCounter].unitsId.length <= fleetIterator.unitTypeCounter) {
+				fleetIterator.fleetCounter++;
+				fleetIterator.unitTypeCounter = 0;
+			}
+
+			throw -2; // Retry with new unit type
+		}
+
+		const target = this.getTarget(currUnitId, sourceFleets[fleetIterator.fleetCounter].id, destinationFleets);
+		if(target.fleet === -1) { throw -1; } // Security
+
+		const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
+
+		// @TODO: apply research bonuses
+
+		if(!!this.unitCache[currUnitId].oneShot) {
+			sourceFleets[fleetIterator.fleetCounter].units[currUnitId]--;
+		}
+
+		const fleetIndex = destinationFleets.map((f) => f.id).indexOf(target.fleet);
+
+		const oldHealth = destinationFleets[fleetIndex].units[target.unit];
+		destinationFleets[fleetIndex].units[target.unit] -= damage;
+
+		if(destinationFleets[fleetIndex].units[target.unit] <= 0) {
+			delete destinationFleets[fleetIndex].units[target.unit];
+			destinationFleets[fleetIndex].unitsId = Object.keys(destinationFleets[fleetIndex].units);
+		}
+
+		if(sourceFleets[fleetIterator.fleetCounter].units[currUnitId] <= 0) {
+			delete sourceFleets[fleetIterator.fleetCounter].units[currUnitId];
+			sourceFleets[fleetIterator.fleetCounter].unitsId = Object.keys(sourceFleets[fleetIterator.fleetCounter].units);
+		}
+
+		action = {
+			fleetSource: sourceFleets[fleetIterator.fleetCounter].name,
+			fleetDestination: destinationFleets[fleetIndex].name,
+			fleetDestinationId: destinationFleets[fleetIndex].id,
+			unitSource: this.unitCache[currUnitId].name,
+			unitDestination: this.unitCache[target.unit].name,
+			unitDestinationId: this.unitCache[target.unit].id,
+			damage: damage,
+			details: logs,
+		};
+
+		if(Math.floor(destinationFleets[fleetIndex].units[target.unit]) < Math.floor(oldHealth)) {
+			// @TODO: recalc fleet points
+
+			// @TODO: recalc fleet population
+
+			this.unitCache[action.unitDestinationId].owned--;
+		}
+
+		++fleetIterator.unitNbCounter;
+
+		return [
+			sourceFleets,
+			destinationFleets,
+			fleetIterator,
+			action,
+		];
+	}
+
 	/**
 	 * Simulate a turn between both sides
 	 */
 	simulateTurn() {
-		const currDefFleets = {
+		let currDefFleets = {
 			fleetCounter: 0,
 			unitTypeCounter: 0,
 			unitNbCounter: 0,
 		};
-		const currAtkFleets = {
+		let currAtkFleets = {
 			fleetCounter: 0,
 			unitTypeCounter: 0,
 			unitNbCounter: 0,
@@ -275,126 +349,22 @@ module.exports = class Combat {
 				atk = true;
 			}
 
-			// Then simulate alternate
-			if(atk) {
-				const currUnitId = this.atkFleets[currAtkFleets.fleetCounter].unitsId[currAtkFleets.unitTypeCounter];
-
-				if(!this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] ||
-					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId].length <= currAtkFleets.unitNbCounter ||
-					Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
-
-					currAtkFleets.unitTypeCounter++;
-					currAtkFleets.unitNbCounter = 0;
-
-					// Retry with new fleet
-					if(this.atkFleets[currAtkFleets.fleetCounter].unitsId.length <= currAtkFleets.unitTypeCounter) {
-						currAtkFleets.fleetCounter++;
-						currAtkFleets.unitTypeCounter = 0;
-					}
-
-					continue; // Retry with new unit type
+			try {
+				// Then simulate alternate
+				if(atk) {
+					[ this.atkFleets, this.defFleet, currAtkFleets, action ] = this.simulateSide(this.atkFleets, this.defFleets, currAtkFleets);
+				} else {
+					[ this.defFleet, this.atkFleets, currDefFleets, action ] = this.simulateSide(this.atkFleets, this.atkFleets, currDefFleets);
+				}
+			} catch(e) {
+				if(e === -1) {
+					break;
+				} else if(e === -2) {
+					continue;
 				}
 
-				const target = this.getTarget(currUnitId, this.atkFleets[currAtkFleets.fleetCounter].id, this.defFleets);
-				if(target.fleet === -1) { break; } // Security
-
-				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
-
-				// @TODO: apply research bonuses
-
-				if(!!this.unitCache[currUnitId].oneShot) {
-					this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId]--;
-				}
-
-				const fleetIndex = this.defFleets.map((f) => f.id).indexOf(target.fleet);
-
-				this.defFleets[fleetIndex].units[target.unit] -= damage;
-
-				if(this.defFleets[fleetIndex].units[target.unit] <= 0) {
-					delete this.defFleets[fleetIndex].units[target.unit];
-					this.defFleets[fleetIndex].unitsId = Object.keys(this.defFleets[fleetIndex].units);
-				}
-
-				if(this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId] <= 0) {
-					delete this.atkFleets[currAtkFleets.fleetCounter].units[currUnitId];
-					this.atkFleets[currAtkFleets.fleetCounter].unitsId = Object.keys(this.atkFleets[currAtkFleets.fleetCounter].units);
-				}
-
-				action = {
-					fleetSource: this.atkFleets[currAtkFleets.fleetCounter].name,
-					fleetDestination: this.defFleets[fleetIndex].name,
-					fleetDestinationId: this.defFleets[fleetIndex].id,
-					unitSource: this.unitCache[currUnitId].name,
-					unitDestination: this.unitCache[target.unit].name,
-					unitDestinationId: this.unitCache[target.unit].id,
-					damage: damage,
-					details: logs,
-				};
-
-				++currAtkFleets.unitNbCounter;
-			} else {
-				const currUnitId = this.defFleets[currDefFleets.fleetCounter].unitsId[currDefFleets.unitTypeCounter];
-
-				if(!this.defFleets[currDefFleets.fleetCounter].units[currUnitId] ||
-					this.defFleets[currDefFleets.fleetCounter].units[currUnitId].length <= currDefFleets.unitNbCounter ||
-					Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
-
-					currDefFleets.unitTypeCounter++;
-					currDefFleets.unitNbCounter = 0;
-
-					// Retry with new fleet
-					if(this.defFleets[currDefFleets.fleetCounter].unitsId.length <= currDefFleets.unitTypeCounter) {
-						currDefFleets.fleetCounter++;
-						currDefFleets.unitTypeCounter = 0;
-					}
-
-					continue; // Retry with new unit type
-				}
-
-				const target = this.getTarget(currUnitId, this.defFleets[currDefFleets.fleetCounter].id, this.atkFleets);
-				if(target.fleet === -1) { break; } // Security
-
-				const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
-
-				// @TODO: apply research bonuses
-
-				if(!!this.unitCache[currUnitId].oneShot) {
-					this.defFleets[currDefFleets.fleetCounter].units[currUnitId]--;
-				}
-
-				const fleetIndex = this.atkFleets.map((f) => f.id).indexOf(target.fleet);
-
-				this.atkFleets[fleetIndex].units[target.unit] -= damage;
-
-				if(this.atkFleets[fleetIndex].units[target.unit] <= 0) {
-					delete this.atkFleets[fleetIndex].units[target.unit];
-					this.atkFleets[fleetIndex].unitsId = Object.keys(this.atkFleets[fleetIndex].units);
-				}
-
-				if(this.defFleets[currDefFleets.fleetCounter].units[currUnitId] <= 0) {
-					delete this.atkFleets[fleetIndex].units[currUnitId];
-					this.defFleets[currDefFleets.fleetCounter].unitsId = Object.keys(this.defFleets[currDefFleets.fleetCounter].units);
-				}
-
-				action = {
-					fleetSource: this.defFleets[currDefFleets.fleetCounter].name,
-					fleetDestination: this.atkFleets[fleetIndex].name,
-					fleetDestinationId: this.atkFleets[fleetIndex].id,
-					unitSource: this.unitCache[currUnitId].name,
-					unitDestination: this.unitCache[target.unit].name,
-					unitDestinationId: this.unitCache[target.unit].id,
-					damage: damage,
-					details: logs,
-				};
-
-				++currDefFleets.unitNbCounter;
+				log(e, 'error');
 			}
-
-			// @TODO: recalc fleet points
-
-			// @TODO: recalc fleet population
-
-			// @TODO: recalc unit owned
 
 			atk = !atk;
 
@@ -507,13 +477,13 @@ module.exports = class Combat {
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
 
-		db.fleets.bulkUpdate([...this.atkFleets, ...this.defFleets]);
+		db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
 
 		// @TODO: steal resources
 
 		// @TODO: downgrade a building
 
-		db.units.bulkUpdate(this.unitCache);
+		db.unit.bulkUpdate(this.unitCache);
 
 		preventRestarts--;
 	}

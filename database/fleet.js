@@ -98,7 +98,7 @@ module.exports = {
 		try {
 			await serverClient.query(query, queryParameters);
 
-			await serverClient.query('DELETE FROM fleets WHERE points = 0 AND "inBuilding" = false');
+			await serverClient.query('DELETE FROM fleets WHERE population = 0 AND "inBuilding" = false');
 		} catch(err) {
 			log(err, 'error');
 		}

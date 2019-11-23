@@ -623,6 +623,9 @@ describe('• Combat', () => {
 			{ id: 'f3', name: 'Fleet 3', endMoveTime: -1, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
 		];
 
+		db.fleet.bulkUpdate = async() => { };
+		db.unit.bulkUpdate = async() => { };
+
 		let expectedLogs = {
 			atk_user_id: 'u2',
 			atk_user_name: 'User 2',
