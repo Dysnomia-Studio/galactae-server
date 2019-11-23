@@ -306,8 +306,9 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 							return;
 						}
 
+						let defUser;
 						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
-							const defUser = await db.player.find(planeteArrivee.owner);
+							defUser = await db.player.find(planeteArrivee.owner);
 
 							if(isset(defUser, 'object') && defUser.beginnerProtectEnd > Date.now()) {
 								log(user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.');
