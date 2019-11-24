@@ -274,7 +274,11 @@
 		}
 
 		static hasOffensiveCapacity(currFleet, unitCache) {
-			for(const currUnit in currFleet.units) {
+			for(let currUnit in currFleet.units) {
+				if(typeof specialUnitsUID[currUnit] !== 'undefined') {
+					currUnit = specialUnitsUID[currUnit];
+				}
+
 				if(Units.getWeapons(unitCache[currUnit]).length > 0) {
 					return true;
 				}

@@ -293,7 +293,7 @@ module.exports = {
 				)).rows[0];
 
 				battleLog.logs = (await serverClient.query(
-					'SELECT "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", "playerSource", "playerDestination", damage, details FROM "battleLogActions" WHERE "battleLog_id" = $1', [battleLogId]
+					'SELECT "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", damage, details FROM "battleLogActions" WHERE "battleLog_id" = $1', [battleLogId]
 				)).rows;
 
 				serverClient.query('UPDATE public."battleLogAccess" SET read = true WHERE "battleLogId" = $1 AND "userId" = $2', [battleLogId, userId]);

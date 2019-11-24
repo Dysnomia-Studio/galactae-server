@@ -48,7 +48,7 @@ module.exports = {
 	},
 	bulkUpdate: async(units) => {
 		let query = 'UPDATE units SET ' +
-			'owned = newUnits.owned, ' +
+			'owned = newUnits.owned ' +
 			'FROM (VALUES ';
 
 		let i = 0;

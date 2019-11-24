@@ -74,7 +74,7 @@ module.exports = {
 	},
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +
-			'endMoveTime = -1, ' +
+			'"endMoveTime" = -1, ' +
 			'points = newFleets.points, ' +
 			'population = newFleets.population, ' +
 			'units = newFleets.units ' +
@@ -83,7 +83,7 @@ module.exports = {
 		let i = 0;
 		const queryParameters = [];
 		for(const fleet of fleets) {
-			query += '($' + (++i) + ', $' + (++i) + ', $' + (++i) + ', $' + (++i) + '::uuid), ';
+			query += '($' + (++i) + '::real, $' + (++i) + '::integer, $' + (++i) + '::json, $' + (++i) + '::uuid), ';
 
 			queryParameters.push(fleet.points);
 			queryParameters.push(fleet.population);

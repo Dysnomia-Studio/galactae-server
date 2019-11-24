@@ -126,7 +126,7 @@ module.exports = class Combat {
 
 		let i = 0;
 		do {
-			for(const unitId in fleetList[i].units) {
+			for(let unitId in fleetList[i].units) {
 				if(compatibleUnits.includes(unitId)) {
 					return [fleetList[i].id, unitId];
 				}
@@ -208,6 +208,14 @@ module.exports = class Combat {
 	}
 
 	simulateDamage(source, destination) {
+		if(typeof specialUnitsUID[source] !== 'undefined') {
+			source = specialUnitsUID[source];
+		}
+
+		if(typeof specialUnitsUID[destination] !== 'undefined') {
+			destination = specialUnitsUID[destination];
+		}
+
 		const sourceUnit = this.unitCache[source];
 		const destinationUnit = this.unitCache[destination];
 
@@ -251,9 +259,14 @@ module.exports = class Combat {
 	simulateSide(sourceFleets, destinationFleets, fleetIterator) {
 		const currUnitId = sourceFleets[fleetIterator.fleetCounter].unitsId[fleetIterator.unitTypeCounter];
 
+		let currUnitIndex = currUnitId;
+		if(typeof specialUnitsUID[currUnitId] !== 'undefined') {
+			currUnitIndex = specialUnitsUID[currUnitId];
+		}
+
 		if(!sourceFleets[fleetIterator.fleetCounter].units[currUnitId] ||
 			sourceFleets[fleetIterator.fleetCounter].units[currUnitId].length <= fleetIterator.unitNbCounter ||
-			Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
+			Units.getWeapons(this.unitCache[currUnitIndex]).length === 0) {
 
 			fleetIterator.unitTypeCounter++;
 			fleetIterator.unitNbCounter = 0;
@@ -264,17 +277,35 @@ module.exports = class Combat {
 				fleetIterator.unitTypeCounter = 0;
 			}
 
-			throw -2; // Retry with new unit type
+			return [
+				sourceFleets,
+				destinationFleets,
+				fleetIterator,
+				{},
+			];
 		}
 
 		const target = this.getTarget(currUnitId, sourceFleets[fleetIterator.fleetCounter].id, destinationFleets);
-		if(target.fleet === -1) { throw -1; } // Security
+		if(target.fleet === -1) { // Security
+			return [
+				sourceFleets,
+				destinationFleets,
+				fleetIterator,
+				{},
+				true,
+			];
+		}
+
+		let targetUnitIndex = target.unit;
+		if(typeof specialUnitsUID[target.unit] !== 'undefined') {
+			targetUnitIndex = specialUnitsUID[target.unit];
+		}
 
 		const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
 
 		// @TODO: apply research bonuses
 
-		if(this.unitCache[currUnitId].oneShot) {
+		if(this.unitCache[currUnitIndex].oneShot) {
 			sourceFleets[fleetIterator.fleetCounter].units[currUnitId]--;
 		}
 
@@ -297,9 +328,9 @@ module.exports = class Combat {
 			fleetSource: sourceFleets[fleetIterator.fleetCounter].name,
 			fleetDestination: destinationFleets[fleetIndex].name,
 			fleetDestinationId: destinationFleets[fleetIndex].id,
-			unitSource: this.unitCache[currUnitId].name,
-			unitDestination: this.unitCache[target.unit].name,
-			unitDestinationId: this.unitCache[target.unit].id,
+			unitSource: this.unitCache[currUnitIndex].name,
+			unitDestination: this.unitCache[targetUnitIndex].name,
+			unitDestinationId: this.unitCache[targetUnitIndex].id,
 			damage: damage,
 			details: logs,
 		};
@@ -339,6 +370,7 @@ module.exports = class Combat {
 		let atk = true;
 
 		let action;
+		let breakOrNo;
 
 		while( (currDefFleets.fleetCounter + currAtkFleets.fleetCounter) < (this.defFleets.length + this.atkFleets.length) ) {
 			if(currAtkFleets.fleetCounter >= this.atkFleets.length) {
@@ -348,22 +380,15 @@ module.exports = class Combat {
 				atk = true;
 			}
 
-			try {
-				// Then simulate alternate
-				if(atk) {
-					[ this.atkFleets, this.defFleet, currAtkFleets, action ] = this.simulateSide(this.atkFleets, this.defFleets, currAtkFleets);
-				} else {
-					[ this.defFleet, this.atkFleets, currDefFleets, action ] = this.simulateSide(this.atkFleets, this.atkFleets, currDefFleets);
-				}
-			} catch(e) {
-				if(e === -1) {
-					break;
-				} else if(e === -2) {
-					continue;
-				}
-
-				log(e, 'error');
+			// Then simulate alternate
+			if(atk) {
+				[ this.atkFleets, this.defFleet, currAtkFleets, action, breakOrNo ] = this.simulateSide(this.atkFleets, this.defFleets, currAtkFleets);
+			} else {
+				[ this.defFleet, this.atkFleets, currDefFleets, action, breakOrNo ] = this.simulateSide(this.defFleets, this.atkFleets, currDefFleets);
 			}
+
+			if(breakOrNo) { break; }
+			if(Object.keys(action).length === 0) { continue; }
 
 			atk = !atk;
 
@@ -394,6 +419,10 @@ module.exports = class Combat {
 					callback();
 				}
 			});
+		}
+
+		if(tacticsIdList.size === 0) {
+			callback();
 		}
 	}
 
@@ -508,6 +537,8 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
+		console.log('Saving logs ...');
+
 		//try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,

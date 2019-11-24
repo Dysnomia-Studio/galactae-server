@@ -120,6 +120,10 @@
 					shipType: 'SHIP_DEF',
 					oneShot: true,
 				};
+
+				if(!units[specialUnitsUID[name]].name) {
+					units[specialUnitsUID[name]].name = name;
+				}
 			}
 
 			return units;

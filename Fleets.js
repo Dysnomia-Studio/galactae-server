@@ -597,7 +597,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			units: [],
 		};
 
-		for(const unitId in fleet.units) {
+		for(let unitId in fleet.units) {
+			if(typeof specialUnitsUID[unitId] !== 'undefined') {
+				unitId = specialUnitsUID[unitId];
+			}
+
 			outputFleet.units.push({
 				...Units.extractPublicInfo(unitsList[unitId]),
 				count: fleet.units[unitId],
