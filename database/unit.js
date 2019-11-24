@@ -56,7 +56,7 @@ module.exports = {
 		for(const unitId in units) {
 			const unit = units[unitId];
 
-			query += '($' + (++i) + ', $' + (++i) + '::uuid), ';
+			query += '($' + (++i) + '::integer, $' + (++i) + '::uuid), ';
 
 			queryParameters.push(unit.owned);
 			queryParameters.push(unit.id);
