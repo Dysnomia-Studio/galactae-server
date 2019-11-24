@@ -539,6 +539,8 @@ module.exports = class Combat {
 	async saveLogs(defWins) {
 		console.log('Saving logs ...');
 
+		console.log(this.atkFleets);
+
 		//try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
