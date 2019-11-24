@@ -58,7 +58,7 @@ module.exports = {
 
 			query += '($' + (++i) + '::integer, $' + (++i) + '::uuid), ';
 
-			queryParameters.push(unit.owned);
+			queryParameters.push(Math.ceil(unit.owned));
 			queryParameters.push(unit.id);
 		}
 		query = query.substring(0, query.length - 2);
