@@ -59,9 +59,9 @@ module.exports = {
 			queryParameters.push(unit.owned);
 			queryParameters.push(unit.id);
 		}
-		query = query.substring(0, query.length - 1);
+		query = query.substring(0, query.length - 2);
 
-		query += ') as newUnits(points, id) ';
+		query += ' ) as newUnits(owned, id) ';
 		query += 'WHERE units.id = newUnits.id';
 
 		try {

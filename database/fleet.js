@@ -90,9 +90,9 @@ module.exports = {
 			queryParameters.push(fleet.units);
 			queryParameters.push(fleet.id);
 		}
-		query = query.substring(0, query.length - 1);
+		query = query.substring(0, query.length - 2);
 
-		query += ') as newFleets(points, population, units, id) ';
+		query += ' ) as newFleets(points, population, units, id) ';
 		query += 'WHERE fleets.id = newFleets.id';
 
 		try {

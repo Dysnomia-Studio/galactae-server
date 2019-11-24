@@ -234,7 +234,7 @@ module.exports = {
 
 				if(battleLog.logs.length > 0) {
 					let battleLogActions = 'INSERT INTO "battleLogActions" ' +
-						'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", "playerSource", "playerDestination", damage, details) ' +
+						'("battleLog_id", "battleLog_ActionId", "fleetSource", "fleetDestination", "fleetDestinationId", "unitSource", "unitDestination", "unitDestinationId", damage, details) ' +
 						'VALUES';
 
 					let battleLogActionsParameters = [];
@@ -243,7 +243,7 @@ module.exports = {
 					for(const currLogId in battleLog.logs) {
 						const currLog = battleLog.logs[currLogId];
 
-						battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
+						battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
 
 						battleLogActionsParameters = battleLogActionsParameters.concat([
 							battleLogId,
@@ -254,8 +254,6 @@ module.exports = {
 							currLog.unitSource,
 							currLog.unitDestination,
 							currLog.unitDestinationId,
-							currLog.playerSource,
-							currLog.playerDestination,
 							currLog.damage,
 							currLog.details
 						]);
