@@ -508,7 +508,7 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
-		try {
+		//try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
 
@@ -530,10 +530,10 @@ module.exports = class Combat {
 
 				logs: this.battleLog,
 			};
-		} catch(e) {
+		/*} catch(e) {
 			log('Error while writing battle logs: ' + e, 'error');
 			return;
-		}
+		}*/
 
 		const id = await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
 

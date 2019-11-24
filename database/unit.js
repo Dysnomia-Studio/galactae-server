@@ -51,12 +51,12 @@ module.exports = {
 			'owned = newUnits.owned, ' +
 			'FROM (VALUES ';
 
-		console.log(units);
-
 		let i = 0;
 		const queryParameters = [];
-		for(const unit of units) {
-			query += '($' + (++i) + ', $' + (++i) + '), ';
+		for(const unitId in units) {
+			const unit = units[unitId];
+
+			query += '($' + (++i) + ', $' + (++i) + '::uuid), ';
 
 			queryParameters.push(unit.owned);
 			queryParameters.push(unit.id);

@@ -83,7 +83,7 @@ module.exports = {
 		let i = 0;
 		const queryParameters = [];
 		for(const fleet of fleets) {
-			query += '($' + (++i) + ', $' + (++i) + ', $' + (++i) + ', $' + (++i) + '), ';
+			query += '($' + (++i) + ', $' + (++i) + ', $' + (++i) + ', $' + (++i) + '::uuid), ';
 
 			queryParameters.push(fleet.points);
 			queryParameters.push(fleet.population);
