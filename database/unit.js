@@ -51,6 +51,8 @@ module.exports = {
 			'owned = newUnits.owned, ' +
 			'FROM (VALUES ';
 
+		console.log(units);
+
 		let i = 0;
 		const queryParameters = [];
 		for(const unit of units) {
