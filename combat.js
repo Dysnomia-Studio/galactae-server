@@ -537,11 +537,6 @@ module.exports = class Combat {
 	 * Saves logs & send it to client
 	 */
 	async saveLogs(defWins) {
-		console.log('Saving logs ...');
-
-		console.log(this.atkFleets);
-		console.log(this.atkFleetId);
-
 		try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
@@ -563,6 +558,11 @@ module.exports = class Combat {
 				// @TODO: save planet name
 
 				logs: this.battleLog,
+
+				// Tests Only
+				finalAtkFleets: this.atkFleets,
+				finalDefenseFleets: this.defFleets,
+				finalUnitCache: this.unitCache,
 			};
 		} catch(e) {
 			log('Error while writing battle logs: ' + e, 'error');
