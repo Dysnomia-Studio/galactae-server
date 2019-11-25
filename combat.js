@@ -540,8 +540,9 @@ module.exports = class Combat {
 		console.log('Saving logs ...');
 
 		console.log(this.atkFleets);
+		console.log(this.atkFleetId);
 
-		//try {
+		try {
 			this.finalBattleLog = {
 				...this.finalBattleLog,
 
@@ -563,10 +564,10 @@ module.exports = class Combat {
 
 				logs: this.battleLog,
 			};
-		/*} catch(e) {
+		} catch(e) {
 			log('Error while writing battle logs: ' + e, 'error');
 			return;
-		}*/
+		}
 
 		const id = await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
 
