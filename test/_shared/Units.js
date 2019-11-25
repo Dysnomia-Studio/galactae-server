@@ -1,34 +1,21 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-const Unit = require('../Unit').Unit;
-
-describe('• Unit', () => {
+describe('• Units (shared)', () => {
 	describe('# checkIfSameParts()', () => {
 		it('Same Ships', () => {
 			const ship1 = {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				true
 			);
 		});
@@ -38,17 +25,17 @@ describe('• Unit', () => {
 				parts:  [
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				true
 			);
 		});
@@ -58,17 +45,17 @@ describe('• Unit', () => {
 				parts:  [
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'vsolaire', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 			const ship2 = {
 				parts:  [
 					{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-				]
+				],
 			};
 
 			assert.deepEqual(
-				Unit.checkIfSameParts(ship1, ship2),
+				Units.checkIfSameParts(ship1, ship2),
 				false
 			);
 		});
@@ -87,12 +74,12 @@ describe('• Unit', () => {
 			parts:  [
 				{ tech: 'ion', type: 'sub_propulsion', name: 'prop_1' }, // [120,45,35,15,0.30,0]  * fighterMult[shipShape] (=0.15)
 				{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }, // [4,1,8,5,0.10,1]  * fighterMult[shipShape] (=0.15)
-			]
+			],
 		};
 
 		it('different parts', () => {
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1 ], ship2),
+				Units.checkIfDuplicate([	ship1 ], ship2),
 				[false, false]
 			);
 		});
@@ -106,7 +93,7 @@ describe('• Unit', () => {
 			ship4.name = '2';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship4 ], ship3),
+				Units.checkIfDuplicate([	ship4 ], ship3),
 				[false, false]
 			);
 		});
@@ -120,7 +107,7 @@ describe('• Unit', () => {
 			ship4.name = '2';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship4 ], ship3),
+				Units.checkIfDuplicate([	ship4 ], ship3),
 				[false, false]
 			);
 		});
@@ -131,7 +118,7 @@ describe('• Unit', () => {
 			ship3.name = '1';
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1 ], ship3),
+				Units.checkIfDuplicate([	ship1 ], ship3),
 				[false, false]
 			);
 		});
@@ -144,14 +131,14 @@ describe('• Unit', () => {
 			};
 
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1, ship2 ], ship3),
+				Units.checkIfDuplicate([	ship1, ship2 ], ship3),
 				[true, false]
 			);
 		});
 
 		it('same name same parts', () => {
 			assert.deepEqual(
-				Unit.checkIfDuplicate([	ship1, ship2 ], ship1),
+				Units.checkIfDuplicate([	ship1, ship2 ], ship1),
 				[false, true]
 			);
 		});
@@ -166,7 +153,7 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[64,32,46,23,0.41,5]
 			);
 		});
@@ -184,7 +171,7 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[687,755,356,152,4.45,1301]
 			);
 		});
@@ -196,8 +183,89 @@ describe('• Unit', () => {
 			];
 
 			assert.deepEqual(
-				Unit.calcCost(shipShape, parts),
+				Units.calcCost(shipShape, parts),
 				[-1]
+			);
+		});
+	});
+
+	describe('# specialUnits()', () => {
+		it('No empty object',() => {
+			assert(
+				isset(
+					Units.specialUnits
+				),
+				'object'
+			);
+		});
+	});
+
+	describe('# getWeapons()', () => {
+		it('undefined unit', () => {
+			try {
+				Units.getWeapons(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no weapons', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('weapons', () => {
+			assert.deepEqual(
+				Units.getWeapons({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'railgun', type: 'cannon', name: 'cannon_1' },
+				] }),
+				[{ tech: 'railgun', type: 'cannon', name: 'cannon_1' }]
+			);
+		});
+	});
+
+	describe('# getShields()', () => {
+		it('undefined unit', () => {
+			try {
+				Units.getShields(undefined);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+		});
+
+		it('no parts', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [] }),
+				[]
+			);
+		});
+
+		it('no shield', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [{ tech: 'none', type: 'hangar', name: 'hangar_1' }] }),
+				[]
+			);
+		});
+
+		it('shield', () => {
+			assert.deepEqual(
+				Units.getShields({ parts: [
+					{ tech: 'none', type: 'hangar', name: 'hangar_1' },
+					{ tech: 'magnetic', type: 'shield', name: 'shield_1' },
+				] }),
+				[{ tech: 'magnetic', type: 'shield', name: 'shield_1' }]
 			);
 		});
 	});

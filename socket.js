@@ -199,13 +199,13 @@ module.exports = class Websocket {
 				}
 
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string')) { return; }
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.address, 'string')) { return; }
 				// User
 				data.sid = socket.id;
 
 				Player.isValid(data,function(data) { // Verify identity
 					Units.refresh(data);
-					Fleets.refresh(data.planet,data.sid);
+					Fleets.refresh(data.address,data.sid);
 					Tactics.refresh(data.id, data.sid);
 				});
 			});
@@ -343,6 +343,61 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Ask a report
+			socket.on('player-report-ask', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.reportId, 'string')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					const result = await db.battleLog.getFullBattleLog(data.reportId, data.id);
+
+					io.to(data.sid).emit(
+						'player-report-full',
+						result
+					);
+				});
+			});
+
+			// Delete reports
+			socket.on('player-report-delete', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.reports, 'array')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					await db.battleLogAccess.deleteReport(data.id, data.reports);
+
+					Reports.refresh(data.id, data.sid);
+				});
+			});
+
+			// Set reports as read
+			socket.on('player-report-set-read', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.reports, 'array')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					await db.battleLogAccess.setReadStatus(data.id, data.reports, true);
+
+					Reports.refresh(data.id, data.sid);
+				});
+			});
+
+			// Set reports as unread
+			socket.on('player-report-set-unread', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.reports, 'array')) { return; }
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					await db.battleLogAccess.setReadStatus(data.id, data.reports, false);
+
+					Reports.refresh(data.id, data.sid);
+				});
+			});
+
 			// Admin panel
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.password, 'string')) { return; }
@@ -380,10 +435,10 @@ module.exports = class Websocket {
 							Websocket.restart();
 							break;
 						case 'start':
-							// Can't do this now ... Waiting a way (@ADD)
+							// Can't do this now ... Waiting a way (@TODO)
 							break;
 						case 'stop':
-							// Can't do this now ... Waiting a way (@ADD)
+							// Can't do this now ... Waiting a way (@TODO)
 							break;
 						default:
 							log('Command ' + data.cmd + ' not found !');
@@ -460,10 +515,14 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 10;
+		let decompte = 5;
 
 		setInterval(function() {
-			if(decompte>0) {
+			if(preventRestarts > 0) {
+				log('Wating simulations to end ...');
+			}
+
+			if(decompte > 0) {
 				log('Restarting server in ' + decompte-- + ' seconds');
 			} else {
 				log('Restarting now !');

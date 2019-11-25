@@ -1,13 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-global.Planet    = require('../planet');
-
 describe('• Planet', () => {
 	describe('# calcPlanetPoints()', () => {
 		it('all lvl 1', () => {

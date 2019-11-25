@@ -1,5 +1,5 @@
 (function (exports) {
-	exports.Fleet = class Fleet {
+	exports._Fleets = class Fleets {
 		/**
 		 * Gets an unit speed depending on a specific tech & speed created by other
 		 * parts.
@@ -17,7 +17,9 @@
 				speed = shipPartsSpeed[tech].slice(0);
 			} else {
 				for(let i=0; i<speed.length; i++) {
-					speed[i] *= 1.5;
+					speed[i] /= 1.5;
+
+					speed[i] = Math.round(speed[i] * 1000000)/1000000;
 				}
 			}
 
@@ -36,14 +38,14 @@
 			let tech = '';
 			let count = 0;
 
-			if(unit === undefined) { console.error('Error: undefined unit in Fleet.calcSpeed()'); return { speed: [] }; }
+			if(unit === undefined) { console.error('Error: undefined unit in Fleets.calcSpeed()'); return { speed: [] }; }
 
 			for(const i in unit.parts) {
 				if(unit.parts[i].type === type) {
 					tech = unit.parts[i].tech;
 					count++;
 
-					speed = Fleet.getSpeed(speed, tech);
+					speed = Fleets.getSpeed(speed, tech);
 					if(speed[0] === undefined) {
 						return { speed: [] };
 					}
@@ -60,7 +62,7 @@
 		 * @return     {Object}  Subspeed
 		 */
 		static calcSubSpeed(unit) {
-			return Fleet.calcSpeed(unit, 'sub_propulsion');
+			return Fleets.calcSpeed(unit, 'sub_propulsion');
 		}
 
 		/**
@@ -70,7 +72,7 @@
 		 * @return     {Object}  Supraspeed
 		 */
 		static calcSupraSpeed(unit) {
-			return Fleet.calcSpeed(unit, 'sup_propulsion');
+			return Fleets.calcSpeed(unit, 'sup_propulsion');
 		}
 
 		/**
@@ -116,7 +118,7 @@
 		 */
 		static getMinSubSpeed(unitList, fleetUnits) {
 			const min = {
-				speed: 0,
+				speed: [],
 				engines: {},
 			};
 
@@ -125,18 +127,18 @@
 			for(const key in fleetUnits) {
 				const currUnit = unitList[unitListId.indexOf(key)];
 
-				const curr = Fleet.calcSubSpeed(currUnit);
+				const curr = Fleets.calcSubSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
-				min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
+				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
 
 				let count = curr.count;
-				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
+				if(currUnit.shipType === 'SHIP_FIGHTER') {
 					count *= fighterMult[currUnit.shipShape];
 				}
 				min.engines[curr.tech] += count * fleetUnits[key];
@@ -164,22 +166,20 @@
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
 
-				const curr = Fleet.calcSupraSpeed(currUnit);
+				const curr = Fleets.calcSupraSpeed(currUnit);
 
 				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
 
-				min.speed = Fleet.slowerSpeed(curr.speed, min.speed);
+				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
 				if(min.engines[curr.tech] === undefined) {
 					min.engines[curr.tech] = 0;
 				}
 
-				let count = curr.count;
-				if(currUnit.shipShape.substr(0,'SHIP_FIGHTER'.length) === 'SHIP_FIGHTER') {
-					count *= fighterMult[currUnit.shipShape];
-				}
-				min.engines[curr.tech] += count * fleetUnits[key];
+				min.engines[curr.tech] += curr.count * fleetUnits[key];
 			}
+
+			delete min.engines['']; // Moteurs vides, on les compte pas
 
 			return min;
 		}
@@ -205,7 +205,7 @@
 		static distributeFuel(planet, fleetList) {
 			let haveToUpdate = [];
 			for(let i=0; i<fleetList.length; i++) {
-				if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
+				if(typeof fleetList[i].fuel === 'undefined') { fleetList[i].fuel = 0; }
 
 				fleetList[i].fuel = parseInt(fleetList[i].fuel);
 				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
@@ -218,8 +218,8 @@
 			let addCount = 0;
 
 			// Priority fleet
-			if(isset(planet.highPriorityFleet, 'string')) {
-				const prioId = fleetList.map(d => d.id).indexOf(planet.highPriorityFleet);
+			if(typeof planet.highPriorityFleet === 'string') {
+				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
 
 				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
 					fleetList[prioId].fuel += planet.resources[1];
@@ -236,7 +236,12 @@
 			// Current planet fleets
 			while(haveToUpdate.length > 0 && Math.floor(planet.resources[1]) > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
-					const id = fleetList.map(f => f.id).indexOf(haveToUpdate[i]);
+					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
+
+					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime < 0) {
+						haveToUpdate[i] = -1;
+						continue;
+					}
 
 					fleetList[id].fuel += addCount;
 					planet.resources[1] -= addCount;
@@ -248,7 +253,7 @@
 					}
 				}
 
-				haveToUpdate = haveToUpdate.filter(d => d !== -1);
+				haveToUpdate = haveToUpdate.filter((d) => d !== -1);
 			}
 
 			return [
@@ -260,12 +265,36 @@
 
 		static removeEmptyUnits(fleet) {
 			for(const unit in fleet.units) {
-				if(fleet.units <= 0) {
+				if(fleet.units[unit] <= 0) {
 					delete fleet.units[unit];
 				}
 			}
 
 			return fleet;
+		}
+
+		static hasOffensiveCapacity(currFleet, unitCache) {
+			for(let currUnit in currFleet.units) {
+				if(typeof specialUnitsUID[currUnit] !== 'undefined') {
+					currUnit = specialUnitsUID[currUnit];
+				}
+
+				if(Units.getWeapons(unitCache[currUnit]).length > 0) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static groupHasOffensiveCapacity(fleetList, unitCache) {
+			for(const currFleet of fleetList) {
+				if(Fleets.hasOffensiveCapacity(currFleet, unitCache)) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

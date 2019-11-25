@@ -255,6 +255,12 @@ module.exports = function() {
 		SHIP_WEP_MINES_IEM: '00000000-0000-0000-0000-000000000002',
 		SHIP_WEP_MINES_NUKE: '00000000-0000-0000-0000-000000000003',
 	};
+	this.specialUnitsParts = {
+		SHIP_WEP_MINES:			[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'explosive' }],
+		SHIP_WEP_MINES_IEM:		[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'iem' }],
+		SHIP_WEP_MINES_NUKE:	[{ 'type': 'rocketLauncher', 'name': 'rocket_1', 'tech': 'nuke' }],
+	};
+	this.fleetTranslate = {};
 
 	this.hqFleetCount = [2,5,9,14,20,0]; // Last entry to prevent bugs
 	this.shipResearchDependencies = {
@@ -634,6 +640,51 @@ module.exports = function() {
 	this.hangarMiss = {
 		hangarSimple:  -2,
 		hangarDouble: -10,
+	};
+
+	this.weaponDamage = {
+		explosive: 		100,
+		nuke: 			400,
+		iem: 			80,
+		antimater: 		1000,
+		// Cannons
+		railgun: 		250,
+		laser: 			125,
+		plasma: 		400,
+	};
+
+	this.shipHealth = {
+		SHIP_WEP_MINES: 			1,
+		SHIP_WEP_MINES_NUKE: 		1,
+		SHIP_WEP_MINES_IEM: 		1,
+		SHIP_WEP_MINES_AM: 			1,
+
+		SHIP_SAT_AG1: 				50,
+		SHIP_SAT_AG2: 				75,
+		SHIP_SAT_AG3:				100,
+
+		SHIP_BATTLECRUISER_SMALL: 	550,
+
+		SHIP_CUIRASSE_SMALL: 		950,
+
+		SHIP_FIGHTER_SMALL: 		100,
+		SHIP_FIGHTER_MEDIUM: 		175,
+		SHIP_FIGHTER_BOMBER: 		250,
+
+		SHIP_CORVET_SMALL: 			175,
+
+		SHIP_CARRIER_SMALL: 		500,
+		SHIP_CARRIER_MEDIUM: 		800,
+	};
+
+	/**
+	 * Fleets move type
+	 */
+	this.FLEET_MOVE_TYPE = {
+		DEFEND: 0,
+		ATTACK: 1,
+		MOVE: 2,
+		SPY: 3,
 	};
 
 	/**

@@ -1,17 +1,4 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-const Tutorials = require('../Tutorials').Tutorials;
-global.Research = require('../research');
-
-describe('• Tutorials', () => {
+describe('• Tutorials (shared)', () => {
 	/**
 	 * Has finished tutorials ?
  	 */
@@ -49,6 +36,16 @@ describe('• Tutorials', () => {
 	 * Has all dependencies ?
  	 */
 	describe('# hasAllDependancies()', () => {
+		it('No dependency for tutorial', () => {
+			assert.equal(
+				Tutorials.hasAllDependancies(
+					'foo',
+					{},
+					{}
+				), true
+			);
+		});
+
 		// Tutorial
 		it('Hasn\'t all dependencies', () => {
 			assert.equal(
@@ -103,6 +100,16 @@ describe('• Tutorials', () => {
 		it('Has already done it', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
+					'foo',
+					{ tutorials: { welcome: true } },
+					{}
+				), true
+			);
+		});
+
+		it('Has already done it', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
 					'welcome',
 					{ tutorials: { welcome: true } },
 					{}
@@ -149,7 +156,7 @@ describe('• Tutorials', () => {
 					{
 						tutorials: { welcome: true, energy: true, resources: true },
 						research: {
-							industrialistion: -1
+							industrialistion: -1,
 						},
 					}
 				), true
@@ -370,7 +377,7 @@ describe('• Tutorials', () => {
 				Tutorials.hasCompletedTutorial(
 					'battle',
 					{
-						tutorials: { interplanetaryFlight: true }
+						tutorials: { interplanetaryFlight: true },
 					},
 					{},
 					[ { orbitPosition: 2, endMoveTime: 1 }],
@@ -384,7 +391,7 @@ describe('• Tutorials', () => {
 				Tutorials.hasCompletedTutorial(
 					'battle',
 					{
-						tutorials: { interplanetaryFlight: true }
+						tutorials: { interplanetaryFlight: true },
 					},
 					{},
 					[ { orbitPosition: 1, endMoveTime: 1 }],

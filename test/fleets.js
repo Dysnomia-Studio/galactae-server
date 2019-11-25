@@ -1,30 +1,4 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Fleets = require('../fleets');
-global.Units = require('../units');
-
-let gameDb;
-
 describe('• Fleets', () => {
-	/*before(function(done) {
-		let count = 0;
-
-		db.connect(function(success,general,database) {
-			if(++count === 2) {
-				done();
-			}
-		});
-	});
-
 	/**
 	 * Has enough carrier capacity ?
  	 */
@@ -32,14 +6,14 @@ describe('• Fleets', () => {
 		it('Enought', () => {
 			const fleetUnits = {
 				'fighter': 1,
-				'carrier': 1
+				'carrier': 1,
 			};
 
 			const unitList = [
 				{
 					id: 'fighter',
 					shipType: 'SHIP_FIGHTER',
-					shipShape: 'SHIP_FIGHTER_SMALL'
+					shipShape: 'SHIP_FIGHTER_SMALL',
 				},
 				{
 					id: 'carrier',
@@ -47,7 +21,7 @@ describe('• Fleets', () => {
 					parts: [
 						{ type: 'hangar', tech: 'hangarDouble' },
 						{ type: 'sub_propulsion', tech: 'vsolaire' },
-					]
+					],
 				},
 				{
 					id: 'other',
@@ -66,14 +40,14 @@ describe('• Fleets', () => {
 		it('No Enought', () => {
 			const fleetUnits = {
 				'fighter': 80,
-				'carrier': 1
+				'carrier': 1,
 			};
 
 			const unitList = [
 				{
 					id: 'fighter',
 					shipType: 'SHIP_FIGHTER',
-					shipShape: 'SHIP_FIGHTER_SMALL'
+					shipShape: 'SHIP_FIGHTER_SMALL',
 				},
 				{
 					id: 'carrier',
@@ -81,7 +55,7 @@ describe('• Fleets', () => {
 					parts: [
 						{ type: 'hangar', tech: 'hangarDouble' },
 						{ type: 'sub_propulsion', tech: 'vsolaire' },
-					]
+					],
 				},
 			];
 
@@ -131,13 +105,6 @@ describe('• Fleets', () => {
 
 				done();
 			});
-		});
-	});
-
-
-	after(function(done) {
-		db.closeConnections(() => {
-			done();
 		});
 	});*/
 });

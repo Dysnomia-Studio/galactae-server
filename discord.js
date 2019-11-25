@@ -51,7 +51,7 @@ module.exports = {
 	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
-		const channel = client.channels.find(channel => channel.name === channelName);
+		const channel = client.channels.find((channel) => channel.name === channelName);
 		channel.send(unNormalizeText(message));
 	},
 	/**
@@ -61,7 +61,7 @@ module.exports = {
 	 */
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
-		const channel = client.channels.find(channel => channel.name === channelName);
+		const channel = client.channels.find((channel) => channel.name === channelName);
 		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
 	},
 };

@@ -1,20 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Chat = require('../chat');
-global.io = class { // Prevent bugs, it's temporary
-	static to() { return new io(); }
-	emit() { return 0; }
-};
-
 const dataModel = {
 	message: '',
 	send: true,
@@ -112,6 +95,6 @@ describe('• Chat', () => {
 	 * sendCommand
 	 */
 	describe('# sendCommand()', () => {
-		// TODO
+		// @TODO
 	});
 });

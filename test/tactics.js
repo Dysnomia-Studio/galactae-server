@@ -1,21 +1,3 @@
-/**
- * Libs
- */
-const assert = require('assert');
-global.Websocket = class Websocket {
-	static SendMessageToClient() {
-		// Do nothing
-	}
-};
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Tactics    = require('../tactics');
-
 describe('• Tactics', () => {
 	describe('# checkTactic()', () => {
 		it('wrong name type', () => {
@@ -93,6 +75,14 @@ describe('• Tactics', () => {
 			for(let i=0; i<TACTIC_MAX_ORDERS*2; i++) {
 				orders.push({ 'test': 'test' });
 			}
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						// Do nothing here
+					},
+				};
+			};
 
 			assert(
 				!Tactics.checkTactic({

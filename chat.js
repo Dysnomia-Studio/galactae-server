@@ -1,16 +1,16 @@
 module.exports = class Chat {
 	static analyse(data) {
-		db.userGameId.find(data.id, function(userGameIdObj) {
+		db.userGameId.find(data.id, (userGameIdObj) => {
 			data.game_id = userGameIdObj.game_id;
 			data.user_id = userGameIdObj.user_id;
 
-			Privileges.isBannedFromChat(data.game_id, function(banned) {
+			Privileges.isBannedFromChat(data.game_id, (banned) =>{
 				if(banned) {
 					Chat.sendSM(data.sid,'ERR_CHAT_BANNED');
 					return;
 				}
 
-				db.privilege.find(data.user_id, function(userPrivileges) {
+				db.privilege.find(data.user_id, (userPrivileges) =>{
 					data.message = textToSmileys(data.message);
 
 					const logname = data.username;
@@ -41,7 +41,7 @@ module.exports = class Chat {
 					} else if(data.message.charAt(0) === '@') { // Messages privés
 						const words =data.message.split(new RegExp('[ ,;]+', 'g'));
 
-						db.player.searchByName(words[0].substr(1).toLowerCase(), function(dataReturned) {
+						db.player.searchByName(words[0].substr(1).toLowerCase(), (dataReturned) => {
 							if(dataReturned === undefined) { return; }
 							const sid = dataReturned.sid;
 
@@ -83,7 +83,7 @@ module.exports = class Chat {
 						Discord.sendChatMessage(data.channel,discordmsg);
 					} else if(data.ally !== undefined) { // Allies messages
 						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-						// @ADD : Ally messages
+						// @TODO : Ally messages
 					}
 
 				});
@@ -122,14 +122,14 @@ module.exports = class Chat {
 	 * @param	  {string}	name	  The target name
 	 * @param	  {Function}  callback  Callback function
 	 */
-	static searchTarget(currUser, name,callback) {
-		db.player.searchByName(name, function(dataReturned) {
+	static searchTarget(currUser, name, callback) {
+		db.player.searchByName(name, (dataReturned) => {
 			if(!isset(dataReturned, 'object') || !isset(dataReturned.sid, 'string')) {
 				Chat.sendSM(currUser.sid,'PLY_NOT_FOUND');
 				log('Player not found');
 			} else {
-				db.userGameId.find(dataReturned.id, function(targetGameIdObj) {
-					db.privilege.find(targetGameIdObj.user_id, function(targetPrivileges) {
+				db.userGameId.find(dataReturned.id, (targetGameIdObj) => {
+					db.privilege.find(targetGameIdObj.user_id, (targetPrivileges) => {
 						let targetLvl = 1;
 						if(isset(targetPrivileges[0], 'object') && isset(targetPrivileges[0].user_privilege_lvl, 'number')) {
 							targetLvl = targetPrivileges[0].user_privilege_lvl;
@@ -166,7 +166,7 @@ module.exports = class Chat {
 				if(data.lvl<3) { return data; } // Admin & Operators only
 				if(args.length<4) { return data; }
 
-				Chat.searchTarget(data, args[1], function(target) {
+				Chat.searchTarget(data, args[1], (target) => {
 					const banMessage = args.splice(3,args.length).join(' ');
 					const banTime = parseChatTime(args[2]);
 					if(banTime < 1) { log('Invalid Time'); return data; }
@@ -194,7 +194,7 @@ module.exports = class Chat {
 			case '!mute':
 				if(args.length<4) { return data; }
 
-				Chat.searchTarget(data, args[1], function(target) {
+				Chat.searchTarget(data, args[1], (target) => {
 					const muteMessage = args.splice(3,args.length).join(' ');
 					const muteTime = parseChatTime(args[2]);
 					if(muteTime < 1) { log('Invalid Time'); return data; }
@@ -222,7 +222,7 @@ module.exports = class Chat {
 				data.send = true;
 				break;
 			case '!help':
-				Chat.sendSM(data.sid,'HELP'); // TODO (admin/staff), no translation to be safe
+				Chat.sendSM(data.sid,'HELP'); // @TODO (admin/staff), no translation to be safe
 				break;
 			default:
 				Chat.sendSM(data.sid,'COMMAND_NOT_FOUND');

@@ -1,1 +1,63 @@
-module.exports={find:(addr,callback)=>{serverClient.query("SELECT * FROM planets WHERE address = $1 LIMIT 1",[addr],(err,planetReturned)=>{if(err){log(err,"error");return}if(isset(planetReturned,"object")&&isset(planetReturned.rows[0],"object")){callback(planetReturned.rows[0])}})},findByOwner:(userId,callback)=>{serverClient.query("SELECT * FROM planets WHERE owner = $1",[userId],(err,planetReturned)=>{if(err){log(err,"error");return}if(isset(planetReturned,"object")){callback(planetReturned.rows)}})},update:(inputPlanet,callback)=>{const planet=Object.assign({},inputPlanet);const id=planet.id;delete planet.id;let[query,values]=db.buildUpdateQuery("planets",planet);values.push(id);query+=" WHERE id = $"+values.length;serverClient.query(query,values,err=>{if(err){log(err,"error");return}if(callback){callback()}})},findBySystemWithOwners:(systemAddr,callback)=>{serverClient.query("SELECT * FROM planets WHERE address LIKE $1",[systemAddr+"%"],(err,planetList)=>{if(err){log(err,"error");return}planetList=planetList.rows;let ended=0;for(let i=0;i<planetList.length;i++){const id=i;db.player.searchById(planetList[id].owner,user=>{if(isset(user,"object")&&!user.name.includes("Colonisable")){planetList[id].ownerName=user.name;planetList[id].ally=user.ally}else{planetList[id].ownerName=null;planetList[id].ally=null}ended++;if(ended===planetList.length){callback(planetList)}})}if(planetList.length===0){callback(planetList)}})}};
+module.exports = {
+	findbyAddress: async (addr) => {
+		try {
+			return (await serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr])).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	find: (addr,callback) => {
+		serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
+			if(err) { log(err, 'error'); return; }
+			if(isset(planetReturned, 'object') && isset(planetReturned.rows[0], 'object')) {
+				callback(planetReturned.rows[0]);
+			}
+		});
+	},
+	findByOwner: (userId, callback) => {
+		serverClient.query('SELECT * FROM planets WHERE owner = $1', [userId], (err, planetReturned) => {
+			if(err) { log(err, 'error'); return; }
+			if(isset(planetReturned, 'object')) {
+				callback(planetReturned.rows);
+			}
+		});
+	},
+	update: (inputPlanet, callback) => {
+		const planet = Object.assign({}, inputPlanet);
+		const id = planet.id;
+		delete planet.id;
+
+		let [query, values] = db.buildUpdateQuery('planets', planet);
+		values.push(id);
+		query += ' WHERE id = $' + values.length;
+
+		serverClient.query(query, values, (err) => {
+			if(err) { log(err, 'error'); return; }
+			if(callback) {
+				callback();
+			}
+		});
+	},
+	findBySystemWithOwners: async (systemAddr, callback) => {
+		let planetList;
+		try {
+			planetList =  (await serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'])).rows;
+		} catch(err) {
+			log(err, 'error');
+			planetList = [];
+		}
+
+		for(let i=0; i<planetList.length; i++) {
+			const user = await db.player.find(planetList[i].owner);
+
+			if(isset(user, 'object') && !user.name.includes('Colonisable')) {
+				planetList[i].ownerName = user.name;
+				planetList[i].ally = user.ally;
+			} else {
+				planetList[i].ownerName = null;
+				planetList[i].ally = null;
+			}
+		}
+		callback(planetList);
+	},
+};

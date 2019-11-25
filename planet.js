@@ -55,7 +55,7 @@ module.exports = class Planet {
 
 						db.planet.update(newPlanet);
 
-						Fleets.refresh(newPlanet.id,inputData.sid);
+						Fleets.refresh(newPlanet.address,inputData.sid);
 
 						if(inputData.pid === currPlanet.address) {
 							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
@@ -226,36 +226,30 @@ module.exports = class Planet {
 	}
 
 	static checkIfCanBuild(planet, user, cost, building, currTime) {
-		let BlockBuild = false;
 		let errormsg = '';
 
 		// Cost verif
 		if(cost.iron>planet.resources[2] || cost.aluminium>planet.resources[3] || cost.copper>planet.resources[4] || cost.titanium>planet.resources[5] ) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_COST';
 		}
 		// Un bâtiment est déja en construction ?
 		if(planet.nextBuildingTime > currTime) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_ALREADY';
 		}
 		// Niveau maximum ?
 		if(planet.Buildings[building]>buildingMaxLvl[building]) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_MAXIMUM';
 		}
 		// Les requirements ?
 		if(!Buildings.HasRequirements(user, planet, building)) {
-			BlockBuild = true;
 			errormsg = 'BUILDING_ERROR_DEPENDENCIES';
 		}
 
 		planet.Buildings[building]++; // Only for calcs
 
 		// Energie ? Habitants ?
-		if(!BlockBuild) {
+		if(errormsg !== '') {
 			if(!Buildings.enoughEnergy(planet.Buildings) && building<=globalConst.groundBuildingNumber && building!==4) { // Only ground buildings affected by this
-				BlockBuild = true;
 				errormsg = 'BUILDING_ERROR_ENERGY';
 			}
 		}
@@ -332,6 +326,8 @@ module.exports = class Planet {
 					log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level','success');
 
 				} else { // We just update ressources
+					delete newData.Buildings;
+
 					Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
 					log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
 				}
@@ -359,13 +355,14 @@ module.exports = class Planet {
 			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
 
 			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
-				const key = Object.keys(specialUnitsUID).find(key => specialUnitsUID[key] === newPlanet.unitBuildingID);
+				const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
 				if(key !== undefined) {
 					newPlanet.unitBuildingID = key;
 
 					unitReturned = {};
 					unitReturned.id = newPlanet.unitBuildingID;
 					unitReturned.shipType = 'SHIP_DEF';
+					unitReturned.name = key;
 					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
 					unitReturned.ownerId = user.id;
 				}
@@ -413,7 +410,7 @@ module.exports = class Planet {
 
 				db.fleet.update(fleetReturned, function() {
 					Units.refresh(user);
-					Fleets.refresh(newPlanet.id,user.sid);
+					Fleets.refresh(newPlanet.address,user.sid);
 					Tactics.refresh(user.id, user.sid);
 				});
 			});
@@ -603,7 +600,7 @@ module.exports = class Planet {
 		db.planet.find(planet, function(planetData) {
 			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
 				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData.id, sid);
+				Fleets.refresh(planetData.address, sid);
 			});
 		});
 	}

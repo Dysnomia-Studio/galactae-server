@@ -1,4 +1,4 @@
-module.exports = class Fleets {
+module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	/**
 	 * Get and send unit data to user
 	 *
@@ -6,7 +6,7 @@ module.exports = class Fleets {
 	 * @param      {object}  sid     user socket id
 	 * @return     {socket}  units   list of units types
 	 */
-	static refresh(pid,sid) {
+	static refresh(address,sid) {
 		if(globalCfg.dev) {
 			log('Refresh fleets');
 		}
@@ -15,17 +15,17 @@ module.exports = class Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(pid, function(originalFList) {
+		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
 			if(originalFList === undefined) { originalFList = []; }
 
-			function sendtoPlayer(FleetList, newPlanet, sid, pid) {
+			async function sendtoPlayer(FleetList, newPlanet, sid, address) {
 				if(newPlanet !== undefined) {
 					db.planet.update({
 						id: newPlanet.id,
 						resources: newPlanet.resources,
 					});
 
-					if(newPlanet.address === pid) {
+					if(newPlanet.address === address) {
 						Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
 					}
 				}
@@ -34,12 +34,20 @@ module.exports = class Fleets {
 					log('Sending fleet');
 				}
 
-				io.to(sid).emit('fleet-recieve-data', { FleetList, pid });
+				for(const fleetId in FleetList) {
+					if(FleetList[fleetId].ownerId !== newPlanet.owner) {
+						const player = await db.player.find(FleetList[fleetId].ownerId);
+
+						FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+					}
+				}
+
+				io.to(sid).emit('fleet-recieve-data', { FleetList });
 			}
 
-			Fleets.recalcFuel(originalFList, function(FleetList, newPlanet) {
+			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
-					sendtoPlayer(FleetList, newPlanet, sid, pid);
+					sendtoPlayer(FleetList, newPlanet, sid, address);
 					return;
 				}
 
@@ -57,6 +65,17 @@ module.exports = class Fleets {
 					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
 					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
 						FleetList[id].endMoveTime = -1;
+
+						if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
+							const atkUser = await db.player.find(newPlanet.owner);
+
+							const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
+							const defUser = await db.player.find(defPlanet.owner);
+
+							Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
+							continue;
+						}
+
 						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
 					}
 
@@ -70,13 +89,13 @@ module.exports = class Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							sendtoPlayer(FleetList, newPlanet, sid, pid);
+							sendtoPlayer(FleetList, newPlanet, sid, address);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					sendtoPlayer(FleetList, newPlanet, sid, pid);
+					sendtoPlayer(FleetList, newPlanet, sid, address);
 				}
 			});
 		});
@@ -90,7 +109,7 @@ module.exports = class Fleets {
 
 		db.fleet.find(fleetId, (obj) => {
 			if(obj.ownerId === uid) {
-				callback();
+				callback(obj);
 			}
 		});
 	}
@@ -110,7 +129,7 @@ module.exports = class Fleets {
 			if(!haveToUpdate) { callback(fleetList, planetData); return; }
 
 			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleet.distributeFuel(planetData, fleetList.slice(0));
+			[newPlanet, fleetList, empty] = Fleets.distributeFuel(planetData, fleetList.slice(0));
 
 			if(empty) { callback(fleetList, planetData); return; }
 
@@ -154,7 +173,7 @@ module.exports = class Fleets {
 				motherPlanetId: planetData.id,
 				motherPlanetAddress: planetData.address,
 				position: planetData.address,
-				orbitPosition: 0,
+				orbitPosition: FLEET_MOVE_TYPE.DEFEND,
 				points: 0,
 				endMoveTime: -1,
 				units: [],
@@ -166,7 +185,7 @@ module.exports = class Fleets {
 
 			db.fleet.create(newFleet, function(newFleet) {
 				// Send new list to client
-				Fleets.refresh(planetData.id,data.sid);
+				Fleets.refresh(planetData.address,data.sid);
 
 				if(callback) {
 					db.fleet.findByMotherPlanet(planetData.id, (fleetList) => {
@@ -221,20 +240,26 @@ module.exports = class Fleets {
 	static moveTo(user, fleetId, destination, moveType) {
 		const now = Date.now();
 
-		moveType = Math.round(moveType);
-		if(moveType < 0 || moveType > 3) { return; }
-		if(moveType === 3) { return; } // @TODO: remove this when adding spying
+		if(moveType !== Math.round(moveType)) {
+			moveType = -1;
+		}
+		if(moveType < FLEET_MOVE_TYPE.DEFEND || moveType > FLEET_MOVE_TYPE.SPY) { return; }
+		if(moveType === FLEET_MOVE_TYPE.SPY) { return; } // @TODO: remove this when adding spying
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object')) { log('fleet not found'); return; } // Does this fleet exists
+			if(!isset(fleetReturned, 'object')) { log('fleet not found'); return; } // Does this fleet exists ?
+
 			if('' + fleetReturned.ownerId !== '' + user.id) { log('user doesn\'t own ths fleet'); return; }
+
 			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
+
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' });
 				return;
 			}
+
 			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
 				log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' });
@@ -247,13 +272,8 @@ module.exports = class Fleets {
 				return;
 			}
 
-			let systemeDepart = fleetReturned.position.split('-');
-			systemeDepart.pop();
-			systemeDepart = systemeDepart.join('-');
-
-			let systemeArrivee = destination.split('-');
-			systemeArrivee.pop();
-			systemeArrivee = systemeArrivee.join('-');
+			const systemeDepart = GameMap.getSystemFromAdress(fleetReturned.position);
+			const systemeArrivee = GameMap.getSystemFromAdress(destination);
 
 			Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
 				if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
@@ -264,9 +284,9 @@ module.exports = class Fleets {
 
 				let minSpeed;
 				if(systemeDepart === systemeArrivee) {
-					minSpeed = Fleet.getMinSubSpeed(unitList, fleetReturned.units);
+					minSpeed = Fleets.getMinSubSpeed(unitList, fleetReturned.units);
 				} else {
-					minSpeed = Fleet.getMinSupraSpeed(unitList, fleetReturned.units);
+					minSpeed = Fleets.getMinSupraSpeed(unitList, fleetReturned.units);
 				}
 
 				if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
@@ -279,11 +299,28 @@ module.exports = class Fleets {
 				}
 
 				db.planet.find(fleetReturned.position, function(planeteDepart) {
-					db.planet.find(destination, function(planeteArrivee) {
+					db.planet.find(destination, async (planeteArrivee) => {
 						if(!isset(planeteArrivee, 'object')) {
 							log(user.username + ' failed to move fleet because destination ('+destination+') does not exists.');
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_NOT_EXISTS' });
 							return;
+						}
+
+						let defUser;
+						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+							defUser = await db.player.find(planeteArrivee.owner);
+
+							if(isset(defUser, 'object') && defUser.beginnerProtectEnd > Date.now()) {
+								log(user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.');
+								Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_IS_PROTECTED' });
+								return;
+							}
+
+							if(isset(defUser, 'object') && defUser.id === user.id) {
+								log(user.username + ' failed to move fleet because defender is the same player as attacker.');
+								Websocket.SendMessageToClient({ sid: user.sid, message: 'DEFENDER_IS_ATTACKER' });
+								return;
+							}
 						}
 
 						let time;
@@ -293,7 +330,7 @@ module.exports = class Fleets {
 								planeteArrivee,
 								now/1000);
 							if(Number.isNaN(baseDist) || baseDist < 0) { return; }
-							const baseTravelTime = Fleet.calcMoveTime(baseDist, minSpeed.speed);
+							const baseTravelTime = Fleets.calcMoveTime(baseDist, minSpeed.speed);
 
 							const previewDist = GameMap.getPlanetDistance(
 								planeteDepart,
@@ -301,7 +338,7 @@ module.exports = class Fleets {
 								now/1000 + Math.round(baseTravelTime*360000)/100);
 
 							if(Number.isNaN(previewDist) || previewDist < 0) { return; }
-							const previewTime = Fleet.calcMoveTime(previewDist, minSpeed.speed);
+							const previewTime = Fleets.calcMoveTime(previewDist, minSpeed.speed);
 
 							/* Final travel time:
 								Average of ...
@@ -316,10 +353,10 @@ module.exports = class Fleets {
 								Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
 							);
 
-							time = Fleet.calcMoveTime(dist, minSpeed.speed);
+							time = Fleets.calcMoveTime(dist, minSpeed.speed);
 						}
 
-						const fuel = Fleet.calcFuelCost(minSpeed.engines);
+						const fuel = Fleets.calcFuelCost(minSpeed.engines);
 						if(!isset(fleetReturned.fuel, 'number') || fleetReturned.fuel < (fuel * time)) {
 							log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
 							Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGH_FUEL' });
@@ -328,33 +365,43 @@ module.exports = class Fleets {
 
 						fleetReturned.fuel -= fuel * time;
 
-						db.player.searchById(user.id, function(foundUser) {
-							let instability = time * 0.001 * (Math.random() - 0.5);
-							if(Research.isSearched(foundUser, 'prop_suprastability')) {
-								instability /= 2;
-							}
+						const atkUser = await db.player.find(user.id);
+						if(!isset(atkUser, 'object')) { return; }
 
-							fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
-							fleetReturned.position = destination;
-							fleetReturned.orbitPosition = moveType;
-							if(destination === fleetReturned.motherPlanetAddress) {
-								fleetReturned.orbitPosition = 0;
-							}
+						let instability = time * 0.001 * (Math.random() - 0.5);
+						if(Research.isSearched(atkUser, 'prop_suprastability')) {
+							instability /= 2;
+						}
 
-							let textDestination = destination;
-							if(planeteArrivee.name !== undefined) {
-								textDestination = planeteArrivee.name + ' (' + destination + ')';
-							}
+						fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
+						fleetReturned.position = destination;
+						fleetReturned.orbitPosition = moveType;
+						if(destination === fleetReturned.motherPlanetAddress) {
+							fleetReturned.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
+						}
 
-							const endTime = new Date(fleetReturned.endMoveTime);
+						let textDestination = destination;
+						if(typeof planeteArrivee.name !== 'undefined') {
+							textDestination = planeteArrivee.name + ' (' + destination + ')';
+						}
 
-							log(user.username + ' began to move fleet ' + fleetReturned.name + ' to ' + textDestination +
-								'. ETA: ' + getDateTime(endTime));
+						const endTime = new Date(fleetReturned.endMoveTime);
 
-							db.fleet.update(fleetReturned, function() {
-								Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-								Fleets.refresh(fleetReturned.motherPlanetId, user.sid);
+						log(user.username + ' began to move fleet (type: ' + moveType + ') ' + fleetReturned.name + ' to ' + textDestination +
+							'. ETA: ' + getDateTime(endTime));
+
+						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+							Websocket.sendNotification(defUser.sid, 'attack', {
+								player: atkUser.name,
+								origin: planeteDepart,
+								destination: planeteArrivee,
+								arriveTime: endTime,
 							});
+						}
+
+						db.fleet.update(fleetReturned, function() {
+							Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
+							Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
 						});
 					});
 				});
@@ -374,7 +421,7 @@ module.exports = class Fleets {
 
 			db.fleet.update(newFleet, function() {
 				log(data.username + ' has succed to rename fleet type old:' + fleetReturned.name + ', new: ' + data.fleetNewName,'success');
-				Fleets.refresh(fleetReturned.motherPlanetId, data.sid);
+				Fleets.refresh(fleetReturned.motherPlanetAddress, data.sid);
 			});
 		});
 	}
@@ -419,7 +466,7 @@ module.exports = class Fleets {
 			return;
 		}
 
-		// TODO: check people limit for fleet & planet
+		// @TODO: check people limit for fleet & planet
 
 		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
 
@@ -438,15 +485,15 @@ module.exports = class Fleets {
 			from.fuel -= transferFuel;
 			to.fuel += transferFuel;
 
-			// TODO: move cargo
+			// @TODO: move cargo
 
-			Fleet.removeEmptyUnits(from);
+			Fleets.removeEmptyUnits(from);
 
 			db.fleet.update(from, function() {
 				db.fleet.update(to, function() {
 					log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 					Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-					Fleets.refresh(from.motherPlanetId, data.sid);
+					Fleets.refresh(from.motherPlanetAddress, data.sid);
 				});
 			});
 		});
@@ -475,7 +522,7 @@ module.exports = class Fleets {
 			return;
 		}
 
-		// TODO: check people limit for fleet & planet
+		// @TODO: check people limit for fleet & planet
 
 		for(const key in from.units) {
 			[from, to] = Fleets.moveUnits(key, from.units[key], from, to);
@@ -488,13 +535,13 @@ module.exports = class Fleets {
 		to.fuel += from.fuel;
 		to.maxFuel += from.maxFuel;
 
-		// TODO: move cargo
+		// @TODO: move cargo
 
 		db.fleet.update(from, function() {
 			db.fleet.update(to, function() {
 				log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetId, data.sid);
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
 	}
@@ -537,8 +584,42 @@ module.exports = class Fleets {
 			db.fleet.update(to, function() {
 				log(data.username + ' has tranfered fuel from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
 				Websocket.SendMessageToClient( { sid: data.sid, message: 'FUEL_TRANSFER_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetId, data.sid);
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
+	}
+
+	static extractPublicInfo(fleet, playerName, unitsList) {
+		const outputFleet = {
+			id: fleet.id,
+			name: fleet.name,
+			owner: playerName,
+			units: [],
+		};
+
+		for(let unitId in fleet.units) {
+			let unitsListId = unitId;
+			if(typeof specialUnitsUID[unitsListId] !== 'undefined') {
+				unitsListId = specialUnitsUID[unitsListId];
+			}
+
+			outputFleet.units.push({
+				...Units.extractPublicInfo(unitsList[unitsListId]),
+				count: fleet.units[unitId],
+			});
+		}
+
+		return outputFleet;
+	}
+
+	static extractOrbitPublicInfo(fleet, playerName) {
+		return {
+			id: fleet.id,
+			name: fleet.name,
+			owner: playerName,
+			position: fleet.position,
+			endMoveTime: fleet.endMoveTime,
+			units: [], // @TODO
+		};
 	}
 };

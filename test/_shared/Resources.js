@@ -1,17 +1,4 @@
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Resources    = require('../Resources').Resources;
-
-describe('• Resources', () => {
+describe('• Resources (shared)', () => {
 	describe('# GetRatiosPerPlanet()', () => {
 		it('0', () => {
 			assert.deepEqual(

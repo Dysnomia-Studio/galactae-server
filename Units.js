@@ -1,4 +1,4 @@
-module.exports = class Units {
+module.exports = class Units extends require('./_shared/Units')._Units {
 	/**
 	 * Get and send unit data to user
 	 *
@@ -160,12 +160,12 @@ module.exports = class Units {
 						return;
 					}
 
-					shipToSave.cost = Unit.calcCost(ship.shape,shipToSave.parts);
+					shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
 
 					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure
 
 					db.unit.findByOwner(data.id,function(unitList) {
-						const [duplicate, duplicateName] = Unit.checkIfDuplicate(unitList, shipToSave);
+						const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
 
 						if(!duplicate && !duplicateName) {
 							db.unit.create(shipToSave, function() {
@@ -389,5 +389,14 @@ module.exports = class Units {
 				});
 			});
 		});
+	}
+
+	static extractPublicInfo(unit) {
+		return {
+			id: unit.id,
+			name: unit.name,
+			shipType: unit.shipType,
+			shipShape: unit.shipShape,
+		};
 	}
 };

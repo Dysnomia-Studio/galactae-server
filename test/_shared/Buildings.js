@@ -1,19 +1,6 @@
 /* eslint-disable no-magic-numbers */
 
-/**
- * Libs
- */
-const assert = require('assert');
-
-/**
- * My libs
- */
-require('../calcConstants')();
-require('../misc')();
-
-global.Buildings    = require('../Buildings').Buildings;
-
-describe('• Buildings', () => {
+describe('• Buildings (shared)', () => {
 	/**
 	 * GetCost
 	 */
@@ -49,7 +36,7 @@ describe('• Buildings', () => {
 	/**
 	 * GetRequirements/HasRequirements
 	 */
-	describe('GetRequirements/HasRequirements()', () => {
+	describe('# GetRequirements/HasRequirements()', () => {
 		it('Building is already > 0', () => {
 			assert(
 				Buildings.HasRequirements({}, { Buildings: [1] }, 0),
@@ -84,6 +71,32 @@ describe('• Buildings', () => {
 			assert(
 				Buildings.HasRequirements({ research: { misc_telemetrie: -1, misc_em: -1 } }, { Buildings: [0,0,0,0,0,0,0,3,0,0,0,0,0] }, 9),
 			);
+		});
+		
+		it('[Translation failed] Parents not OK (building)', () => {
+			global.translate = {};
+
+			try {
+				Buildings.HasRequirements({ research: { misc_telemetrie: -1, misc_em: -1 } }, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0] }, 9);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+
+			delete translate;
+		});
+
+		it('[Translation failed] Parents not OK (research)', () => {
+			global.translate = {};
+
+			try {
+				Buildings.HasRequirements({ research: {} }, { Buildings: [0,0,0,0,0,0,0,3,0,0,0,0,0] }, 9);
+				assert(false);
+			} catch(e) {
+				assert(true);
+			}
+
+			delete translate;
 		});
 	});
 

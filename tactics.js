@@ -40,12 +40,12 @@ module.exports = class Tactics {
 
 		// Check max orders
 		if(tactic.orders.length > TACTIC_MAX_ORDERS) {
-			log(user.username + ' failed to create/update tactic becase it has too much orders.');
+			log(user.username + ' failed to create/update tactic because it has too much orders.');
 			Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_TOO_MUCH_ORDERS' });
 			return false;
 		}
 		if(tactic.orders === 0) {
-			log(user.username + ' failed to create/update tactic becase it has no orders.');
+			log(user.username + ' failed to create/update tactic because it has no orders.');
 			Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_NO_ORDERS' });
 			return false;
 		}
@@ -67,7 +67,7 @@ module.exports = class Tactics {
 			if(list.length === 0) {
 				callback();
 			} else {
-				log(user.username + ' failed to delete tactic becase it\'s used by some fleets.');
+				log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
 			}
 		});
@@ -109,13 +109,13 @@ module.exports = class Tactics {
 
 	static assign(user, fleetId, tacticId) {
 		Tactics.checkOwner(user.id, tacticId, () => {
-			Fleets.checkOwner(user.id, fleetId, () => {
+			Fleets.checkOwner(user.id, fleetId, (fleet) => {
 				if(tacticId === '-1') { tacticId = null; }
 
 				db.fleet.assignFleet(fleetId, tacticId, () => {
 					log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
 					Websocket.SendMessageToClient('TACTIC_ASSIGNED');
-					Fleets.refresh(user.pid, user.sid);
+					Fleets.refresh(fleet.position, user.sid);
 				});
 			});
 		});

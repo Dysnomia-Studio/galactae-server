@@ -9,7 +9,7 @@ global.fs = require('fs');
 global.preventConnection = false;
 global.preventConnectionMsg = '';
 global.maintenance = false;
-global.preventRestarts = 0; //@ADD: Really prevent restarting server until this is set to 0
+global.preventRestarts = 0;
 global.adminSid = '';
 
 /**
@@ -28,21 +28,20 @@ require('./console')();
 global.db         = require('./database');
 global.Discord    = require('./discord');
 // Then include other classes
-global.Buildings  = require('./Buildings').Buildings;
+global.Buildings  = require('./Buildings');
 global.Chat       = require('./chat');
 global.Combat     = require('./combat');
-global.Fleet 	  = require('./Fleet').Fleet;
-global.Fleets 	  = require('./fleets');
-global.GameMap    = require('./GameMap').GameMap;
+global.Fleets 	  = require('./Fleets');
+global.GameMap    = require('./GameMap');
 global.Planet     = require('./planet');
 global.Player     = require('./player');
 global.Privileges = require('./privileges');
+global.Reports    = require('./Reports');
 global.Research   = require('./research');
-global.Resources  = require('./Resources').Resources;
+global.Resources  = require('./Resources');
 global.Tactics    = require('./tactics');
-global.Tutorials  = require('./Tutorials').Tutorials;
-global.Units      = require('./units');
-global.Unit       = require('./Unit').Unit;
+global.Tutorials  = require('./Tutorials');
+global.Units      = require('./Units');
 // And that's in last
 global.Websocket  = require('./socket');
 
