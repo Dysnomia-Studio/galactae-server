@@ -218,7 +218,7 @@ module.exports = class Chat {
 				break;
 			case '!maintenance':
 				if(data.lvl<4) { break; } // Admin only
-				websocket.beginMaintenance();
+				Websocket.beginMaintenance();
 				data.send = true;
 				break;
 			case '!help':
