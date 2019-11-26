@@ -393,8 +393,8 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
 							Websocket.sendNotification(defUser.sid, 'attack', {
 								player: atkUser.name,
-								origin: planeteDepart,
-								destination: planeteArrivee,
+								origin: (planeteDepart.name) ? planeteDepart.name : planeteDepart.address,
+								destination: (planeteArrivee.name) ? planeteArrivee.name : planeteArrivee.address,
 								arriveTime: endTime,
 							});
 						}
