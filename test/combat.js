@@ -693,8 +693,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 
@@ -770,8 +768,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 
@@ -901,8 +897,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 
@@ -1036,8 +1030,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 
@@ -1149,8 +1141,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 
@@ -1259,8 +1249,6 @@ describe('• Combat', () => {
 				delete logs.finalDefenseFleets;
 
 				for(const unit in logs.finalUnitCache) {
-					if(logs.finalUnitCache[unit].shipType === 'SHIP_DEF') { continue; }
-
 					assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 				}
 

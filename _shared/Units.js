@@ -114,6 +114,7 @@
 					id: specialUnitsUID[name],
 					name: fleetTranslate[name],
 					note: 0, // @TODO: Note
+					owned: 0,
 					cost: shipCosts[name],
 					parts: specialUnitsParts[name],
 					shipShape: name,
