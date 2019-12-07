@@ -27,8 +27,11 @@ steps:
   settings:
     repo: dysnomia/galactae-server
     dockerfile: Dockerfile
+    tags: ${DRONE_BRANCH}
     dry_run: true
-    purge: false
+    pull-image: false
+  environment:
+    PLUGIN_PULL_IMAGE: false
 
   when:
     event:
