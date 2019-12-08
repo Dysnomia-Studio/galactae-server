@@ -1,4 +1,32 @@
 module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
+
+	static async sendtoPlayer(FleetList, newPlanet, sid, address) {
+		if(newPlanet !== undefined) {
+			db.planet.update({
+				id: newPlanet.id,
+				resources: newPlanet.resources,
+			});
+
+			if(newPlanet.address === address) {
+				Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
+			}
+		}
+
+		if(globalCfg.dev) {
+			log('Sending fleet');
+		}
+
+		for(const fleetId in FleetList) {
+			if(FleetList[fleetId].ownerId !== newPlanet.owner) {
+				const player = await db.player.find(FleetList[fleetId].ownerId);
+
+				FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+			}
+		}
+
+		io.to(sid).emit('fleet-recieve-data', { FleetList });
+	}
+
 	/**
 	 * Get and send unit data to user
 	 *
@@ -16,38 +44,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
-			if(originalFList === undefined) { originalFList = []; }
-
-			async function sendtoPlayer(FleetList, newPlanet, sid, address) {
-				if(newPlanet !== undefined) {
-					db.planet.update({
-						id: newPlanet.id,
-						resources: newPlanet.resources,
-					});
-
-					if(newPlanet.address === address) {
-						Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
-					}
-				}
-
-				if(globalCfg.dev) {
-					log('Sending fleet');
-				}
-
-				for(const fleetId in FleetList) {
-					if(FleetList[fleetId].ownerId !== newPlanet.owner) {
-						const player = await db.player.find(FleetList[fleetId].ownerId);
-
-						FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
-					}
-				}
-
-				io.to(sid).emit('fleet-recieve-data', { FleetList });
+			if(originalFList === undefined) {
+				originalFList = [];
 			}
 
 			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
-					sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
 					return;
 				}
 
@@ -89,13 +92,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							sendtoPlayer(FleetList, newPlanet, sid, address);
+							Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
 				}
 			});
 		});
