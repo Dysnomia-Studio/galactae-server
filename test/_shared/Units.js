@@ -154,7 +154,7 @@ describe('• Units (shared)', () => {
 
 			assert.deepEqual(
 				Units.calcCost(shipShape, parts),
-				[64,32,46,23,0.41,5]
+				[69,32,46,21,0.41,5]
 			);
 		});
 
@@ -172,7 +172,7 @@ describe('• Units (shared)', () => {
 
 			assert.deepEqual(
 				Units.calcCost(shipShape, parts),
-				[687,755,356,152,4.45,1301]
+				[697,755,356,152,4.45,1301]
 			);
 		});
 
