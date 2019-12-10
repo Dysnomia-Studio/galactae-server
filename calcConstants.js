@@ -498,27 +498,27 @@ module.exports = function() {
 		 */
 
 		// Defenses
-		SHIP_WEP_MINES: 			[  2, 15,  5,  4,0.08,   0],
-		SHIP_WEP_MINES_NUKE: 		[  4, 20,  7,  6,0.10,   0],
-		SHIP_WEP_MINES_IEM: 		[ 15, 25,  6, 15,0.20,   0],
-		SHIP_WEP_MINES_AM: 			[  4, 25,  8,  7,0.12,   0],
+		SHIP_WEP_MINES: 			[  3, 15,  5,  4,0.08,   0],
+		SHIP_WEP_MINES_NUKE: 		[  8, 30, 12, 10,0.15,   0],
+		SHIP_WEP_MINES_IEM: 		[ 15, 35,  6, 12,0.20,   0],
+		SHIP_WEP_MINES_AM: 			[  6, 35,  8,  7,0.12,   0],
 		// Satellites
 		SHIP_SAT_AG1: 				[ 10, 15, 35, 15,0.25,   0],
 		SHIP_SAT_AG2: 				[ 15, 20, 50, 23,0.37,   0],
 		SHIP_SAT_AG3: 				[ 30, 35, 60, 36,0.70,   0],
 		// Battlecruisers
-		SHIP_BATTLECRUISER_SMALL: 	[250,250,120, 65,1.12, 160],
+		SHIP_BATTLECRUISER_SMALL: 	[260,250,120, 60,1.12, 160],
 		// Cruisaders
-		SHIP_CUIRASSE_SMALL: 		[320,350,180,100,1.45, 220],
+		SHIP_CUIRASSE_SMALL: 		[330,350,180, 95,1.45, 220],
 		// Fighters
-		SHIP_FIGHTER_SMALL: 		[ 45, 25, 40, 20, 0.35,   5],
-		SHIP_FIGHTER_MEDIUM: 		[ 65, 35, 60, 30, 0.52,  10],
-		SHIP_FIGHTER_BOMBER: 		[ 90, 60,100, 48, 0.78,  20],
+		SHIP_FIGHTER_SMALL: 		[ 50, 25, 40, 18, 0.35,   5],
+		SHIP_FIGHTER_MEDIUM: 		[ 70, 35, 60, 25, 0.52,  10],
+		SHIP_FIGHTER_BOMBER: 		[ 95, 60,100, 40, 0.78,  20],
 		// Corvets
-		SHIP_CORVET_SMALL: 			[115, 20, 90, 40,0.62,  40],
+		SHIP_CORVET_SMALL: 			[110, 18, 85, 35, 0.62,  40],
 		// Carriers
-		SHIP_CARRIER_SMALL: 		[400,300,140, 75,1.25, 920],
-		SHIP_CARRIER_MEDIUM: 		[500,420,190, 95,1.65,1200],
+		SHIP_CARRIER_SMALL: 		[405,300,140, 75,1.25, 920],
+		SHIP_CARRIER_MEDIUM: 		[510,420,190, 95,1.65,1200],
 
 		/**
 		 * Ship parts
