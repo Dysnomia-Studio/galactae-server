@@ -80,12 +80,12 @@
 				],
 				time: [
 					// Ground building
-					[0.03,0.05,-0.2], // Quarry
-					[0.06,-0.15,0.1], // Metallurgie
-					[0.07,-0.1,0.05], // Living
-					[0.065,-0.1,0], // Serres
-					[0.05,-0.1,0.03], // Solar panel
-					[0.035,0.05,-0.2], // Warehouse
+					[0.03,0.045,-0.2], // Quarry
+					[0.06,-0.2,0.2], // Metallurgie
+					[0.068,-0.1,0.05], // Living
+					[0.063,-0.12,0.04], // Serres
+					[0.05,-0.11,0.05], // Solar panel
+					[0.035,0.03,-0.17], // Warehouse
 					[0.05,0.1,-0.1], // Hedquarters
 					[0.04,0.08,-0.1], // Launching Center
 					[0.02,0.03,-0.1], // Research Center
