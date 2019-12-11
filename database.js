@@ -94,6 +94,7 @@ module.exports = {
 	/**
 	 * Game Server queries
 	 */
+	alliance: require('./database/alliance'),
 	battleLog: require('./database/battleLog'),
 	battleLogAccess: require('./database/battleLogAccess'),
 	fleet: require('./database/fleet'),
@@ -181,18 +182,18 @@ module.exports = {
 		},
 	},
 	globalRank: {
-		update: (game_id, points, pcount, name) => {
+		update: (game_id, points, pcount, name, ally) => {
 			generalClient.query('SELECT * FROM "globalRanks" WHERE game_id=$1 AND server_name=$2', [game_id,globalCfg.serverGlobalName], (err, obj) => {
 				if(err) { log(err, 'error'); return; }
 
 				if(obj.rows.length > 0) {
-					generalClient.query('UPDATE "globalRanks" SET points=$1, planets=$2 WHERE game_id=$3 AND server_name=$4',
-						[points,pcount,game_id,globalCfg.serverGlobalName], (err) => {
+					generalClient.query('UPDATE "globalRanks" SET points=$1, planets=$2, ally=$5 WHERE game_id=$3 AND server_name=$4',
+						[points,pcount,game_id,globalCfg.serverGlobalName, ally], (err) => {
 							if(err) { log(err, 'error'); return; }
 						});
 				} else {
-					generalClient.query('INSERT INTO "globalRanks"(points,planets,game_id,server_name,name) VALUES($1,$2,$3,$4,$5)',
-						[points,pcount,game_id,globalCfg.serverGlobalName,name], (err) => {
+					generalClient.query('INSERT INTO "globalRanks"(points,planets,game_id,server_name,name,ally) VALUES($1,$2,$3,$4,$5,$6)',
+						[points,pcount,game_id,globalCfg.serverGlobalName,name,ally], (err) => {
 							if(err) { log(err, 'error'); return; }
 						});
 				}
@@ -201,19 +202,19 @@ module.exports = {
 	},
 
 	sectorRank: {
-		update: (game_id, sector, points, pcount, name) => {
+		update: (game_id, sector, points, pcount, name, ally) => {
 			generalClient.query('SELECT * FROM "sectorRanks" WHERE game_id=$1 AND server_name=$2 AND sector=$3',
 				[game_id,globalCfg.serverGlobalName,sector], (err, obj) => {
 					if(err) { log(err, 'error'); return; }
 
 					if(obj.rows.length > 0) {
-						generalClient.query('UPDATE "sectorRanks" SET points=$1, planets=$2 WHERE game_id=$3 AND server_name=$4 AND sector=$5',
-							[points,pcount,game_id,globalCfg.serverGlobalName,sector], (err) => {
+						generalClient.query('UPDATE "sectorRanks" SET points=$1, planets=$2, ally=$6 WHERE game_id=$3 AND server_name=$4 AND sector=$5',
+							[points,pcount,game_id,globalCfg.serverGlobalName,sector,ally], (err) => {
 								if(err) { log(err, 'error'); return; }
 							});
 					} else {
-						generalClient.query('INSERT INTO "sectorRanks"(points,planets,game_id,server_name,name,sector) VALUES($1,$2,$3,$4,$5,$6)',
-							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector], (err) => {
+						generalClient.query('INSERT INTO "sectorRanks"(points,planets,game_id,server_name,name,sector,ally) VALUES($1,$2,$3,$4,$5,$6,$7)',
+							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector,ally], (err) => {
 								if(err) { log(err, 'error'); return; }
 							});
 					}
