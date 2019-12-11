@@ -50,7 +50,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
-					Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
 					return;
 				}
 
@@ -92,13 +92,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 					db.fleet.update(newFleet, function() {
 						if(++done === haveToDone) {
-							Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
+							Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					Fleet.sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
 				}
 			});
 		});
@@ -600,7 +600,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			units: [],
 		};
 
-		for(let unitId in fleet.units) {
+		for(const unitId in fleet.units) {
 			let unitsListId = unitId;
 			if(typeof specialUnitsUID[unitsListId] !== 'undefined') {
 				unitsListId = specialUnitsUID[unitsListId];
