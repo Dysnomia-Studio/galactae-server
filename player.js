@@ -94,6 +94,16 @@ module.exports = class Player {
 			//log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
+		if(playerData.ally !== null) {
+			playerData.ally = await db.alliance.find(playerData.ally);
+		} 
+
+		if(!isset(playerData.ally, 'object')) {
+			playerData.ally = {
+				name: null,
+			};
+		}
+
 		playerData.sid = data.sid;
 
 		const jour = TIME.DAY_TO_MS;
@@ -119,6 +129,7 @@ module.exports = class Player {
 			tutorials: playerData.tutorials,
 		});
 
+		Alliances.sendToPlayer(playerData);
 		Units.refresh(data);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
@@ -223,7 +234,7 @@ module.exports = class Player {
 			newUserData.points = Math.round(newUserData.points);
 
 			// MaJ des BDD Globales
-			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name, newUserData.allyName);
+			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name, newUserData.ally.name);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
 				db.sectorRank.update(
@@ -232,7 +243,7 @@ module.exports = class Player {
 					newUserData.sectorPointsValue[sector],
 					newUserData.sectorPointsPcount[sector],
 					newUserData.name,
-					newUserData.allyName
+					newUserData.ally.name
 				);
 			}
 

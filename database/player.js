@@ -13,7 +13,7 @@ module.exports = {
 		}
 	},
 	searchByName: (name,callback) => {
-		serverClient.query('SELECT users.*, alliances.name as "allyName" FROM users LEFT JOIN alliances ON alliances.id = users.ally WHERE users.name = $1 LIMIT 1', [name], (err, objReturned) => {
+		serverClient.query('SELECT * FROM users WHERE users.name = $1 LIMIT 1', [name], (err, objReturned) => {
 			if(err) { log(err, 'error'); return; }
 			callback(objReturned.rows[0]);
 		});
@@ -38,7 +38,7 @@ module.exports = {
 		delete user.sectorPointsAddresses;
 		delete user.sectorPointsValue;
 		delete user.sectorPointsPcount;
-		delete user.allyName;
+		delete user.ally;
 
 		let [query, values] = db.buildUpdateQuery('users', user);
 		values.push(id);
