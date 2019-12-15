@@ -1,15 +1,11 @@
 const { Pool } = require('pg');
-let generalPool,
-	generalClient;
-global.serverPool;
-global.serverClient;
 
 module.exports = {
 	/**
 	 * Used to connect to database
 	 */
 	connect: (callback) => {
-		generalPool = new Pool({
+		global.generalPool = new Pool({
 			user: '***REMOVED***',
 			host: '***REMOVED***',
 			database: 'galactae',
@@ -17,7 +13,7 @@ module.exports = {
 			port: 5432,
 		});
 
-		serverPool = new Pool(globalCfg.db);
+		global.serverPool = new Pool(globalCfg.db);
 
 		/**
 		 * Events
@@ -29,7 +25,7 @@ module.exports = {
 				return;
 			}
 
-			serverClient = client;
+			global.serverClient = client;
 
 			log('Successfuly connected to server database.');
 			callback(true);
@@ -42,7 +38,7 @@ module.exports = {
 				return;
 			}
 
-			generalClient = client;
+			global.generalClient = client;
 
 			log('Successfuly connected to general database.');
 			callback(true,true);
