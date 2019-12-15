@@ -13,8 +13,12 @@
 		}
 
 		static researchedParent(user, planet, researchName, atleastOne=false) {
-			if(researchList[researchName] === undefined) { return false; }
-			if(researchName === 'researchCenter') { return true; }
+			if(researchList[researchName] === undefined) {
+				return false;
+			}
+			if(researchName === 'researchCenter') {
+				return true;
+			}
 
 			let count = 0;
 

@@ -500,6 +500,8 @@ describe('• Fleets (shared)', () => {
 						id: 'f' + currentFleet,
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
+						orbitPosition: Math.round(Math.random() * 4),
+						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now())
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -622,6 +624,15 @@ describe('• Fleets (shared)', () => {
 				Fleets.hasOffensiveCapacity(
 					{ units: { 'u1': 10 } },
 					{ u1: { parts: [{ type: 'cannon'}] }}
+				), true
+			);
+		});
+
+		it('Offensive unit (special)', () => {
+			assert.equal(
+				Fleets.hasOffensiveCapacity(
+					{ units: { 'SHIP_WEP_MINES': 10 } },
+					{ '00000000-0000-0000-0000-000000000001': { parts: specialUnitsParts['SHIP_WEP_MINES'] }}
 				), true
 			);
 		});

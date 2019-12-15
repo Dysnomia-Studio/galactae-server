@@ -90,11 +90,61 @@ describe('• Chat', () => {
 		});
 	});
 
+	/**
+	 * sendSM
+	 */
+	describe('# sendSM()', () => {
+		it('should work', () => {
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'chat-message-system') {
+							assert.equal(content, 'message');
+						}
+					},
+				};
+			};
+
+			Chat.sendSM('sid', 'message');
+		});
+	});
 
 	/**
-	 * sendCommand
+	 * sendPM
 	 */
-	describe('# sendCommand()', () => {
-		// @TODO
+	describe('# sendPM()', () => {
+		it('should work (with sound true)', () => {
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'chat-message-private') {
+							assert.deepEqual(content, {
+								msg: 'message',
+								sound: true,
+							});
+						}
+					},
+				};
+			};
+
+			Chat.sendPM('sid', 'message', true);
+		});
+
+		it('should work (with sound false)', () => {
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'chat-message-private') {
+							assert.deepEqual(content, {
+								msg: 'message',
+								sound: false,
+							});
+						}
+					},
+				};
+			};
+
+			Chat.sendPM('sid', 'message', false);
+		});
 	});
 });

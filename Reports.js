@@ -1,6 +1,8 @@
 module.exports = class Reports {
 	static async refresh(plyId, sid) {
-		if(sid === '-1') { return; }
+		if(sid === '-1') {
+			return;
+		}
 
 		const result = await db.battleLogAccess.fetchByPlayer(plyId);
 

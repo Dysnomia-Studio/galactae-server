@@ -1,5 +1,12 @@
 (function (exports) {
 	exports._Units = class Units {
+		static sortUnitParts(a, b) {
+			if(a.name < b.name) {
+				return -1;
+			}
+			return 1;
+		}
+
 		/**
 		 * Check if two ships have the same parts
 		 *
@@ -9,19 +16,8 @@
 		 */
 		static checkIfSameParts(ship1, ship2) {
 			// Sort
-			ship1.parts.sort(function(a,b) {
-				if(a.name < b.name) {
-					return -1;
-				}
-				return 1;
-			});
-
-			ship2.parts.sort(function(a,b) {
-				if(a.name < b.name) {
-					return -1;
-				}
-				return 1;
-			});
+			ship1.parts.sort(Units.sortUnitParts);
+			ship2.parts.sort(Units.sortUnitParts);
 
 			// Compare
 			let duplicate = true;

@@ -100,13 +100,15 @@ module.exports = class Combat {
 
 				const currUnit = Math.round(Math.random() * (fleetList[currFleet].unitsId.length - 1));
 
-				if(currUnit < 0) { continue; }
+				if(currUnit < 0) {
+					continue;
+				}
 
 				const unitCount = fleetList[currFleet].units[fleetList[currFleet].unitsId[currUnit]];
 				if(typeof unitCount !== 'undefined' && unitCount > 0) {
 					return [
 						fleetList[currFleet].id,
-						fleetList[currFleet].unitsId[currUnit]
+						fleetList[currFleet].unitsId[currUnit],
 					];
 				}
 			}
@@ -126,7 +128,7 @@ module.exports = class Combat {
 
 		let i = 0;
 		do {
-			for(let unitId in fleetList[i].units) {
+			for(const unitId in fleetList[i].units) {
 				if(compatibleUnits.includes(unitId)) {
 					return [fleetList[i].id, unitId];
 				}
@@ -182,7 +184,9 @@ module.exports = class Combat {
 	}
 
 	getShieldAbsorption(weapon, shield) {
-		if(shield === 'none') { return 0; }
+		if(shield === 'none') {
+			return 0;
+		}
 
 		let weaponType = '';
 		switch(weapon) {
@@ -387,8 +391,12 @@ module.exports = class Combat {
 				[ this.defFleet, this.atkFleets, currDefFleets, action, breakOrNo ] = this.simulateSide(this.defFleets, this.atkFleets, currDefFleets);
 			}
 
-			if(breakOrNo) { break; }
-			if(Object.keys(action).length === 0) { continue; }
+			if(breakOrNo) {
+				break;
+			}
+			if(Object.keys(action).length === 0) {
+				continue;
+			}
 
 			atk = !atk;
 
@@ -405,7 +413,10 @@ module.exports = class Combat {
 		// Get units id list
 		const tacticsIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
-			if(!isset(currFleet.tactic) || currFleet.tactic === '') { continue; }
+			if(!isset(currFleet.tactic) || currFleet.tactic === '') {
+				continue;
+			}
+
 			tacticsIdList.add(currFleet.tactic);
 		}
 
@@ -569,7 +580,7 @@ module.exports = class Combat {
 			return;
 		}
 
-		const id = await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
+		await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
 
 		Reports.refresh(this.atkUser.id, this.atkUser.sid);
 		Reports.refresh(this.defUser.id, this.defUser.sid);
@@ -586,7 +597,9 @@ module.exports = class Combat {
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime > Date.now()) { continue; }
+				if(fleetList[i].endMoveTime > Date.now()) {
+					continue;
+				}
 
 				if(fleetList[i].orbitPosition === 0) {
 					battle.joinTeam('def', fleetList[i]);

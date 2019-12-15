@@ -69,42 +69,141 @@ describe('• Fleets', () => {
 	});
 
 	/**
-	 * Get units list
+	 * extractPublicInfo()
 	 */
-	/*describe('# getUnitsList()', () => {
-		it('Existing', function(done) {
-			const unitIdList = [
-				['eee16ad8-5777-11e9-ae80-67804909a59f',1]
-			];
-
-			Fleets.getUnitsList(unitIdList, function(unitList) {
-				assert.equal(
-					unitList.length,
-					1
-				);
-
-				assert.equal(
-					unitList[0].name,
-					'UnitTest Unit'
-				);
-
-				done();
-			});
+	describe('extractPublicInfo()', () => {
+		it('Should work with empty units', () => {
+			assert.deepEqual(
+				Fleets.extractPublicInfo({
+					id: 'id',
+					name: 'name',
+					foo: 'bar',
+					units: {},
+				}, 'player', {}), {
+					id: 'id',
+					name: 'name',
+					owner: 'player',
+					units: [],
+				}
+			);
 		});
 
-		it('Not existing', function(done) {
-			const unitIdList = [
-				['00000000-0000-0000-0000-000000000000',1]
-			];
-
-			Fleets.getUnitsList(unitIdList, function(unitList) {
-				assert.equal(
-					unitList.length,
-					0
-				);
-
-				done();
-			});
+		it('Should work with normal units', () => {
+			assert.deepEqual(
+				Fleets.extractPublicInfo({
+					id: 'id',
+					name: 'name',
+					foo: 'bar',
+					units: {
+						'u1': 10,
+						'u2': 20,
+					},
+				}, 'player', {
+					'u1': {
+						id: 'u1',
+						name: 'unitName',
+						shipType: 'shipType',
+						shipShape: 'shipShape',
+						foo: 'bar',
+					},
+					'u2': {
+						id: 'u2',
+						name: 'unitName2',
+						shipType: 'shipType2',
+						shipShape: 'shipShape2',
+						foo: 'bar',
+					},
+				}), {
+					id: 'id',
+					name: 'name',
+					owner: 'player',
+					units: [{
+						id: 'u1',
+						name: 'unitName',
+						shipType: 'shipType',
+						shipShape: 'shipShape',
+						count: 10,
+					},
+					{
+						id: 'u2',
+						name: 'unitName2',
+						shipType: 'shipType2',
+						shipShape: 'shipShape2',
+						count: 20,
+					}],
+				}
+			);
 		});
-	});*/
+
+		it('Should work with special units', () => {
+			assert.deepEqual(
+				Fleets.extractPublicInfo({
+					id: 'id',
+					name: 'name',
+					foo: 'bar',
+					units: {
+						'SHIP_WEP_MINES': 10,
+						'u2': 20,
+					},
+				}, 'player', {
+					'00000000-0000-0000-0000-000000000001': {
+						id: 'SHIP_WEP_MINES',
+						name: 'unitName',
+						shipType: 'shipType',
+						shipShape: 'shipShape',
+						foo: 'bar',
+					},
+					'u2': {
+						id: 'u2',
+						name: 'unitName2',
+						shipType: 'shipType2',
+						shipShape: 'shipShape2',
+						foo: 'bar',
+					},
+				}), {
+					id: 'id',
+					name: 'name',
+					owner: 'player',
+					units: [{
+						id: 'SHIP_WEP_MINES',
+						name: 'unitName',
+						shipType: 'shipType',
+						shipShape: 'shipShape',
+						count: 10,
+					},
+					{
+						id: 'u2',
+						name: 'unitName2',
+						shipType: 'shipType2',
+						shipShape: 'shipShape2',
+						count: 20,
+					}],
+				}
+			);
+		});
+	});
+
+	/**
+	 * extractOrbitPublicInfo()
+	 */
+	describe('extractOrbitPublicInfo()', () => {
+		it('Works', () => {
+			assert.deepEqual(
+				Fleets.extractOrbitPublicInfo({
+					id: 'id',
+					name: 'name',
+					bar: 'foo',
+					position: 'position',
+					endMoveTime: 'endMoveTime',
+				}, 'playerName'), {
+					id: 'id',
+					name: 'name',
+					owner: 'playerName',
+					position: 'position',
+					endMoveTime: 'endMoveTime',
+					units: [], // @TODO
+				}
+			);
+		});
+	});
 });

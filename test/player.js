@@ -148,6 +148,13 @@ describe('• Player', () => {
 			);
 		});
 
+		it('calcResearchPoints(some research 2)', () => {
+			assert.equal(
+				Player.calcResearchPoints({ research: { researchCenter: -1, industrialistion: -1, phyContemporaine: -1, thermodynamique: 10 } }),
+				pointsCoef.research * (0 + 8 + 20)
+			);
+		});
+
 		it('calcResearchPoints(all research)', () => {
 			const research = {};
 			let total = 0;

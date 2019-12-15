@@ -98,7 +98,7 @@ module.exports = {
 		try {
 			await serverClient.query(query, queryParameters);
 
-			await serverClient.query('DELETE FROM fleets WHERE units::text = \'{}\'::text; AND "inBuilding" = false');
+			await serverClient.query('DELETE FROM fleets WHERE units::text = \'{}\'::text AND "inBuilding" = false');
 		} catch(err) {
 			log(err, 'error');
 		}
