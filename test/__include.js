@@ -9,6 +9,7 @@ global.assert = require('assert');
 require('../calcConstants')();
 require('../misc')();
 
+global.Alliances    = require('../Alliances');
 global.Buildings    = require('../Buildings');
 global.Combat 		= require('../combat');
 global.Chat 		= require('../chat');
