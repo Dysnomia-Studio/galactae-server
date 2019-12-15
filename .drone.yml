@@ -18,6 +18,7 @@ steps:
   when:
     branch:
     - dev
+    - feature/*
 
 - name: docker
   image: plugins/docker
@@ -36,6 +37,9 @@ steps:
   when:
     event:
     - push
+    branch:
+    - master
+    - dev
 
 - name: discord
   pull: default
