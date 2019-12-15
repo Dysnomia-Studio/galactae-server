@@ -6,9 +6,9 @@ describe('• Buildings (shared)', () => {
 	 */
 	describe('# GetCost()', () => {
 		it('build < 0', () => {
-			assert.equal(
+			assert.deepEqual(
 				Buildings.GetCost(-1),
-				undefined
+				{}
 			);
 		});
 
@@ -25,9 +25,9 @@ describe('• Buildings (shared)', () => {
 		});
 
 		it('build >= max', () => {
-			assert.equal(
+			assert.deepEqual(
 				Buildings.GetCost(globalConst.buildingNumber),
-				undefined
+				{}
 			);
 		});
 	});

@@ -25,17 +25,29 @@
 		 * @return     {number}  Distance between planets
 		 */
 		static getPlanetDistance(from, to, when) {
-			if(!from.orbitDuration) { from.orbitDuration = 0; }
-			if(!to.orbitDuration) { to.orbitDuration = 0; }
+			if(!from.orbitDuration) {
+				from.orbitDuration = 0;
+			}
+			if(!to.orbitDuration) {
+				to.orbitDuration = 0;
+			}
 
-			if(!from.orbitDist) { from.orbitDist = 0; }
-			if(!to.orbitDist) { to.orbitDist = 0; }
+			if(!from.orbitDist) {
+				from.orbitDist = 0;
+			}
+			if(!to.orbitDist) {
+				to.orbitDist = 0;
+			}
 
 			let angleDepart = (2* Math.PI) - (when%parseFloat(from.orbitDuration) / parseFloat(from.orbitDuration)) * (2* Math.PI);
 			let angleArrivee = (2* Math.PI) - (when%parseFloat(to.orbitDuration) / parseFloat(to.orbitDuration)) * (2* Math.PI);
 
-			if(Number.isNaN(angleDepart)) { angleDepart = 0; }
-			if(Number.isNaN(angleArrivee)) { angleArrivee = 0; }
+			if(Number.isNaN(angleDepart)) {
+				angleDepart = 0;
+			}
+			if(Number.isNaN(angleArrivee)) {
+				angleArrivee = 0;
+			}
 
 			const coordsDepart = GameMap.getPlanetCoords(angleDepart, parseFloat(from.orbitDist));
 			const coordsArrivee = GameMap.getPlanetCoords(angleArrivee, parseFloat(to.orbitDist));

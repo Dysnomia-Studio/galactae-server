@@ -38,7 +38,10 @@
 			let tech = '';
 			let count = 0;
 
-			if(unit === undefined) { console.error('Error: undefined unit in Fleets.calcSpeed()'); return { speed: [] }; }
+			if(unit === undefined) {
+				console.error('Error: undefined unit in Fleets.calcSpeed()');
+				return { speed: [] };
+			}
 
 			for(const i in unit.parts) {
 				if(unit.parts[i].type === type) {
@@ -129,7 +132,9 @@
 
 				const curr = Fleets.calcSubSpeed(currUnit);
 
-				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
+				if(curr.speed[0] === undefined) { // Just in case of bugs
+					return { speed: [] };
+				}
 
 				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
@@ -164,11 +169,15 @@
 			for(const key in fleetUnits) {
 				const currUnit = unitList[unitListId.indexOf(key)];
 
-				if(currUnit.shipType === 'SHIP_FIGHTER') { continue; } // Don't care about fighter they are carried
+				if(currUnit.shipType === 'SHIP_FIGHTER') { // Don't care about fighter they are carried
+					continue;
+				}
 
 				const curr = Fleets.calcSupraSpeed(currUnit);
 
-				if(curr.speed[0] === undefined) { return { speed: [] }; } // Just in case of bugs
+				if(curr.speed[0] === undefined) { // Just in case of bugs
+					return { speed: [] };
+				}
 
 				min.speed = Fleets.slowerSpeed(curr.speed, min.speed);
 
@@ -205,7 +214,9 @@
 		static distributeFuel(planet, fleetList) {
 			let haveToUpdate = [];
 			for(let i=0; i<fleetList.length; i++) {
-				if(typeof fleetList[i].fuel === 'undefined') { fleetList[i].fuel = 0; }
+				if(typeof fleetList[i].fuel === 'undefined') {
+					fleetList[i].fuel = 0;
+				}
 
 				fleetList[i].fuel = parseInt(fleetList[i].fuel);
 				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
@@ -274,12 +285,13 @@
 		}
 
 		static hasOffensiveCapacity(currFleet, unitCache) {
-			for(let currUnit in currFleet.units) {
-				if(typeof specialUnitsUID[currUnit] !== 'undefined') {
-					currUnit = specialUnitsUID[currUnit];
+			for(const currUnit in currFleet.units) {
+				let realUnitId = currUnit;
+				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
+					realUnitId = specialUnitsUID[realUnitId];
 				}
 
-				if(Units.getWeapons(unitCache[currUnit]).length > 0) {
+				if(Units.getWeapons(unitCache[realUnitId]).length > 0) {
 					return true;
 				}
 			}

@@ -145,7 +145,9 @@
 		 * @return     {object}  The building cost.
 		 */
 		static GetCost(build,level) {
-			if(build < 0 || build >= globalConst.buildingNumber) { return; }
+			if(build < 0 || build >= globalConst.buildingNumber) {
+				return {};
+			}
 
 			const retour = {
 				aluminium: 	Math.round(Buildings.buildCost['aluminium'][build][0]*Math.pow(level,2) +		Buildings.buildCost['aluminium'][build][1]*level + 	Buildings.buildCost['aluminium'][build][2]),
@@ -179,8 +181,9 @@
 		 * @return     {string}  The requirements.
 		 */
 		static GetRequirements(user, planet, id) {
-			if(planet.Buildings[id] > 0) { return ''; }
-			if(buildingParents[id] === undefined) { return ''; }
+			if(planet.Buildings[id] > 0 || buildingParents[id] === undefined) {
+				return '';
+			}
 
 			let requirements = '';
 

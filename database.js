@@ -102,7 +102,9 @@ module.exports = {
 	stat: {
 		submit: (currTime) => {
 			serverClient.query('INSERT INTO stats (time, "plCount") VALUES ($1, $2)', [currTime, playerList.size], (err) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+				}
 			});
 		},
 	},
@@ -113,7 +115,10 @@ module.exports = {
 	privilege: {
 		find: (id,callback) => {
 			generalClient.query('SELECT * FROM privileges WHERE user_id=$1 AND server_name=$2', [id, globalCfg.serverGlobalName], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				// DO NOT CHECK IF WE HAVE OBJECT, NOT EVERYONE IS REGISTERED IN THIS DATABASE
 				callback(obj.rows);
 			});
@@ -123,7 +128,10 @@ module.exports = {
 	userGameId: {
 		find: (id,callback) => {
 			generalClient.query('SELECT * FROM "userGameIds" WHERE game_id = $1', [id], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				if(isset(obj, 'object') && isset(obj.rows, 'array') && isset(obj.rows[0], 'object')) {
 					callback(obj.rows[0]);
 				}
@@ -134,7 +142,10 @@ module.exports = {
 	server: {
 		find: (callback) => {
 			generalClient.query('SELECT * FROM servers WHERE server_name = $1', [globalCfg.serverGlobalName], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				if(isset(obj, 'object') && isset(obj.rows, 'array') && isset(obj.rows[0], 'object')) {
 					callback(obj.rows[0]);
 				}
@@ -150,7 +161,10 @@ module.exports = {
 			query += ' WHERE server_name = $' + values.length;
 
 			serverClient.query(query, values, (err) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				if(callback) {
 					callback();
 				}
@@ -161,7 +175,10 @@ module.exports = {
 	ban: {
 		find: (uid,type,callback) => {
 			generalClient.query('SELECT * FROM bans WHERE user_id=$1 AND server_name=$2 AND ban_type=$3', [uid, globalCfg.serverGlobalName, type], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				callback(obj.rows);
 			});
 		},
@@ -169,7 +186,10 @@ module.exports = {
 			const [query, values] = db.buildInsertQuery('bans', bans);
 
 			generalClient.query(query, values, (err) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 				if(callback) {
 					callback(bans);
 				}
@@ -179,17 +199,24 @@ module.exports = {
 	globalRank: {
 		update: (game_id, points, pcount, name) => {
 			generalClient.query('SELECT * FROM "globalRanks" WHERE game_id=$1 AND server_name=$2', [game_id,globalCfg.serverGlobalName], (err, obj) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 
 				if(obj.rows.length > 0) {
 					generalClient.query('UPDATE "globalRanks" SET points=$1, planets=$2 WHERE game_id=$3 AND server_name=$4',
-						[points,pcount,game_id,globalCfg.serverGlobalName], (err) => {
-							if(err) { log(err, 'error'); return; }
+						[points,pcount,game_id,globalCfg.serverGlobalName], (updateErr) => {
+							if(updateErr) {
+								log(updateErr, 'error');
+							}
 						});
 				} else {
 					generalClient.query('INSERT INTO "globalRanks"(points,planets,game_id,server_name,name) VALUES($1,$2,$3,$4,$5)',
-						[points,pcount,game_id,globalCfg.serverGlobalName,name], (err) => {
-							if(err) { log(err, 'error'); return; }
+						[points,pcount,game_id,globalCfg.serverGlobalName,name], (insertErr) => {
+							if(insertErr) {
+								log(insertErr, 'error');
+							}
 						});
 				}
 			});
@@ -200,17 +227,24 @@ module.exports = {
 		update: (game_id, sector, points, pcount, name) => {
 			generalClient.query('SELECT * FROM "sectorRanks" WHERE game_id=$1 AND server_name=$2 AND sector=$3',
 				[game_id,globalCfg.serverGlobalName,sector], (err, obj) => {
-					if(err) { log(err, 'error'); return; }
+					if(err) {
+						log(err, 'error');
+						return;
+					}
 
 					if(obj.rows.length > 0) {
 						generalClient.query('UPDATE "sectorRanks" SET points=$1, planets=$2 WHERE game_id=$3 AND server_name=$4 AND sector=$5',
-							[points,pcount,game_id,globalCfg.serverGlobalName,sector], (err) => {
-								if(err) { log(err, 'error'); return; }
+							[points,pcount,game_id,globalCfg.serverGlobalName,sector], (updateErr) => {
+								if(updateErr) {
+									log(updateErr, 'error');
+								}
 							});
 					} else {
 						generalClient.query('INSERT INTO "sectorRanks"(points,planets,game_id,server_name,name,sector) VALUES($1,$2,$3,$4,$5,$6)',
-							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector], (err) => {
-								if(err) { log(err, 'error'); return; }
+							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector], (insertErr) => {
+								if(insertErr) {
+									log(insertErr, 'error');
+								}
 							});
 					}
 				});
@@ -232,5 +266,7 @@ module.exports = {
 		} catch(err) {
 			log(err, 'error');
 		}
-	}
+
+		return [];
+	},
 };
