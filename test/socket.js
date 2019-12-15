@@ -36,6 +36,11 @@ describe('• Websocket', () => {
 
 			assert(isset(socketEvents['tutorial-confirm']), true);
 
+			assert(isset(socketEvents['player-report-ask']), true);
+			assert(isset(socketEvents['player-report-delete']), true);
+			assert(isset(socketEvents['player-report-set-read']), true);
+			assert(isset(socketEvents['player-report-set-unread']), true);
+
 			assert(isset(socketEvents['server-monitore-connect']), true);
 			assert(isset(socketEvents['admin-request-cmd']), true);
 		});
