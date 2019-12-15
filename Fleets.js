@@ -1,15 +1,17 @@
 module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static async sendtoPlayer(FleetList, newPlanet, sid, address) {
-		if(newPlanet !== undefined) {
-			db.planet.update({
-				id: newPlanet.id,
-				resources: newPlanet.resources,
-			});
+		if(!isset(newPlanet)) {
+			newPlanet = {};
+		}
 
-			if(newPlanet.address === address) {
-				Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
-			}
+		db.planet.update({
+			id: newPlanet.id,
+			resources: newPlanet.resources,
+		});
+
+		if(newPlanet.address === address) {
+			Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
 		}
 
 		if(globalCfg.dev) {
@@ -393,7 +395,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						log(user.username + ' began to move fleet (type: ' + moveType + ') ' + fleetReturned.name + ' to ' + textDestination +
 							'. ETA: ' + getDateTime(endTime));
 
-						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+						if(moveType === FLEET_MOVE_TYPE.ATTACK && isset(defUser)) {
 							Websocket.sendNotification(defUser.sid, 'attack', {
 								player: atkUser.name,
 								origin: (planeteDepart.name) ? planeteDepart.name : planeteDepart.address,
