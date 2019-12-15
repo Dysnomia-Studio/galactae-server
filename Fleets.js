@@ -93,7 +93,8 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					};
 
 					db.fleet.update(newFleet, function() {
-						if(++done === haveToDone) {
+						++done;
+						if(done === haveToDone) {
 							Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
 						}
 					});
@@ -122,21 +123,33 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static recalcFuel(fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
-			if(fleetList[i].fuel === undefined) { fleetList[i].fuel = 0; }
+			if(fleetList[i].fuel === undefined) {
+				fleetList[i].fuel = 0;
+			}
+
 			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
 				haveToUpdate = true;
 			}
 		}
 
-		if(fleetList.length === 0) { callback(fleetList); return; }
+		if(fleetList.length === 0) {
+			callback(fleetList);
+			return;
+		}
 
 		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
-			if(!haveToUpdate) { callback(fleetList, planetData); return; }
+			if(!haveToUpdate) {
+				callback(fleetList, planetData);
+				return;
+			}
 
 			let newPlanet, empty;
 			[newPlanet, fleetList, empty] = Fleets.distributeFuel(planetData, fleetList.slice(0));
 
-			if(empty) { callback(fleetList, planetData); return; }
+			if(empty) {
+				callback(fleetList, planetData);
+				return;
+			}
 
 			// Current in-orbit fleets
 			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {
@@ -188,7 +201,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				inBuilding: false,
 			};
 
-			db.fleet.create(newFleet, function(newFleet) {
+			db.fleet.create(newFleet, (createdFleet) => {
 				// Send new list to client
 				Fleets.refresh(planetData.address,data.sid);
 
@@ -209,7 +222,9 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		for(const u in unitList) {
 			for(const f in currFleet.units) {
-				if(f !== unitList[u].id) { continue; }
+				if(f !== unitList[u].id) {
+					continue;
+				}
 
 				if(unitList[u].shipType === 'SHIP_FIGHTER') {
 					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f];
@@ -248,16 +263,28 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		if(moveType !== Math.round(moveType)) {
 			moveType = -1;
 		}
-		if(moveType < FLEET_MOVE_TYPE.DEFEND || moveType > FLEET_MOVE_TYPE.SPY) { return; }
-		if(moveType === FLEET_MOVE_TYPE.SPY) { return; } // @TODO: remove this when adding spying
+		if(moveType < FLEET_MOVE_TYPE.DEFEND || moveType > FLEET_MOVE_TYPE.SPY) {
+			return;
+		}
+		if(moveType === FLEET_MOVE_TYPE.SPY) { // @TODO: remove this when adding spying
+			return;
+		}
 
 		// Get Fleet data
 		db.fleet.find(fleetId, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object')) { log('fleet not found'); return; } // Does this fleet exists ?
+			if(!isset(fleetReturned, 'object')) { // Does this fleet exists ?
+				log('fleet not found');
+				return;
+			}
 
-			if('' + fleetReturned.ownerId !== '' + user.id) { log('user doesn\'t own ths fleet'); return; }
+			if('' + fleetReturned.ownerId !== '' + user.id) {
+				log('user doesn\'t own ths fleet');
+				return;
+			}
 
-			if(fleetReturned.name === 'SHIP_DEF') { return; } // Is this fleet movable ? (not defense fleet)
+			if(fleetReturned.name === 'SHIP_DEF') { // Is this fleet movable ? (not defense fleet)
+				return;
+			}
 
 			if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
 				log(user.username + ' failed to move fleet because units are building in this fleet.');
@@ -334,15 +361,18 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 								planeteDepart,
 								planeteArrivee,
 								now/1000);
-							if(Number.isNaN(baseDist) || baseDist < 0) { return; }
+							if(Number.isNaN(baseDist) || baseDist < 0) {
+								return;
+							}
 							const baseTravelTime = Fleets.calcMoveTime(baseDist, minSpeed.speed);
 
 							const previewDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
 								now/1000 + Math.round(baseTravelTime*360000)/100);
-
-							if(Number.isNaN(previewDist) || previewDist < 0) { return; }
+							if(Number.isNaN(previewDist) || previewDist < 0) {
+								return;
+							}
 							const previewTime = Fleets.calcMoveTime(previewDist, minSpeed.speed);
 
 							/* Final travel time:
@@ -371,7 +401,9 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						fleetReturned.fuel -= fuel * time;
 
 						const atkUser = await db.player.find(user.id);
-						if(!isset(atkUser, 'object')) { return; }
+						if(!isset(atkUser, 'object')) {
+							return;
+						}
 
 						let instability = time * 0.001 * (Math.random() - 0.5);
 						if(Research.isSearched(atkUser, 'prop_suprastability')) {
@@ -416,8 +448,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static renameFleet(data) {
 		db.fleet.find(data.fleetId, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || ''+fleetReturned.ownerId !== ''+data.id) { return; }
-			if(fleetReturned.name === 'SHIP_DEF') { return; }
+			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || ''+fleetReturned.ownerId !== ''+data.id) {
+				return;
+			}
+			if(fleetReturned.name === 'SHIP_DEF') {
+				return;
+			}
 
 			const newFleet = {
 				id: fleetReturned.id,
@@ -432,7 +468,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	}
 
 	static moveUnits(unitId, count, from, to) {
-		if(count <= 0) { return [-1]; }
+		if(count <= 0) {
+			return [-1];
+		}
+
 		if(from.units[unitId] < count) {
 			log('Failed to move units from fleet ' + from.name + ' to ' + to.name + ' because the unit count was incorrect.', 'fail');
 			return [-1];
@@ -448,18 +487,24 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static transferSomeUnits(from, to, data) {
 		data.unitCount = parseInt(data.unitCount);
-		if(Number.isNaN(data.unitCount)) { return; }
+		if(Number.isNaN(data.unitCount)) {
+			return;
+		}
 
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.transferSomeUnits(fleetData, to, data);
 			});
 			return;
 		}
 		if(typeof(to) === 'string') {
 			db.fleet.find(to, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.transferSomeUnits(from, fleetData, data);
 			});
 			return;
@@ -475,10 +520,14 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		[from, to] = Fleets.moveUnits(data.unitId, data.unitCount, from, to);
 
-		if(from === -1) { return; }
+		if(from === -1) {
+			return;
+		}
 
 		db.unit.find(data.unitId, function(unit) {
-			if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) { return; }
+			if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) {
+				return;
+			}
 
 			// Transfer fuel
 			const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
@@ -508,14 +557,18 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static mergeFleet(from, to, data) {
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.mergeFleet(fleetData, to, data);
 			});
 			return;
 		}
 		if(typeof(to) === 'string') {
 			db.fleet.find(to, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.mergeFleet(from, fleetData, data);
 			});
 			return;
@@ -531,7 +584,9 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		for(const key in from.units) {
 			[from, to] = Fleets.moveUnits(key, from.units[key], from, to);
-			if(from === -1) { return; }
+			if(from === -1) {
+				return;
+			}
 		}
 
 		from.units = [];
@@ -554,14 +609,18 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static transferFuelBetweenFleets(from, to, data) {
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.transferFuelBetweenFleets(fleetData, to, data);
 			});
 			return;
 		}
 		if(typeof(to) === 'string') {
 			db.fleet.find(to, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) { return; }
+				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
+					return;
+				}
 				Fleets.transferFuelBetweenFleets(from, fleetData, data);
 			});
 			return;
@@ -574,8 +633,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		}
 
 		data.fuelCount = parseInt(data.fuelCount);
-		if(Number.isNaN(data.fuelCount) || data.fuelCount <= 0) { return; }
-		if(from.fuel <= data.fuelCount) { return; }
+		if(Number.isNaN(data.fuelCount) || data.fuelCount <= 0) {
+			return;
+		}
+		if(from.fuel <= data.fuelCount) {
+			return;
+		}
 
 		from.fuel -= data.fuelCount;
 		to.fuel += data.fuelCount;

@@ -42,7 +42,9 @@ module.exports = class Chat {
 						const words =data.message.split(new RegExp('[ ,;]+', 'g'));
 
 						db.player.searchByName(words[0].substr(1).toLowerCase(), (dataReturned) => {
-							if(dataReturned === undefined) { return; }
+							if(dataReturned === undefined) {
+								return;
+							}
 							const sid = dataReturned.sid;
 
 							/* Recuperer le vrai message */
@@ -75,7 +77,9 @@ module.exports = class Chat {
 						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
 						return;
 					}
-					if(data.message === '' || !isset(data.message, 'string')) { return; }
+					if(data.message === '' || !isset(data.message, 'string')) {
+						return;
+					}
 
 					if(data.channel !== 'hud-chat-ally') { // Normal chat
 						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
@@ -96,13 +100,17 @@ module.exports = class Chat {
 	 */
 	static protect(data) {
 		let str = data.message;
-		if(!str) { str = ''; }
+		if(!str) {
+			str = '';
+		}
 
 		str = filterUnwantedChars(str);
 		str = normalizeText(str);
 
 		// Empty message
-		if(str.split(' ').join('') === '') { data.send = false; }
+		if(str.split(' ').join('') === '') {
+			data.send = false;
+		}
 
 		/* Disable links */
 		if(str !== str.split('://').join('') || str !== str.split('www.').join('')) {
@@ -163,13 +171,20 @@ module.exports = class Chat {
 				Websocket.SendGeneralMessage(str.substr(6));
 				break;
 			case '!ban':
-				if(data.lvl<3) { return data; } // Admin & Operators only
-				if(args.length<4) { return data; }
+				if(data.lvl<3) { // Admin & Operators only
+					return data;
+				}
+				if(args.length<4) {
+					return data;
+				}
 
 				Chat.searchTarget(data, args[1], (target) => {
 					const banMessage = args.splice(3,args.length).join(' ');
 					const banTime = parseChatTime(args[2]);
-					if(banTime < 1) { log('Invalid Time'); return data; }
+					if(banTime < 1) {
+						log('Invalid Time');
+						return;
+					}
 					const now = Date.now();
 
 					log('Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
@@ -192,12 +207,17 @@ module.exports = class Chat {
 				});
 				break;
 			case '!mute':
-				if(args.length<4) { return data; }
+				if(args.length<4) {
+					return data;
+				}
 
 				Chat.searchTarget(data, args[1], (target) => {
 					const muteMessage = args.splice(3,args.length).join(' ');
 					const muteTime = parseChatTime(args[2]);
-					if(muteTime < 1) { log('Invalid Time'); return data; }
+					if(muteTime < 1) {
+						log('Invalid Time');
+						return;
+					}
 					const now = Date.now();
 
 					log('Banned ' + muteTime + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
@@ -217,7 +237,9 @@ module.exports = class Chat {
 				});
 				break;
 			case '!maintenance':
-				if(data.lvl<4) { break; } // Admin only
+				if(data.lvl<4) { // Admin only
+					break;
+				}
 				Websocket.beginMaintenance();
 				data.send = true;
 				break;

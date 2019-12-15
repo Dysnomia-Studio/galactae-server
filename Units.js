@@ -11,7 +11,10 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		 * YOU NEED TO AUTH USER BEFORE !
 		 */
 		db.unit.findByOwner(data.id,function(unitList) {
-			if(unitList===undefined) { unitList = []; }
+			if(unitList===undefined) {
+				unitList = [];
+			}
+
 			io.to(data.sid).emit('units-recieve-data', unitList);
 		});
 	}
@@ -21,7 +24,10 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		let supprop = '';
 
 		for(const i in ship) {
-			if(i==='name' || i==='type' || i==='shape') { continue; }
+			if(i==='name' || i==='type' || i==='shape') {
+				continue;
+			}
+
 			// Check if that kind of part exists in that kind of ship
 			let valid = false;
 			for(const type in shipShapesDetails[ship.type][ship.shape].content) {
@@ -90,7 +96,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		const ship = data.ship;
 
 		// That block 90% of tries to crash
-		if(ship.name===undefined || ship.shape===undefined || ship.type===undefined) { return; }
+		if(ship.name===undefined || ship.shape===undefined || ship.type===undefined) {
+			return;
+		}
 
 		// Filter name
 		ship.name = filterUnwantedChars(ship.name );
@@ -123,7 +131,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 			db.player.searchByName(data.username,function(userReturned) {
 				// Check research
 				for(const i in ship) {
-					if(i==='name' || i==='type' || i==='shape') { continue; }
+					if(i==='name' || i==='type' || i==='shape') {
+						continue;
+					}
 
 					if(shipResearchDependencies[ship[i].value] !== undefined && !Research.isSearched(userReturned,shipResearchDependencies[ship[i].value])) {
 						message = 'NEEDED_RESEARCH_MISSING';
@@ -147,7 +157,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 					};
 
 					for(const i in ship) {
-						if(i==='name' || i==='type' || i==='shape') { continue; }
+						if(i==='name' || i==='type' || i==='shape') {
+							continue;
+						}
 
 						shipToSave.parts.push({
 							type: ship[i].type,
@@ -162,7 +174,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 					shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
 
-					if(shipToSave.cost[0] === -1) { return; } // There's something wrong ... Security measure
+					if(shipToSave.cost[0] === -1) { // There's something wrong ... Security measure
+						return;
+					}
 
 					db.unit.findByOwner(data.id,function(unitList) {
 						const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
@@ -198,7 +212,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 	static renameType(data) {
 		db.unit.find(data.shipId, function(unitReturned) {
-			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) {
+				return;
+			}
 
 			const newUnit = {
 				id: unitReturned.id,
@@ -214,7 +230,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 	static deleteType(data) {
 		db.unit.find(data.unit, function(unitReturned) {
-			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) { return; }
+			if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+data.id) {
+				return;
+			}
 
 			if(unitReturned.owned !== 0) {
 				log(data.username + ' has failed to delete unit model named ' + unitReturned.name + ' because it\'s used by some units.','fail');
@@ -239,11 +257,15 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 	 * @param      string  unitData  What need to build ?
 	 */
 	static build(inputData) {
-		if(inputData.count < 1) { return; }
+		if(inputData.count < 1) {
+			return;
+		}
 
 		// Check if planet, unit & fleet belong to player
 		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
-			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) { return; }
+			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) {
+				return;
+			}
 
 			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
@@ -262,10 +284,17 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
-				if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+inputData.id) { return; }
+				if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+inputData.id) {
+					return;
+				}
+
 				// Check defence fleet
-				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') { return; }
-				if(unitReturned.shipType === 'SHIP_DEF') { inputData.fleet = -2; }
+				if(inputData.fleet === -2 && unitReturned.shipType !== 'SHIP_DEF') {
+					return;
+				}
+				if(unitReturned.shipType === 'SHIP_DEF') {
+					inputData.fleet = -2;
+				}
 
 				let choosenFleet;
 				fleetList.forEach(function(fleet) {
@@ -372,7 +401,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 							Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 							return;
 						}
-						if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) { return; }
+						if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) {
+							return;
+						}
 
 						// Check if fleet max size is reached
 						if((choosenFleet.population + totalCost[5]) > globalConst.maxFleetSize) {

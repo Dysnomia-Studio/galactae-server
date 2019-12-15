@@ -52,7 +52,9 @@ module.exports = function() {
 				break;
 			default:
 		}
-		if(nodate === false || nodate === undefined) { text = logdate() + ' ' + text;}
+		if(nodate === false || nodate === undefined) {
+			text = logdate() + ' ' + text;
+		}
 
 		console.log(text);
 		if(adminSid !== '') {
