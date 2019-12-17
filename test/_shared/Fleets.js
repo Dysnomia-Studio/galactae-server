@@ -713,4 +713,44 @@ describe('• Fleets (shared)', () => {
 			);
 		});
 	});
+
+	describe('isImmobile()', () => {
+		it('Should work (ok)', () => {
+			assert(Fleets.isImmobile({
+				endMoveTime: -1
+			}));
+		});
+
+		it('Should work (past)', () => {
+			assert(!Fleets.isImmobile({
+				endMoveTime: Date.now() - 100000
+			}));
+		});
+
+		it('Should work (future)', () => {
+			assert(!Fleets.isImmobile({
+				endMoveTime: Date.now() + 100000
+			}));
+		});
+	});
+
+	describe('hasEndedMove()', () => {
+		it('Should work (ok)', () => {
+			assert(!Fleets.hasEndedMove({
+				endMoveTime: -1
+			}));
+		});
+
+		it('Should work (past)', () => {
+			assert(Fleets.hasEndedMove({
+				endMoveTime: Date.now() - 100000
+			}));
+		});
+
+		it('Should work (future)', () => {
+			assert(!Fleets.hasEndedMove({
+				endMoveTime: Date.now() + 100000
+			}));
+		});
+	});
 });
