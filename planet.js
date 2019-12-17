@@ -267,7 +267,9 @@ module.exports = class Planet {
 	 */
 	static build(data) {
 		// Mauvais n° de batiment
-		if(data.building > globalConst.buildingNumber || data.building < 0) { return; } // Stop Executing, it may create bugs;
+		if(data.building > globalConst.buildingNumber || data.building < 0) { // Stop Executing, it may create bugs;
+			return;
+		}
 
 		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
@@ -349,10 +351,14 @@ module.exports = class Planet {
 		const newPlanet = Object.assign({}, planetIn);
 		newPlanet.unitBuildingEndTime = parseInt(newPlanet.unitBuildingEndTime);
 
-		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) { return; }
+		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) {
+			return;
+		}
 
 		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) { return; }
+			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) {
+				return;
+			}
 
 			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
 				const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
@@ -389,7 +395,9 @@ module.exports = class Planet {
 					unitCount = restantDepuisSynchro - restant;
 				}
 
-				if(unitCount === 0) { return; } // Prevent some bugs
+				if(unitCount === 0) { // Prevent some bugs
+					return;
+				}
 
 				if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
 					unitCount = newPlanet.unitBuildingCount;
@@ -477,7 +485,10 @@ module.exports = class Planet {
 
 		// Buildings
 		for(let i=0; i<14; i++) {
-			if(buildings[i]===0) { continue; }
+			if(buildings[i]===0) {
+				continue;
+			}
+
 			if(i===planetData.nextBuilding) {
 				// Current in-build building
 				cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
@@ -529,7 +540,9 @@ module.exports = class Planet {
 					break;
 				}
 			}
-			if(empty) { return; }
+			if(empty) {
+				return;
+			}
 
 			const replace = [
 				['<',''],

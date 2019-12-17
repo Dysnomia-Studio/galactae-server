@@ -3,7 +3,11 @@ module.exports = {
 		const [query, values] = db.buildInsertQuery('units', unit);
 
 		serverClient.query(query, values, (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback(unit);
 			}
@@ -11,7 +15,11 @@ module.exports = {
 	},
 	find: (id,callback) => {
 		serverClient.query('SELECT * FROM units WHERE id=$1',[id], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback(obj.rows[0]);
 			}
@@ -19,7 +27,11 @@ module.exports = {
 	},
 	findByOwner: (id,callback) => {
 		serverClient.query('SELECT * FROM units WHERE "ownerId"=$1',[id], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
@@ -40,7 +52,11 @@ module.exports = {
 		query += ' WHERE id = $' + values.length;
 
 		serverClient.query(query, values, (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback();
 			}
@@ -74,7 +90,11 @@ module.exports = {
 	},
 	delete: (id,callback) => {
 		serverClient.query('DELETE FROM units WHERE id=$1',[id], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback();
 			}

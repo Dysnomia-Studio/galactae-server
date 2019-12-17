@@ -48,10 +48,14 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	}
 
 	static ChangePlanetResearch(data, researchName) {
-		if(!isset(researchList[researchName], 'object')) { return; }
+		if(!isset(researchList[researchName], 'object')) {
+			return;
+		}
 
 		Planet.find(data,data.pid,0,function(planetReturned,userReturned,fleetReturned) {
-			if(!isset(planetReturned, 'object') || !isset(userReturned, 'object')) { return; }
+			if(!isset(planetReturned, 'object') || !isset(userReturned, 'object')) {
+				return;
+			}
 
 			Research.refreshUserResearch(userReturned, function(userNewResearch) {
 				db.player.update(userNewResearch);

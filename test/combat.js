@@ -539,8 +539,10 @@ describe('• Combat', () => {
 			];
 
 			const timeout = setTimeout(
-				() => { assert(false); done(); },
-				2500
+				() => {
+					assert(false);
+					done();
+				}, 2500
 			);
 
 
@@ -563,8 +565,10 @@ describe('• Combat', () => {
 	describe('# saveLogs()', () => {
 		it('saveLogs', (done) => {
 			const timeout = setTimeout(
-				() => { assert(false, 'Logs are not saved/transmitted to client.'); done(); },
-				500
+				() => {
+					assert(false, 'Logs are not saved/transmitted to client.');
+					done();
+				}, 500
 			);
 
 			let added = 0;
