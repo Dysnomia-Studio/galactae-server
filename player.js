@@ -24,7 +24,11 @@ module.exports = class Player {
 	/* Get player ally */
 	static getAlly(data,callback) {
 		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj, 'object')) { log('Error: ' + data.username + ' not found.'); return; }
+			if(!isset(obj, 'object')) {
+				log('Error: ' + data.username + ' not found.');
+				return;
+			}
+
 			data.ally = obj.ally;
 			callback(data);
 		});
@@ -65,13 +69,21 @@ module.exports = class Player {
 						}
 
 						db.player.searchByName(data.username,function(dataReturned) {
-							if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
+							if(!isset(dataReturned, 'object')) {
+								console.error('User: ' + data.username + ' not found !');
+								return;
+							}
+
 							Player.traitementsConnexion(data, dataReturned);
 						});
 					}); // Privileges db query
 				} else { // Normal behavior
 					db.player.searchByName(data.username,function(dataReturned) {
-						if(!isset(dataReturned, 'object')) { console.error('User: ' + data.username + ' not found !'); return; }
+						if(!isset(dataReturned, 'object')) {
+							console.error('User: ' + data.username + ' not found !');
+							return;
+						}
+
 						Player.traitementsConnexion(data, dataReturned);
 					});
 				}
@@ -112,9 +124,13 @@ module.exports = class Player {
 		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 
-		if(playerData.lastBonus < hierMinuit) { dayStreak = 1; } // Pas pris le bonus hier ?
+		if(playerData.lastBonus < hierMinuit) { // Pas pris le bonus hier ?
+			dayStreak = 1;
+		}
 
-		if(dayStreak > bonusBest) { bonusBest = dayStreak; }
+		if(dayStreak > bonusBest) {
+			bonusBest = dayStreak;
+		}
 
 		if(playerData.lastBonus < minuit) {
 			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest});
@@ -154,9 +170,15 @@ module.exports = class Player {
 
 	/* Disconnect Player */
 	static disconnect(data) {
-		if(!isset(data.sid, 'string')) { return; }
+		if(!isset(data.sid, 'string')) {
+			return;
+		}
+
 		db.player.searchBySid(data.sid,function(dataReturned) {
-			if(!isset(dataReturned, 'string')) { return; }
+			if(!isset(dataReturned, 'string')) {
+				return;
+			}
+
 			dataReturned.sid = '-1';
 			db.player.update(dataReturned);
 		});
@@ -228,7 +250,10 @@ module.exports = class Player {
 			newUserData.points += Player.calcResearchPoints(newUserData);
 
 			// Money
-			if(newUserData.money === undefined || Number.isNaN(newUserData.money)) { newUserData.money = 0; }
+			if(newUserData.money === undefined || Number.isNaN(newUserData.money)) {
+				newUserData.money = 0;
+			}
+
 			newUserData.points += (newUserData.money*pointsCoef.money);
 
 			newUserData.points = Math.round(newUserData.points);
@@ -280,12 +305,17 @@ module.exports = class Player {
 
 			const streak = bonus.newPlayerData.dayBonusStreak%30; // Bonus is periodic
 
-			if(streak===1) { bonus.credits = 15; }
-			else if(streak===2) { bonus.credits = 25; }
-			else if(streak===3) { bonus.credits = 50; }
-			else if(streak===4) { bonus.credits = 80; }
-			else if(streak<10) { bonus.credits = 100; }
-			else if(streak<20) {
+			if(streak===1) {
+				bonus.credits = 15;
+			} else if(streak===2) {
+				bonus.credits = 25;
+			} else if(streak===3) {
+				bonus.credits = 50;
+			} else if(streak===4) {
+				bonus.credits = 80;
+			} else if(streak<10) {
+				bonus.credits = 100;
+			} else if(streak<20) {
 				bonus.credits = 10*(streak + 1); // 110 to 200
 				bonus.helium = 1750 * streak; // 15000 is about 45 min of ion propulsion for 1 vessel - 15000 to 33250
 			} else if(streak<30) {

@@ -1,7 +1,11 @@
 module.exports = {
 	findAll: (callback) => {
 		serverClient.query('SELECT * FROM users', [], (err, objReturned) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(objReturned.rows);
 		});
 	},
@@ -13,20 +17,32 @@ module.exports = {
 		}
 	},
 	searchByName: (name,callback) => {
-		serverClient.query('SELECT * FROM users WHERE users.name = $1 LIMIT 1', [name], (err, objReturned) => {
-			if(err) { log(err, 'error'); return; }
+		serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name], (err, objReturned) => {
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(objReturned.rows[0]);
 		});
 	},
 	searchById: (id,callback) => {
 		serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id], (err, objReturned) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(objReturned.rows[0]);
 		});
 	},
 	searchBySid: (sid,callback) => {
 		serverClient.query('SELECT * FROM users WHERE sid = $1 LIMIT 1', [sid], (err, objReturned) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(objReturned.rows[0]);
 		});
 	},
@@ -45,7 +61,11 @@ module.exports = {
 		query += ' WHERE id = $' + values.length;
 
 		serverClient.query(query, values, (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback();
 			}
@@ -55,7 +75,11 @@ module.exports = {
 		log('Clearing player list ...');
 
 		serverClient.query('UPDATE users SET sid = \'-1\'', [], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			log('List cleared !') ;
 		});
 	},

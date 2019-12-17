@@ -1,7 +1,11 @@
 module.exports = {
 	find: (id,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				const fleet = obj.rows[0];
 
@@ -28,31 +32,51 @@ module.exports = {
 	},
 	findByOwner: (id,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE "ownerId"=$1', [id], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
 	findByMotherPlanet: (planetId,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
 	findByPosition: (address,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE position=$1', [address], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
 	findAllFleetReferingToPosition: (address,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
 	findByTactic: (tid,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid], (err, obj) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback(obj.rows);
 		});
 	},
@@ -66,7 +90,11 @@ module.exports = {
 		query += ' WHERE id = $' + values.length;
 
 		serverClient.query(query, values, (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback();
 			}
@@ -107,7 +135,11 @@ module.exports = {
 		const [query, values] = db.buildInsertQuery('fleets', fleet);
 
 		serverClient.query(query, values, (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			if(callback) {
 				callback(fleet);
 			}
@@ -115,12 +147,19 @@ module.exports = {
 	},
 	remove: (id) => {
 		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 		});
 	},
 	assignFleet: (fid, tid, callback) => {
 		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
 			callback();
 		});
 	},

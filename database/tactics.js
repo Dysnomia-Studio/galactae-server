@@ -1,6 +1,9 @@
 function rollback() {
 	serverClient.query('ROLLBACK', (err) => {
-		if(err) { log(err, 'error'); return; }
+		if(err) {
+			log(err, 'error');
+			return;
+		}
 	});
 }
 
@@ -25,7 +28,10 @@ module.exports = {
 		}
 
 		serverClient.query('SELECT * FROM tactics WHERE id=$1', [tid], (err, tacticListQuery) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
 			if(tacticListQuery.rows.length === 0) {
 				callback();
@@ -42,7 +48,10 @@ module.exports = {
 	},
 	findByOwner: (owner, callback) => {
 		serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], (err, tacticListQuery) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
 			const tacticList = tacticListQuery.rows;
 			let todo = 0;
@@ -67,7 +76,10 @@ module.exports = {
 	},
 	findByOwnerAndName: (tactic, callback) => {
 		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], (err, tacticListQuery) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
 			if(tacticListQuery.rows.length === 0) {
 				callback();
@@ -92,7 +104,9 @@ module.exports = {
 		}
 
 		serverClient.query('BEGIN', (err) => {
-			if(err) { rollback(); }
+			if(err) {
+				rollback();
+			}
 
 			db.tactics.find(inputTactic.id, (tactic) => {
 				if(!isset(tactic)) {
@@ -114,14 +128,20 @@ module.exports = {
 	},
 	insert: (tactic, callback) => {
 		serverClient.query('INSERT INTO tactics (name, owner) VALUES ($1, $2)', [tactic.name, tactic.owner], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
 			callback();
 		});
 	},
 	updateName: (tactic, callback) => {
 		serverClient.query('UPDATE tactics SET name=$1 WHERE id=$2', [tactic.name, tactic.id], (err) => {
-			if(err) { log(err, 'error'); return; }
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
 			callback();
 		});
@@ -129,7 +149,10 @@ module.exports = {
 	delete: (tid, callback) => {
 		db.tacticsOrders.delete(tid, () => {
 			serverClient.query('DELETE FROM tactics WHERE id=$1', [tid], (err) => {
-				if(err) { log(err, 'error'); return; }
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 
 				callback();
 			});

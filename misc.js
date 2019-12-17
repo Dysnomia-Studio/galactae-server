@@ -130,7 +130,9 @@ module.exports = function() {
 	  */
 	this.isset = function(variable, type='') {
 		let array = (type === 'array');
-		if(array) { type = 'object'; }
+		if(array) {
+			type = 'object';
+		}
 
 		if(variable === null ||
 			typeof variable === 'undefined') {

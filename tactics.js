@@ -24,14 +24,20 @@ module.exports = class Tactics {
 		for(const key in tactic) {
 			switch(key) {
 				case 'name':
-					if(!isset(tactic[key],'string')) { return false; }
+					if(!isset(tactic[key],'string')) {
+						return false;
+					}
 					break;
 				case 'id':
 				case 'owner':
-					if(isset(tactic[key]) && typeof tactic[key] !== 'string') { return false; }
+					if(isset(tactic[key]) && typeof tactic[key] !== 'string') {
+						return false;
+					}
 					break;
 				case 'orders':
-					if(!isset(tactic[key], 'array')) { return false; }
+					if(!isset(tactic[key], 'array')) {
+						return false;
+					}
 					break;
 				default:
 					return false;
@@ -54,9 +60,14 @@ module.exports = class Tactics {
 		for(const order of tactic.orders) {
 			if( !isset(order.unit, 'string') ||
 				!isset(order.target, 'string') ||
-				!isset(order.priority, 'number')) { return false; }
+				!isset(order.priority, 'number')) {
 
-			if(order.unit.includes('SHIP_WEP_MINES')) { return false; }
+				return false;
+			}
+
+			if(order.unit.includes('SHIP_WEP_MINES')) {
+				return false;
+			}
 		}
 
 		return true;
@@ -74,7 +85,9 @@ module.exports = class Tactics {
 	}
 
 	static create(user, tactic) {
-		if(!Tactics.checkTactic(tactic, user)) { return; }
+		if(!Tactics.checkTactic(tactic, user)) {
+			return;
+		}
 
 		db.tactics.upsert(tactic, () => {
 			log(user.username + ' has created a new tactic named ' + tactic.name);
@@ -84,7 +97,9 @@ module.exports = class Tactics {
 	}
 
 	static update(user, tactic) {
-		if(!Tactics.checkTactic(tactic, user)) { return; }
+		if(!Tactics.checkTactic(tactic, user)) {
+			return;
+		}
 
 		Tactics.checkOwner(user.id, tactic.id, () => {
 			db.tactics.upsert(tactic, () => {

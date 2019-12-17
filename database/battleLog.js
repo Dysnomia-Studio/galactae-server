@@ -65,7 +65,9 @@ module.exports = {
 				[battleLogId, userId])).rows;
 
 			// Check rights & battleLog exists
-			if(access.length === 0) { return []; }
+			if(access.length === 0) {
+				return [];
+			}
 
 			const battleLog = (await serverClient.query(
 				'SELECT * FROM "battleLog" WHERE "battleLog_id" = $1', [battleLogId]
