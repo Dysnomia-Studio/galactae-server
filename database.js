@@ -207,14 +207,14 @@ module.exports = {
 
 				if(obj.rows.length > 0) {
 					generalClient.query('UPDATE "globalRanks" SET points=$1, planets=$2, ally=$5 WHERE game_id=$3 AND server_name=$4',
-						[points,pcount,game_id,globalCfg.serverGlobalName, ally], (err) => {
+						[points,pcount,game_id,globalCfg.serverGlobalName, ally], (updateErr) => {
 							if(updateErr) {
 								log(updateErr, 'error');
 							}
 						});
 				} else {
 					generalClient.query('INSERT INTO "globalRanks"(points,planets,game_id,server_name,name,ally) VALUES($1,$2,$3,$4,$5,$6)',
-						[points,pcount,game_id,globalCfg.serverGlobalName,name,ally], (err) => {
+						[points,pcount,game_id,globalCfg.serverGlobalName,name,ally], (insertErr) => {
 							if(insertErr) {
 								log(insertErr, 'error');
 							}
@@ -235,14 +235,14 @@ module.exports = {
 
 					if(obj.rows.length > 0) {
 						generalClient.query('UPDATE "sectorRanks" SET points=$1, planets=$2, ally=$6 WHERE game_id=$3 AND server_name=$4 AND sector=$5',
-							[points,pcount,game_id,globalCfg.serverGlobalName,sector,ally], (err) => {
+							[points,pcount,game_id,globalCfg.serverGlobalName,sector,ally], (updateErr) => {
 								if(updateErr) {
 									log(updateErr, 'error');
 								}
 							});
 					} else {
 						generalClient.query('INSERT INTO "sectorRanks"(points,planets,game_id,server_name,name,sector,ally) VALUES($1,$2,$3,$4,$5,$6,$7)',
-							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector,ally], (err) => {
+							[points,pcount,game_id,globalCfg.serverGlobalName,name,sector,ally], (insertErr) => {
 								if(insertErr) {
 									log(insertErr, 'error');
 								}
