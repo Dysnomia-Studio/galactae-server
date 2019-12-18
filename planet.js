@@ -8,35 +8,39 @@ module.exports = class Planet {
 	 * @param      {Function}  callback  Function needed to call back
 	 */
 	static find(user,pid,decalage,callback) {
-		db.player.searchById(user.id, function(userReturned) {
-			if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
-				const nbPlanetes = userReturned.planetlist.length;
-				let valid = false;
+		const currPlayer = db.player.find(user.id);
 
-				for(let i=0; i<nbPlanetes; i++) {
-					if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-						if(i===0 && decalage < 0) {
-							pid = userReturned.planetlist[nbPlanetes+decalage];
-						} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
-							pid = userReturned.planetlist[decalage-1];
-						} else {
-							pid = userReturned.planetlist[i+decalage];
-						}
+		if(!isset(currPlayer, 'object') || !isset(currPlayer.planetlist, 'array') || !isset(currPlayer.planetlist[0], 'string')) {
+			return;
+		}
 
-						valid = true;
-						break;
-					}
+		const nbPlanetes = currPlayer.planetlist.length;
+		let valid = false;
+
+		for(let i=0; i<nbPlanetes; i++) {
+			if(pid===currPlayer.planetlist[i]) { // Cas où le joueur a les bonnes infos
+				if(i===0 && decalage < 0) {
+					pid = currPlayer.planetlist[nbPlanetes+decalage];
+				} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
+					pid = currPlayer.planetlist[decalage-1];
+				} else {
+					pid = currPlayer.planetlist[i+decalage];
 				}
-				// Si pas d'info, on met la premiere planete dans la liste
-				if(!valid) {
-					pid = userReturned.planetlist[0];
-				}
-				db.planet.find(pid,function(planetReturned) {
-					db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
-						callback(planetReturned,userReturned,fleetReturned);
-					});
-				});
+
+				valid = true;
+				break;
 			}
+		}
+
+		// Si pas d'info, on met la premiere planete dans la liste
+		if(!valid) {
+			pid = currPlayer.planetlist[0];
+		}
+
+		db.planet.find(pid,function(planetReturned) {
+			db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
+				callback(planetReturned,currPlayer,fleetReturned);
+			});
 		});
 	}
 
