@@ -40,5 +40,5 @@ module.exports = {
 		} catch(err) {
 			log(err, 'error');
 		}
-	}
+	},
 };

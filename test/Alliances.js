@@ -22,7 +22,7 @@ describe('• Alliances', () => {
 					name: 'name',
 					description: 'description',
 				},
-				foo: 'bar'
+				foo: 'bar',
 			});
 		});
 	});

@@ -236,7 +236,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -308,7 +308,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -363,7 +363,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -448,7 +448,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -501,7 +501,7 @@ describe('• Fleets (shared)', () => {
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
-						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now())
+						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now()),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -717,19 +717,19 @@ describe('• Fleets (shared)', () => {
 	describe('isImmobile()', () => {
 		it('Should work (ok)', () => {
 			assert(Fleets.isImmobile({
-				endMoveTime: -1
+				endMoveTime: -1,
 			}));
 		});
 
 		it('Should work (past)', () => {
 			assert(!Fleets.isImmobile({
-				endMoveTime: Date.now() - 100000
+				endMoveTime: Date.now() - 100000,
 			}));
 		});
 
 		it('Should work (future)', () => {
 			assert(!Fleets.isImmobile({
-				endMoveTime: Date.now() + 100000
+				endMoveTime: Date.now() + 100000,
 			}));
 		});
 	});
@@ -737,19 +737,19 @@ describe('• Fleets (shared)', () => {
 	describe('hasEndedMove()', () => {
 		it('Should work (ok)', () => {
 			assert(!Fleets.hasEndedMove({
-				endMoveTime: -1
+				endMoveTime: -1,
 			}));
 		});
 
 		it('Should work (past)', () => {
 			assert(Fleets.hasEndedMove({
-				endMoveTime: Date.now() - 100000
+				endMoveTime: Date.now() - 100000,
 			}));
 		});
 
 		it('Should work (future)', () => {
 			assert(!Fleets.hasEndedMove({
-				endMoveTime: Date.now() + 100000
+				endMoveTime: Date.now() + 100000,
 			}));
 		});
 	});

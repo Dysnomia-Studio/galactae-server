@@ -217,13 +217,13 @@ describe('• Fleets', () => {
 			};
 
 			const fleetA = {
-				bar: 'foo'
+				bar: 'foo',
 			};
 			const fleetB = {
-				foo: 'bar'
+				foo: 'bar',
 			};
 			const data = {
-				test: 4
+				test: 4,
 			};
 
 			Fleets.fetchFleets(fleetA, fleetB, data, (newFleetA, newFleetB, newData) => {
@@ -239,7 +239,7 @@ describe('• Fleets', () => {
 			const dbValue = {
 				fetched: true,
 				name: 'test',
-				ownerId: 'ownerId'
+				ownerId: 'ownerId',
 			};
 
 			db.fleet.find = (id, callback) => {
@@ -247,11 +247,11 @@ describe('• Fleets', () => {
 			};
 
 			const fleetB = {
-				foo: 'bar'
+				foo: 'bar',
 			};
 			const data = {
 				test: 4,
-				id: 'ownerId'
+				id: 'ownerId',
 			};
 
 			Fleets.fetchFleets('fleetA', fleetB, data, (newFleetA, newFleetB, newData) => {
@@ -267,7 +267,7 @@ describe('• Fleets', () => {
 			const dbValue = {
 				fetched: true,
 				name: 'test',
-				ownerId: 'ownerId'
+				ownerId: 'ownerId',
 			};
 
 			db.fleet.find = (id, callback) => {
@@ -275,11 +275,11 @@ describe('• Fleets', () => {
 			};
 
 			const fleetA = {
-				foo: 'bar'
+				foo: 'bar',
 			};
 			const data = {
 				test: 4,
-				id: 'ownerId'
+				id: 'ownerId',
 			};
 
 			Fleets.fetchFleets(fleetA, 'fleetB', data, (newFleetA, newFleetB, newData) => {
@@ -295,7 +295,7 @@ describe('• Fleets', () => {
 			const dbValue = {
 				fetched: true,
 				name: 'test',
-				ownerId: 'ownerId'
+				ownerId: 'ownerId',
 			};
 
 			db.fleet.find = (id, callback) => {
@@ -304,7 +304,7 @@ describe('• Fleets', () => {
 
 			const data = {
 				test: 4,
-				id: 'ownerId'
+				id: 'ownerId',
 			};
 
 			Fleets.fetchFleets('fleetA', 'fleetB', data, (newFleetA, newFleetB, newData) => {

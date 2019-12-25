@@ -59,7 +59,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, payload.sid);
 						assert.equal(event, 'server-alert');
 						assert.equal(data, payload.message);
-					}
+					},
 				};
 			};
 
@@ -98,7 +98,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, sid);
 						assert.equal(event, 'notification');
 						assert.deepEqual(data, payload);
-					}
+					},
 				};
 			};
 
@@ -113,7 +113,7 @@ describe('• Websocket', () => {
 	describe('# sendTutorial', () => {
 		it('sendTutorial(normal data)', () => {
 			const user = {
-				sid: 'MyAmazingSid'
+				sid: 'MyAmazingSid',
 			};
 
 			const payload = {
@@ -127,7 +127,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, user.sid);
 						assert.equal(event, 'tutorial');
 						assert.deepEqual(data, payload);
-					}
+					},
 				};
 			};
 
