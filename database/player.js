@@ -16,6 +16,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	findByAlly: async(allyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM users WHERE ally = $1', [allyId])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	searchByName: (name,callback) => {
 		serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name], (err, objReturned) => {
 			if(err) {
