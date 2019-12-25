@@ -1272,4 +1272,46 @@ describe('• Combat', () => {
 			}, '6272e472-586d-11e9-b743-2bbdb01acdd3');
 		});
 	});
+
+	describe('getAttacksAgainstPlayer()', () => {
+		it('Should work', (done) => {
+			db.getAttacksAgainstPlayer = async(plyId) => {
+				return [
+					{ id: 'f1', name: 'fleet1', endMoveTime: Date.now() },
+					{ id: 'f2', name: 'fleet2', endMoveTime: Date.now() - 10000 },
+				];
+			};
+
+			let doneTimes = 0;
+
+			io.to = (sid) => {
+				return {
+					emit: (eventType, content) => {
+						if(eventType === 'notification') {
+							assert(content.type === 'attack');
+
+							assert(content.args.arriveTime instanceof Date);
+
+							delete content.args.arriveTime;
+
+							if(content.args.id === 'f1') {
+								assert.deepEqual(content.args, { id: 'f1', name: 'fleet1' });
+							} else if(content.args.id === 'f2') {
+								assert.deepEqual(content.args, { id: 'f2', name: 'fleet2' });
+							} else {
+								assert(false, 'invalid fleet id');
+							}
+
+							doneTimes++;
+							if(doneTimes === 2) {
+								done();
+							}
+						}
+					},
+				};
+			};
+
+			Combat.getAttacksAgainstPlayer('plyId', 'plySid');
+		});
+	});
 });
