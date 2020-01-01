@@ -41,26 +41,27 @@ module.exports = class Chat {
 					} else if(data.message.charAt(0) === '@') { // Messages privés
 						const words =data.message.split(new RegExp('[ ,;]+', 'g'));
 
-						db.player.searchByName(words[0].substr(1).toLowerCase(), (dataReturned) => {
-							if(dataReturned === undefined) {
-								return;
-							}
-							const sid = dataReturned.sid;
+						const playerTarget = await db.player.findByName(words[0].substr(1).toLowerCase());
 
-							/* Recuperer le vrai message */
-							data.newmessage = data.message.substr(words[0].length+1);
-							data.message = words[0] + ': ' + data.message.substr(words[0].length+1);
+						if(!issert(playerTarget, 'object')) {
+							return;
+						}
 
-							/* Envoyer le PM */
-							if(sid !== undefined && sid !== '-1' && data.newmessage !== '' && sid !== data.sid) {
-								Chat.sendPM(data.sid,data.message,false);
-								Chat.sendPM(sid,data.username + ': ' + data.newmessage,true);
-							} else if(words[0].substr(1).toLowerCase() === data.username) {
-								Chat.sendSM(data.sid,'NO_PM_YOU');
-							} else if(sid === undefined || sid !== '-1') {
-								Chat.sendSM(data.sid,'PLY_NOT_FOUND');
-							}
-						});
+						const sid = playerTarget.sid;
+
+						/* Recuperer le vrai message */
+						data.newmessage = data.message.substr(words[0].length+1);
+						data.message = words[0] + ': ' + data.message.substr(words[0].length+1);
+
+						/* Envoyer le PM */
+						if(sid !== undefined && sid !== '-1' && data.newmessage !== '' && sid !== data.sid) {
+							Chat.sendPM(data.sid,data.message,false);
+							Chat.sendPM(sid,data.username + ': ' + data.newmessage,true);
+						} else if(words[0].substr(1).toLowerCase() === data.username) {
+							Chat.sendSM(data.sid,'NO_PM_YOU');
+						} else if(sid === undefined || sid !== '-1') {
+							Chat.sendSM(data.sid,'PLY_NOT_FOUND');
+						}
 
 						data.send = false;
 					} else { // Normal messages
@@ -130,29 +131,31 @@ module.exports = class Chat {
 	 * @param	  {string}	name	  The target name
 	 * @param	  {Function}  callback  Callback function
 	 */
-	static searchTarget(currUser, name, callback) {
-		db.player.searchByName(name, (dataReturned) => {
-			if(!isset(dataReturned, 'object') || !isset(dataReturned.sid, 'string')) {
-				Chat.sendSM(currUser.sid,'PLY_NOT_FOUND');
-				log('Player not found');
-			} else {
-				db.userGameId.find(dataReturned.id, (targetGameIdObj) => {
-					db.privilege.find(targetGameIdObj.user_id, (targetPrivileges) => {
-						let targetLvl = 1;
-						if(isset(targetPrivileges[0], 'object') && isset(targetPrivileges[0].user_privilege_lvl, 'number')) {
-							targetLvl = targetPrivileges[0].user_privilege_lvl;
-						}
+	static async searchTarget(currUser, name, callback) {
+		const dataReturned = await db.player.findByName(name);
 
-						if(currUser.lvl > targetLvl) {
-							callback(dataReturned);
-						} else {
-							Chat.sendSM(currUser.sid,'PERMISSION_DENIED');
-							log('Permission denied');
-						}
-					});
+		if(!isset(dataReturned, 'object') || !isset(dataReturned.sid, 'string')) {
+			Chat.sendSM(currUser.sid,'PLY_NOT_FOUND');
+			log('Player not found');
+		} else {
+			db.userGameId.find(dataReturned.id, (targetGameIdObj) => {
+				db.privilege.find(targetGameIdObj.user_id, (targetPrivileges) => {
+					let targetLvl = 1;
+					if(isset(targetPrivileges[0], 'object') && isset(targetPrivileges[0].user_privilege_lvl, 'number')) {
+						targetLvl = targetPrivileges[0].user_privilege_lvl;
+					}
+
+					console.log(currUser.lvl);
+
+					if(currUser.lvl > targetLvl) {
+						callback(dataReturned);
+					} else {
+						Chat.sendSM(currUser.sid,'PERMISSION_DENIED');
+						log('Permission denied');
+					}
 				});
-			}
-		});
+			});
+		}
 	}
 
 	/**

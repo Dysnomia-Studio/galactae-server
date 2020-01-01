@@ -46,44 +46,48 @@ module.exports = class Planet {
 	 * @param      {<type>}  data      data sent by user
 	 * @param      {number}  decalage  le decalage de planete
 	 */
-	static refresh(inputData, callback, disableTutorials=false) {
-		db.player.searchById(inputData.id, (userReturned) => {
-			db.planet.findByOwner(inputData.id, (planetsReturned) => {
-				for(const currPlanet of planetsReturned) {
-					db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
-						const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
+	static async refresh(inputData, callback, disableTutorials=false) {
+		let userReturned = await db.player.find(inputData.id);
 
-						db.planet.update(newPlanet);
+		if(!isset(userReturned, 'object')) {
+			return;
+		}
 
-						Fleets.refresh(newPlanet.address,inputData.sid);
+		db.planet.findByOwner(inputData.id, (planetsReturned) => {
+			for(const currPlanet of planetsReturned) {
+				db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
+					const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
 
-						if(inputData.pid === currPlanet.address) {
-							if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
-								db.unit.findByOwner(userReturned.id, (unitsList) => {
-									const oldCount = Object.keys(userReturned.tutorials).length;
+					db.planet.update(newPlanet);
 
-									userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
+					Fleets.refresh(newPlanet.address,inputData.sid);
 
-									if(Object.keys(userReturned.tutorials).length !== oldCount) {
-										db.player.update({
-											id: userReturned.id,
-											tutorials: userReturned.tutorials,
-										});
-									}
+					if(inputData.pid === currPlanet.address) {
+						if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
+							db.unit.findByOwner(userReturned.id, (unitsList) => {
+								const oldCount = Object.keys(userReturned.tutorials).length;
 
-									Tutorials.checkTutorials(userReturned, newPlanet);
-								});
-							}
+								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
-							if(callback) {
-								callback(newPlanet);
-							} else {
-								Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
-							}
+								if(Object.keys(userReturned.tutorials).length !== oldCount) {
+									db.player.update({
+										id: userReturned.id,
+										tutorials: userReturned.tutorials,
+									});
+								}
+
+								Tutorials.checkTutorials(userReturned, newPlanet);
+							});
 						}
-					});
-				}
-			});
+
+						if(callback) {
+							callback(newPlanet);
+						} else {
+							Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						}
+					}
+				});
+			}
 		});
 	}
 

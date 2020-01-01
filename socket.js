@@ -93,8 +93,10 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Player.getAlly(data, Chat.analyse);
+				Player.isValid(data, async(data) => { // Verify identity
+					data = await Player.getAlly(data);
+
+					Chat.analyse(data);
 				});
 			});
 

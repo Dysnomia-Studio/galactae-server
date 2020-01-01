@@ -91,7 +91,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 	 * @class      CreateUnitType (name)
 	 * @param      {<type>}  data    Data given by client
 	 */
-	static createType(data) {
+	static async createType(data) {
 		let message = '';
 		const ship = data.ship;
 
@@ -128,81 +128,81 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 		// Last check
 		if(!isset(message)) {
-			db.player.searchByName(data.username,function(userReturned) {
-				// Check research
+			const userReturned = await db.player.findByName(data.username);
+
+			// Check research
+			for(const i in ship) {
+				if(i==='name' || i==='type' || i==='shape') {
+					continue;
+				}
+
+				if(shipResearchDependencies[ship[i].value] !== undefined && !Research.isSearched(userReturned,shipResearchDependencies[ship[i].value])) {
+					message = 'NEEDED_RESEARCH_MISSING';
+					break;
+				}
+			}
+
+			// Saving
+			if(!isset(message)) {
+				// Save to database
+				const shipToSave = {
+					name: ship.name,
+					shipType: ship.type,
+					shipShape: ship.shape,
+					ownerId: data.id,
+					cost: [],
+					parts: [],
+					armorType: 0, // None yet
+					note: 0, // Not yet
+					owned: 0,
+				};
+
 				for(const i in ship) {
 					if(i==='name' || i==='type' || i==='shape') {
 						continue;
 					}
 
-					if(shipResearchDependencies[ship[i].value] !== undefined && !Research.isSearched(userReturned,shipResearchDependencies[ship[i].value])) {
-						message = 'NEEDED_RESEARCH_MISSING';
-						break;
-					}
-				}
-
-				// Saving
-				if(!isset(message)) {
-					// Save to database
-					const shipToSave = {
-						name: ship.name,
-						shipType: ship.type,
-						shipShape: ship.shape,
-						ownerId: data.id,
-						cost: [],
-						parts: [],
-						armorType: 0, // None yet
-						note: 0, // Not yet
-						owned: 0,
-					};
-
-					for(const i in ship) {
-						if(i==='name' || i==='type' || i==='shape') {
-							continue;
-						}
-
-						shipToSave.parts.push({
-							type: ship[i].type,
-							name: i,
-							tech: ship[i].value,
-						});
-					}
-
-					if(shipToSave.parts.length !== shipShapesDetails[ship.type][ship.shape].partCount) {
-						return;
-					}
-
-					shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
-
-					if(shipToSave.cost[0] === -1) { // There's something wrong ... Security measure
-						return;
-					}
-
-					db.unit.findByOwner(data.id,function(unitList) {
-						const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
-
-						if(!duplicate && !duplicateName) {
-							db.unit.create(shipToSave, function() {
-								log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
-								Units.refresh(data);
-							});
-						} else if(duplicate) {
-							message = 'SHIP_TYPE_ALREADY_EXISTS';
-							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-							Websocket.SendMessageToClient({sid: data.sid, message: message});
-						} else {
-							message = 'SHIP_NAME_ALREADY_EXISTS';
-							log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-							Websocket.SendMessageToClient({sid: data.sid, message: message});
-						}
+					shipToSave.parts.push({
+						type: ship[i].type,
+						name: i,
+						tech: ship[i].value,
 					});
-
-				} else {
-					// Notify client
-					log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-					Websocket.SendMessageToClient({sid: data.sid, message: message});
 				}
-			});
+
+				if(shipToSave.parts.length !== shipShapesDetails[ship.type][ship.shape].partCount) {
+					return;
+				}
+
+				shipToSave.cost = Units.calcCost(ship.shape,shipToSave.parts);
+
+				if(shipToSave.cost[0] === -1) { // There's something wrong ... Security measure
+					return;
+				}
+
+				db.unit.findByOwner(data.id,function(unitList) {
+					const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
+
+					if(!duplicate && !duplicateName) {
+						db.unit.create(shipToSave, function() {
+							log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
+							Units.refresh(data);
+						});
+					} else if(duplicate) {
+						message = 'SHIP_TYPE_ALREADY_EXISTS';
+						log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
+						Websocket.SendMessageToClient({sid: data.sid, message: message});
+					} else {
+						message = 'SHIP_NAME_ALREADY_EXISTS';
+						log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
+						Websocket.SendMessageToClient({sid: data.sid, message: message});
+					}
+				});
+
+			} else {
+				// Notify client
+				log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
+				Websocket.SendMessageToClient({sid: data.sid, message: message});
+			}
 		} else {
 			// Notify client
 			log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');

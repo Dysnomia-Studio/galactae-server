@@ -81,14 +81,14 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 		});
 	}
 
-	static sync(data) {
-		db.player.searchByName(data.username,function(userReturned) {
-			Research.refreshUserResearch(userReturned, function(userNewResearch) {
-				db.planet.find(data.pid, function(planetReturned) {
-					db.player.update(userNewResearch);
+	static async sync(data) {
+		const player = await db.player.findByName(data.username);
 
-					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
-				});
+		Research.refreshUserResearch(player, function(userNewResearch) {
+			db.planet.find(data.pid, function(planetReturned) {
+				db.player.update(userNewResearch);
+
+				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 			});
 		});
 	}

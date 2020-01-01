@@ -15,24 +15,28 @@ module.exports = class Player {
 			}
 		});
 	}
+
 	/* Does the player can act ? */
 	static canAct(user) {
 		const minTime = 100; //time in ms
 
 		return ((Date.now()-user.lastAction)>minTime);
 	}
-	/* Get player ally */
-	static getAlly(data,callback) {
-		db.player.searchById(data.id,function(obj) {
-			if(!isset(obj, 'object')) {
-				log('Error: ' + data.username + ' not found.');
-				return;
-			}
 
-			data.ally = obj.ally;
-			callback(data);
-		});
+	/* Get player ally */
+	static async getAlly(data) {
+		const player = await db.player.find(data.id);
+
+		if(!isset(player, 'object')) {
+			log('Error: ' + data.username + ' not found.');
+			return;
+		}
+
+		data.ally = player.ally;
+
+		return data;
 	}
+
 	/* Connect Player */
 	static connect(data) {
 		db.userGameId.find(data.id, function(userGameIdObj) {
