@@ -145,8 +145,6 @@ module.exports = class Chat {
 						targetLvl = targetPrivileges[0].user_privilege_lvl;
 					}
 
-					console.log(currUser.lvl);
-
 					if(currUser.lvl > targetLvl) {
 						callback(dataReturned);
 					} else {
@@ -197,10 +195,10 @@ module.exports = class Chat {
 						user_id: target.id,
 						server_name: globalCfg.serverGlobalName,
 						ban_type: 2,
-						ban_begin: now,
+						ban_start: now,
 						ban_end: now + banTime,
 						ban_reason: banMessage,
-						admin: data.user_id,
+						admin_id: data.user_id,
 					});
 
 					io.to('' + target.sid).emit('server-kick', banMessage);
@@ -223,17 +221,17 @@ module.exports = class Chat {
 					}
 					const now = Date.now();
 
-					log('Banned ' + muteTime + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
-					Chat.sendSM(data.sid,'Banned ' + muteTime + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
+					log('Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
+					Chat.sendSM(data.sid,'Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
 
 					db.ban.create({
 						user_id: target.id,
 						server_name: globalCfg['serverGlobalName'],
 						ban_type: 1,
-						ban_begin: now,
+						ban_start: now,
 						ban_end: now + muteTime,
 						ban_reason: muteMessage,
-						admin: data.user_id,
+						admin_id: data.user_id,
 					});
 
 					io.to(target.sid).emit('chat-mute', {muteTime: muteTime, message: muteMessage});

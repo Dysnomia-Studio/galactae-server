@@ -190,9 +190,6 @@ module.exports = {
 					log(err, 'error');
 					return;
 				}
-				if(callback) {
-					callback(bans);
-				}
 			});
 		},
 	},
