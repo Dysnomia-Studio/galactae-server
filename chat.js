@@ -10,7 +10,7 @@ module.exports = class Chat {
 					return;
 				}
 
-				db.privilege.find(data.user_id, (userPrivileges) =>{
+				db.privilege.find(data.user_id, async(userPrivileges) =>{
 					data.message = textToSmileys(data.message);
 
 					const logname = data.username;
