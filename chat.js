@@ -33,7 +33,7 @@ module.exports = class Chat {
 
 					const rank = Privileges.getChatRank(data.lvl);
 
-					const discordmsg = rank + data.username + ': ' + data.message;
+					const discordmsg = '**' + rank + data.username + ':** ' + data.message;
 					data.username = '<span class="username">' + data.username + '</span>';
 
 					if(data.message.charAt(0) === '!' && data.lvl > 1) {

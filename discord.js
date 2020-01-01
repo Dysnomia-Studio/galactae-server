@@ -61,6 +61,7 @@ module.exports = {
 		const channel = client.channels.find((channel) => channel.name === channelName);
 		channel.send(unNormalizeText(message));
 	},
+
 	/**
 	 * Alert something on discord global chat of this server
 	 *
@@ -69,6 +70,6 @@ module.exports = {
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
 		const channel = client.channels.find((channel) => channel.name === channelName);
-		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
+		channel.send('**[SYSTEM MESSAGE]** ' + unNormalizeText(message));
 	},
 };
