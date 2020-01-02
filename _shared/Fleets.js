@@ -308,5 +308,17 @@
 
 			return false;
 		}
+
+		static isImmobile(fleet) {
+			fleet.endMoveTime = parseInt(fleet.endMoveTime);
+
+			return fleet.endMoveTime === -1;
+		}
+
+		static hasEndedMove(fleet) {
+			fleet.endMoveTime = parseInt(fleet.endMoveTime);
+
+			return !Fleets.isImmobile(fleet) && fleet.endMoveTime <= Date.now();
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);
