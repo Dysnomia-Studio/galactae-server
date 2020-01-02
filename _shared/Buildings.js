@@ -304,5 +304,15 @@
 				(cost.aluminium <= metal*ratio.aluRatio) &&
 				(cost.iron <= metal*ratio.ironRatio);
 		}
+
+		/**
+		 * Calculates the morale of a planet
+		 */
+		static calcPlanetMorale(buildings) {
+			return Math.min(
+				0.5 + 0.5 * buildings[2] / buildings[3],
+				2
+			);
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

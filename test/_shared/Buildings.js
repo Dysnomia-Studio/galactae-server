@@ -286,4 +286,81 @@ describe('• Buildings (shared)', () => {
 			);
 		});
 	});
+
+	/**
+	 * calcPlanetMorale
+	 */
+	describe('# calcPlanetMorale()', () => {
+		it('same level', () => {
+			for(let i = 1; i < 26; i++) {
+				assert.equal(
+					Buildings.calcPlanetMorale([0,0,i,i]),
+					1
+				);
+			}
+		});
+
+		it('2 hab 1 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,2,1]),
+				1.5
+			);
+		});
+
+		it('25 hab 1 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,25,1]),
+				2
+			);
+		});
+
+		it('1 hab 25 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,1,25]),
+				0.52
+			);
+		});
+
+		it('6 hab 9 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,6,9]).toFixed(4),
+				0.8333
+			);
+		});
+
+		it('10 hab 15 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,10,15]).toFixed(4),
+				0.8333
+			);
+		});
+
+		it('12 hab 17 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,12,17]).toFixed(4),
+				0.8529
+			);
+		});
+
+		it('19 hab 17 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,19,17]).toFixed(4),
+				1.0588
+			);
+		});
+
+		it('22 hab 23 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,22,23]).toFixed(4),
+				0.9783
+			);
+		});
+
+		it('1 hab 25 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,1,25]),
+				0.52
+			);
+		});
+	});
 });
