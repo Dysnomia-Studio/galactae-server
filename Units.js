@@ -346,7 +346,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 						// Create entry in planet db for in-build unit
 						newPlanet.unitBuildingID = inputData.unit;
-						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7])) * TIME.HOUR_TO_MS);
+						newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11]))) * TIME.HOUR_TO_MS);
 						newPlanet.unitBuildingCount = inputData.count;
 						newPlanet.unitBuildingFleetID = fleetReturned.id;
 
