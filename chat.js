@@ -245,7 +245,20 @@ module.exports = class Chat {
 				data.send = true;
 				break;
 			case '!help':
-				Chat.sendSM(data.sid,'HELP'); // @TODO (admin/staff), no translation to be safe
+				let maintenance = '';
+
+				if(data.lvl >= 4) {
+					maintenance = '<li><b>!maintenance</b> Begins a maintenance</li>';
+				}
+
+				Chat.sendSM(data.sid,'Admin/Staff Commands:' +
+					'<ul>' +
+					'<li><b>!help</b> Display this help</li>' +
+					'<li><b>!ban target time reason</b> Ban a player from the game</li>' +
+					'<li><b>!mute target time reason</b> Mute a player from the chat</li>' +
+					maintenance +
+					'<li><b>!asay message</b> Create a system mewssage</li>' +
+					'</ul>');
 				break;
 			default:
 				Chat.sendSM(data.sid,'COMMAND_NOT_FOUND');
