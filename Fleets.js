@@ -36,7 +36,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	 * @param      {object}  sid     user socket id
 	 * @return     {socket}  units   list of units types
 	 */
-	static refresh(address,sid) {
+	static refresh(address,sid,playerAddress='') {
+		if(playerAddress === '') {
+			playerAddress = address;
+		}
+
 		if(globalCfg.dev) {
 			log('Refresh fleets');
 		}
@@ -52,7 +56,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
-					Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 					return;
 				}
 
@@ -95,13 +99,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					db.fleet.update(newFleet, function() {
 						++done;
 						if(done === haveToDone) {
-							Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
+							Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 						}
 					});
 				}
 
 				if(haveToDone === 0) {
-					Fleets.sendtoPlayer(FleetList, newPlanet, sid, address);
+					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 				}
 			});
 		});

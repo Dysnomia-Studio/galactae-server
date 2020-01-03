@@ -60,7 +60,7 @@ module.exports = class Planet {
 
 					db.planet.update(newPlanet);
 
-					Fleets.refresh(newPlanet.address,inputData.sid);
+					Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
 
 					if(inputData.pid === currPlanet.address) {
 						if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
