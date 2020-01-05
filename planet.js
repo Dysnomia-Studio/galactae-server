@@ -7,37 +7,37 @@ module.exports = class Planet {
 	 * @param      {number}    decalage  decalage de n°
 	 * @param      {Function}  callback  Function needed to call back
 	 */
-	static find(user,pid,decalage,callback) {
-		db.player.searchById(user.id, function(userReturned) {
-			if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
-				const nbPlanetes = userReturned.planetlist.length;
-				let valid = false;
+	static async find(user,pid,decalage,callback) {
+		const userReturned = await db.player.find(user.id);
 
-				for(let i=0; i<nbPlanetes; i++) {
-					if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-						if(i===0 && decalage < 0) {
-							pid = userReturned.planetlist[nbPlanetes+decalage];
-						} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
-							pid = userReturned.planetlist[decalage-1];
-						} else {
-							pid = userReturned.planetlist[i+decalage];
-						}
+		if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
+			const nbPlanetes = userReturned.planetlist.length;
+			let valid = false;
 
-						valid = true;
-						break;
+			for(let i=0; i<nbPlanetes; i++) {
+				if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
+					if(i===0 && decalage < 0) {
+						pid = userReturned.planetlist[nbPlanetes+decalage];
+					} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
+						pid = userReturned.planetlist[decalage-1];
+					} else {
+						pid = userReturned.planetlist[i+decalage];
 					}
+
+					valid = true;
+					break;
 				}
-				// Si pas d'info, on met la premiere planete dans la liste
-				if(!valid) {
-					pid = userReturned.planetlist[0];
-				}
-				db.planet.find(pid,function(planetReturned) {
-					db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
-						callback(planetReturned,userReturned,fleetReturned);
-					});
-				});
 			}
-		});
+			// Si pas d'info, on met la premiere planete dans la liste
+			if(!valid) {
+				pid = userReturned.planetlist[0];
+			}
+			db.planet.find(pid,function(planetReturned) {
+				db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
+					callback(planetReturned,userReturned,fleetReturned);
+				});
+			});
+		}
 	}
 
 	/**
