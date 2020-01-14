@@ -161,7 +161,7 @@ module.exports = function() {
 		// Cuirasse
 		cuirasse_small: 	[7500,4500],
 		// Corvet
-		corvet_small: 		[6600,3800],
+		corvet_aegis: 		[6600,3800],
 		// Carrier
 		carrier_small: 		[5750,3600],
 		carrier_medium: 	[5350,3350],
@@ -228,7 +228,7 @@ module.exports = function() {
 		// Cuirasse
 		cuirasse_small: 			{ cost: 2580, 	parents: ['prop_ions','misc_advTelemetrie'] },
 		// Corvet
-		corvet_small: 				{ cost: 680, 	parents: ['prop_main', 'misc_advTelemetrie'] },
+		corvet_aegis: 				{ cost: 680, 	parents: ['prop_main', 'misc_advTelemetrie'] },
 		// Carrier
 		carrier_small: 				{ cost: 2580, 	parents: ['figther_light_interceptor','prop_ions'] },
 		carrier_medium: 			{ cost: 2850, 	parents: ['carrier_small'] },
@@ -285,7 +285,7 @@ module.exports = function() {
 		SHIP_CUIRASSE_SMALL: 'cuirasse_small',
 
 		// Corvet
-		SHIP_CORVET_SMALL: 'corvet_small',
+		SHIP_CORVET_AEGIS: 'corvet_aegis',
 
 		// Carrier
 		SHIP_CARRIER_MEDIUM: 'carrier_medium',
@@ -439,7 +439,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_CORVET: {
-			SHIP_CORVET_SMALL: {
+			SHIP_CORVET_AEGIS: {
 				svg: [
 					['struct','rect'  , 50,150,120, 60], // Moteur 1
 					['struct','rect'  , 50,290,120, 60], // Moteur 2
@@ -515,7 +515,7 @@ module.exports = function() {
 		SHIP_FIGHTER_MEDIUM: 		[ 70, 35, 60, 25, 0.52,  10],
 		SHIP_FIGHTER_BOMBER: 		[ 95, 60,100, 40, 0.78,  20],
 		// Corvets
-		SHIP_CORVET_SMALL: 			[110, 18, 85, 35, 0.62,  40],
+		SHIP_CORVET_AEGIS: 			[110, 18, 85, 35, 0.62,  40],
 		// Carriers
 		SHIP_CARRIER_SMALL: 		[405,300,140, 75,1.25, 920],
 		SHIP_CARRIER_MEDIUM: 		[510,420,190, 95,1.65,1200],
@@ -614,7 +614,7 @@ module.exports = function() {
 		SHIP_FIGHTER_MEDIUM: 10000,
 		SHIP_FIGHTER_BOMBER: 13000,
 
-		SHIP_CORVET_SMALL: 80000,
+		SHIP_CORVET_AEGIS: 80000,
 
 		SHIP_CARRIER_SMALL: 180000,
 		SHIP_CARRIER_MEDIUM: 320000,
@@ -671,7 +671,7 @@ module.exports = function() {
 		SHIP_FIGHTER_MEDIUM: 		175,
 		SHIP_FIGHTER_BOMBER: 		250,
 
-		SHIP_CORVET_SMALL: 			175,
+		SHIP_CORVET_AEGIS: 			175,
 
 		SHIP_CARRIER_SMALL: 		500,
 		SHIP_CARRIER_MEDIUM: 		800,
@@ -751,7 +751,7 @@ module.exports = function() {
 					'battlecruiser_atrios',
 					'cuirasse_small',
 
-					'corvet_small',
+					'corvet_aegis',
 
 					'carrier_small',
 					'carrier_medium',
