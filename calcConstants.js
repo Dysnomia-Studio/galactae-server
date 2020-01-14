@@ -157,7 +157,7 @@ module.exports = function() {
 		figther_heavy_interceptor: [6150,3400],
 		figther_bomber: 	[6250,3100],
 		// Battlecruiser
-		battlecruiser_small: [7800,4900],
+		battlecruiser_atrios: [7800,4900],
 		// Cuirasse
 		cuirasse_small: 	[7500,4500],
 		// Corvet
@@ -224,7 +224,7 @@ module.exports = function() {
 		figther_heavy_interceptor: 	{ cost: 850, 	parents: ['figther_light_interceptor'] },
 		figther_bomber: 			{ cost: 1320, 	parents: ['figther_heavy_interceptor', 'wep_nuke'] },
 		// Battlecruiser
-		battlecruiser_small: 		{ cost: 2550, 	parents: ['prop_ions','misc_advTelemetrie'] },
+		battlecruiser_atrios: 		{ cost: 2550, 	parents: ['prop_ions','misc_advTelemetrie'] },
 		// Cuirasse
 		cuirasse_small: 			{ cost: 2580, 	parents: ['prop_ions','misc_advTelemetrie'] },
 		// Corvet
@@ -279,7 +279,7 @@ module.exports = function() {
 		SHIP_FIGHTER_MEDIUM: 'figther_heavy_interceptor',
 
 		// Battlecruiser
-		SHIP_BATTLECRUISER_SMALL: 'battlecruiser_small',
+		SHIP_BATTLECRUISER_ATRIOS: 'battlecruiser_atrios',
 
 		// Cuirasse
 		SHIP_CUIRASSE_SMALL: 'cuirasse_small',
@@ -353,7 +353,7 @@ module.exports = function() {
 			},
 		},
 		SHIP_BATTLECRUISER: {
-			SHIP_BATTLECRUISER_SMALL: {
+			SHIP_BATTLECRUISER_ATRIOS: {
 				svg: [
 					// Structure
 					['struct','path','M200',130,'Q',300,165,200,200,'L100',200,'L100',130,'L200',130], // Moteur gauche
@@ -507,7 +507,7 @@ module.exports = function() {
 		SHIP_SAT_AG2: 				[ 15, 20, 50, 23,0.37,   0],
 		SHIP_SAT_AG3: 				[ 30, 35, 60, 36,0.70,   0],
 		// Battlecruisers
-		SHIP_BATTLECRUISER_SMALL: 	[260,250,120, 60,1.12, 160],
+		SHIP_BATTLECRUISER_ATRIOS: 	[260,250,120, 60,1.12, 160],
 		// Cruisaders
 		SHIP_CUIRASSE_SMALL: 		[330,350,180, 95,1.45, 220],
 		// Fighters
@@ -606,7 +606,7 @@ module.exports = function() {
 	};
 
 	this.fuelStorage = {
-		SHIP_BATTLECRUISER_SMALL: 250000,
+		SHIP_BATTLECRUISER_ATRIOS: 250000,
 
 		SHIP_CUIRASSE_SMALL: 225000,
 
@@ -663,7 +663,7 @@ module.exports = function() {
 		SHIP_SAT_AG2: 				75,
 		SHIP_SAT_AG3:				100,
 
-		SHIP_BATTLECRUISER_SMALL: 	550,
+		SHIP_BATTLECRUISER_ATRIOS: 	550,
 
 		SHIP_CUIRASSE_SMALL: 		950,
 
@@ -748,7 +748,7 @@ module.exports = function() {
 					'figther_heavy_interceptor',
 					'figther_bomber',
 
-					'battlecruiser_small',
+					'battlecruiser_atrios',
 					'cuirasse_small',
 
 					'corvet_small',
