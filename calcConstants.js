@@ -115,69 +115,73 @@ module.exports = function() {
 
 	this.researchPos = {
 		// Noeud Central
-		researchCenter:		[5000,5000],
-		industrialistion:	[5563,5000],
-		phyContemporaine:	[4813,5333],
-		thermodynamique:	[4900,4467],
+		researchCenter:				[5000,5000],
+		industrialistion:			[5333,5000],
+		phyContemporaine:			[4666,6000],
+		thermodynamique:			[4666,4666],
 		// Mise en orbite et propulsion
-		prop_main:			[4313,3933],
-		prop_vSolaire:		[3600,4250],
-		prop_ions:			[5922,4114],
-		prop_plasma:		[6918,4196],
-		prop_vsl:			[7800,4150],
-		prop_wd:			[8700,4100],
-		prop_hyperespace:	[8750,3000],
-		prop_manoeuvre:		[4813,3433],
-		prop_advManoeuvre:	[5000,3000],
-		prop_suprastability:[7850,3850],
+		prop_main:					[3333,4333],
+		prop_vSolaire:				[3666,4900],
+		prop_ions:					[4500,4100],
+		prop_plasma:				[4000,3666],
+		prop_vsl:					[7500,4000],
+		prop_wd:					[8000,4000],
+		prop_hyperespace:			[8500,4000],
+		prop_manoeuvre:				[3000,4000],
+		prop_advManoeuvre:			[2666,3666],
+		prop_suprastability:		[8000,4500],
 		// Construction et production
-		cp_mecanisation:	[6000,4600],
-		cp_tracteur:		[6300,4950],
-		cp_materielTp:		[6550,5250],
-		cp_dbRaffinage:		[6100,5400],
-		cp_molecular_compression: [5450,5350],
+		cp_mecanisation:			[5666,5333],
+		cp_tracteur:				[5666,4666],
+		cp_materielTp:				[6000,5000],
+		cp_dbRaffinage:				[5333,4600],
+		cp_molecular_compression: 	[5333,5500],
 		// Armes
-		wep_railgun:		[5900,5700],
-		wep_nuke:			[6500,6300],
-		wep_laser:			[6600,6000],
-		wep_plasma:			[7300,6400],
+		wep_railgun:				[4000,8500],
+		wep_nuke:					[5250,9000],
+		wep_laser:					[4000,7000],
+		wep_plasma:					[3666,7333],
 		// Shields & Defenses
-		def_turret:			[7500,5750],
-		def_shield_magnetic:[7800,6100],
-		def_shield_projector:[8100,6450],
-		def_shield_singularity:[7800,7400],
+		def_turret:					[6500,8500],
+		def_shield_magnetic: 		[6000,8000],
+		def_shield_projector: 		[5666,8333],
+		def_shield_singularity:		[4500,8250],
 		// Hangars
-		hangarDouble:		[5750,3300],
+		hangarDouble:				[4666,3222],
 		// Mines
-		wep_mines:			[5300,6600],
-		wep_mines_nuke:		[6250,6600],
-		wep_mines_iem:		[4600,6100],
+		wep_mines:					[5500,7000],
+		wep_mines_nuke:				[5666,7666],
+		wep_mines_iem:				[5333,7333],
 		// Figther
-		figther_light_interceptor: [6100,3700],
-		figther_heavy_interceptor: [6150,3400],
-		figther_bomber: 	[6250,3100],
+		figther_light_interceptor:	[7000,3000],
+		figther_heavy_interceptor:	[7000,6000],
+		figther_bomber: 			[7000,7500],
 		// Battlecruiser
-		battlecruiser_atrios: [7800,4900],
+		battlecruiser_atrios: 		[6600,3500],
 		// Cuirasse
-		cuirasse_small: 	[7500,4500],
+		cuirasse_small: 			[6333,4150],
 		// Corvet
-		corvet_aegis: 		[6600,3800],
+		corvet_aegis: 				[6000,4500],
 		// Carrier
-		carrier_small: 		[5750,3600],
-		carrier_medium: 	[5350,3350],
+		carrier_small: 				[5000,3500],
+		carrier_medium: 			[5000,3000],
+		// Colony ship
+		colony_ship: 				[3000,4900],
+		heavy_colony_ship:  		[2666,4900],
 		// Satellites
-		wep_sat_ag1:		[5300,7100],
-		wep_sat_ag2:		[6350,7500],
-		wep_sat_ag3:		[7329,7850],
+		wep_sat_ag1:				[6000,6500],
+		wep_sat_ag2:				[6000,7000],
+		wep_sat_ag3:				[6000,7500],
 		// Autres recherches spatiales
-		misc_astronomie:	[5200,6200],
-		misc_telemetrie:	[6100,6200],
-		misc_advTelemetrie:	[6900,5600],
-		misc_mecStellaire:	[4000,6100],
-		misc_phySolaire:	[3700,5850],
-		misc_phyQuantique:	[4800,5850],
-		misc_calcGravit:	[4500,6500],
-		misc_em:			[4300,5600],
+		misc_astronomie:			[5500,6000],
+		misc_telemetrie:			[6000,6000],
+		misc_advTelemetrie:			[6500,6000],
+		misc_mecStellaire:			[3333,6666],
+		misc_phySolaire:			[3666,5666],
+		misc_phyQuantique:			[4000,6000],
+		misc_calcGravit:			[5000,6666],
+		misc_em:					[4800,7800],
+		misc_colony:				[3000,6666],
 	};
 
 	this.researchList = {
@@ -232,6 +236,9 @@ module.exports = function() {
 		// Carrier
 		carrier_small: 				{ cost: 2580, 	parents: ['figther_light_interceptor','prop_ions'] },
 		carrier_medium: 			{ cost: 2850, 	parents: ['carrier_small'] },
+		// Colony ship
+		colony_ship:  				{ cost: 3500,	parents: ['prop_vsl', 'misc_colony', 'cp_molecular_compression', [11,10] ]},
+		heavy_colony_ship: 			{ cost: 8500, 	parents: ['colony_ship', [11,15] ]},
 		// Satellites
 		wep_sat_ag1:				{ cost: 360, 	parents: ['misc_calcGravit','misc_telemetrie', [7,5] ] },
 		wep_sat_ag2:				{ cost: 650, 	parents: ['wep_sat_ag1','misc_advTelemetrie', [7,10]] },
@@ -245,6 +252,7 @@ module.exports = function() {
 		misc_phySolaire: 			{ cost: 280, 	parents: ['misc_phyQuantique'] },
 		misc_calcGravit: 			{ cost: 240, 	parents: ['misc_astronomie'] },
 		misc_em: 					{ cost: 110, 	parents: ['phyContemporaine'] },
+		misc_colony: 				{ cost: 850,    parents: ['misc_mecStellaire'] },
 	};
 
 	/**
