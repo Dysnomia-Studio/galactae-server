@@ -406,7 +406,7 @@ module.exports = function() {
 		SHIP_FIGHTER: {
 			SHIP_FIGHTER_SMALL: {
 				svg: [
-					['struct','poly',100,100,70,250,100,400,170,400,250,250,170,100], // Ailes
+					['struct','poly',100,100,70,250,100,400,170,400,250,350,180,340,250,250,180,160,250,150,170,100], // Ailes
 					['struct','poly',60,205,50,250,60,295,510,280,520,250,510,220], // Corps
 					//['struct','poly',50,50,50,50,50,50,50,50], // Cockpit
 					// Armes
@@ -425,6 +425,8 @@ module.exports = function() {
 					['struct','path','M50',300,'Q',300,-100,550,300], // Arriere
 					['struct','path','M260',228,'Q',300,130,340,228], // Avant
 					['struct','path','M50',300,'Q',300,150,550,300], // Cockpit
+					['struct','poly',170,300,180,300,185,210,165,210], // Arme 1
+					['struct','poly',420,300,430,300,435,210,415,210], // Arme 2
 					// Armes
 					['cannon','rect'  ,150,180, 50, 50,'cannon_1'],
 					['cannon','rect'  ,400,180, 50, 50,'cannon_2'],
@@ -441,8 +443,8 @@ module.exports = function() {
 		SHIP_CORVET: {
 			SHIP_CORVET_AEGIS: {
 				svg: [
-					['struct','rect'  , 50,150,120, 60], // Moteur 1
-					['struct','rect'  , 50,290,120, 60], // Moteur 2
+					['struct', 'poly', 20,150,50,210,170,210,170,150 ], // Moteur 1
+					['struct', 'poly', 50,290,20,350,170,350,170,290 ], // Moteur 2
 					['struct','circle',250,250,150], // Corps
 					['struct','path'  ,'M385',185,'Q',300,250,385,315], // Cockpit
 					// Cloak
