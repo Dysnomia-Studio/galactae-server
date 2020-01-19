@@ -296,6 +296,11 @@ module.exports = class Planet {
 
 			newData.Buildings[data.building]++;
 			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
+				if(!isset(newData, 'object')) {
+					errormsg = '?';
+					console.trace('Error: planet data undefined');
+				}
+
 				if(!enoughPeople) {
 					errormsg = 'BUILDING_ERROR_PEOPLE';
 				}
