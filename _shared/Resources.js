@@ -23,5 +23,101 @@
 
 			return Resources.planetRatios[0];
 		}
+
+		/**
+		 * Calculates the new resources based on constants building level on a
+		 * specific time period.
+		 *
+		 * @class      CalcNewResources (resources)
+		 * @param      {array}   resources   The old resources
+		 * @param      {number}  buildings   The buildings levels
+		 * @param      {number}  planetType  The planet type
+		 * @param      {number}  time        The time period
+		 * @param      {object}  user        The user
+		 */
+		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
+			time = time/3600/1000; // Passage en heures
+
+			const ratio = Resources.GetRatiosPerPlanet(planetType);
+			const ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
+
+			const mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
+			const metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
+			const heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
+
+			const [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
+
+			//Minerals
+			if(currentBuilding !== 0) {
+				resources[0] += mineralProdBase*time;
+			}
+
+			//Helium 3
+			if(buildings[13] !== 0 && currentBuilding !== 13) {
+				resources[1] += heliumProdBase*time;
+			}
+
+			//Metals
+			if(currentBuilding !== 1) {
+				if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
+					for(let i=2; i<6; i++) {
+						resources[i] += (metalProdBase*time)*ratios[i-2];
+					}
+
+					resources[0] -= (metalProdBase*time); //Consomation Algorithm
+				} else { // Do the max we can
+					for(let i=2; i<6; i++) {
+						resources[i] += resources[0]*ratios[i-2];
+					}
+
+					resources[0] = 0;
+				}
+			}
+
+			// Si Max de tout les metaux
+			if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
+				(resources[4]>metalsStorageBase*ratio.copperRatio) &&
+				(resources[3]>metalsStorageBase*ratio.aluRatio) &&
+				(resources[2]>metalsStorageBase*ratio.ironRatio)) {
+
+				let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
+
+				for(let i=3; i<6; i++) {
+					const temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
+
+					if(temp<min) {
+						min = temp;
+					}
+				}
+				resources[0]+=min;
+
+				for(let i=2; i<6; i++) {
+					resources[i] -= min*ratios[i-2];
+				}
+			}
+
+			//Max Storage
+			if(resources[0]>mineralStorageBase) {
+				resources[0] = mineralStorageBase;
+			}
+
+			if(resources[1]>storageHelium) {
+				resources[1] = storageHelium;
+			}
+
+			// On detruit tout ce qui est > au max
+			for(let i=2; i<6; i++) {
+				if(resources[i]>metalsStorageBase*ratios[i-2]) {
+					resources[i] = metalsStorageBase*ratios[i-2];
+				}
+			}
+
+			// Arrondi
+			for(let i=0; i<resources.length; i++) {
+				resources[i] = Math.round(resources[i] * 1000)/1000;
+			}
+
+			return resources;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

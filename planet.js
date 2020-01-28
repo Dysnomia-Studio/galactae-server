@@ -133,102 +133,6 @@ module.exports = class Planet {
 		io.to(data.sid).emit('planet-recieve-data', data );
 	}
 
-	/**
-	 * Calculates the new resources based on constants building level on a
-	 * specific time period.
-	 *
-	 * @class      CalcNewResources (resources)
-	 * @param      {array}   resources   The old resources
-	 * @param      {number}  buildings   The buildings levels
-	 * @param      {number}  planetType  The planet type
-	 * @param      {number}  time        The time period
-	 * @param      {object}  user        The user
-	 */
-	static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
-		time = time/3600/1000; // Passage en heures
-
-		const ratio = Resources.GetRatiosPerPlanet(planetType);
-		const ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
-
-		const mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
-		const metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
-		const heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
-
-		const [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
-
-		//Minerals
-		if(currentBuilding !== 0) {
-			resources[0] += mineralProdBase*time;
-		}
-
-		//Helium 3
-		if(buildings[13] !== 0 && currentBuilding !== 13) {
-			resources[1] += heliumProdBase*time;
-		}
-
-		//Metals
-		if(currentBuilding !== 1) {
-			if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
-				for(let i=2; i<6; i++) {
-					resources[i] += (metalProdBase*time)*ratios[i-2];
-				}
-
-				resources[0] -= (metalProdBase*time); //Consomation Algorithm
-			} else { // Do the max we can
-				for(let i=2; i<6; i++) {
-					resources[i] += resources[0]*ratios[i-2];
-				}
-
-				resources[0] = 0;
-			}
-		}
-
-		// Si Max de tout les metaux
-		if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
-			(resources[4]>metalsStorageBase*ratio.copperRatio) &&
-			(resources[3]>metalsStorageBase*ratio.aluRatio) &&
-			(resources[2]>metalsStorageBase*ratio.ironRatio)) {
-
-			let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
-
-			for(let i=3; i<6; i++) {
-				const temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
-
-				if(temp<min) {
-					min = temp;
-				}
-			}
-			resources[0]+=min;
-
-			for(let i=2; i<6; i++) {
-				resources[i] -= min*ratios[i-2];
-			}
-		}
-
-		//Max Storage
-		if(resources[0]>mineralStorageBase) {
-			resources[0] = mineralStorageBase;
-		}
-
-		if(resources[1]>storageHelium) {
-			resources[1] = storageHelium;
-		}
-
-		// On detruit tout ce qui est > au max
-		for(let i=2; i<6; i++) {
-			if(resources[i]>metalsStorageBase*ratios[i-2]) {
-				resources[i] = metalsStorageBase*ratios[i-2];
-			}
-		}
-
-		// Arrondi
-		for(let i=0; i<resources.length; i++) {
-			resources[i] = Math.round(resources[i] * 1000)/1000;
-		}
-
-		return resources;
-	}
-
 	static checkIfCanBuild(planet, user, cost, building, currTime) {
 		let errormsg = '';
 
@@ -576,32 +480,32 @@ module.exports = class Planet {
 	 * Calculates the resources.
 	 *
 	 * @class      CalcResources (name)
-	 * @param      {<type>}  dataIn  Input planet data
+	 * @param      {<type>}  planetData  Input planet data
 	 */
-	static UpdateResources(dataIn,user) {
-		const Dtime = Date.now()-dataIn.nextBuildingTime;
-		let resources = dataIn.resources;
+	static UpdateResources(planetData,user) {
+		const Dtime = Date.now()-planetData.nextBuildingTime;
+		let resources = planetData.resources;
 
-		if(Dtime<0 || parseInt(dataIn.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+		if(Dtime<0 || parseInt(planetData.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (planetData.nextBuildingTime-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
 			// Calcul avec les nouveaux bâtiments
-			const tmpBuildings = dataIn.Buildings.slice();
-			tmpBuildings[dataIn.nextBuilding]++;
-			resources = Planet.CalcNewResources(resources,tmpBuildings,dataIn.planetType,Dtime,user,-1);
+			const tmpBuildings = planetData.Buildings.slice();
+			tmpBuildings[planetData.nextBuilding]++;
+			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1);
 		}
 
 		return resources;
 	}
 
-	static calcPlanetPoints(dataIn) {
+	static calcPlanetPoints(planetData) {
 		let points = 0;
 
 		// Building points count
 		for(let i=0; i<globalConst.buildingNumber; i++) {
-			points += (dataIn.Buildings[i] * buildingPointCoef[i]);
+			points += (planetData.Buildings[i] * buildingPointCoef[i]);
 		}
 
 		return points;
