@@ -1,4 +1,4 @@
-module.exports = class Reports {
+module.exports = class Reports extends require('./_shared/Reports')._Reports {
 	static async refresh(plyId, sid) {
 		if(sid === '-1') {
 			return;
