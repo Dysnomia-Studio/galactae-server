@@ -199,10 +199,15 @@ module.exports = class Planet {
 			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
 
 			newData.Buildings[data.building]++;
-			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
+			Planet.enoughPeople(newData, fleetReturned, function(enoughPeople) {
 				if(!isset(newData, 'object')) {
 					errormsg = '?';
 					console.trace('Error: planet data undefined');
+				}
+				
+				if(!isset(newData.Buildings, 'object')) {
+					errormsg = '?';
+					console.trace('Error: planet building data undefined');
 				}
 
 				if(!enoughPeople) {
@@ -415,7 +420,7 @@ module.exports = class Planet {
 			cons += fleets[i].population;
 		}
 
-		callback(planetData,prod,cons);
+		callback(prod,cons);
 	}
 
 	/**
@@ -424,11 +429,11 @@ module.exports = class Planet {
 	 * @param      {Object}  buildings  The buildings list
 	 */
 	static enoughPeople(planetData, fleets, callback) {
-		Planet.getPeople(planetData, fleets, function(planet, prod, cons) {
+		Planet.getPeople(planetData, fleets, function(prod, cons) {
 			if(prod<cons) {
-				callback(planetData,false);
+				callback(false);
 			}
-			callback(planetData,true);
+			callback(true);
 		});
 	}
 	/**
