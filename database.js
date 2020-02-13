@@ -92,6 +92,7 @@ module.exports = {
 	 */
 	battleLog: require('./database/battleLog'),
 	battleLogAccess: require('./database/battleLogAccess'),
+	conquest: require('./database/conquest'),
 	fleet: require('./database/fleet'),
 	player: require('./database/player'),
 	planet: require('./database/planet'),
