@@ -134,136 +134,6 @@ module.exports = class Planet {
 	}
 
 	/**
-	 * Calculates the new resources based on constants building level on a
-	 * specific time period.
-	 *
-	 * @class      CalcNewResources (resources)
-	 * @param      {array}   resources   The old resources
-	 * @param      {number}  buildings   The buildings levels
-	 * @param      {number}  planetType  The planet type
-	 * @param      {number}  time        The time period
-	 * @param      {object}  user        The user
-	 */
-	static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
-		time = time/3600/1000; // Passage en heures
-
-		const ratio = Resources.GetRatiosPerPlanet(planetType);
-		const ratios = [ratio.ironRatio,ratio.aluRatio,ratio.copperRatio,ratio.titanRatio];
-
-		const mineralProdBase = mineralProd[0]*Math.pow(buildings[0],2) + mineralProd[1]*buildings[0] + mineralProd[2];
-		const metalProdBase   = metalProd[0]*Math.pow(buildings[1],2)   + metalProd[1]*buildings[1]   + metalProd[2];
-		const heliumProdBase  = heliumProd[0]*Math.pow(buildings[13],2)  + heliumProd[1]*buildings[13]  + heliumProd[2];
-
-		const [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
-
-		//Minerals
-		if(currentBuilding !== 0) {
-			resources[0] += mineralProdBase*time;
-		}
-
-		//Helium 3
-		if(buildings[13] !== 0 && currentBuilding !== 13) {
-			resources[1] += heliumProdBase*time;
-		}
-
-		//Metals
-		if(currentBuilding !== 1) {
-			if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
-				for(let i=2; i<6; i++) {
-					resources[i] += (metalProdBase*time)*ratios[i-2];
-				}
-
-				resources[0] -= (metalProdBase*time); //Consomation Algorithm
-			} else { // Do the max we can
-				for(let i=2; i<6; i++) {
-					resources[i] += resources[0]*ratios[i-2];
-				}
-
-				resources[0] = 0;
-			}
-		}
-
-		// Si Max de tout les metaux
-		if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
-			(resources[4]>metalsStorageBase*ratio.copperRatio) &&
-			(resources[3]>metalsStorageBase*ratio.aluRatio) &&
-			(resources[2]>metalsStorageBase*ratio.ironRatio)) {
-
-			let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
-
-			for(let i=3; i<6; i++) {
-				const temp = (resources[i] - metalsStorageBase*ratios[i-2])/ratios[i-2];
-
-				if(temp<min) {
-					min = temp;
-				}
-			}
-			resources[0]+=min;
-
-			for(let i=2; i<6; i++) {
-				resources[i] -= min*ratios[i-2];
-			}
-		}
-
-		//Max Storage
-		if(resources[0]>mineralStorageBase) {
-			resources[0] = mineralStorageBase;
-		}
-
-		if(resources[1]>storageHelium) {
-			resources[1] = storageHelium;
-		}
-
-		// On detruit tout ce qui est > au max
-		for(let i=2; i<6; i++) {
-			if(resources[i]>metalsStorageBase*ratios[i-2]) {
-				resources[i] = metalsStorageBase*ratios[i-2];
-			}
-		}
-
-		// Arrondi
-		for(let i=0; i<resources.length; i++) {
-			resources[i] = Math.round(resources[i] * 1000)/1000;
-		}
-
-		return resources;
-	}
-
-	static checkIfCanBuild(planet, user, cost, building, currTime) {
-		let errormsg = '';
-
-		// Cost verif
-		if(cost.iron>planet.resources[2] || cost.aluminium>planet.resources[3] || cost.copper>planet.resources[4] || cost.titanium>planet.resources[5] ) {
-			errormsg = 'BUILDING_ERROR_COST';
-		}
-		// Un bâtiment est déja en construction ?
-		if(planet.nextBuildingTime > currTime) {
-			errormsg = 'BUILDING_ERROR_ALREADY';
-		}
-		// Niveau maximum ?
-		if(planet.Buildings[building]>buildingMaxLvl[building]) {
-			errormsg = 'BUILDING_ERROR_MAXIMUM';
-		}
-		// Les requirements ?
-		if(!Buildings.HasRequirements(user, planet, building)) {
-			errormsg = 'BUILDING_ERROR_DEPENDENCIES';
-		}
-
-		planet.Buildings[building]++; // Only for calcs
-
-		// Energie ? Habitants ?
-		if(errormsg !== '') {
-			if(!Buildings.enoughEnergy(planet.Buildings) && building<=globalConst.groundBuildingNumber && building!==4) { // Only ground buildings affected by this
-				errormsg = 'BUILDING_ERROR_ENERGY';
-			}
-		}
-
-		planet.Buildings[building]--; // Revert
-
-		return errormsg;
-	}
-
-	/**
 	 * Do we can upgrade a building ? And if yes build it !
 	 *
 	 * @class      TryBuilding (name)
@@ -290,63 +160,50 @@ module.exports = class Planet {
 			// Calc new planet data
 			const newData = Planet.update(planetReturned,userReturned,fleetReturned);
 
-			// Vars for this building tes
+			// Vars for this building tests
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
-			let errormsg = Planet.checkIfCanBuild(newData, userReturned, cost, data.building, currTime);
+			const errormsg = Buildings.checkIfCanBuild(newData, fleetReturned, userReturned, cost, data.building, currTime);
 
-			newData.Buildings[data.building]++;
-			Planet.enoughPeople(newData, fleetReturned, function(newData,enoughPeople) {
-				if(!isset(newData, 'object')) {
-					errormsg = '?';
-					console.trace('Error: planet data undefined');
+			if(errormsg === '') {
+				// Research bonus
+				if(Research.isSearched(userReturned,'cp_mecanisation')) {
+					timeSpeed += researchBonus.cp_mecanisation;
 				}
 
-				if(!enoughPeople) {
-					errormsg = 'BUILDING_ERROR_PEOPLE';
-				}
-				newData.Buildings[data.building]--; // Revert new building, it's not builded yet
-
-				if(errormsg === '') {
-					// Research bonus
-					if(Research.isSearched(userReturned,'cp_mecanisation')) {
-						timeSpeed += researchBonus.cp_mecanisation;
+				if(data.building >= globalConst.groundBuildingNumber) {
+					if(Research.isSearched(userReturned,'cp_tracteur')) {
+						timeSpeed += researchBonus.cp_tracteur;
+					}
+					if(Research.isSearched(userReturned,'cp_materielTp')) {
+						timeSpeed += researchBonus.cp_materielTp;
 					}
 
-					if(data.building >= globalConst.groundBuildingNumber) {
-						if(Research.isSearched(userReturned,'cp_tracteur')) {
-							timeSpeed += researchBonus.cp_tracteur;
-						}
-						if(Research.isSearched(userReturned,'cp_materielTp')) {
-							timeSpeed += researchBonus.cp_materielTp;
-						}
-
-						// Faster if shipyard have higher lvl
-						cost.time *= (1-(buildLvlUnitBuildingSpeedBonus*newData.Buildings[7]));
-					}
-
-					// We consume resources
-					newData.resources[2] -= cost.iron;
-					newData.resources[3] -= cost.aluminium;
-					newData.resources[4] -= cost.copper;
-					newData.resources[5] -= cost.titanium;
-
-					newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed);
-					newData.nextBuilding = data.building;
-
-					Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
-					log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level','success');
-
-				} else { // We just update ressources
-					delete newData.Buildings;
-
-					Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
-					log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
+					// Faster if shipyard have higher lvl
+					cost.time *= (1-(buildLvlUnitBuildingSpeedBonus*newData.Buildings[7]));
 				}
 
-				db.planet.update(newData);
+				// We consume resources
+				newData.resources[2] -= cost.iron;
+				newData.resources[3] -= cost.aluminium;
+				newData.resources[4] -= cost.copper;
+				newData.resources[5] -= cost.titanium;
 
-				Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
-			});
+				newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed);
+				newData.nextBuilding = data.building;
+
+				Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
+				log(data.username+' updated building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level','success');
+
+			} else { // We just update ressources
+				delete newData.Buildings;
+
+				Websocket.SendMessageToClient({ sid: data.sid, message: errormsg });
+				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
+			}
+
+			db.planet.update(newData);
+
+			Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
 		});
 	}
 	/**
@@ -482,52 +339,6 @@ module.exports = class Planet {
 	}
 
 	/**
-	 * Gets the people count
-	 *
-	 * @param      {<type>}    planet    Planet data
-	 * @param      {Function}  callback  Function needed to called back
-	 */
-	static getPeople(planetData, fleets, callback) {
-		const buildings = planetData.Buildings;
-		const prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
-		let cons = 0;
-
-		// Buildings
-		for(let i=0; i<14; i++) {
-			if(buildings[i]===0) {
-				continue;
-			}
-
-			if(i===planetData.nextBuilding) {
-				// Current in-build building
-				cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
-				continue;
-			}
-			cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants);
-		}
-
-		// Units builded and in-build
-		for(let i=0; i<fleets.length; i++) {
-			cons += fleets[i].population;
-		}
-
-		callback(planetData,prod,cons);
-	}
-
-	/**
-	 * Is there enough people on planet ?
-	 *
-	 * @param      {Object}  buildings  The buildings list
-	 */
-	static enoughPeople(planetData, fleets, callback) {
-		Planet.getPeople(planetData, fleets, function(planet, prod, cons) {
-			if(prod<cons) {
-				callback(planetData,false);
-			}
-			callback(planetData,true);
-		});
-	}
-	/**
 	 * Change the planet name
 	 *
 	 * @class      rename (name)
@@ -576,32 +387,32 @@ module.exports = class Planet {
 	 * Calculates the resources.
 	 *
 	 * @class      CalcResources (name)
-	 * @param      {<type>}  dataIn  Input planet data
+	 * @param      {<type>}  planetData  Input planet data
 	 */
-	static UpdateResources(dataIn,user) {
-		const Dtime = Date.now()-dataIn.nextBuildingTime;
-		let resources = dataIn.resources;
+	static UpdateResources(planetData,user) {
+		const Dtime = Date.now()-planetData.nextBuildingTime;
+		let resources = planetData.resources;
 
-		if(Dtime<0 || parseInt(dataIn.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(Date.now()-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+		if(Dtime<0 || parseInt(planetData.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
-			resources = Planet.CalcNewResources(resources,dataIn.Buildings,dataIn.planetType,(dataIn.nextBuildingTime-dataIn.lastResourcesUpdate),user,dataIn.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (planetData.nextBuildingTime-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
 			// Calcul avec les nouveaux bâtiments
-			const tmpBuildings = dataIn.Buildings.slice();
-			tmpBuildings[dataIn.nextBuilding]++;
-			resources = Planet.CalcNewResources(resources,tmpBuildings,dataIn.planetType,Dtime,user,-1);
+			const tmpBuildings = planetData.Buildings.slice();
+			tmpBuildings[planetData.nextBuilding]++;
+			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1);
 		}
 
 		return resources;
 	}
 
-	static calcPlanetPoints(dataIn) {
+	static calcPlanetPoints(planetData) {
 		let points = 0;
 
 		// Building points count
 		for(let i=0; i<globalConst.buildingNumber; i++) {
-			points += (dataIn.Buildings[i] * buildingPointCoef[i]);
+			points += (planetData.Buildings[i] * buildingPointCoef[i]);
 		}
 
 		return points;

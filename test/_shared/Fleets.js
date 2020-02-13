@@ -713,4 +713,88 @@ describe('• Fleets (shared)', () => {
 			);
 		});
 	});
+
+	describe('# isImmobile()', () => {
+		it('Mobile (string)', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: '100' }
+				), false
+			);
+		});
+
+		it('Mobile (int)', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: 100 }
+				), false
+			);
+		});
+
+		it('Immobile (string)', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: '-1' }
+				), true
+			);
+		});
+
+		it('Immobile (int)', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: -1 }
+				), true
+			);
+		});
+	});
+
+	describe('# hasEndedMove()', () => {
+		it('Mobile, arrived (string)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: '100' }
+				), true
+			);
+		});
+
+		it('Mobile, arrived (int)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: 100 }
+				), true
+			);
+		});
+
+		it('Mobile, not arrived (string)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: '' + (Date.now() + 10000) }
+				), false
+			);
+		});
+
+		it('Mobile, not arrived (int)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: (Date.now() + 10000) }
+				), false
+			);
+		});
+
+		it('Immobile (string)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: '-1' }
+				), false
+			);
+		});
+
+		it('Immobile (int)', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: -1 }
+				), false
+			);
+		});
+	});
 });
