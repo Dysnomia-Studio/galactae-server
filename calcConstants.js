@@ -532,7 +532,7 @@ module.exports = function() {
 				},
 				partCount: 5,
 			},
-		}
+		},
 	};
 	this.shipCosts =  { // [Al,Fe,Ti,Cu,Time,Population]
 		/**

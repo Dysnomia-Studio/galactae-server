@@ -2,7 +2,7 @@ describe('• Reports', () => {
 	describe('# getAllLostUnitsInFleets()', () => {
 		it('Empty logs', () => {
 			const report = {
-				logs: []
+				logs: [],
 			};
 			const expected = {};
 
@@ -18,14 +18,14 @@ describe('• Reports', () => {
 					{
 						fleetDestinationId: 'F1',
 						unitDestinationId: 'U1',
-						damage: 1
-					}
-				]
+						damage: 1,
+					},
+				],
 			};
 			const expected = {
 				F1: {
-					U1: 1
-				}
+					U1: 1,
+				},
 			};
 
 			assert.deepEqual(

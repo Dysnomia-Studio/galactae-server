@@ -2,7 +2,7 @@ describe('• Reports', () => {
 	describe('# refresh()', () => {
 		it('should work with valid sid', (done) => {
 			const result = [
-				1,2,3
+				1,2,3,
 			];
 
 			db.battleLogAccess.fetchByPlayer = () => {
@@ -31,7 +31,7 @@ describe('• Reports', () => {
 
 		it('should work with invalid sid', (done) => {
 			const result = [
-				1,2,3
+				1,2,3,
 			];
 
 			db.battleLogAccess.fetchByPlayer = () => {

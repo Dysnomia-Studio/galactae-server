@@ -424,7 +424,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
 			};
 
 			assert.deepEqual(
@@ -446,7 +446,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
 			};
 
 			assert.deepEqual(
@@ -468,7 +468,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
 			};
 
 			assert.deepEqual(
@@ -490,7 +490,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [0,0,0,0,0,0]
+				resources: [0,0,0,0,0,0],
 			};
 
 			assert.deepEqual(
@@ -514,7 +514,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
 			};
 
 			assert.deepEqual(
@@ -536,7 +536,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: Date.now() + 100000,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
 			};
 
 			assert.deepEqual(
@@ -558,7 +558,7 @@ describe('• Buildings (shared)', () => {
 			const planetData = {
 				nextBuildingTime: -1,
 				Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 0, 0, 0],
-				resources: [1000000,1000000,1000000,1000000,1000000,1000000]
+				resources: [1000000,1000000,1000000,1000000,1000000,1000000],
 			};
 
 			assert.deepEqual(
