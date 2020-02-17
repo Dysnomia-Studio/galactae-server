@@ -1,3 +1,3 @@
 module.exports = class Resources extends require('./_shared/Resources')._Resources {
-
+	// No function here yet ...
 };

@@ -70,12 +70,12 @@ module.exports = class Chat {
 						}
 
 						if(!data.noname) {
-							data.message = '<strong>'+ data.username +' :</strong> '+ data.message;
+							data.message = '<strong>'+ data.username + ' :</strong> '+ data.message;
 						}
 					}
 
 					if(!data.send) {
-						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+						log('(Blocked) [' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						return;
 					}
 					if(data.message === '' || !isset(data.message, 'string')) {
@@ -83,11 +83,11 @@ module.exports = class Chat {
 					}
 
 					if(data.channel !== 'hud-chat-ally') { // Normal chat
-						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+						log('[' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						io.emit('chat-message', { message: data.message, channel: data.channel });
 						Discord.sendChatMessage(data.channel,discordmsg);
 					} else if(data.ally !== undefined) { // Allies messages
-						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+						log('[' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						// @TODO : Ally messages
 					}
 
