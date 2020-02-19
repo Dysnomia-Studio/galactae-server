@@ -109,7 +109,7 @@ module.exports = {
 				'INNER JOIN users ON users.id = fleets."ownerId" ' +
 				'WHERE "orbitPosition" = 1 ' +
 				'AND planets.owner = $1 ' +
-				'AND fleets."endMoveTime" > 0',
+				'AND fleets."endMoveTime" IS NOT NULL',
 				[playerId]
 			)).rows;
 		} catch(err) {

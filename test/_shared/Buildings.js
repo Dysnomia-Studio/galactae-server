@@ -422,7 +422,7 @@ describe('• Buildings (shared)', () => {
 	describe('# checkIfCanBuild()', () => {
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
 			};
@@ -434,7 +434,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				''
 			);
@@ -444,7 +444,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy), no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
 			};
@@ -456,7 +456,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_PEOPLE'
 			);
@@ -466,7 +466,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1, no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
 			};
@@ -478,7 +478,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_ENERGY'
 			);
@@ -488,7 +488,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - empty resources', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [0,0,0,0,0,0],
 			};
@@ -500,7 +500,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(12,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_COST'
 			);
@@ -512,7 +512,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 12 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
 			};
@@ -524,7 +524,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(12,2),
 					12,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_DEPENDENCIES'
 			);
@@ -534,7 +534,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - currently building', () => {
 			const planetData = {
-				nextBuildingTime: Date.now() + 100000,
+				nextBuildingTime: new Date(Date.now() + 100000),
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
 			};
@@ -546,7 +546,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_ALREADY'
 			);
@@ -556,7 +556,7 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 35, no fleets, beginner, building 0 lvl 36', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 0, 0, 0],
 				resources: [1000000,1000000,1000000,1000000,1000000,1000000],
 			};
@@ -568,7 +568,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,36),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_MAXIMUM'
 			);

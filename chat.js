@@ -186,7 +186,7 @@ module.exports = class Chat {
 						log('Invalid Time');
 						return;
 					}
-					const now = Date.now();
+					const now = new Date();
 
 					log('Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
 					Chat.sendSM(data.sid,'Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
@@ -196,7 +196,7 @@ module.exports = class Chat {
 						server_name: globalCfg.serverGlobalName,
 						ban_type: 2,
 						ban_start: now,
-						ban_end: now + banTime,
+						ban_end: new Date(now.getTime() + banTime),
 						ban_reason: banMessage,
 						admin_id: data.user_id,
 					});
@@ -219,7 +219,7 @@ module.exports = class Chat {
 						log('Invalid Time');
 						return;
 					}
-					const now = Date.now();
+					const now = new Date();
 
 					log('Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
 					Chat.sendSM(data.sid,'Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
@@ -229,7 +229,7 @@ module.exports = class Chat {
 						server_name: globalCfg['serverGlobalName'],
 						ban_type: 1,
 						ban_start: now,
-						ban_end: now + muteTime,
+						ban_end: new Date(now.getTime() + muteTime),
 						ban_reason: muteMessage,
 						admin_id: data.user_id,
 					});

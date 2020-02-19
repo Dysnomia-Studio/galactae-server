@@ -624,9 +624,9 @@ describe('• Combat', () => {
 	 */
 	describe('# beginFight', () => {
 		let globalFleetList = [
-			{ id: 'f1', name: 'Fleet 1', endMoveTime: -1, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f2', name: 'Fleet 2', endMoveTime: -1, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f3', name: 'Fleet 3', endMoveTime: -1, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
+			{ id: 'f1', name: 'Fleet 1', endMoveTime: null, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
+			{ id: 'f2', name: 'Fleet 2', endMoveTime: null, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
+			{ id: 'f3', name: 'Fleet 3', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
 		];
 
 		db.fleet.bulkUpdate = async() => { };
@@ -644,7 +644,7 @@ describe('• Combat', () => {
 			def_user_id: 'u1',
 			def_user_name: 'User 1',
 
-			date: Date.now(),
+			date: new Date(),
 
 			location: 'P1',
 
@@ -718,13 +718,13 @@ describe('• Combat', () => {
 
 		it('Normal battle n°1', (done) => {
 			globalFleetList.push(
-				{ id: 'f4', name: 'Fleet 4', endMoveTime: -1, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
+				{ id: 'f4', name: 'Fleet 4', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
 			);
 			globalFleetList.push(
-				{ id: 'f5', name: 'Fleet 5', endMoveTime: -1, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 } }
+				{ id: 'f5', name: 'Fleet 5', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 } }
 			);
 			globalFleetList.push(
-				{ id: 'f6', name: 'Fleet 6', endMoveTime: -1, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
+				{ id: 'f6', name: 'Fleet 6', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
 			);
 
 			const units = {
@@ -801,7 +801,7 @@ describe('• Combat', () => {
 					'motherPlanetAddress': '4-5-659-P0',
 					'orbitPosition': 1,
 					'points': 18.8751,
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'units': {
 						'ee6b3f3e-5777-11e9-922f-d365dca99a37': 92,
 						'eea78f48-5777-11e9-b8d8-5ff5b53be6fe': 18,
@@ -824,7 +824,7 @@ describe('• Combat', () => {
 					'motherPlanetAddress': '5-4-189-P6',
 					'orbitPosition': 0,
 					'points': 58.344,
-					'endMoveTime': '-1',
+					'endMoveTime': null,
 					'units': {
 						'eeaa0034-5777-11e9-a8a8-236ac8528781': 50,
 						'ee8b842e-5777-11e9-922f-ff30780dc725': 1300,
@@ -930,7 +930,7 @@ describe('• Combat', () => {
 					'motherPlanetAddress': '4-5-659-P0',
 					'orbitPosition': 1,
 					'points': 18.8751,
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'units': {
 						'ee6b3f3e-5777-11e9-922f-d365dca99a37': 92,
 						'eea78f48-5777-11e9-b8d8-5ff5b53be6fe': 18,
@@ -949,7 +949,7 @@ describe('• Combat', () => {
 					'id':'627299cc-586d-11e9-a3e4-1b130d0eb996',
 					'name':'SHIP_DEF',
 					'ownerId':'80658302-5775-11e9-86a1-7f506956c446',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'orbitPosition': 0,
@@ -963,7 +963,7 @@ describe('• Combat', () => {
 					'id':'6276d5fa-586d-11e9-94f1-4f74a65f2491',
 					'name':'Fleet One',
 					'ownerId':'80658302-5775-11e9-86a1-7f506956c446',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'orbitPosition': 0,
@@ -1062,7 +1062,7 @@ describe('• Combat', () => {
 					'orbitPosition': 1,
 					'position': '5-4-189-P6',
 					'ownerId': '80660e8a-5775-11e9-9959-e7363221e85e',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'units': {
@@ -1079,7 +1079,7 @@ describe('• Combat', () => {
 					'orbitPosition': 0,
 					'position': '5-4-189-P6',
 					'ownerId': '80661808-5775-11e9-82cb-7b8f6e03caec',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'units': {
@@ -1171,7 +1171,7 @@ describe('• Combat', () => {
 					'name': 'Phalanx',
 					'owner': 'Firestorm',
 					'ownerId': '80661808-5775-11e9-82cb-7b8f6e03caec',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'orbitPosition': 1,
@@ -1189,7 +1189,7 @@ describe('• Combat', () => {
 					'name': 'SHIP_DEF',
 					'owner': 'damlanil',
 					'ownerId': '80660e8a-5775-11e9-9959-e7363221e85e',
-					'endMoveTime': -1,
+					'endMoveTime': null,
 					'population': 0,
 					'points': 0,
 					'orbitPosition': 0,

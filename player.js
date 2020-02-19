@@ -6,7 +6,7 @@ module.exports = class Player {
 				if(Player.canAct(playerData)) { // Don't spam
 					callback(user);
 
-					playerData.lastAction = Date.now();
+					playerData.lastAction = new Date();
 					db.player.update(playerData);
 				}
 			} else {
@@ -20,7 +20,7 @@ module.exports = class Player {
 	static canAct(user) {
 		const minTime = 100; //time in ms
 
-		return ((Date.now()-user.lastAction)>minTime);
+		return ((Date.now()-user.lastAction.getTime())>minTime);
 	}
 
 	/* Get player ally */
@@ -54,7 +54,7 @@ module.exports = class Player {
 				if(isset(banObj, 'object')) {
 					const now = Date.now();
 					for(let i=0; i<banObj.length; i++) {
-						if(banObj[i].ban_end > now) {
+						if(banObj[i].ban_end.getTime() > now) {
 							log('Error: ' + data.username + ' is banned.');
 							io.to(data.sid).emit('server-kick','ERR_BANNED');
 							return;
@@ -130,7 +130,7 @@ module.exports = class Player {
 			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest});
 		}
 
-		playerData.lastConnected = Date.now();
+		playerData.lastConnected = new Date();
 
 		io.to(data.sid).emit('player-recieve-data',{
 			planetlist: playerData.planetlist,
@@ -284,7 +284,7 @@ module.exports = class Player {
 			bonus.newPlayerData.id = userData.id;
 			bonus.newPlayerData.dayBonusStreak = userData.dayBonusStreak+1;
 			bonus.newPlayerData.dayBonusBest = userData.dayBonusBest;
-			bonus.newPlayerData.lastBonus = Date.now();
+			bonus.newPlayerData.lastBonus = new Date();
 
 			if(userData.lastBonus < hierMinuit) { // Si pas hier
 				bonus.newPlayerData.dayBonusStreak = 1;

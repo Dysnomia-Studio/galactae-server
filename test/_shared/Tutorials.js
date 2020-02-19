@@ -295,7 +295,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: -1 }],
+					[ { orbitPosition: 2, endMoveTime: null }],
 					[]
 				), false
 			);
@@ -308,7 +308,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: 1, endMoveTime: 1 }],
+					[ { orbitPosition: 1, endMoveTime: new Date() }],
 					[]
 				), false
 			);
@@ -323,7 +323,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1 }],
+					[ { orbitPosition: 2, endMoveTime: new Date() }],
 					[]
 				), true
 			);
@@ -338,7 +338,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: -1, motherPlanetAddress: '1-2-P3', position: '1-2-P1' }],
+					[ { orbitPosition: 2, endMoveTime: null, motherPlanetAddress: '1-2-P3', position: '1-2-P1' }],
 					[]
 				), false
 			);
@@ -351,7 +351,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: 1, endMoveTime: 1, motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
+					[ { orbitPosition: 1, endMoveTime: new Date(), motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
 					[]
 				), false
 			);
@@ -366,7 +366,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1, motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
+					[ { orbitPosition: 2, endMoveTime: new Date(), motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
 					[]
 				), true
 			);
@@ -380,7 +380,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1 }],
+					[ { orbitPosition: 2, endMoveTime: new Date() }],
 					[]
 				), false
 			);
@@ -394,7 +394,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: 1, endMoveTime: 1 }],
+					[ { orbitPosition: 1, endMoveTime: new Date() }],
 					[]
 				), true
 			);

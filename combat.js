@@ -592,12 +592,14 @@ module.exports = class Combat {
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
+		const currTime = Date.now();
+
 		db.fleet.findByPosition(defPlanet.address, (fleetList) => {
 			const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime > Date.now()) {
+				if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
 					continue;
 				}
 
@@ -619,7 +621,7 @@ module.exports = class Combat {
 		const fleetList = await db.getAttacksAgainstPlayer(plyId);
 
 		for(const fleet of fleetList) {
-			fleet.arriveTime = new Date(parseInt(fleet.endMoveTime));
+			fleet.arriveTime = new Date(fleet.endMoveTime);
 			delete fleet.endMoveTime;
 
 			Websocket.sendNotification(plySid, 'attack', fleet);

@@ -176,7 +176,7 @@
 
 						let index = -1;
 						for(let i=0; i<fleets.length; i++) {
-							if(fleets[i].endMoveTime > 0 && fleets[i].orbitPosition === moveType) {
+							if(fleets[i].endMoveTime !== null && fleets[i].orbitPosition === moveType) {
 								index = i;
 							}
 						}

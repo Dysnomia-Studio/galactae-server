@@ -371,7 +371,7 @@
 		 * @param      {<type>}  user      The user data
 		 * @param      {<type>}  cost      The cost of the building
 		 * @param      {number}  building  The building id
-		 * @param      {number}  currTime  The current time
+		 * @param      {Date}  currTime  The current time
 		 * @return     {string}  error message, empty string if it's ok
 		 */
 		static checkIfCanBuild(currentPlanet, fleetList, user, cost, building, currTime) {
@@ -382,7 +382,7 @@
 				errormsg = 'BUILDING_ERROR_COST';
 			}
 			// Un bâtiment est déja en construction ?
-			if(currentPlanet.nextBuildingTime > currTime) {
+			if(currentPlanet.nextBuildingTime !== null && currentPlanet.nextBuildingTime.getTime() > currTime.getTime()) {
 				errormsg = 'BUILDING_ERROR_ALREADY';
 			}
 			// Niveau maximum ?
