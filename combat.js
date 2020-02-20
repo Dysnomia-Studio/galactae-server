@@ -211,7 +211,7 @@ module.exports = class Combat {
 		return shieldAbsorption[shield][weaponType];
 	}
 
-	simulateDamage(source, destination) {
+	simulateDamage(source, destination, missChance) {
 		if(typeof specialUnitsUID[source] !== 'undefined') {
 			source = specialUnitsUID[source];
 		}
@@ -244,7 +244,9 @@ module.exports = class Combat {
 
 			// @TODO: Gestion du projecteur à distance via distanceShieldAbsorption
 
-			// @TODO: Add miss chance
+			if(Math.random() < missChance) {
+				continue;
+			}
 
 			// @TODO: Add details to logs: original damage, shield absorption, miss (or not)
 
@@ -305,7 +307,22 @@ module.exports = class Combat {
 			targetUnitIndex = specialUnitsUID[target.unit];
 		}
 
-		const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
+		let missChance = 0;
+		if(this.playerList[this.unitCache[target.unit].ownerId]) {
+			if(Research.isSearched(
+				this.playerList[this.unitCache[target.unit].ownerId],
+				'prop_manoeuvre'
+			)) {
+				missChance += researchBonus['prop_manoeuvre'];
+			}
+			if(Research.isSearched(
+				this.playerList[this.unitCache[target.unit].ownerId],
+				'prop_advManoeuvre'
+			)) {
+				missChance += researchBonus['prop_advManoeuvre'];
+			}
+		}
+		const [damage, logs] = this.simulateDamage(currUnitId, target.unit, missChance);
 
 		// @TODO: apply research bonuses
 

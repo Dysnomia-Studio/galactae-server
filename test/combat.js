@@ -108,15 +108,15 @@ describe('• Combat', () => {
 
 	db.player.find = async(id) => {
 		return [
-			{ id: 'u1', name: 'User 1' },
-			{ id: 'u2', name: 'User 2' },
-			{ id: 'u3', name: 'User 3' },
-			{ id: 'u4', name: 'User 4' },
-			{ id: 'u5', name: 'User 5' },
-			{ id: '80655df0-5775-11e9-99e3-8b79cb37567b', name: 'Elanis' },
-			{ id: '80661808-5775-11e9-82cb-7b8f6e03caec', name: 'Firestorm' },
-			{ id: '80658302-5775-11e9-86a1-7f506956c446', name: 'junkyfox' },
-			{ id: '80660e8a-5775-11e9-9959-e7363221e85e', name: 'damlanil' },
+			{ id: 'u1', name: 'User 1', research: {} },
+			{ id: 'u2', name: 'User 2', research: {} },
+			{ id: 'u3', name: 'User 3', research: {} },
+			{ id: 'u4', name: 'User 4', research: {} },
+			{ id: 'u5', name: 'User 5', research: {} },
+			{ id: '80655df0-5775-11e9-99e3-8b79cb37567b', name: 'Elanis', research: { prop_manoeuvre: -1 } },
+			{ id: '80661808-5775-11e9-82cb-7b8f6e03caec', name: 'Firestorm', research: { prop_manoeuvre: -1, prop_advManoeuvre: -1 } },
+			{ id: '80658302-5775-11e9-86a1-7f506956c446', name: 'junkyfox', research: { prop_manoeuvre: -1, prop_advManoeuvre: 1 } },
+			{ id: '80660e8a-5775-11e9-9959-e7363221e85e', name: 'damlanil', research: { prop_manoeuvre: 1 } },
 		].filter((elt) => elt.id === id)[0];
 	};
 
