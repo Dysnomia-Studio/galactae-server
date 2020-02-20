@@ -22,6 +22,13 @@ module.exports = {
 				return;
 			}
 
+			let role = '';
+			if(message.member.roles.find('name', 'Administrathor')) {
+				role = Privileges.getChatRank(4);
+			} else if(message.member.roles.find('name', 'Moderathor')) {
+				role = Privileges.getChatRank(3);
+			}
+
 			if(message.channel.name.substr(0,globalCfg.serverName.length) === globalCfg.serverName) { // If it's a message for this server then send it to chat
 				const msg = message.cleanContent;
 				if(msg !== msg.replace('http','')) {
@@ -35,8 +42,8 @@ module.exports = {
 
 				const data = {};
 				data.channel = channel;
-				data.username = '[Discord] <span class="username no-pm">' + message.author.username + ': </span>';
-				data.message = '<strong>'+ data.username +' :</strong> '+ msg;
+				data.username = '[Discord] '+ role + ' <span class="username no-pm">' + message.author.username + ' : </span>';
+				data.message = '<strong>' + data.username +'</strong> '+ msg;
 
 				log('(Discord) [' + channel.substr(9) + '] '+message.author.username+': ' +msg);
 
