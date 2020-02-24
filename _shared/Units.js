@@ -1,5 +1,12 @@
 (function (exports) {
 	exports._Units = class Units {
+		/**
+		 * Sort units by name
+		 *
+		 * @param      {object}  a       First unit
+		 * @param      {object}  b       Second unit
+		 * @return     {number}  Sort order
+		 */
 		static sortUnitParts(a, b) {
 			if(a.name < b.name) {
 				return -1;
@@ -102,6 +109,11 @@
 			return totalCost;
 		}
 
+		/**
+		 * Get special unit list
+		 *
+		 * @type       {array}
+		 */
 		static get specialUnits() {
 			const units = {};
 
@@ -126,10 +138,22 @@
 			return units;
 		}
 
+		/**
+		 * Gets the weapons list of a specific unit
+		 *
+		 * @param      {object}  unit    The unit
+		 * @return     {array}  The weapons.
+		 */
 		static getWeapons(unit) {
 			return unit.parts.filter((part) => part.type === 'cannon' || part.type === 'rocketLauncher');
 		}
 
+		/**
+		 * Gets the shields list of a specific unit
+		 *
+		 * @param      {object}  unit    The unit
+		 * @return     {array}  The shields.
+		 */
 		static getShields(unit) {
 			return unit.parts.filter((part) => part.type === 'shield');
 		}

@@ -106,11 +106,15 @@ module.exports = function() {
 	 */
 	this.researchProduction = [-0.05,12,-8];
 	this.researchBonus = {
-		// Bonus construction
+		// Construction bonus
 		cp_mecanisation: -0.05,
 		cp_tracteur: 	 -0.05,
 		cp_materielTp: 	 -0.1,
 		cp_molecular_compression: 1.1,
+
+		// Combat bonus
+		prop_manoeuvre: 0.02,
+		prop_advManoeuvre: 0.03, // Note: added to prop_manoeuvre bonus
 	};
 
 	this.researchPos = {
@@ -532,7 +536,7 @@ module.exports = function() {
 				},
 				partCount: 5,
 			},
-		}
+		},
 	};
 	this.shipCosts =  { // [Al,Fe,Ti,Cu,Time,Population]
 		/**

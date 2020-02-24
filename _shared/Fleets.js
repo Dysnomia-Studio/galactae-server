@@ -249,7 +249,7 @@
 				for(let i=0; i<haveToUpdate.length; i++) {
 					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
 
-					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime < 0) {
+					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime === null) {
 						haveToUpdate[i] = -1;
 						continue;
 					}
@@ -310,15 +310,11 @@
 		}
 
 		static isImmobile(fleet) {
-			fleet.endMoveTime = parseInt(fleet.endMoveTime);
-
-			return fleet.endMoveTime === -1;
+			return fleet.endMoveTime === null;
 		}
 
 		static hasEndedMove(fleet) {
-			fleet.endMoveTime = parseInt(fleet.endMoveTime);
-
-			return !Fleets.isImmobile(fleet) && fleet.endMoveTime <= Date.now();
+			return !Fleets.isImmobile(fleet) && fleet.endMoveTime.getTime() <= new Date();
 		}
 	};
 })(typeof exports === 'undefined'? window : exports);

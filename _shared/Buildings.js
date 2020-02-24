@@ -314,5 +314,104 @@
 				2
 			);
 		}
+
+		/**
+		 * Gets the people count
+		 *
+		 * @param      {<type>}  currPlanet  Planet data
+		 * @param      {<type>}  fleetList   The fleet list
+		 * @return     {Array}   The people consumation & production
+		 */
+		static getPeopleConsAndProd(currPlanet, fleetList) {
+			const buildings = currPlanet.Buildings;
+			const prod = Math.round(habGen[0]*Math.pow(buildings[2],2) + habGen[1]*buildings[2] + habGen[2]);
+			let cons = 0;
+
+			// Buildings
+			for(let i=0; i<14; i++) {
+				if(buildings[i]===0) {
+					continue;
+				}
+
+				if(i===currPlanet.nextBuilding) {
+					// Current in-build building
+					cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
+					continue;
+				}
+				cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants);
+			}
+
+			// Units builded and in-build
+			for(let i=0; i<fleetList.length; i++) {
+				cons += fleetList[i].population;
+			}
+
+			return [prod, cons];
+		}
+
+		/**
+		 * Is there enough people on planet ?
+		 *
+		 * @param      {Object}  buildings  The buildings list
+		 */
+		static enoughPeople(planetData, fleets) {
+			const [prod, cons] = Buildings.getPeopleConsAndProd(planetData, fleets);
+
+			if(prod<cons) {
+				return false;
+			}
+
+			return true;
+		}
+
+		/**
+		 * Check if we can buid a building (cost given) on a specific planet
+		 *
+		 * @param      {<type>}  planet    The planet data
+		 * @param      {<type>}  user      The user data
+		 * @param      {<type>}  cost      The cost of the building
+		 * @param      {number}  building  The building id
+		 * @param      {Date}  currTime  The current time
+		 * @return     {string}  error message, empty string if it's ok
+		 */
+		static checkIfCanBuild(currentPlanet, fleetList, user, cost, building, currTime) {
+			let errormsg = '';
+
+			// Cost verif
+			if(cost.iron>currentPlanet.resources[2] || cost.aluminium>currentPlanet.resources[3] || cost.copper>currentPlanet.resources[4] || cost.titanium>currentPlanet.resources[5] ) {
+				errormsg = 'BUILDING_ERROR_COST';
+			}
+			// Un bâtiment est déja en construction ?
+			if(currentPlanet.nextBuildingTime !== null && currentPlanet.nextBuildingTime.getTime() > currTime.getTime()) {
+				errormsg = 'BUILDING_ERROR_ALREADY';
+			}
+			// Niveau maximum ?
+			if(currentPlanet.Buildings[building]>buildingMaxLvl[building]) {
+				errormsg = 'BUILDING_ERROR_MAXIMUM';
+			}
+			// Les requirements ?
+			if(!Buildings.HasRequirements(user, currentPlanet, building)) {
+				errormsg = 'BUILDING_ERROR_DEPENDENCIES';
+			}
+
+			currentPlanet.Buildings[building]++; // Only for calcs
+
+			// Energie ? Habitants ?
+			if(errormsg === '') {
+				if(!Buildings.enoughEnergy(currentPlanet.Buildings) && building <= globalConst.groundBuildingNumber && building !== 4) { // Only ground buildings affected by this
+					errormsg = 'BUILDING_ERROR_ENERGY';
+				}
+			}
+
+			if(errormsg === '') {
+				if(!Buildings.enoughPeople(currentPlanet, fleetList)) {
+					errormsg = 'BUILDING_ERROR_PEOPLE';
+				}
+			}
+
+			currentPlanet.Buildings[building]--; // Revert
+
+			return errormsg;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

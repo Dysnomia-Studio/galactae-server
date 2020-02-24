@@ -77,10 +77,10 @@ db.connect(function(success,general=false) {
 			const statsInterval = 0.5 * TIME.MINUTES_TO_MS;
 
 			setTimeout(function() {
-				db.stat.submit(Date.now() - Date.now()%statsInterval);
+				db.stat.submit(new Date(Date.now() - Date.now()%statsInterval));
 
 				setInterval(function() {
-					db.stat.submit(Date.now() - Date.now()%statsInterval);
+					db.stat.submit(new Date(Date.now() - Date.now()%statsInterval));
 				},statsInterval);
 			},statsInterval - Date.now()%statsInterval);
 		}

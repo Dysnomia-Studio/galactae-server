@@ -236,7 +236,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -308,7 +308,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -363,7 +363,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -448,7 +448,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -501,7 +501,7 @@ describe('• Fleets (shared)', () => {
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
-						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now())
+						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -710,6 +710,50 @@ describe('• Fleets (shared)', () => {
 						u2: { parts: [{ type: 'shield' }] },
 					}
 				), true
+			);
+		});
+	});
+
+	describe('# isImmobile()', () => {
+		it('Mobile', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: new Date(Date.now() + 10000) }
+				), false
+			);
+		});
+
+		it('Immobile', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: null }
+				), true
+			);
+		});
+	});
+
+	describe('# hasEndedMove()', () => {
+		it('Mobile, arrived', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: new Date(Date.now() - 10000) }
+				), true
+			);
+		});
+
+		it('Mobile, not arrived', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: new Date(Date.now() + 10000) }
+				), false
+			);
+		});
+
+		it('Immobile', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: null }
+				), false
 			);
 		});
 	});

@@ -1,10 +1,10 @@
 describe('• Privileges', () => {
 	describe('# isBannedFromChat', () => {
 		const bans = [
-			{ user_id: 'u1', ban_end: Date.now() + 100000 },
-			{ user_id: 'u3', ban_end: Date.now() - 100000 },
-			{ user_id: 'u4', ban_end: Date.now() - 100000 },
-			{ user_id: 'u4', ban_end: Date.now() + 100000 },
+			{ user_id: 'u1', ban_end: new Date(Date.now() + 100000) },
+			{ user_id: 'u3', ban_end: new Date(Date.now() - 100000) },
+			{ user_id: 'u4', ban_end: new Date(Date.now() - 100000) },
+			{ user_id: 'u4', ban_end: new Date(Date.now() + 100000) },
 		];
 
 		db.ban.find = (userId, type, callback) => {
