@@ -108,4 +108,7 @@ if(!globalCfg.dev) {
 	process.on('SIGTERM', function() {
 		Websocket.restart();
 	});
+	process.on('SIGINT', function() {
+		Websocket.restart();
+	});
 }
