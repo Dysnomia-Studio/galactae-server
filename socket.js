@@ -617,11 +617,12 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 5;
+		let decompte = 3;
 
 		setInterval(function() {
 			if(preventRestarts > 0) {
 				log('Wating simulations to end ...');
+				return;
 			}
 
 			if(decompte > 0) {

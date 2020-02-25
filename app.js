@@ -105,7 +105,7 @@ if(!globalCfg.dev) {
 	/**
 	 * Graceful stop
 	 */
-	process.on('SIGINT', function() {
+	process.on('SIGTERM', function() {
 		Websocket.restart();
 	});
 }
