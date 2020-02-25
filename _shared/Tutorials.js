@@ -60,12 +60,12 @@
 				return true;
 			}
 
-			if(!Tutorials.hasAllDependancies(currTuto, user, planet)) {
-				return false;
-			}
-
 			if(manually && tutorialObjectives[currTuto].length === 0) {
 				return false; // Must be completed manually
+			}
+
+			if(!Tutorials.hasAllDependancies(currTuto, user, planet)) {
+				return false;
 			}
 
 			return DependencyEngine.hasAllDependencies(tutorialObjectives[currTuto], user, planet, fleets, units);

@@ -31,6 +31,7 @@ global.Discord    = require('./discord');
 global.Buildings  = require('./Buildings');
 global.Chat       = require('./chat');
 global.Combat     = require('./combat');
+global.DependencyEngine = require('./DependencyEngine');
 global.Fleets 	  = require('./Fleets');
 global.GameMap    = require('./GameMap');
 global.Planet     = require('./planet');
