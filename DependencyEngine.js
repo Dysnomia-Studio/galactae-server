@@ -1,0 +1,3 @@
+module.exports = class DependencyEngine extends require('./_shared/DependencyEngine')._DependencyEngine {
+	// No function here yet ...
+};

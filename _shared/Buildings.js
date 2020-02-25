@@ -185,6 +185,8 @@
 				return '';
 			}
 
+			// @TODO: Use dependency engine
+
 			let requirements = '';
 
 			for(let i=0; i<buildingParents[id].research.length; i++) {
