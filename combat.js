@@ -597,11 +597,13 @@ module.exports = class Combat {
 			return;
 		}
 
-		await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
+		const playerList = Object.values(this.playerList).map((ply) => ply.id);
 
-		Reports.refresh(this.atkUser.id, this.atkUser.sid);
-		Reports.refresh(this.defUser.id, this.defUser.sid);
-		// @TODO: notify ALL Players
+		await db.battleLog.save(this.finalBattleLog, playerList);
+
+		for(const ply in this.playerList) {
+			Reports.refresh(ply.id, ply.sid);
+		}
 	}
 
 	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
