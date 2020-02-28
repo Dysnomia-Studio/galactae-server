@@ -46,7 +46,9 @@ module.exports = function() {
 	/**
 	 * Buildings
 	 */
-	this.buildingMaxLvl = [
+	this.buildingMaxLvl = [];
+	// Terre
+	this.buildingMaxLvl[0] = this.buildingMaxLvl[1] = this.buildingMaxLvl[2] = this.buildingMaxLvl[3] = this.buildingMaxLvl[4] = this.buildingMaxLvl[5] = this.buildingMaxLvl[6] = this.buildingMaxLvl[7] = this.buildingMaxLvl[8] = this.buildingMaxLvl[9] = [
 		25,	// Carriere
 		25,	// Metallurgie
 		25,	// Habitations
@@ -56,6 +58,159 @@ module.exports = function() {
 		5,	// Etat Major
 		35,	// Centre de lancement
 		30,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Lave
+	this.buildingMaxLvl[101] = this.buildingMaxLvl[104] = [
+		15,	// Carriere
+		30,	// Metallurgie
+		22,	// Habitations
+		22,	// Serres
+		26,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre Grise
+	this.buildingMaxLvl[102] = this.buildingMaxLvl[113] = [
+		30,	// Carriere
+		20,	// Metallurgie
+		21,	// Habitations
+		21,	// Serres
+		25,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		40,	// Centre de lancement
+		30,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Glace
+	this.buildingMaxLvl[103] = [
+		15,	// Carriere
+		15,	// Metallurgie
+		18,	// Habitations
+		18,	// Serres
+		17,	// Centrales Solaires
+		15,	// Entrepôts
+		5,	// Etat Major
+		20,	// Centre de lancement
+		20,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Pierre rouge
+	this.buildingMaxLvl[105] = this.buildingMaxLvl[109] = [
+		25,	// Carriere
+		25,	// Metallurgie
+		23,	// Habitations
+		23,	// Serres
+		26,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Montagnes, forets
+	this.buildingMaxLvl[106] = this.buildingMaxLvl[107] = [
+		30,	// Carriere
+		30,	// Metallurgie
+		25,	// Habitations
+		25,	// Serres
+		29,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Montagnes, glace
+	this.buildingMaxLvl[108] = [
+		25,	// Carriere
+		15,	// Metallurgie
+		20,	// Habitations
+		20,	// Serres
+		21,	// Centrales Solaires
+		15,	// Entrepôts
+		5,	// Etat Major
+		20,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Pierre marron
+	this.buildingMaxLvl[110] = [
+		20,	// Carriere
+		20,	// Metallurgie
+		21,	// Habitations
+		21,	// Serres
+		22,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre couleur rouille
+	this.buildingMaxLvl[111] = [
+		30,	// Carriere
+		30,	// Metallurgie
+		24,	// Habitations
+		24,	// Serres
+		29,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre bleue et blanche
+	this.buildingMaxLvl[112] = [
+		25,	// Carriere
+		25,	// Metallurgie
+		22,	// Habitations
+		22,	// Serres
+		25,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
 		10,	// Radar
 		25,	// Reservoir
 		25,	// Chantier naval

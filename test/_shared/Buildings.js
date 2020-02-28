@@ -425,6 +425,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -447,6 +448,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -469,6 +471,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -491,6 +494,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [0,0,0,0,0,0],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -515,6 +519,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -537,6 +542,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: new Date(Date.now() + 100000),
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
 				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -559,6 +565,7 @@ describe('• Buildings (shared)', () => {
 				nextBuildingTime: null,
 				Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 0, 0, 0],
 				resources: [1000000,1000000,1000000,1000000,1000000,1000000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(

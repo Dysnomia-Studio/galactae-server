@@ -388,7 +388,7 @@
 				errormsg = 'BUILDING_ERROR_ALREADY';
 			}
 			// Niveau maximum ?
-			if(currentPlanet.Buildings[building]>buildingMaxLvl[building]) {
+			if(currentPlanet.Buildings[building]>buildingMaxLvl[currentPlanet.planetType][building]) {
 				errormsg = 'BUILDING_ERROR_MAXIMUM';
 			}
 			// Les requirements ?
