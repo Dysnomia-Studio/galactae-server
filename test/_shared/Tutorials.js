@@ -310,7 +310,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date() }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), true
 			);
@@ -325,7 +325,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: null, motherPlanetAddress: '1-1-2-P3', position: '1-1-2-P1' }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: null, ownerId: '', motherPlanetAddress: '1-1-2-P3', position: '1-1-2-P1' }],
 					[]
 				), false
 			);
@@ -340,7 +340,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), motherPlanetAddress: '1-1-2-P3', position: '1-1-3-P1' }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '', motherPlanetAddress: '1-1-2-P3', position: '1-1-3-P1' }],
 					[]
 				), true
 			);
@@ -354,7 +354,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date() }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), false
 			);
@@ -368,7 +368,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.ATTACK, endMoveTime: new Date() }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.ATTACK, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), true
 			);
