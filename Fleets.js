@@ -12,21 +12,22 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		if(newPlanet.address === address) {
 			Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
-		}
 
-		if(globalCfg.dev) {
-			log('Sending fleet');
-		}
-
-		for(const fleetId in FleetList) {
-			if(FleetList[fleetId].ownerId !== newPlanet.owner) {
-				const player = await db.player.find(FleetList[fleetId].ownerId);
-
-				FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+			if(globalCfg.dev) {
+				log('Sending fleet');
 			}
-		}
 
-		io.to(sid).emit('fleet-recieve-data', { FleetList });
+
+			for(const fleetId in FleetList) {
+				if(FleetList[fleetId].ownerId !== newPlanet.owner) {
+					const player = await db.player.find(FleetList[fleetId].ownerId);
+
+					FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+				}
+			}
+
+			io.to(sid).emit('fleet-recieve-data', { FleetList });
+		}
 	}
 
 	/**
@@ -54,7 +55,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				originalFList = [];
 			}
 
-			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
+			Fleets.recalcFuel(address, originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
 					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 					return;
@@ -123,14 +124,14 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		});
 	}
 
-	static recalcFuel(fleetList, callback) {
+	static recalcFuel(address, fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) {
 				fleetList[i].fuel = 0;
 			}
 
-			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
+			if(fleetList[i].fuel < fleetList[i].maxFuel) {
 				haveToUpdate = true;
 			}
 		}
@@ -140,7 +141,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
+		db.planet.find(address, function(planetData) {
 			if(!haveToUpdate) {
 				callback(fleetList, planetData);
 				return;

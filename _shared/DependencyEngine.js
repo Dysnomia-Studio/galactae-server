@@ -106,6 +106,10 @@
 		static countMovingFleets(fleetList, dependency) {
 			let movingFleets = 0;
 			for(const fleet of fleetList) {
+				if(typeof fleet.ownerId === 'undefined') {
+					continue; // We got only public info, it's a foreign fleet
+				}
+
 				if(dependency.location === 'outerSystem' && (
 					GameMap.getSystemFromAdress(fleet.position) === GameMap.getSystemFromAdress(fleet.motherPlanetAddress)
 				)) {
