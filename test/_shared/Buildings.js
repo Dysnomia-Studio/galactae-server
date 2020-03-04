@@ -286,4 +286,301 @@ describe('• Buildings (shared)', () => {
 			);
 		});
 	});
+
+	/**
+	 * calcPlanetMorale
+	 */
+	describe('# calcPlanetMorale()', () => {
+		it('same level', () => {
+			for(let i = 1; i < 26; i++) {
+				assert.equal(
+					Buildings.calcPlanetMorale([0,0,i,i]),
+					1
+				);
+			}
+		});
+
+		it('2 hab 1 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,2,1]),
+				1.5
+			);
+		});
+
+		it('25 hab 1 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,25,1]),
+				2
+			);
+		});
+
+		it('1 hab 25 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,1,25]),
+				0.52
+			);
+		});
+
+		it('6 hab 9 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,6,9]).toFixed(4),
+				0.8333
+			);
+		});
+
+		it('10 hab 15 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,10,15]).toFixed(4),
+				0.8333
+			);
+		});
+
+		it('12 hab 17 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,12,17]).toFixed(4),
+				0.8529
+			);
+		});
+
+		it('19 hab 17 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,19,17]).toFixed(4),
+				1.0588
+			);
+		});
+
+		it('22 hab 23 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,22,23]).toFixed(4),
+				0.9783
+			);
+		});
+
+		it('1 hab 25 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,1,25]),
+				0.52
+			);
+		});
+	});
+
+	/**
+	 * getPeopleConsAndProd
+	 */
+	describe('# getPeopleConsAndProd()', () => {
+		it('all lvl 1, no fleet', () => {
+			assert.deepEqual(
+				Buildings.getPeopleConsAndProd({ nextBuilding: -1, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, []),
+				[275357,232985]
+			);
+		});
+
+		it('all lvl 1, no fleet, nextBuilding 1', () => {
+			assert.deepEqual(
+				Buildings.getPeopleConsAndProd({ nextBuilding: 0, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, []),
+				[275357,232985 - 30820 + 123040]
+			);
+		});
+
+		it('all lvl 1, fleet', () => {
+			assert.deepEqual(
+				Buildings.getPeopleConsAndProd({ nextBuilding: -1, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, [ { population: 1000.5 }]),
+				[275357,233985.5]
+			);
+		});
+
+		it('all lvl 35, no fleet', () => {
+			assert.deepEqual(
+				Buildings.getPeopleConsAndProd({ nextBuilding: -1, Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35, 35] }, []),
+				[45699425,38937630]
+			);
+		});
+	});
+
+	/**
+	 * enoughPeople
+	 */
+	describe('# enoughPeople()', () => {
+		it('all lvl 1, no fleet', () => {
+			assert.deepEqual(
+				Buildings.enoughPeople({ nextBuilding: -1, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, []),
+				true
+			);
+		});
+
+		it('all lvl 1, no fleet, nextBuilding 1', () => {
+			assert.deepEqual(
+				Buildings.enoughPeople({ nextBuilding: 1, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, []),
+				false
+			);
+		});
+	});
+
+	/**
+	 * enoughPeople
+	 */
+	describe('# checkIfCanBuild()', () => {
+		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(0,2),
+					0,
+					new Date()
+				),
+				''
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		it('all lvl 1 (except energy), no fleets, beginner, building 0 lvl 2', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(0,2),
+					0,
+					new Date()
+				),
+				'BUILDING_ERROR_PEOPLE'
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		it('all lvl 1, no fleets, beginner, building 0 lvl 2', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(0,2),
+					0,
+					new Date()
+				),
+				'BUILDING_ERROR_ENERGY'
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - empty resources', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [0,0,0,0,0,0],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(12,2),
+					0,
+					new Date()
+				),
+				'BUILDING_ERROR_COST'
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		// @TODO: specific tests for all resources
+
+		it('all lvl 1 (except energy and people), no fleets, beginner, building 12 lvl 2', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(12,2),
+					12,
+					new Date()
+				),
+				'BUILDING_ERROR_DEPENDENCIES'
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - currently building', () => {
+			const planetData = {
+				nextBuildingTime: new Date(Date.now() + 100000),
+				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(0,2),
+					0,
+					new Date()
+				),
+				'BUILDING_ERROR_ALREADY'
+			);
+
+			assert.equal(planetData.Buildings[0], 1);
+		});
+
+		it('all lvl 35, no fleets, beginner, building 0 lvl 36', () => {
+			const planetData = {
+				nextBuildingTime: null,
+				Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 0, 0, 0],
+				resources: [1000000,1000000,1000000,1000000,1000000,1000000],
+				planetType: 0,
+			};
+
+			assert.deepEqual(
+				Buildings.checkIfCanBuild(
+					planetData,
+					[],
+					{ research: [] },
+					Buildings.GetCost(0,36),
+					0,
+					new Date()
+				),
+				'BUILDING_ERROR_MAXIMUM'
+			);
+
+			assert.equal(planetData.Buildings[0], 35);
+		});
+	});
 });

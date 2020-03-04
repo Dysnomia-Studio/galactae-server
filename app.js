@@ -32,6 +32,7 @@ global.Alliances  = require('./Alliances');
 global.Buildings  = require('./Buildings');
 global.Chat       = require('./chat');
 global.Combat     = require('./combat');
+global.DependencyEngine = require('./DependencyEngine');
 global.Fleets 	  = require('./Fleets');
 global.GameMap    = require('./GameMap');
 global.Planet     = require('./planet');
@@ -78,10 +79,10 @@ db.connect(function(success,general=false) {
 			const statsInterval = 0.5 * TIME.MINUTES_TO_MS;
 
 			setTimeout(function() {
-				db.stat.submit(Date.now() - Date.now()%statsInterval);
+				db.stat.submit(new Date(Date.now() - Date.now()%statsInterval));
 
 				setInterval(function() {
-					db.stat.submit(Date.now() - Date.now()%statsInterval);
+					db.stat.submit(new Date(Date.now() - Date.now()%statsInterval));
 				},statsInterval);
 			},statsInterval - Date.now()%statsInterval);
 		}
@@ -105,6 +106,9 @@ if(!globalCfg.dev) {
 	/**
 	 * Graceful stop
 	 */
+	process.on('SIGTERM', function() {
+		Websocket.restart();
+	});
 	process.on('SIGINT', function() {
 		Websocket.restart();
 	});

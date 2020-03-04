@@ -1,5 +1,11 @@
 (function (exports) {
 	exports._Reports = class Reports {
+		/**
+		 * Gets all lost units in fleets of a specific report
+		 *
+		 * @param      {object}  report  The report data
+		 * @return     {object}  All lost units in fleets.
+		 */
 		static getAllLostUnitsInFleets(report) {
 			const fleetLosts = {};
 

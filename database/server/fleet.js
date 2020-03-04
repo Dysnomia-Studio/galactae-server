@@ -102,7 +102,7 @@ module.exports = {
 	},
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +
-			'"endMoveTime" = -1, ' +
+			'"endMoveTime" = NULL, ' +
 			'points = newFleets.points, ' +
 			'population = newFleets.population, ' +
 			'units = newFleets.units ' +

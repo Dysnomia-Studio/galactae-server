@@ -33,10 +33,17 @@ module.exports = {
 
 				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
+				let role = '';
+				if(message.member && message.member.roles.find('name', 'Administrathor')) {
+					role = Privileges.getChatRank(4);
+				} else if(message.member && message.member.roles.find('name', 'Moderathor')) {
+					role = Privileges.getChatRank(3);
+				}
+
 				const data = {};
 				data.channel = channel;
-				data.username = '[Discord] <span class="username no-pm">' + message.author.username + ': </span>';
-				data.message = '<strong>'+ data.username +' :</strong> '+ msg;
+				data.username = '[Discord] '+ role + ' <span class="username no-pm">' + message.author.username + ' : </span>';
+				data.message = '<strong>' + data.username +'</strong> '+ msg;
 
 				log('(Discord) [' + channel.substr(9) + '] '+message.author.username+': ' +msg);
 
@@ -61,6 +68,7 @@ module.exports = {
 		const channel = client.channels.find((channel) => channel.name === channelName);
 		channel.send(unNormalizeText(message));
 	},
+
 	/**
 	 * Alert something on discord global chat of this server
 	 *
@@ -69,6 +77,6 @@ module.exports = {
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
 		const channel = client.channels.find((channel) => channel.name === channelName);
-		channel.send('[SYSTEM MESSAGE] ' + unNormalizeText(message));
+		channel.send('**[SYSTEM MESSAGE]** ' + unNormalizeText(message));
 	},
 };

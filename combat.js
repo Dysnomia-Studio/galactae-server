@@ -211,7 +211,7 @@ module.exports = class Combat {
 		return shieldAbsorption[shield][weaponType];
 	}
 
-	simulateDamage(source, destination) {
+	simulateDamage(source, destination, missChance) {
 		if(typeof specialUnitsUID[source] !== 'undefined') {
 			source = specialUnitsUID[source];
 		}
@@ -244,7 +244,9 @@ module.exports = class Combat {
 
 			// @TODO: Gestion du projecteur à distance via distanceShieldAbsorption
 
-			// @TODO: Add miss chance
+			if(Math.random() < missChance) {
+				continue;
+			}
 
 			// @TODO: Add details to logs: original damage, shield absorption, miss (or not)
 
@@ -305,7 +307,22 @@ module.exports = class Combat {
 			targetUnitIndex = specialUnitsUID[target.unit];
 		}
 
-		const [damage, logs] = this.simulateDamage(currUnitId, target.unit);
+		let missChance = 0;
+		if(this.playerList[this.unitCache[target.unit].ownerId]) {
+			if(Research.isSearched(
+				this.playerList[this.unitCache[target.unit].ownerId],
+				'prop_manoeuvre'
+			)) {
+				missChance += researchBonus['prop_manoeuvre'];
+			}
+			if(Research.isSearched(
+				this.playerList[this.unitCache[target.unit].ownerId],
+				'prop_advManoeuvre'
+			)) {
+				missChance += researchBonus['prop_advManoeuvre'];
+			}
+		}
+		const [damage, logs] = this.simulateDamage(currUnitId, target.unit, missChance);
 
 		// @TODO: apply research bonuses
 
@@ -580,11 +597,13 @@ module.exports = class Combat {
 			return;
 		}
 
-		await db.battleLog.save(this.finalBattleLog, [this.atkUser.id, this.defUser.id]);
+		const playerList = Object.values(this.playerList).map((ply) => ply.id);
 
-		Reports.refresh(this.atkUser.id, this.atkUser.sid);
-		Reports.refresh(this.defUser.id, this.defUser.sid);
-		// @TODO: notify ALL Players
+		await db.battleLog.save(this.finalBattleLog, playerList);
+
+		for(const ply in this.playerList) {
+			Reports.refresh(ply.id, ply.sid);
+		}
 	}
 
 	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
@@ -592,12 +611,14 @@ module.exports = class Combat {
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
+		const currTime = Date.now();
+
 		db.fleet.findByPosition(defPlanet.address, (fleetList) => {
 			const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
 
 			// Add all fleets to fight
 			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime > Date.now()) {
+				if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
 					continue;
 				}
 
@@ -619,7 +640,7 @@ module.exports = class Combat {
 		const fleetList = await db.getAttacksAgainstPlayer(plyId);
 
 		for(const fleet of fleetList) {
-			fleet.arriveTime = new Date(parseInt(fleet.endMoveTime));
+			fleet.arriveTime = new Date(fleet.endMoveTime);
 			delete fleet.endMoveTime;
 
 			Websocket.sendNotification(plySid, 'attack', fleet);

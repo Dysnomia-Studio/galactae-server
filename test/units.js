@@ -68,7 +68,7 @@ describe('• Units', () => {
 		it('Ship w/ same sub propulsion', () => {
 			ship = {
 				type: 'SHIP_CORVET',
-				shape: 'SHIP_CORVET_SMALL',
+				shape: 'SHIP_CORVET_AEGIS',
 				prop_1: { value: 'ion', type: 'sub_propulsion' }, // Here's the problem
 				prop_2: { value: 'ion', type: 'sub_propulsion' }, // Here's the problem
 			};

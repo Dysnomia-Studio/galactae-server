@@ -194,13 +194,13 @@ describe('• Fleets', () => {
 					name: 'name',
 					bar: 'foo',
 					position: 'position',
-					endMoveTime: 'endMoveTime',
+					endMoveTime: null,
 				}, 'playerName'), {
 					id: 'id',
 					name: 'name',
 					owner: 'playerName',
 					position: 'position',
-					endMoveTime: 'endMoveTime',
+					endMoveTime: null,
 					units: [], // @TODO
 				}
 			);

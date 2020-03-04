@@ -93,8 +93,10 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
-					Player.getAlly(data, Chat.analyse);
+				Player.isValid(data, async(data) => { // Verify identity
+					data = await Player.getAlly(data);
+
+					Chat.analyse(data);
 				});
 			});
 
@@ -615,11 +617,12 @@ module.exports = class Websocket {
 		io.emit('server-reboot');
 		Discord.alert('Restarting game server ...');
 
-		let decompte = 5;
+		let decompte = 3;
 
 		setInterval(function() {
 			if(preventRestarts > 0) {
 				log('Wating simulations to end ...');
+				return;
 			}
 
 			if(decompte > 0) {

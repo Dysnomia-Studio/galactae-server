@@ -101,10 +101,10 @@ describe('• misc', () => {
 		it('isset(\'test\', \'object\')', () => {
 			assert.equal(isset('test', 'object'), false);
 		});
-		it('isset(\'inheritence\')', () => {
+		it('isset(\'inheritence\', \'object\')', () => {
 			class Parent {
 				motherFunc() {
-
+					this.test = 'test';
 				}
 			}
 
@@ -113,6 +113,11 @@ describe('• misc', () => {
 			}
 
 			assert.equal(isset(new Child(), 'object'), false);
+		});
+		it('isset(\'inheritence2\', \'object\')', () => {
+			const obj = Object.create({name: 'inherited'});
+
+			assert.equal(isset(obj, 'object'), false);
 		});
 
 		// numbers
@@ -288,6 +293,12 @@ describe('• misc', () => {
 			assert.equal(
 				getDateTime(new Date(2010,9,10,10,10,10)),
 				'10/10/2010 10:10:10'
+			);
+		});
+		it('getDateTime(default)', () => {
+			assert.equal(
+				typeof getDateTime(),
+				'string'
 			);
 		});
 	});

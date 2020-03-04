@@ -501,7 +501,7 @@ describe('• Fleets (shared)', () => {
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
-						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now()),
+						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -714,43 +714,47 @@ describe('• Fleets (shared)', () => {
 		});
 	});
 
-	describe('isImmobile()', () => {
-		it('Should work (ok)', () => {
-			assert(Fleets.isImmobile({
-				endMoveTime: -1,
-			}));
+	describe('# isImmobile()', () => {
+		it('Mobile', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: new Date(Date.now() + 10000) }
+				), false
+			);
 		});
 
-		it('Should work (past)', () => {
-			assert(!Fleets.isImmobile({
-				endMoveTime: Date.now() - 100000,
-			}));
-		});
-
-		it('Should work (future)', () => {
-			assert(!Fleets.isImmobile({
-				endMoveTime: Date.now() + 100000,
-			}));
+		it('Immobile', () => {
+			assert.equal(
+				Fleets.isImmobile(
+					{ endMoveTime: null }
+				), true
+			);
 		});
 	});
 
-	describe('hasEndedMove()', () => {
-		it('Should work (ok)', () => {
-			assert(!Fleets.hasEndedMove({
-				endMoveTime: -1,
-			}));
+	describe('# hasEndedMove()', () => {
+		it('Mobile, arrived', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: new Date(Date.now() - 10000) }
+				), true
+			);
 		});
 
-		it('Should work (past)', () => {
-			assert(Fleets.hasEndedMove({
-				endMoveTime: Date.now() - 100000,
-			}));
+		it('Mobile, not arrived', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: new Date(Date.now() + 10000) }
+				), false
+			);
 		});
 
-		it('Should work (future)', () => {
-			assert(!Fleets.hasEndedMove({
-				endMoveTime: Date.now() + 100000,
-			}));
+		it('Immobile', () => {
+			assert.equal(
+				Fleets.hasEndedMove(
+					{ endMoveTime: null }
+				), false
+			);
 		});
 	});
 });

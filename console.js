@@ -40,7 +40,6 @@ module.exports = function() {
 			case 'error':
 				console.trace(redText('ERROR: ') + redText(text));
 				return;
-				break;
 			case 'fail':
 				text = yellowText(text);
 				break;
@@ -57,6 +56,7 @@ module.exports = function() {
 		}
 
 		console.log(text);
+
 		if(adminSid !== '') {
 			io.to(adminSid).emit('server-log', getDateTime() + ' ' + msg);
 		}
