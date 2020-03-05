@@ -497,6 +497,188 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Search Alliance
+			socket.on('alliance-search', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.searchText, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.search(data.sid, data.searchText);
+				});
+			});
+
+			// Create Alliance
+			socket.on('alliance-create', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.name, 'string') || !isset(data.description, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.create(data.sid, user, data.name, data.description);
+				});
+			});
+
+			// Ask to join Alliance
+			socket.on('alliance-join-ask', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.askToJoin(data.id, data.allyId);
+				});
+			});
+
+			// Accept/Refuse join Alliance
+			socket.on('alliance-join-choice', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string') || !isset(data.choice, 'boolean')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.choiceAskToJoin(data.id, data.allyId, data.choice);
+				});
+			});
+
+			// Invite player
+			socket.on('alliance-invite-ask', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.playerName, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.invite(data.id, data.playerName);
+				});
+			});
+
+			// Accept/Refuse invitation
+			socket.on('alliance-invite-choice', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string') || !isset(data.choice, 'boolean')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.choiceInvite(data.id, data.allyId, data.choice);
+				});
+			});
+
+			// Kick member
+			socket.on('alliance-members-kick', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.playerName, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.kick(data.id, data.playerName);
+				});
+			});
+
+			// Edit member permissions
+			socket.on('alliance-members-permissionsEdit', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.founder, 'boolean') || !isset(data.leader, 'boolean') || !isset(data.diplomacy, 'boolean')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.editPermissions(data.id, data.allyId, data.founder, data.leader, data.diplomacy);
+				});
+			});
+
+			// Edit alliance informations
+			socket.on('alliance-edit', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.name, 'string') || !isset(data.description, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.edit(data.id, data.name, data.description);
+				});
+			});
+
+			// Leave alliance
+			socket.on('alliance-leave', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.leave(data.id);
+				});
+			});
+
+			// Dissolve alliance
+			socket.on('alliance-disslove', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.disslove(data.id);
+				});
+			});
+
+			// Ask for pact
+			socket.on('alliance-pact-ask', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.askToPact(data.id, data.allyId);
+				});
+			});
+
+			// Accept/Refuse pact
+			socket.on('alliance-pact-choice', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string') || !isset(data.choice, 'boolean')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.pactChoice(data.id, data.allyId, data.choice);
+				});
+			});
+
 			// Admin panel
 			socket.on('server-monitore-connect', function(data) {
 				if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.password, 'string')) {
