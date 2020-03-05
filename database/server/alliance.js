@@ -20,16 +20,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	updateDesc: async (id, desc) => {
+	update: async (id, name, desc) => {
 		try {
-			await serverClient.query('UPDATE alliances SET desc = $1 WHERE id = $2', [desc, id]);
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	updateName: async (id, name) => {
-		try {
-			await serverClient.query('UPDATE alliances SET name = $1 WHERE id = $2', [name, id]);
+			await serverClient.query('UPDATE alliances SET desc = $1, name = $2 WHERE id = $3', [desc, name, id]);
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -41,4 +34,11 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	search: async (searchText) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances WHERE name ILIKE $1', ['%' + searchText + '%'])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	}
 };

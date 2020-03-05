@@ -75,6 +75,16 @@ module.exports = {
 			}
 		});
 	},
+	joinAlly: async (userId, allyId) => {
+		try {
+			await serverClient.query(
+				'UPDATE users SET ally = $2 WHERE id = $1',
+				[userId, allyId]
+			);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	clearList: () => {
 		log('Clearing player list ...');
 
