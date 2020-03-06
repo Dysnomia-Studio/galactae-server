@@ -535,21 +535,21 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.askToJoin(data.id, data.allyId);
+					Alliances.askToJoin(user.name, data.allyId);
 				});
 			});
 
 			// Accept/Refuse join Alliance
 			socket.on('alliance-join-choice', (data) => {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string') || !isset(data.choice, 'boolean')) {
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.plyName, 'string') || !isset(data.choice, 'boolean')) {
 					return;
 				}
 
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.choiceAskToJoin(data.id, data.allyId, data.choice);
+					Alliances.choiceAskToJoin(user, data.plyName, data.choice);
 				});
 			});
 
@@ -563,7 +563,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.invite(data.id, data.playerName);
+					Alliances.invite(user.name, data.playerName);
 				});
 			});
 
@@ -577,7 +577,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.choiceInvite(data.id, data.allyId, data.choice);
+					Alliances.choiceInvite(user, data.id, data.allyId, data.choice);
 				});
 			});
 

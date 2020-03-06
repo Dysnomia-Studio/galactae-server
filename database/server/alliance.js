@@ -48,4 +48,46 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	askToJoin: async (playerName, allyId) => {
+		try {
+			await serverClient.query('INSERT INTO alliances_join (player, alliance) VALUES ($1, $2)', [playerName, allyId]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	askedToJoin: async (playerName, allyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_join WHERE player = $1 AND alliance = $2', [playerName, allyId]).rows.length > 0);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	removeJoinAsk: async (playerName) => {
+		try {
+			await serverClient.query('DELETE FROM alliances_join WHERE player = $1', [playerName]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	invite: async (playerName, allyId) => {
+		try {
+			await serverClient.query('INSERT INTO alliances_invitations (player, alliance) VALUES ($1, $2)', [playerName, allyId]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	hasBeenInvited: async (playerId, allyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerId, allyId]).rows.length > 0);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	removeInvitations: async (playerName) => {
+		try {
+			await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1', [playerName]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 };

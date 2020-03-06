@@ -16,9 +16,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByName: async (id) => {
+	findByName: async (name) => {
 		try {
-			return (await serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [id])).rows[0];
+			return (await serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
