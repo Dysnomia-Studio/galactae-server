@@ -40,5 +40,12 @@ module.exports = {
 		} catch(err) {
 			log(err, 'error');
 		}
-	}
+	},
+	getMembers: async (id) => {
+		try {
+			return (await serverClient.query('// ************** @TODO ************** \\', [id])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 };

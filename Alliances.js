@@ -1,22 +1,23 @@
 module.exports = class Alliances {
 	static async sendToPlayer(player) {
 		const ally = {
+			id: player.ally.id,
 			name: player.ally.name,
 			description: player.ally.description,
-			members: (await db.player.findByAlly(player.ally.id)).map((ply) => ply.name)
+			members: (await db.alliance.getMembers(player.ally.id)),
 		};
 
 		io.to(player.sid).emit('player-alliance-data', ally);
 	}
 
 	static async search(sid, searchText) {
-		const alliances = await db.alliances.search(searchText);
+		const alliances = await db.alliance.search(searchText);
 
 		io.to(sid).emit('player-search-results', alliances);
 	}
 
 	static async create(sid, userData, name, description) {
-		const allyId = await db.alliances.create({
+		const allyId = await db.alliance.create({
 			name,
 			description,
 		});

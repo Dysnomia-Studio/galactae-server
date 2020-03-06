@@ -50,6 +50,7 @@ global.io = class io {
 };
 
 global.db = {
+	alliance: {},
 	ban: {},
 	battleLog: {},
 	battleLogAccess: { fetchByPlayer: () => {} },
