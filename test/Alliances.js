@@ -542,4 +542,46 @@ describe('• Alliances', () => {
 			Alliances.choiceInvite({ ally: 'foo' }, 'allyId', false);
 		});
 	});
+
+	describe('# kick()', () => {
+		it('Should Work', () => {
+			const userData = {
+				id: 'MyId',
+			};
+
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
+
+			db.player.findByName = () => {
+				return userData;
+			};
+
+			db.player.updateAlly = (newPlayer) => {
+				assert(isset(newPlayer, 'object'));
+			};
+
+			db.alliance.dropPermissions = (id) => {
+				assert(id, userData.id);
+			};
+
+			Alliances.kick({}, 'playerName');
+		});
+
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.player.updateAlly = () => {
+				assert(false);
+			};
+
+			db.alliance.dropPermissions = () => {
+				assert(false);
+			};
+
+			Alliances.kick({}, 'playerName');
+		});
+	});
 });

@@ -53,7 +53,7 @@ module.exports = class Alliances {
 		});
 
 		await db.alliance.dropPermissions(
-			targetPlayer.id,
+			targetPlayer.id
 		);
 	}
 
@@ -161,5 +161,19 @@ module.exports = class Alliances {
 
 			// @TODO: notify alliance members
 		}
+	}
+
+	static async kick(currPlayer, targetPlayerName) {
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		// @TODO: check target player have less permissions than current player
+
+		const targetPlayer = await db.player.findByName(targetPlayerName);
+
+		Alliances.removePlayerFromAlliance(targetPlayer);
+
+		// @TODO: notify alliance members
 	}
 };
