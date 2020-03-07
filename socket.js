@@ -535,7 +535,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.askToJoin(user.name, data.allyId);
+					Alliances.askToJoin(user, user.name, data.allyId);
 				});
 			});
 
@@ -563,7 +563,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.invite(user.name, data.playerName);
+					Alliances.invite(user, user.name, data.playerName);
 				});
 			});
 

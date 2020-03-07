@@ -82,7 +82,7 @@ describe('• Alliances', () => {
 	});
 
 	describe('create()', () => {
-		it('should work', () => {
+		it('should work (ally=null)', () => {
 			let steps = 0;
 
 			const allianceData = {
@@ -100,7 +100,7 @@ describe('• Alliances', () => {
 				id: 'PlyId',
 				name: 'PlyName',
 				sid: 'sid',
-				ally: allianceData,
+				ally: null,
 			};
 
 			db.alliance.create = (obj) => {
@@ -133,10 +133,24 @@ describe('• Alliances', () => {
 
 			Alliances.create(userData.sid, userData, allianceData.name, allianceData.description);
 		});
+
+		it('should work (ally!=null)', () => {
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.create('sid', { ally: 'foo' }, 'name', 'description');
+		});
 	});
 
 	describe('askToJoin()', () => {
-		it('should work', () => {
+		it('should work (ally=null)', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
 
@@ -145,7 +159,18 @@ describe('• Alliances', () => {
 				assert.equal(allianceId, allyId);
 			};
 
-			Alliances.askToJoin(playerId, allianceId);
+			Alliances.askToJoin({ name: 'bar', ally: null }, playerId, allianceId);
+		});
+
+		it('should work (ally!=null)', () => {
+			const playerId = 'plyId';
+			const allianceId = 'allyId';
+
+			db.alliance.askToJoin = (plyId, allyId) => {
+				assert(false);
+			};
+
+			Alliances.askToJoin({ name: 'bar', ally: 'foo' }, playerId, allianceId);
 		});
 	});
 
@@ -269,7 +294,7 @@ describe('• Alliances', () => {
 				assert.equal(allianceId, allyId);
 			};
 
-			Alliances.invite(playerId, allianceId);
+			Alliances.invite({ name: 'plyName' }, playerId, allianceId);
 		});
 	});
 
@@ -278,7 +303,8 @@ describe('• Alliances', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
 			const currPlayer = {
-				ally: 'MyAllyId',
+				id: 'plyId',
+				ally: null,
 			};
 
 			db.alliance.hasBeenInvited = () => {
@@ -316,7 +342,8 @@ describe('• Alliances', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
 			const currPlayer = {
-				ally: 'MyAllyId',
+				id: 'plyId',
+				ally: null,
 			};
 
 			db.alliance.hasBeenInvited = () => {
@@ -365,7 +392,21 @@ describe('• Alliances', () => {
 				};
 			};
 
-			Alliances.choiceInvite({}, 'allyId', false);
+			Alliances.choiceInvite({ ally: null }, 'allyId', false);
+		});
+
+		it('should work (ally != null)', () => {
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert.equal(steps, 4);
+						}
+					},
+				};
+			};
+
+			Alliances.choiceInvite({ ally: 'foo' }, 'allyId', false);
 		});
 	});
 });
