@@ -10,6 +10,56 @@ module.exports = class Alliances {
 		io.to(player.sid).emit('player-alliance-data', ally);
 	}
 
+	/**
+	 * Permissions
+	 */
+	static async hasFounderPermissions(targetPlayerId) {
+		const permissions = await db.alliance.getPermissions(targetPlayerId);
+
+		return permissions.founder;
+	}
+
+	static async hasLeaderPermissions(targetPlayerId) {
+		const permissions = await db.alliance.getPermissions(targetPlayerId);
+
+		return permissions.founder || permissions.leader;
+	}
+
+	static async hasDiplomacyPermissions(targetPlayerId) {
+		const permissions = await db.alliance.getPermissions(targetPlayerId);
+
+		return permissions.founder || permissions.leader || permissions.diplomacy;
+	}
+
+	/**
+	 * Member management
+	 */
+	static async addPlayerToAlliance(targetPlayer, allyId) {
+		await db.player.updateAlly({
+			id: targetPlayer.id,
+			ally: allyId,
+		});
+
+		await db.alliance.createPermissions(
+			targetPlayer.id,
+			allyId,
+		);
+	}
+
+	static async removePlayerFromAlliance(targetPlayer) {
+		await db.player.updateAlly({
+			id: targetPlayer.id,
+			ally: null,
+		});
+
+		await db.alliance.dropPermissions(
+			targetPlayer.id,
+		);
+	}
+
+	/**
+	 * Orders from socket events
+	 */
 	static async search(sid, searchText) {
 		const alliances = await db.alliance.search(searchText);
 
@@ -26,10 +76,7 @@ module.exports = class Alliances {
 			description,
 		});
 
-		await db.player.joinAlly(
-			userData.id,
-			allyId
-		);
+		Alliances.addPlayerToAlliance(userData, allyId);
 
 		userData.ally = {
 			id: allyId,
@@ -55,16 +102,15 @@ module.exports = class Alliances {
 	}
 
 	static async choiceAskToJoin(currPlayer, playerName, choice) {
-		// @TODO: check if is leader
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
 
 		if(await db.alliance.askedToJoin(playerName, currPlayer.ally)) {
 			const playerData = await db.player.findByName(playerName);
 
 			if(choice) {
-				await db.player.update({
-					id: playerData.id,
-					ally: currPlayer.ally,
-				});
+				Alliances.addPlayerToAlliance(playerData, currPlayer.ally);
 
 				log(playerName + ' was granted to join alliance "' + currPlayer.ally + '" by ' + currPlayer.name + '.');
 			} else {
@@ -82,7 +128,9 @@ module.exports = class Alliances {
 	}
 
 	static async invite(currPlayer, invitedPlayerName, allyId) {
-		// @TODO: check if is leader
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
 
 		log(invitedPlayerName + ' was invited to join alliance "' + allyId + '" by ' + currPlayer.name + '.');
 
@@ -98,10 +146,7 @@ module.exports = class Alliances {
 
 		if(await db.alliance.hasBeenInvited(currPlayer.id, allyId)) {
 			if(choice) {
-				await db.player.update({
-					id: currPlayer.id,
-					ally: allyId,
-				});
+				Alliances.addPlayerToAlliance(currPlayer, allyId);
 
 				log(currPlayer.name + ' accepted to join alliance "' + allyId + '.');
 			} else {

@@ -591,7 +591,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.kick(data.id, data.playerName);
+					Alliances.kick(user, data.playerName);
 				});
 			});
 

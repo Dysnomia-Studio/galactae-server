@@ -50,6 +50,13 @@ module.exports = {
 			callback(objReturned.rows[0]);
 		});
 	},
+	updateAlly: async(user) => {
+		try {
+			await serverClient.query('UPDATE users SET ally = $1 WHERE id = $2', [user.ally, user.id]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	update: (inputUser, callback) => {
 		const user = Object.assign({}, inputUser);
 		const id = user.id;

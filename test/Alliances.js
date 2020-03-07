@@ -39,6 +39,84 @@ describe('• Alliances', () => {
 		});
 	});
 
+	describe('# hasFounderPermissions()', () => {
+		it('Founder perms', async() => {
+			db.alliance.getPermissions = () => { return { founder: true }; };
+
+			assert(
+				await Alliances.hasFounderPermissions({ })
+			);
+		});
+
+		it('No perms', async() => {
+			db.alliance.getPermissions = () => { return { }; };
+
+			assert(
+				!(await Alliances.hasFounderPermissions({ }))
+			);
+		});
+	});
+
+	describe('# hasLeaderPermissions()', () => {
+		it('Founder perms', async() => {
+			db.alliance.getPermissions = () => { return { founder: true }; };
+
+			assert(
+				await Alliances.hasLeaderPermissions({ })
+			);
+		});
+
+		it('Leader perms', async() => {
+			db.alliance.getPermissions = () => { return { leader: true }; };
+
+			assert(
+				await Alliances.hasLeaderPermissions({ })
+			);
+		});
+
+		it('No perms', async() => {
+			db.alliance.getPermissions = () => { return { }; };
+
+			assert(
+				!(await Alliances.hasLeaderPermissions({ }))
+			);
+		});
+	});
+
+	describe('# hasDiplomacyPermissions()', () => {
+		it('Founder perms', async() => {
+			db.alliance.getPermissions = () => { return { founder: true }; };
+
+			assert(
+				await Alliances.hasDiplomacyPermissions({ })
+			);
+		});
+
+		it('Leader perms', async() => {
+			db.alliance.getPermissions = () => { return { leader: true }; };
+
+			assert(
+				await Alliances.hasDiplomacyPermissions({ })
+			);
+		});
+
+		it('Diplomacy perms', async() => {
+			db.alliance.getPermissions = () => { return { diplomacy: true }; };
+
+			assert(
+				await Alliances.hasDiplomacyPermissions({ })
+			);
+		});
+
+		it('No perms', async() => {
+			db.alliance.getPermissions = () => { return { }; };
+
+			assert(
+				!(await Alliances.hasDiplomacyPermissions({ }))
+			);
+		});
+	});
+
 	describe('# search()', () => {
 		db.alliance.search = (text) => {
 			if(text === 'blah') {
@@ -82,7 +160,7 @@ describe('• Alliances', () => {
 	});
 
 	describe('create()', () => {
-		it('should work (ally=null)', () => {
+		it('ally = null', () => {
 			let steps = 0;
 
 			const allianceData = {
@@ -103,6 +181,8 @@ describe('• Alliances', () => {
 				ally: null,
 			};
 
+			db.alliance.createPermissions = () => { steps++; };
+
 			db.alliance.create = (obj) => {
 				assert.equal(obj.name, allianceData.name);
 				assert.equal(obj.description, allianceData.description);
@@ -112,9 +192,9 @@ describe('• Alliances', () => {
 				return allianceData.id;
 			};
 
-			db.player.joinAlly = (userId, allyId) => {
-				assert.equal(userId, userData.id);
-				assert.equal(allyId, allianceData.id);
+			db.player.updateAlly = (user) => {
+				assert.equal(user.id, userData.id);
+				assert.equal(user.ally, allianceData.id);
 
 				steps++;
 			};
@@ -125,7 +205,7 @@ describe('• Alliances', () => {
 					emit: (event, content) => {
 						if(event === 'player-alliance-data') {
 							assert.deepEqual(content, allianceData);
-							assert.equal(steps, 2);
+							assert.equal(steps, 3);
 						}
 					},
 				};
@@ -134,7 +214,7 @@ describe('• Alliances', () => {
 			Alliances.create(userData.sid, userData, allianceData.name, allianceData.description);
 		});
 
-		it('should work (ally!=null)', () => {
+		it('ally != null', () => {
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {
@@ -150,7 +230,7 @@ describe('• Alliances', () => {
 	});
 
 	describe('askToJoin()', () => {
-		it('should work (ally=null)', () => {
+		it('ally = null', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
 
@@ -162,7 +242,7 @@ describe('• Alliances', () => {
 			Alliances.askToJoin({ name: 'bar', ally: null }, playerId, allianceId);
 		});
 
-		it('should work (ally!=null)', () => {
+		it('ally != null', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
 
@@ -175,7 +255,7 @@ describe('• Alliances', () => {
 	});
 
 	describe('choiceAskToJoin()', () => {
-		it('should work (choice=true)', () => {
+		it('choice = true', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
 			const currPlayer = {
@@ -187,6 +267,14 @@ describe('• Alliances', () => {
 				return true;
 			};
 
+			db.alliance.createPermissions = () => { steps++; };
+
+			db.alliance.getPermissions = () => {
+				steps++;
+
+				return { founder: true };
+			};
+
 			db.player.findByName = (playerName) => {
 				steps++;
 				return {
@@ -194,7 +282,60 @@ describe('• Alliances', () => {
 				};
 			};
 
-			db.player.update = () => { steps++; };
+			db.player.updateAlly = () => { steps++; };
+
+			db.alliance.removeJoinAsk = () => { steps++; };
+
+			db.alliance.find = () => {
+				steps++;
+				return {
+					id: 'MyAllyId',
+					name: 'MyAllyName',
+					description: 'MyAllyDesc',
+				};
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert.equal(steps, 7);
+						}
+					},
+				};
+			};
+
+			Alliances.choiceAskToJoin(currPlayer, playerName, true);
+		});
+
+		it('choice = false', () => {
+			let steps = 0;
+			const playerName = 'myPlayerName';
+			const currPlayer = {
+				ally: 'MyAllyId',
+			};
+
+			db.alliance.askedToJoin = () => {
+				steps++;
+				return true;
+			};
+
+			db.alliance.createPermissions = () => { steps++; };
+
+			db.alliance.getPermissions = () => {
+				steps++;
+
+				return { leader: true };
+			};
+
+			db.player.findByName = (playerName) => {
+				steps++;
+				return {
+					id: 'playerId',
+				};
+			};
+
+			db.player.updateAlly = () => { steps++; };
 
 			db.alliance.removeJoinAsk = () => { steps++; };
 
@@ -217,57 +358,30 @@ describe('• Alliances', () => {
 				};
 			};
 
-			Alliances.choiceAskToJoin(currPlayer, playerName, true);
+			Alliances.choiceAskToJoin(currPlayer, playerName, false);
 		});
 
-		it('should work (choice=false)', () => {
-			let steps = 0;
-			const playerName = 'myPlayerName';
-			const currPlayer = {
-				ally: 'MyAllyId',
-			};
-
+		it('askedToJoin = false', () => {
 			db.alliance.askedToJoin = () => {
-				steps++;
-				return true;
-			};
-
-			db.player.findByName = (playerName) => {
-				steps++;
-				return {
-					id: 'playerId',
-				};
-			};
-
-			db.player.update = () => { steps++; };
-
-			db.alliance.removeJoinAsk = () => { steps++; };
-
-			db.alliance.find = () => {
-				steps++;
-				return {
-					id: 'MyAllyId',
-					name: 'MyAllyName',
-					description: 'MyAllyDesc',
-				};
+				return false;
 			};
 
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {
 						if(event === 'player-alliance-data') {
-							assert.equal(steps, 4);
+							assert(false);
 						}
 					},
 				};
 			};
 
-			Alliances.choiceAskToJoin(currPlayer, playerName, false);
+			Alliances.choiceAskToJoin({}, 'ply', false);
 		});
 
-		it('should work (askedToJoin=false)', () => {
-			db.alliance.askedToJoin = () => {
-				return false;
+		it('no perms', () => {
+			db.alliance.getPermissions = () => {
+				return { leader: false, founder: false, diplomacy: false };
 			};
 
 			io.to = (sid) => {
@@ -289,6 +403,10 @@ describe('• Alliances', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
 
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
+
 			db.alliance.invite = (plyId, allyId) => {
 				assert.equal(playerId, plyId);
 				assert.equal(allianceId, allyId);
@@ -296,10 +414,25 @@ describe('• Alliances', () => {
 
 			Alliances.invite({ name: 'plyName' }, playerId, allianceId);
 		});
+
+		it('no perms', () => {
+			const playerId = 'plyId';
+			const allianceId = 'allyId';
+
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.invite = (plyId, allyId) => {
+				assert(false);
+			};
+
+			Alliances.invite({ name: 'plyName' }, playerId, allianceId);
+		});
 	});
 
 	describe('choiceInvite()', () => {
-		it('should work (choice=true)', () => {
+		it('choice = true', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
 			const currPlayer = {
@@ -312,7 +445,7 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.player.update = () => { steps++; };
+			db.player.updateAlly = () => { steps++; };
 
 			db.alliance.removeInvitations = () => { steps++; };
 
@@ -338,7 +471,7 @@ describe('• Alliances', () => {
 			Alliances.choiceInvite(currPlayer, playerName, true);
 		});
 
-		it('should work (choice=false)', () => {
+		it('choice = false', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
 			const currPlayer = {
@@ -351,7 +484,7 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.player.update = () => { steps++; };
+			db.player.updateAlly = () => { steps++; };
 
 			db.alliance.removeInvitations = () => { steps++; };
 
@@ -377,7 +510,7 @@ describe('• Alliances', () => {
 			Alliances.choiceInvite(currPlayer, playerName, false);
 		});
 
-		it('should work (hasBeenInvited=false)', () => {
+		it('hasBeenInvited = false', () => {
 			db.alliance.hasBeenInvited = () => {
 				return false;
 			};
@@ -395,7 +528,7 @@ describe('• Alliances', () => {
 			Alliances.choiceInvite({ ally: null }, 'allyId', false);
 		});
 
-		it('should work (ally != null)', () => {
+		it('ally != null', () => {
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {

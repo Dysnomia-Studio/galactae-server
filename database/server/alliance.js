@@ -43,7 +43,7 @@ module.exports = {
 	},
 	getMembers: async (id) => {
 		try {
-			return (await serverClient.query('// ************** @TODO ************** \\', [id])).rows;
+			return (await serverClient.query('SELECT * FROM alliances_permissions INNER JOIN users ON users.id = player WHERE ally = $1', [id])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -86,6 +86,30 @@ module.exports = {
 	removeInvitations: async (playerName) => {
 		try {
 			await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1', [playerName]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	createPermissions: async (playerId, allyId) => {
+		try {
+			await serverClient.query(
+				'INSERT INTO alliances_permissions (ally, player, founder, leader, diplomacy) VALUES ($1, $2, 0, 0, 0)',
+				[allyId, playerId]
+			);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	getPermissions: async (playerId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_permissions WHERE player = $1', [playerId])).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	dropPermissions: async (playerId) => {
+		try {
+			return await serverClient.query('DELETE FROM alliances_permissions WHERE player = $1', [playerId]);
 		} catch(err) {
 			log(err, 'error');
 		}
