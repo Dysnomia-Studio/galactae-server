@@ -549,7 +549,11 @@ describe('• Alliances', () => {
 				id: 'MyId',
 			};
 
-			db.alliance.getPermissions = () => {
+			db.alliance.getPermissions = (id) => {
+				if(id === userData.id) {
+					return {};
+				}
+
 				return { leader: true };
 			};
 
@@ -562,15 +566,31 @@ describe('• Alliances', () => {
 			};
 
 			db.alliance.dropPermissions = (id) => {
-				assert(id, userData.id);
+				assert.equal(id, userData.id);
 			};
 
-			Alliances.kick({}, 'playerName');
+			Alliances.kick({ id: 'currPlayer' }, 'playerName');
 		});
 
 		it('No perms', () => {
 			db.alliance.getPermissions = () => {
 				return {};
+			};
+
+			db.player.updateAlly = () => {
+				assert(false);
+			};
+
+			db.alliance.dropPermissions = () => {
+				assert(false);
+			};
+
+			Alliances.kick({}, 'playerName');
+		});
+
+		it('No perms on target', () => {
+			db.alliance.getPermissions = () => {
+				return { leader: true };
 			};
 
 			db.player.updateAlly = () => {
@@ -618,7 +638,13 @@ describe('• Alliances', () => {
 				id: 'plyId',
 			};
 
-			db.alliance.getPermissions = () => { return { leader: true }; };
+			db.alliance.getPermissions = (id) => {
+				if(id === userData.id) {
+					return {};
+				}
+
+				return { leader: true };
+			};
 
 			db.player.findByName = () => { return userData; };
 
@@ -637,7 +663,13 @@ describe('• Alliances', () => {
 				id: 'plyId',
 			};
 
-			db.alliance.getPermissions = () => { return { founder: true }; };
+			db.alliance.getPermissions = (id) => {
+				if(id === userData.id) {
+					return {};
+				}
+
+				return { founder: true };
+			};
 
 			db.player.findByName = () => { return userData; };
 
@@ -649,6 +681,22 @@ describe('• Alliances', () => {
 			};
 
 			Alliances.editPermissions({}, 'userName', false, true, false);
+		});
+
+		it('No enough perms on target', () => {
+			const userData = {
+				id: 'plyId',
+			};
+
+			db.alliance.getPermissions = (id) => {
+				return { leader: true };
+			};
+
+			db.player.findByName = () => { return userData; };
+
+			db.alliance.setPermissions = () => { assert(false); };
+
+			Alliances.editPermissions({}, 'userName', false, false, true);
 		});
 	});
 });

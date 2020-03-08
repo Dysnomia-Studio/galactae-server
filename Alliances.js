@@ -31,6 +31,21 @@ module.exports = class Alliances {
 		return permissions.founder || permissions.leader || permissions.diplomacy;
 	}
 
+	static async hasEnoughRightsOnTarget(currPlayerId, targetPlayerId) {
+		const currPermissions = await db.alliance.getPermissions(currPlayerId);
+		const targetPermissions = await db.alliance.getPermissions(targetPlayerId);
+
+		if(currPermissions.founder) {
+			return true;
+		}
+
+		if(currPermissions.leader && !(targetPermissions.founder || targetPermissions.leader)) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Member management
 	 */
@@ -168,9 +183,11 @@ module.exports = class Alliances {
 			return;
 		}
 
-		// @TODO: check target player have less permissions than current player
-
 		const targetPlayer = await db.player.findByName(targetPlayerName);
+
+		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
+			return;
+		}
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
 
@@ -190,9 +207,11 @@ module.exports = class Alliances {
 			return;
 		}
 
-		// @TODO: check target player have less permissions than current player
-
 		const targetPlayer = await db.player.findByName(targetPlayerName);
+
+		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
+			return;
+		}
 
 		await db.alliance.setPermissions(
 			targetPlayer.id,
