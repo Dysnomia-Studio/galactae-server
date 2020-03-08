@@ -8,9 +8,13 @@ describe('• Research', () => {
 				research: {
 					researchCenter: 0,
 				},
+				planetlist: ['1']
 			});
 
-			const newUser2 = Research.addChilds({ research: newUser1 });
+			const newUser2 = Research.addChilds({
+				research: newUser1,
+				planetlist: ['1']
+			});
 
 			assert.deepEqual(
 				newUser1, {

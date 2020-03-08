@@ -7,7 +7,7 @@ module.exports = class Planet {
 	 * @param      {number}    decalage  decalage de n°
 	 * @param      {Function}  callback  Function needed to call back
 	 */
-	static async find(user,pid,decalage,callback) {
+	static async find(user, pid, decalage, callback) {
 		const userReturned = await db.player.find(user.id);
 
 		if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
@@ -246,7 +246,7 @@ module.exports = class Planet {
 				}
 
 				let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
-				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
+				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
 
 				const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
 				if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add

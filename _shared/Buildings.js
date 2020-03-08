@@ -185,6 +185,8 @@
 				return '';
 			}
 
+			// @TODO: Use dependency engine
+
 			let requirements = '';
 
 			for(let i=0; i<buildingParents[id].research.length; i++) {
@@ -386,7 +388,7 @@
 				errormsg = 'BUILDING_ERROR_ALREADY';
 			}
 			// Niveau maximum ?
-			if(currentPlanet.Buildings[building]>buildingMaxLvl[building]) {
+			if(currentPlanet.Buildings[building]>buildingMaxLvl[currentPlanet.planetType][building]) {
 				errormsg = 'BUILDING_ERROR_MAXIMUM';
 			}
 			// Les requirements ?

@@ -204,47 +204,8 @@
 			return Math.pow(dist, 2)*speed[0] + dist*speed[1] + speed[2];
 		}
 
-		/**
-		 * Distribute planet helium 3 to all fleets
-		 *
-		 * @param      {<type>}  planet     Old planet data
-		 * @param      {<type>}  fleetList  Old fleet list
-		 * @return     {<type>}  [New planet data, New fleet list]
-		 */
-		static distributeFuel(planet, fleetList) {
-			let haveToUpdate = [];
-			for(let i=0; i<fleetList.length; i++) {
-				if(typeof fleetList[i].fuel === 'undefined') {
-					fleetList[i].fuel = 0;
-				}
-
-				fleetList[i].fuel = parseInt(fleetList[i].fuel);
-				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
-
-				if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
-					haveToUpdate.push(fleetList[i].id);
-				}
-			}
-
+		static distributeToSomeFleets(planet, fleetList, haveToUpdate) {
 			let addCount = 0;
-
-			// Priority fleet
-			if(typeof planet.highPriorityFleet === 'string') {
-				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
-
-				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
-					fleetList[prioId].fuel += planet.resources[1];
-
-					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
-						planet.resources[1] = (fleetList[prioId].fuel - fleetList[prioId].maxFuel);
-						fleetList[prioId].fuel = 0 + fleetList[prioId].maxFuel;
-					} else {
-						planet.resources[1] = 0;
-					}
-				}
-			}
-
-			// Current planet fleets
 			while(haveToUpdate.length > 0 && Math.floor(planet.resources[1]) > 0 && (addCount = Math.floor(planet.resources[1]/haveToUpdate.length)) > 0) {
 				for(let i=0; i<haveToUpdate.length; i++) {
 					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
@@ -267,10 +228,76 @@
 				haveToUpdate = haveToUpdate.filter((d) => d !== -1);
 			}
 
+			return [ planet, fleetList, haveToUpdate ];
+		}
+
+		/**
+		 * Distribute planet helium 3 to all fleets
+		 *
+		 * @param      {<type>}  planet     Old planet data
+		 * @param      {<type>}  fleetList  Old fleet list
+		 * @return     {<type>}  [New planet data, New fleet list]
+		 */
+		static distributeFuel(planet, fleetList) {
+			let planetFleets = [];
+			let ownerFleets = [];
+			let allyFleets = [];
+			for(let i=0; i<fleetList.length; i++) {
+				if(typeof fleetList[i].fuel === 'undefined') {
+					fleetList[i].fuel = 0;
+				}
+
+				fleetList[i].fuel = parseInt(fleetList[i].fuel);
+				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
+
+				if(fleetList[i].fuel < fleetList[i].maxFuel) {
+					if(fleetList[i].position === fleetList[i].motherPlanetAddress) {
+						planetFleets.push(fleetList[i].id);
+					} else if(fleetList[i].ownerId === planet.owner) {
+						ownerFleets.push(fleetList[i].id);
+					}
+
+					// @TODO: ally check
+				}
+			}
+
+			// Priority fleet
+			if(typeof planet.highPriorityFleet === 'string') {
+				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
+
+				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
+					fleetList[prioId].fuel += planet.resources[1];
+
+					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
+						planet.resources[1] = (fleetList[prioId].fuel - fleetList[prioId].maxFuel);
+						fleetList[prioId].fuel = 0 + fleetList[prioId].maxFuel;
+					} else {
+						planet.resources[1] = 0;
+					}
+				}
+			}
+
+			if(planetFleets.length !== 0) {
+				// Current planet fleets
+				[planet, fleetList, planetFleets] = Fleets.distributeToSomeFleets(planet, fleetList, planetFleets);
+			}
+
+			if(planetFleets.length === 0) {
+				if(ownerFleets.length !== 0) {
+					// Same owner fleets
+					[planet, fleetList, ownerFleets] = Fleets.distributeToSomeFleets(planet, fleetList, ownerFleets);
+				}
+
+				if(ownerFleets.length === 0 && allyFleets.length !== 0) {
+					// Same ally fleets
+					[planet, fleetList, allyFleets] = Fleets.distributeToSomeFleets(planet, fleetList, allyFleets);
+				}
+			}
+
 			return [
 				planet,
 				fleetList,
-				haveToUpdate.length === 0, // No resources left
+				[...planetFleets, ...ownerFleets, ...allyFleets].length === 0, // No resources left
 			];
 		}
 

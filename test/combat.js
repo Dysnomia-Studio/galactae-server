@@ -603,6 +603,10 @@ describe('• Combat', () => {
 				id: 'u1',
 				name:'User 1',
 			};
+			battleArena.playerList = {
+				u2: battleArena.atkUser,
+				u1: battleArena.defUser,
+			};
 
 			const action = {
 				'message': 'test',

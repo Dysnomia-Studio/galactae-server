@@ -5,5 +5,4 @@ WORKDIR /app
 COPY . /app/
 RUN npm install --only=production
 
-
-ENTRYPOINT [ "npm", "start" ]
+ENTRYPOINT [ "node", "app" ]
