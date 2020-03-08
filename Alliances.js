@@ -247,5 +247,7 @@ module.exports = class Alliances {
 		const targetPlayer = await db.player.find(plyId);
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
+
+		// @TODO: notify player
 	}
 };

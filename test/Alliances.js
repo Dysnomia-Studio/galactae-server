@@ -12,9 +12,7 @@ describe('• Alliances', () => {
 				],
 			};
 
-			db.alliance.getMembers = (allyId) => {
-				return allianceData.members;
-			};
+			db.alliance.getMembers = (allyId) => allianceData.members;
 
 			io.to = (sid) => {
 				return {
@@ -34,14 +32,16 @@ describe('• Alliances', () => {
 					name: 'name',
 					description: 'description',
 				},
-				foo: 'bar'
+				foo: 'bar',
 			});
 		});
 	});
 
 	describe('# hasFounderPermissions()', () => {
 		it('Founder perms', async() => {
-			db.alliance.getPermissions = () => { return { founder: true }; };
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
 
 			assert(
 				await Alliances.hasFounderPermissions({ })
@@ -49,7 +49,9 @@ describe('• Alliances', () => {
 		});
 
 		it('No perms', async() => {
-			db.alliance.getPermissions = () => { return { }; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
 			assert(
 				!(await Alliances.hasFounderPermissions({ }))
@@ -59,7 +61,9 @@ describe('• Alliances', () => {
 
 	describe('# hasLeaderPermissions()', () => {
 		it('Founder perms', async() => {
-			db.alliance.getPermissions = () => { return { founder: true }; };
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
 
 			assert(
 				await Alliances.hasLeaderPermissions({ })
@@ -67,7 +71,9 @@ describe('• Alliances', () => {
 		});
 
 		it('Leader perms', async() => {
-			db.alliance.getPermissions = () => { return { leader: true }; };
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
 
 			assert(
 				await Alliances.hasLeaderPermissions({ })
@@ -75,7 +81,9 @@ describe('• Alliances', () => {
 		});
 
 		it('No perms', async() => {
-			db.alliance.getPermissions = () => { return { }; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
 			assert(
 				!(await Alliances.hasLeaderPermissions({ }))
@@ -85,7 +93,9 @@ describe('• Alliances', () => {
 
 	describe('# hasDiplomacyPermissions()', () => {
 		it('Founder perms', async() => {
-			db.alliance.getPermissions = () => { return { founder: true }; };
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
 
 			assert(
 				await Alliances.hasDiplomacyPermissions({ })
@@ -93,7 +103,9 @@ describe('• Alliances', () => {
 		});
 
 		it('Leader perms', async() => {
-			db.alliance.getPermissions = () => { return { leader: true }; };
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
 
 			assert(
 				await Alliances.hasDiplomacyPermissions({ })
@@ -101,7 +113,9 @@ describe('• Alliances', () => {
 		});
 
 		it('Diplomacy perms', async() => {
-			db.alliance.getPermissions = () => { return { diplomacy: true }; };
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
 
 			assert(
 				await Alliances.hasDiplomacyPermissions({ })
@@ -109,7 +123,9 @@ describe('• Alliances', () => {
 		});
 
 		it('No perms', async() => {
-			db.alliance.getPermissions = () => { return { }; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
 			assert(
 				!(await Alliances.hasDiplomacyPermissions({ }))
@@ -121,7 +137,7 @@ describe('• Alliances', () => {
 		db.alliance.search = (text) => {
 			if(text === 'blah') {
 				return [
-					{ foo: 'bar' }
+					{ foo: 'bar' },
 				];
 			}
 
@@ -134,7 +150,7 @@ describe('• Alliances', () => {
 					emit: (event, content) => {
 						if(event === 'player-search-results') {
 							assert.deepEqual(content, [
-								{ foo: 'bar' }
+								{ foo: 'bar' },
 							]);
 						}
 					},
@@ -267,7 +283,9 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.alliance.createPermissions = () => { steps++; };
+			db.alliance.createPermissions = () => {
+				steps++;
+			};
 
 			db.alliance.getPermissions = () => {
 				steps++;
@@ -282,9 +300,13 @@ describe('• Alliances', () => {
 				};
 			};
 
-			db.player.updateAlly = () => { steps++; };
+			db.player.updateAlly = () => {
+				steps++;
+			};
 
-			db.alliance.removeJoinAsk = () => { steps++; };
+			db.alliance.removeJoinAsk = () => {
+				steps++;
+			};
 
 			db.alliance.find = () => {
 				steps++;
@@ -320,7 +342,9 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.alliance.createPermissions = () => { steps++; };
+			db.alliance.createPermissions = () => {
+				steps++;
+			};
 
 			db.alliance.getPermissions = () => {
 				steps++;
@@ -335,9 +359,13 @@ describe('• Alliances', () => {
 				};
 			};
 
-			db.player.updateAlly = () => { steps++; };
+			db.player.updateAlly = () => {
+				steps++;
+			};
 
-			db.alliance.removeJoinAsk = () => { steps++; };
+			db.alliance.removeJoinAsk = () => {
+				steps++;
+			};
 
 			db.alliance.find = () => {
 				steps++;
@@ -445,9 +473,13 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.player.updateAlly = () => { steps++; };
+			db.player.updateAlly = () => {
+				steps++;
+			};
 
-			db.alliance.removeInvitations = () => { steps++; };
+			db.alliance.removeInvitations = () => {
+				steps++;
+			};
 
 			db.alliance.find = () => {
 				steps++;
@@ -484,9 +516,13 @@ describe('• Alliances', () => {
 				return true;
 			};
 
-			db.player.updateAlly = () => { steps++; };
+			db.player.updateAlly = () => {
+				steps++;
+			};
 
-			db.alliance.removeInvitations = () => { steps++; };
+			db.alliance.removeInvitations = () => {
+				steps++;
+			};
 
 			db.alliance.find = () => {
 				steps++;
@@ -607,7 +643,9 @@ describe('• Alliances', () => {
 
 	describe('# editPermissions()', () => {
 		it('too much rights', () => {
-			db.alliance.setPermissions = () => { assert(false); };
+			db.alliance.setPermissions = () => {
+				assert(false);
+			};
 
 			Alliances.editPermissions({}, 'plyName', true, true, true);
 
@@ -617,17 +655,25 @@ describe('• Alliances', () => {
 		});
 
 		it('currPlayer has no rights', () => {
-			db.alliance.getPermissions = () => { return { }; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
-			db.alliance.setPermissions = () => { assert(false); };
+			db.alliance.setPermissions = () => {
+				assert(false);
+			};
 
 			Alliances.editPermissions({}, 'plyName', false, false, true);
 		});
 
 		it('currPlayer has no rights to grant leader/founder permissions', () => {
-			db.alliance.getPermissions = () => { return { leader: true }; };
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
 
-			db.alliance.setPermissions = () => { assert(false); };
+			db.alliance.setPermissions = () => {
+				assert(false);
+			};
 
 			Alliances.editPermissions({}, 'plyName', true, false, false);
 			Alliances.editPermissions({}, 'plyName', false, true, false);
@@ -646,7 +692,9 @@ describe('• Alliances', () => {
 				return { leader: true };
 			};
 
-			db.player.findByName = () => { return userData; };
+			db.player.findByName = () => {
+				return userData;
+			};
 
 			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
 				assert.equal(userData.id, ply);
@@ -671,7 +719,9 @@ describe('• Alliances', () => {
 				return { founder: true };
 			};
 
-			db.player.findByName = () => { return userData; };
+			db.player.findByName = () => {
+				return userData;
+			};
 
 			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
 				assert.equal(userData.id, ply);
@@ -692,9 +742,13 @@ describe('• Alliances', () => {
 				return { leader: true };
 			};
 
-			db.player.findByName = () => { return userData; };
+			db.player.findByName = () => {
+				return userData;
+			};
 
-			db.alliance.setPermissions = () => { assert(false); };
+			db.alliance.setPermissions = () => {
+				assert(false);
+			};
 
 			Alliances.editPermissions({}, 'userName', false, false, true);
 		});
@@ -712,7 +766,9 @@ describe('• Alliances', () => {
 				return { founder: true };
 			};
 
-			db.player.findByName = () => { return userData; };
+			db.player.findByName = () => {
+				return userData;
+			};
 
 			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
 				if(ply === userData.id) {
@@ -732,9 +788,13 @@ describe('• Alliances', () => {
 
 	describe('# edit()', () => {
 		it('No perms', () => {
-			db.alliance.getPermissions = () => { return {}; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
-			db.alliance.update = () => { assert(false); };
+			db.alliance.update = () => {
+				assert(false);
+			};
 
 			Alliances.edit({}, '', '');
 		});
@@ -746,7 +806,9 @@ describe('• Alliances', () => {
 			const name = 'MyAllyName';
 			const desc = 'MyAllyDesc';
 
-			db.alliance.getPermissions = () => { return { leader: true }; };
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
 
 			db.alliance.update = (allyId, newName, newDesc) => {
 				assert.equal(allyId, userData.ally);
@@ -760,11 +822,17 @@ describe('• Alliances', () => {
 
 	describe('# leave()', () => {
 		it('Founder', () => {
-			db.alliance.getPermissions = () => { return { founder: true }; };
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
 
-			db.player.find = () => { assert(false); };
+			db.player.find = () => {
+				assert(false);
+			};
 
-			db.player.updateAlly = () => { assert(false); };
+			db.player.updateAlly = () => {
+				assert(false);
+			};
 
 			Alliances.leave('');
 		});
@@ -775,9 +843,13 @@ describe('• Alliances', () => {
 				foo: 'bar',
 			};
 
-			db.alliance.getPermissions = () => { return { }; };
+			db.alliance.getPermissions = () => {
+				return {};
+			};
 
-			db.player.find = () => { return userData; };
+			db.player.find = () => {
+				return userData;
+			};
 
 			db.player.updateAlly = (user) => {
 				assert.deepEqual(user, {
