@@ -228,4 +228,14 @@ module.exports = class Alliances {
 
 		// @TODO: notify player
 	}
+
+	static async edit(currPlayer, newName, newDescription) {
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		db.alliance.update(currPlayer.ally, newName, newDescription);
+
+		// @TODO: notify player
+	}
 };

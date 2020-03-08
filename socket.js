@@ -619,7 +619,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.edit(data.id, data.name, data.description);
+					Alliances.edit(user, data.name, data.description);
 				});
 			});
 

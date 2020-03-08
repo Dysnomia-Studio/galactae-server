@@ -729,4 +729,32 @@ describe('• Alliances', () => {
 			Alliances.editPermissions({}, 'userName', true, false, false);
 		});
 	});
+
+	describe('# edit()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => { return {}; };
+
+			db.alliance.update = () => { assert(false); };
+
+			Alliances.edit({}, '', '');
+		});
+
+		it('Should Work', () => {
+			const userData = {
+				ally: 'MyAllyId',
+			};
+			const name = 'MyAllyName';
+			const desc = 'MyAllyDesc';
+
+			db.alliance.getPermissions = () => { return { leader: true }; };
+
+			db.alliance.update = (allyId, newName, newDesc) => {
+				assert.equal(allyId, userData.ally);
+				assert.equal(newName, name);
+				assert.equal(newDesc, desc);
+			};
+
+			Alliances.edit(userData, name, desc);
+		});
+	});
 });
