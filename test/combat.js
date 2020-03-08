@@ -106,7 +106,7 @@ describe('• Combat', () => {
 		callback(unitsList);
 	};
 
-	db.player.find = async(id) => {
+	const findPlayer = async(id) => {
 		return [
 			{ id: 'u1', name: 'User 1', research: {} },
 			{ id: 'u2', name: 'User 2', research: {} },
@@ -664,6 +664,8 @@ describe('• Combat', () => {
 		};
 
 		it('No defending units', (done) => {
+			db.player.find = findPlayer;
+
 			io.to = (sid) => {
 				return {
 					emit: (event, content) => {

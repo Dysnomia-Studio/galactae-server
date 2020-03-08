@@ -238,4 +238,14 @@ module.exports = class Alliances {
 
 		// @TODO: notify player
 	}
+
+	static async leave(plyId) {
+		if(await Alliances.hasFounderPermissions(plyId)) {
+			return;
+		}
+
+		const targetPlayer = await db.player.find(plyId);
+
+		Alliances.removePlayerFromAlliance(targetPlayer);
+	}
 };

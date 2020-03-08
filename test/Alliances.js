@@ -757,4 +757,40 @@ describe('• Alliances', () => {
 			Alliances.edit(userData, name, desc);
 		});
 	});
+
+	describe('# leave()', () => {
+		it('Founder', () => {
+			db.alliance.getPermissions = () => { return { founder: true }; };
+
+			db.player.find = () => { assert(false); };
+
+			db.player.updateAlly = () => { assert(false); };
+
+			Alliances.leave('');
+		});
+
+		it('Should Work', () => {
+			const userData = {
+				id: 'test',
+				foo: 'bar',
+			};
+
+			db.alliance.getPermissions = () => { return { }; };
+
+			db.player.find = () => { return userData; };
+
+			db.player.updateAlly = (user) => {
+				assert.deepEqual(user, {
+					id: userData.id,
+					ally: null
+				});
+			};
+
+			db.alliance.dropPermissions = (id) => {
+				assert.equal(id, userData.id);
+			};
+
+			Alliances.leave('user');
+		});
+	});
 });
