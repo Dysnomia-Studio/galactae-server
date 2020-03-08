@@ -107,6 +107,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	setPermissions: async (playerId, founder, leader, diplomacy) => {
+		try {
+			await serverClient.query('UPDATE alliances_permissions SET founder = $2, leader = $3, diplomacy = $4 WHERE player = $1', [playerId, founder, leader, diplomacy]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	dropPermissions: async (playerId) => {
 		try {
 			return await serverClient.query('DELETE FROM alliances_permissions WHERE player = $1', [playerId]);

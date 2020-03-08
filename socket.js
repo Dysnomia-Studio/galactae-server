@@ -598,14 +598,14 @@ module.exports = class Websocket {
 			// Edit member permissions
 			socket.on('alliance-members-permissionsEdit', (data) => {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.founder, 'boolean') || !isset(data.leader, 'boolean') || !isset(data.diplomacy, 'boolean')) {
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.playerName, 'string') || !isset(data.founder, 'boolean') || !isset(data.leader, 'boolean') || !isset(data.diplomacy, 'boolean')) {
 					return;
 				}
 
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.editPermissions(data.id, data.allyId, data.founder, data.leader, data.diplomacy);
+					Alliances.editPermissions(user, data.playerName, data.founder, data.leader, data.diplomacy);
 				});
 			});
 

@@ -584,4 +584,71 @@ describe('• Alliances', () => {
 			Alliances.kick({}, 'playerName');
 		});
 	});
+
+	describe('# editPermissions()', () => {
+		it('too much rights', () => {
+			db.alliance.setPermissions = () => { assert(false); };
+
+			Alliances.editPermissions({}, 'plyName', true, true, true);
+
+			Alliances.editPermissions({}, 'plyName', true, true, false);
+			Alliances.editPermissions({}, 'plyName', true, false, true);
+			Alliances.editPermissions({}, 'plyName', false, true, true);
+		});
+
+		it('currPlayer has no rights', () => {
+			db.alliance.getPermissions = () => { return { }; };
+
+			db.alliance.setPermissions = () => { assert(false); };
+
+			Alliances.editPermissions({}, 'plyName', false, false, true);
+		});
+
+		it('currPlayer has no rights to grant leader/founder permissions', () => {
+			db.alliance.getPermissions = () => { return { leader: true }; };
+
+			db.alliance.setPermissions = () => { assert(false); };
+
+			Alliances.editPermissions({}, 'plyName', true, false, false);
+			Alliances.editPermissions({}, 'plyName', false, true, false);
+		});
+
+		it('Assign diplomacy permissions', () => {
+			const userData = {
+				id: 'plyId',
+			};
+
+			db.alliance.getPermissions = () => { return { leader: true }; };
+
+			db.player.findByName = () => { return userData; };
+
+			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
+				assert.equal(userData.id, ply);
+				assert(!founder);
+				assert(!leader);
+				assert(diplomacy);
+			};
+
+			Alliances.editPermissions({}, 'userName', false, false, true);
+		});
+
+		it('Assign leader permissions', () => {
+			const userData = {
+				id: 'plyId',
+			};
+
+			db.alliance.getPermissions = () => { return { founder: true }; };
+
+			db.player.findByName = () => { return userData; };
+
+			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
+				assert.equal(userData.id, ply);
+				assert(!founder);
+				assert(leader);
+				assert(!diplomacy);
+			};
+
+			Alliances.editPermissions({}, 'userName', false, true, false);
+		});
+	});
 });

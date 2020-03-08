@@ -176,4 +176,30 @@ module.exports = class Alliances {
 
 		// @TODO: notify alliance members
 	}
+
+	static async editPermissions(currPlayer, targetPlayerName, founder, leader, diplomacy) {
+		if((founder + leader + diplomacy) > 1) {
+			return;
+		}
+
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		if((founder || leader) && !(await Alliances.hasFounderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		// @TODO: check target player have less permissions than current player
+
+		const targetPlayer = await db.player.findByName(targetPlayerName);
+
+		await db.alliance.setPermissions(
+			targetPlayer.id,
+			founder, leader, diplomacy
+		);
+		// @TODO: remove founder permissions if assigning fouder permissions
+
+		// @TODO: notify player
+	}
 };
