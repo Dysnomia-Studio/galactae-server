@@ -647,7 +647,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.disslove(data.id);
+					Alliances.disslove(user);
 				});
 			});
 

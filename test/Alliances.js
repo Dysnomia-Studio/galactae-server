@@ -865,4 +865,34 @@ describe('• Alliances', () => {
 			Alliances.leave('user');
 		});
 	});
+
+	describe('# disslove()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.delete = () => {
+				assert(false);
+			};
+
+			Alliances.dissolve({});
+		});
+
+		it('Should Work', () => {
+			const userData = {
+				ally: 'MyAllyId',
+			};
+
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
+
+			db.alliance.delete = (allyId) => {
+				assert.equal(allyId, userData.ally);
+			};
+
+			Alliances.dissolve(userData);
+		});
+	});
 });

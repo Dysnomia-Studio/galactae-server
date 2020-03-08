@@ -29,8 +29,17 @@ module.exports = {
 	},
 	delete: async (id) => {
 		try {
-			await serverClient.query('DELETE FROM alliances WHERE id = $2', [id]);
+			await serverClient.query('BEGIN');
+
+			await serverClient.query('DELETE FROM alliances_join WHERE alliance = $1', [id]);
+			await serverClient.query('DELETE FROM alliances_invitations WHERE alliance = $1', [id]);
+			await serverClient.query('DELETE FROM alliances_perms WHERE ally = $1', [id]);
+
+			await serverClient.query('DELETE FROM alliances WHERE id = $1', [id]);
+
+			await serverClient.query('COMMIT');
 		} catch(err) {
+			await serverClient.query('ROLLBACK');
 			log(err, 'error');
 		}
 	},

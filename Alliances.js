@@ -250,4 +250,12 @@ module.exports = class Alliances {
 
 		// @TODO: notify player
 	}
+
+	static async dissolve(currPlayer) {
+		if(!(await Alliances.hasFounderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		db.alliances.delete(currPlayer.ally);
+	}
 };
