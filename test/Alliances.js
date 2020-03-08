@@ -698,5 +698,35 @@ describe('• Alliances', () => {
 
 			Alliances.editPermissions({}, 'userName', false, false, true);
 		});
+
+		it('Assign founder permissions', () => {
+			const userData = {
+				id: 'plyId',
+			};
+
+			db.alliance.getPermissions = (id) => {
+				if(id === userData.id) {
+					return {};
+				}
+
+				return { founder: true };
+			};
+
+			db.player.findByName = () => { return userData; };
+
+			db.alliance.setPermissions = (ply, founder, leader, diplomacy) => {
+				if(ply === userData.id) {
+					assert(founder);
+					assert(!leader);
+					assert(!diplomacy);
+				} else {
+					assert(!founder);
+					assert(leader);
+					assert(!diplomacy);
+				}
+			};
+
+			Alliances.editPermissions({}, 'userName', true, false, false);
+		});
 	});
 });

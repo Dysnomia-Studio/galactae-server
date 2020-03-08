@@ -217,7 +217,14 @@ module.exports = class Alliances {
 			targetPlayer.id,
 			founder, leader, diplomacy
 		);
-		// @TODO: remove founder permissions if assigning fouder permissions
+
+		// Remove founder perms from current player if assigning a new founder
+		if(founder) {
+			await db.alliance.setPermissions(
+				currPlayer.id,
+				false, true, false
+			);
+		}
 
 		// @TODO: notify player
 	}
