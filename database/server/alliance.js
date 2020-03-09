@@ -34,7 +34,7 @@ module.exports = {
 			await serverClient.query('DELETE FROM alliances_join WHERE alliance = $1', [id]);
 			await serverClient.query('DELETE FROM alliances_invitations WHERE alliance = $1', [id]);
 			await serverClient.query('DELETE FROM alliances_pacts WHERE first = $1 OR second = $1', [id]);
-			await serverClient.query('DELETE FROM alliances_perms WHERE ally = $1', [id]);
+			await serverClient.query('DELETE FROM alliances_permissions WHERE ally = $1', [id]);
 
 			await serverClient.query('DELETE FROM alliances WHERE id = $1', [id]);
 
@@ -56,7 +56,7 @@ module.exports = {
 	 */
 	getMembers: async (id) => {
 		try {
-			return (await serverClient.query('SELECT * FROM alliances_permissions INNER JOIN users ON users.id = player WHERE ally = $1', [id])).rows;
+			return (await serverClient.query('SELECT users.name, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -153,7 +153,7 @@ module.exports = {
 	 */
 	getPacts: async (allyId) => {
 		try {
-			return await serverClient.query('SELECT * FROM alliances_pacts WHERE first = $1 OR second = $1', [allyId]).rows;
+			return (await serverClient.query('SELECT * FROM alliances_pacts WHERE first = $1 OR second = $1', [allyId])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
