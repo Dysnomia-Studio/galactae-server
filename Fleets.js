@@ -484,6 +484,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		if(!to.units[unitId]) {
 			to.units[unitId] = 0;
 		}
+		from.units[unitId] -= count;
 		to.units[unitId] += count;
 
 		return [from, to];
