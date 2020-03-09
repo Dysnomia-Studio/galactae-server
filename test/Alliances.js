@@ -10,9 +10,14 @@ describe('• Alliances', () => {
 					{ name: 'Foo', founder: false, leader: false, diplomacy: false },
 					{ name: 'Bar', founder: false, leader: true, diplomacy: false },
 				],
+				pacts: [
+					{ first: 'MyId', second: 'ally2', accepted: true },
+					{ first: 'MyId', second: 'ally3', accepted: false },
+				]
 			};
 
 			db.alliance.getMembers = (allyId) => allianceData.members;
+			db.alliance.getPacts = (allyId) => allianceData.pacts;
 
 			io.to = (sid) => {
 				return {
@@ -28,9 +33,9 @@ describe('• Alliances', () => {
 				id: 'test',
 				name: 'foo',
 				ally: {
-					id: 'MyId',
-					name: 'name',
-					description: 'description',
+					id: allianceData.id,
+					name: allianceData.name,
+					description: allianceData.description,
 				},
 				foo: 'bar',
 			});
@@ -175,7 +180,7 @@ describe('• Alliances', () => {
 		});
 	});
 
-	describe('create()', () => {
+	describe('# create()', () => {
 		it('ally = null', () => {
 			let steps = 0;
 
@@ -188,7 +193,14 @@ describe('• Alliances', () => {
 					{ name: 'Foo', founder: false, leader: false, diplomacy: false },
 					{ name: 'Bar', founder: false, leader: true, diplomacy: false },
 				],
+				pacts: [
+					{ first: 'MyId', second: 'ally2', accepted: true },
+					{ first: 'MyId', second: 'ally3', accepted: false },
+				]
 			};
+
+			db.alliance.getMembers = (allyId) => allianceData.members;
+			db.alliance.getPacts = (allyId) => allianceData.pacts;
 
 			const userData = {
 				id: 'PlyId',
@@ -245,7 +257,7 @@ describe('• Alliances', () => {
 		});
 	});
 
-	describe('askToJoin()', () => {
+	describe('# askToJoin()', () => {
 		it('ally = null', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
@@ -270,7 +282,7 @@ describe('• Alliances', () => {
 		});
 	});
 
-	describe('choiceAskToJoin()', () => {
+	describe('# choiceAskToJoin()', () => {
 		it('choice = true', () => {
 			let steps = 0;
 			const playerName = 'myPlayerName';
@@ -426,7 +438,21 @@ describe('• Alliances', () => {
 		});
 	});
 
-	describe('invite()', () => {
+	describe('# removeAskToJoin()', () => {
+		it('Should Work', () => {
+			const plyName = 'myPlayerName';
+			const allyId = 'MyAllyId';
+
+			db.alliance.removeJoinAsk = (ply, ally) => {
+				assert.equal(plyName, ply);
+				assert.equal(allyId, ally);
+			};
+
+			Alliances.removeAskToJoin(plyName, allyId);
+		});
+	});
+
+	describe('# invite()', () => {
 		it('should work', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
@@ -578,6 +604,40 @@ describe('• Alliances', () => {
 			Alliances.choiceInvite({ ally: 'foo' }, 'allyId', false);
 		});
 	});
+
+	describe('# removeInvite()', () => {
+		it('should work', () => {
+			const playerId = 'plyId';
+			const allianceId = 'allyId';
+
+			db.alliance.getPermissions = () => {
+				return { leader: true };
+			};
+
+			db.alliance.removeInvitations = (plyId, allyId) => {
+				assert.equal(playerId, plyId);
+				assert.equal(allianceId, allyId);
+			};
+
+			Alliances.removeInvite({ name: 'plyName' }, playerId, allianceId);
+		});
+
+		it('no perms', () => {
+			const playerId = 'plyId';
+			const allianceId = 'allyId';
+
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.removeInvitations = (plyId, allyId) => {
+				assert(false);
+			};
+
+			Alliances.removeInvite({ name: 'plyName' }, playerId, allianceId);
+		});
+	});
+
 
 	describe('# kick()', () => {
 		it('Should Work', () => {
@@ -866,7 +926,7 @@ describe('• Alliances', () => {
 		});
 	});
 
-	describe('# disslove()', () => {
+	describe('# dissolve()', () => {
 		it('No perms', () => {
 			db.alliance.getPermissions = () => {
 				return {};
@@ -876,7 +936,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.dissolve({});
+			Alliances.dissolve('id', 'ally');
 		});
 
 		it('Should Work', () => {
@@ -892,7 +952,112 @@ describe('• Alliances', () => {
 				assert.equal(allyId, userData.ally);
 			};
 
-			Alliances.dissolve(userData);
+			Alliances.dissolve(userData.id, userData.ally);
+		});
+	});
+
+	describe('# askToPact()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.askPact = () => {
+				assert(false);
+			};
+
+			Alliances.askToPact('id', 'ally', 'ally2');
+		});
+
+		it('Same alliance', () => {
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
+
+			db.alliance.askPact = () => {
+				assert(false);
+			};
+
+			Alliances.askToPact('id', 'ally', 'ally');
+		});
+
+		it('Should Work', () => {
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
+
+			db.alliance.askPact = (ally, otherAlly) => {
+				assert.equal(ally, 'ally');
+				assert.equal(otherAlly, 'ally2');
+			};
+
+			Alliances.askToPact('id', 'ally', 'ally2');
+		});
+	});
+
+	describe('# pactChoice()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.acceptPact = () => {
+				assert(false);
+			};
+			db.alliance.removePact = () => {
+				assert(false);
+			};
+
+			Alliances.pactChoice('id', 'ally', 'ally2');
+		});
+
+		it('Choice true', () => {
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
+
+			db.alliance.acceptPact = () => assert(true);
+			db.alliance.removePact = () => assert(false);
+
+			Alliances.pactChoice('id', 'ally', 'ally2', true);
+		});
+
+		it('Choice false', () => {
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
+
+			db.alliance.acceptPact = () => assert(false);
+			db.alliance.removePact = () => assert(true);
+
+			Alliances.pactChoice('id', 'ally', 'ally2', false);
+		});
+	});
+
+	describe('# stopPact()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.removePact = () => {
+				assert(false);
+			};
+
+			Alliances.stopPact('id', 'ally', 'ally2');
+		});
+
+		it('Should Work', () => {
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
+
+			db.alliance.removePact = (allyId, otherId) => {
+				assert.equal(allyId, 'ally');
+				assert.equal(otherId, 'ally2');
+			};
+
+			Alliances.stopPact('id', 'ally', 'ally2');
 		});
 	});
 });

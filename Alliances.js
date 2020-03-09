@@ -5,6 +5,7 @@ module.exports = class Alliances {
 			name: player.ally.name,
 			description: player.ally.description,
 			members: (await db.alliance.getMembers(player.ally.id)),
+			pacts: (await db.alliance.getPacts(player.ally.id)),
 		};
 
 		io.to(player.sid).emit('player-alliance-data', ally);
@@ -142,6 +143,12 @@ module.exports = class Alliances {
 		}
 	}
 
+	static async removeAskToJoin(playerName, allyId) {
+		log(playerName + ' no longer want to join alliance "' + allyId + '".');
+
+		await db.alliance.removeJoinAsk(playerName, allyId);
+	}
+
 	static async invite(currPlayer, invitedPlayerName, allyId) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			return;
@@ -178,6 +185,16 @@ module.exports = class Alliances {
 		}
 	}
 
+	static async removeInvite(currPlayer, invitedPlayerName, allyId) {
+		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			return;
+		}
+
+		log(invitedPlayerName + ' is no longer invited to join alliance "' + allyId + '" (removed by ' + currPlayer.name + ').');
+
+		await db.alliance.removeInvitations(invitedPlayerName, allyId);
+	}
+
 	static async kick(currPlayer, targetPlayerName) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			return;
@@ -188,6 +205,8 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
 			return;
 		}
+
+		log(targetPlayerName + 'was kicked from its alliance by' + currPlayer.name);
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
 
@@ -213,6 +232,8 @@ module.exports = class Alliances {
 			return;
 		}
 
+		log(currPlayer.name + ' edited ' + targetPlayerName + 'permissions (' + founder + ',' + leader + ',' + diplomacy + ')');
+
 		await db.alliance.setPermissions(
 			targetPlayer.id,
 			founder, leader, diplomacy
@@ -234,6 +255,8 @@ module.exports = class Alliances {
 			return;
 		}
 
+		log(currPlayer + ' edited its alliance (' + newName + ', ' + newDescription + ')');
+
 		db.alliance.update(currPlayer.ally, newName, newDescription);
 
 		// @TODO: notify player
@@ -244,6 +267,8 @@ module.exports = class Alliances {
 			return;
 		}
 
+		log(plyId + ' left its alliance.');
+
 		const targetPlayer = await db.player.find(plyId);
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
@@ -251,11 +276,53 @@ module.exports = class Alliances {
 		// @TODO: notify player
 	}
 
-	static async dissolve(currPlayer) {
-		if(!(await Alliances.hasFounderPermissions(currPlayer.id))) {
+	static async dissolve(plyId, allyId) {
+		if(!(await Alliances.hasFounderPermissions(plyId))) {
 			return;
 		}
 
-		db.alliances.delete(currPlayer.ally);
+		log(allyId + ' was dissolved.');
+
+		db.alliance.delete(allyId);
+
+		// @TODO: notify alliance members
+	}
+
+	static async askToPact(plyId, allyId, otherAllyId) {
+		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			return;
+		}
+
+		if(allyId === otherAllyId) {
+			return;
+		}
+
+		db.alliance.askPact(allyId, otherAllyId);
+
+		log(allyId + ' stopped pact with alliance ' + otherAllyId);
+	}
+
+	static async pactChoice(plyId, allyId, otherAllyId, choice) {
+		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			return;
+		}
+
+		if(choice) {
+			db.alliance.acceptPact(allyId, otherAllyId);
+			log(ally + ' accepted pact with ' + otherAllyId);
+		} else {
+			db.alliance.removePact(allyId, otherAllyId);
+			log(ally + ' refused pact with ' + otherAllyId);
+		}
+	}
+
+	static async stopPact(plyId, allyId, otherAllyId) {
+		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			return;
+		}
+
+		log(allyId + ' stopped pact with alliance ' + otherAllyId);
+
+		db.alliance.removePact(allyId, otherAllyId);
 	}
 };

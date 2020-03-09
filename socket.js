@@ -553,6 +553,20 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Remove join alliance request
+			socket.on('alliance-join-remove', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.removeAskToJoin(user.name, data.allyId);
+				});
+			});
+
 			// Invite player
 			socket.on('alliance-invite-ask', (data) => {
 				// Vars
@@ -563,7 +577,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.invite(user, user.name, data.playerName);
+					Alliances.invite(user, data.playerName, user.ally);
 				});
 			});
 
@@ -577,7 +591,21 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.choiceInvite(user, data.id, data.allyId, data.choice);
+					Alliances.choiceInvite(user, data.allyId, data.choice);
+				});
+			});
+
+			// Remove invitation
+			socket.on('alliance-invite-remove', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.playerName, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.removeInvite(user, data.playerName, user.ally);
 				});
 			});
 
@@ -647,7 +675,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.disslove(user);
+					Alliances.disslove(user.id, user.ally);
 				});
 			});
 
@@ -661,7 +689,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.askToPact(data.id, data.allyId);
+					Alliances.askToPact(data.id, user.ally, data.allyId);
 				});
 			});
 
@@ -675,7 +703,21 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.pactChoice(data.id, data.allyId, data.choice);
+					Alliances.pactChoice(data.id, user.ally, data.allyId, data.choice);
+				});
+			});
+
+			// Stop pact
+			socket.on('alliance-pact-stop', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.stopPact(data.id, user.ally, data.allyId);
 				});
 			});
 

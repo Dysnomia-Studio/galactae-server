@@ -109,9 +109,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	removeJoinAsk: async (playerName) => {
+	removeJoinAsk: async (playerName, ally) => {
 		try {
-			await serverClient.query('DELETE FROM alliances_join WHERE player = $1', [playerName]);
+			if(!ally) {
+				await serverClient.query('DELETE FROM alliances_join WHERE player = $1', [playerName]);
+			} else {
+				await serverClient.query('DELETE FROM alliances_join WHERE player = $1 AND alliance = $2', [playerName, ally]);
+			}
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -133,9 +137,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	removeInvitations: async (playerName) => {
+	removeInvitations: async (playerName, ally) => {
 		try {
-			await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1', [playerName]);
+			if(!ally) {
+				await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1', [playerName]);
+			} else {
+				await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerName, ally]);
+			}
 		} catch(err) {
 			log(err, 'error');
 		}
