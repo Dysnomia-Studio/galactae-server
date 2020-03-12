@@ -4,6 +4,8 @@ module.exports = class Alliances {
 			id: player.ally.id,
 			name: player.ally.name,
 			description: player.ally.description,
+			askToJoin: (await db.alliance.getAskToJoin(player.ally.id)),
+			invitations: (await db.alliance.getInvitations(player.ally.id)),
 			members: (await db.alliance.getMembers(player.ally.id)),
 			pacts: (await db.alliance.getPacts(player.ally.id)),
 		};
@@ -255,7 +257,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		log(currPlayer + ' edited its alliance (' + newName + ', ' + newDescription + ')');
+		log(currPlayer.name + ' edited its alliance (' + newName + ', ' + newDescription + ')');
 
 		db.alliance.update(currPlayer.ally, newName, newDescription);
 
@@ -309,10 +311,10 @@ module.exports = class Alliances {
 
 		if(choice) {
 			db.alliance.acceptPact(allyId, otherAllyId);
-			log(ally + ' accepted pact with ' + otherAllyId);
+			log(allyId + ' accepted pact with ' + otherAllyId);
 		} else {
 			db.alliance.removePact(allyId, otherAllyId);
-			log(ally + ' refused pact with ' + otherAllyId);
+			log(allyId + ' refused pact with ' + otherAllyId);
 		}
 	}
 

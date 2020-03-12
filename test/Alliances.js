@@ -13,11 +13,15 @@ describe('• Alliances', () => {
 				pacts: [
 					{ first: 'MyId', second: 'ally2', accepted: true },
 					{ first: 'MyId', second: 'ally3', accepted: false },
-				]
+				],
+				askToJoin: [],
+				invitations: [],
 			};
 
 			db.alliance.getMembers = (allyId) => allianceData.members;
 			db.alliance.getPacts = (allyId) => allianceData.pacts;
+			db.alliance.getAskToJoin = (allyId) => allianceData.askToJoin;
+			db.alliance.getInvitations = (allyId) => allianceData.invitations;
 
 			io.to = (sid) => {
 				return {
@@ -196,11 +200,15 @@ describe('• Alliances', () => {
 				pacts: [
 					{ first: 'MyId', second: 'ally2', accepted: true },
 					{ first: 'MyId', second: 'ally3', accepted: false },
-				]
+				],
+				askToJoin: [],
+				invitations: [],
 			};
 
 			db.alliance.getMembers = (allyId) => allianceData.members;
 			db.alliance.getPacts = (allyId) => allianceData.pacts;
+			db.alliance.getAskToJoin = (allyId) => allianceData.askToJoin;
+			db.alliance.getInvitations = (allyId) => allianceData.invitations;
 
 			const userData = {
 				id: 'PlyId',
