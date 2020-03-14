@@ -576,7 +576,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.invite(user, data.playerName, user.ally);
 				});
 			});
@@ -590,7 +590,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.choiceInvite(user, data.allyId, data.choice);
 				});
 			});
@@ -604,7 +604,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.removeInvite(user, data.playerName, user.ally);
 				});
 			});
@@ -618,7 +618,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.kick(user, data.playerName);
 				});
 			});
@@ -632,7 +632,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.editPermissions(user, data.playerName, data.founder, data.leader, data.diplomacy);
 				});
 			});
@@ -646,7 +646,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.edit(user, data.name, data.description);
 				});
 			});
@@ -660,7 +660,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.leave(data.id);
 				});
 			});
@@ -674,7 +674,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.disslove(user.id, user.ally);
 				});
 			});
@@ -688,7 +688,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.askToPact(data.id, user.ally, data.allyId);
 				});
 			});
@@ -702,7 +702,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.pactChoice(data.id, user.ally, data.allyId, data.choice);
 				});
 			});
@@ -716,7 +716,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.cancelPactInvitation(data.id, user.ally, data.allyId);
 				});
 			});
@@ -730,7 +730,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(user) => { // Verify identity
+				Player.isValid(data, (user) => { // Verify identity
 					Alliances.stopPact(data.id, user.ally, data.allyId);
 				});
 			});

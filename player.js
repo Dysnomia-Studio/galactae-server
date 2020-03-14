@@ -4,7 +4,7 @@ module.exports = class Player {
 		db.player.searchBySid(user.sid, (playerData) => {
 			if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
 				if(Player.canAct(playerData)) { // Don't spam
-					callback(user);
+					callback(playerData);
 
 					playerData.lastAction = new Date();
 					db.player.update(playerData);

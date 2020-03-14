@@ -1,4 +1,78 @@
+const oldResync = Alliances.reSyncAllAllyMembers;
+Alliances.reSyncAllAllyMembers = () => { }; // Too hard to test it in all cases ...
+
 describe('• Alliances', () => {
+	describe('# reSyncAllAllyMembers', () => {
+		it('should work', () => {
+			Alliances.reSyncAllAllyMembers = oldResync;
+
+			const allianceData = {
+				id: 'MyId',
+				name: 'name',
+				description: 'description',
+				members: [
+					{ name: 'Elanis', founder: true, leader: false, diplomacy: false },
+					{ name: 'Foo', founder: false, leader: false, diplomacy: false },
+					{ name: 'Bar', founder: false, leader: true, diplomacy: false },
+				],
+				pacts: [
+					{ first: 'MyId', second: 'ally2', accepted: true },
+					{ first: 'MyId', second: 'ally3', accepted: false },
+				],
+				askToJoin: [],
+				invitations: [],
+			};
+
+			db.alliance.find = () => allianceData;
+			db.alliance.getMembers = (allyId) => allianceData.members;
+			db.alliance.getPacts = (allyId) => allianceData.pacts;
+			db.alliance.getAskToJoin = (allyId) => allianceData.askToJoin;
+			db.alliance.getInvitations = (allyId) => allianceData.invitations;
+
+			const playerList = [
+				{ name: 'Elanis', sid: '1' },
+				{ name: 'Foo', sid: '-1' },
+				{ name: 'Bar', sid: 'r' },
+			];
+
+			db.player.findByAlly = () => playerList;
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert.deepEqual(content, allianceData);
+						}
+					},
+				};
+			};
+
+			Alliances.reSyncAllAllyMembers(allianceData.id);
+
+			Alliances.reSyncAllAllyMembers = () => { };
+		});
+
+		it('alliance does not exists', () => {
+			Alliances.reSyncAllAllyMembers = oldResync;
+
+			db.alliance.find = () => undefined;
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.reSyncAllAllyMembers('id');
+
+			Alliances.reSyncAllAllyMembers = () => { };
+		});
+	});
+
 	describe('# sendToPlayer()', () => {
 		it('should work', () => {
 			const allianceData = {
@@ -1039,6 +1113,33 @@ describe('• Alliances', () => {
 			db.alliance.removePact = () => assert(true);
 
 			Alliances.pactChoice('id', 'ally', 'ally2', false);
+		});
+	});
+
+	describe('# cancelPactInvitation()', () => {
+		it('No perms', () => {
+			db.alliance.getPermissions = () => {
+				return {};
+			};
+
+			db.alliance.removePact = () => {
+				assert(false);
+			};
+
+			Alliances.cancelPactInvitation('id', 'ally', 'ally2');
+		});
+
+		it('Should Work', () => {
+			db.alliance.getPermissions = () => {
+				return { founder: true };
+			};
+
+			db.alliance.removePact = (allyId, otherId) => {
+				assert.equal(allyId, 'ally');
+				assert.equal(otherId, 'ally2');
+			};
+
+			Alliances.cancelPactInvitation('id', 'ally', 'ally2');
 		});
 	});
 

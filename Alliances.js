@@ -1,4 +1,27 @@
 module.exports = class Alliances {
+	static async reSyncAllAllyMembers(allyId) {
+		const alliance = await db.alliance.find(allyId);
+		if(!alliance) {
+			return;
+		}
+
+		const players = await db.player.findByAlly(allyId);
+
+		const ally = {
+			id: alliance.id,
+			name: alliance.name,
+			description: alliance.description,
+			askToJoin: (await db.alliance.getAskToJoin(alliance.id)),
+			invitations: (await db.alliance.getInvitations(alliance.id)),
+			members: (await db.alliance.getMembers(alliance.id)),
+			pacts: (await db.alliance.getPacts(alliance.id)),
+		};
+
+		for(const player of players) {
+			io.to(player.sid).emit('player-alliance-data', ally);
+		}
+	}
+
 	static async sendToPlayer(player) {
 		const ally = {
 			id: player.ally.id,
@@ -116,6 +139,8 @@ module.exports = class Alliances {
 
 		db.alliance.askToJoin(playerName, allyId);
 
+		Alliances.reSyncAllAllyMembers(allyId);
+
 		// @TODO: notify alliance staff
 	}
 
@@ -140,15 +165,17 @@ module.exports = class Alliances {
 			await db.alliance.removeJoinAsk(playerName);
 
 			playerData.ally = await db.alliance.find(playerData.ally);
-
-			Alliances.sendToPlayer(playerData);
 		}
+
+		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 	}
 
 	static async removeAskToJoin(playerName, allyId) {
 		log(playerName + ' no longer want to join alliance "' + allyId + '".');
 
 		await db.alliance.removeJoinAsk(playerName, allyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
 	}
 
 	static async invite(currPlayer, invitedPlayerName, allyId) {
@@ -159,6 +186,8 @@ module.exports = class Alliances {
 		log(invitedPlayerName + ' was invited to join alliance "' + allyId + '" by ' + currPlayer.name + '.');
 
 		db.alliance.invite(invitedPlayerName, allyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
 
 		// @TODO: notify player
 	}
@@ -181,10 +210,10 @@ module.exports = class Alliances {
 
 			currPlayer.ally = await db.alliance.find(currPlayer.ally);
 
-			Alliances.sendToPlayer(currPlayer);
-
 			// @TODO: notify alliance members
 		}
+
+		Alliances.reSyncAllAllyMembers(allyId);
 	}
 
 	static async removeInvite(currPlayer, invitedPlayerName, allyId) {
@@ -195,6 +224,8 @@ module.exports = class Alliances {
 		log(invitedPlayerName + ' is no longer invited to join alliance "' + allyId + '" (removed by ' + currPlayer.name + ').');
 
 		await db.alliance.removeInvitations(invitedPlayerName, allyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
 	}
 
 	static async kick(currPlayer, targetPlayerName) {
@@ -212,7 +243,10 @@ module.exports = class Alliances {
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
 
+		Alliances.reSyncAllAllyMembers(currPlayer.ally);
+
 		// @TODO: notify alliance members
+		// @TODO: notify player and sync him
 	}
 
 	static async editPermissions(currPlayer, targetPlayerName, founder, leader, diplomacy) {
@@ -249,6 +283,8 @@ module.exports = class Alliances {
 			);
 		}
 
+		Alliances.reSyncAllAllyMembers(currPlayer.ally);
+
 		// @TODO: notify player
 	}
 
@@ -260,6 +296,8 @@ module.exports = class Alliances {
 		log(currPlayer.name + ' edited its alliance (' + newName + ', ' + newDescription + ')');
 
 		db.alliance.update(currPlayer.ally, newName, newDescription);
+
+		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
 		// @TODO: notify player
 	}
@@ -275,7 +313,9 @@ module.exports = class Alliances {
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
 
-		// @TODO: notify player
+		Alliances.reSyncAllAllyMembers(targetPlayer.ally);
+
+		// @TODO: notify player & sync him
 	}
 
 	static async dissolve(plyId, allyId) {
@@ -287,7 +327,7 @@ module.exports = class Alliances {
 
 		db.alliance.delete(allyId);
 
-		// @TODO: notify alliance members
+		// @TODO: notify alliance members & sync them
 	}
 
 	static async askToPact(plyId, allyId, otherAllyId) {
@@ -302,6 +342,11 @@ module.exports = class Alliances {
 		db.alliance.askPact(allyId, otherAllyId);
 
 		log(allyId + ' stopped pact with alliance ' + otherAllyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
+		Alliances.reSyncAllAllyMembers(otherAllyId);
+
+		// @TODO: notify target staff
 	}
 
 	static async pactChoice(plyId, allyId, otherAllyId, choice) {
@@ -316,6 +361,11 @@ module.exports = class Alliances {
 			db.alliance.removePact(allyId, otherAllyId);
 			log(allyId + ' refused pact with ' + otherAllyId);
 		}
+
+		Alliances.reSyncAllAllyMembers(allyId);
+		Alliances.reSyncAllAllyMembers(otherAllyId);
+
+		// @TODO: notify both staff
 	}
 
 	static async cancelPactInvitation(plyId, allyId, otherAllyId) {
@@ -326,6 +376,9 @@ module.exports = class Alliances {
 		log(allyId + ' cancelled pact invitation with alliance ' + otherAllyId);
 
 		db.alliance.removePact(allyId, otherAllyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
+		Alliances.reSyncAllAllyMembers(otherAllyId);
 	}
 
 	static async stopPact(plyId, allyId, otherAllyId) {
@@ -336,5 +389,10 @@ module.exports = class Alliances {
 		log(allyId + ' stopped pact with alliance ' + otherAllyId);
 
 		db.alliance.removePact(allyId, otherAllyId);
+
+		Alliances.reSyncAllAllyMembers(allyId);
+		Alliances.reSyncAllAllyMembers(otherAllyId);
+
+		// @TODO: notify both staff
 	}
 };
