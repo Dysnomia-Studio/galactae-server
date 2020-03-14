@@ -707,6 +707,20 @@ module.exports = class Websocket {
 				});
 			});
 
+			// Cancel pact invitation
+			socket.on('alliance-pact-cancelInvite', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					Alliances.cancelPactInvitation(data.id, user.ally, data.allyId);
+				});
+			});
+
 			// Stop pact
 			socket.on('alliance-pact-stop', (data) => {
 				// Vars

@@ -318,6 +318,16 @@ module.exports = class Alliances {
 		}
 	}
 
+	static async cancelPactInvitation(plyId, allyId, otherAllyId) {
+		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			return;
+		}
+
+		log(allyId + ' cancelled pact invitation with alliance ' + otherAllyId);
+
+		db.alliance.removePact(allyId, otherAllyId);
+	}
+
 	static async stopPact(plyId, allyId, otherAllyId) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			return;

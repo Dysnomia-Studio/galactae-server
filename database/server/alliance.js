@@ -95,6 +95,13 @@ module.exports = {
 	/**
 	 * Join
 	 */
+	hasAskedToJoin: async (playerName, allyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_join WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	getAskToJoin: async(allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_join WHERE alliance = $1', [allyId])).rows;
@@ -103,6 +110,10 @@ module.exports = {
 		}
 	},
 	askToJoin: async (playerName, allyId) => {
+		if(await db.alliance.hasAskedToJoin(playerName, allyId)) {
+			return;
+		}
+
 		try {
 			await serverClient.query('INSERT INTO alliances_join (player, alliance) VALUES ($1, $2)', [playerName, allyId]);
 		} catch(err) {
@@ -130,6 +141,13 @@ module.exports = {
 	/**
 	 * Invitations
 	 */
+	isInvited: async (playerName, allyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	getInvitations: async(allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE alliance = $1', [allyId])).rows;
@@ -138,6 +156,10 @@ module.exports = {
 		}
 	},
 	invite: async (playerName, allyId) => {
+		if(await db.alliance.isInvited(playerName, allyId)) {
+			return;
+		}
+
 		try {
 			await serverClient.query('INSERT INTO alliances_invitations (player, alliance) VALUES ($1, $2)', [playerName, allyId]);
 		} catch(err) {
@@ -165,6 +187,13 @@ module.exports = {
 	/**
 	 * Pacts
 	 */
+	hasPact: async (allyId, otherAllyId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM alliances_pacts WHERE (first = $1 AND second = $2) OR (first = $2 AND second = $1)', [allyId, otherAllyId])).rows.length > 0;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	getPacts: async (allyId) => {
 		try {
 			return (await serverClient.query('SELECT alliances_pacts.*, a1.name as ally_1_name, a2.name as ally_2_name FROM alliances_pacts INNER JOIN alliances AS a1 ON a1.id = first INNER JOIN alliances AS a2 ON a2.id = second WHERE first = $1 OR second = $1', [allyId])).rows;
@@ -173,6 +202,10 @@ module.exports = {
 		}
 	},
 	askPact: async (allyId, otherAllyId) => {
+		if(await db.alliance.hasPact(allyId, otherAllyId)) {
+			return;
+		}
+
 		try {
 			await serverClient.query('INSERT INTO alliances_pacts (first, second, accepted) VALUES ($1, $2, false)', [allyId, otherAllyId]);
 		} catch(err) {
