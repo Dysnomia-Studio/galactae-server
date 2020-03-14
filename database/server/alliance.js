@@ -31,6 +31,8 @@ module.exports = {
 		try {
 			await serverClient.query('BEGIN');
 
+			await serverClient.query('UPDATE users SET ally = null WHERE ally = $1', [id]);
+
 			await serverClient.query('DELETE FROM alliances_join WHERE alliance = $1', [id]);
 			await serverClient.query('DELETE FROM alliances_invitations WHERE alliance = $1', [id]);
 			await serverClient.query('DELETE FROM alliances_pacts WHERE first = $1 OR second = $1', [id]);
