@@ -682,14 +682,14 @@ module.exports = class Websocket {
 			// Ask for pact
 			socket.on('alliance-pact-ask', (data) => {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyName, 'string')) {
 					return;
 				}
 
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, (user) => { // Verify identity
-					Alliances.askToPact(data.id, user.ally, data.allyId);
+					Alliances.askToPact(data.id, user.ally, data.allyName);
 				});
 			});
 

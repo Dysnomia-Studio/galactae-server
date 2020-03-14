@@ -223,7 +223,7 @@ module.exports = {
 	},
 	removePact: async (allyId, otherAllyId) => {
 		try {
-			await serverClient.query('DELETE FROM alliances_pacts WHERE ((first = $1 AND second = $2) OR (first = $2 AND second = $1)', [allyId, otherAllyId]);
+			await serverClient.query('DELETE FROM alliances_pacts WHERE ((first = $1 AND second = $2) OR (first = $2 AND second = $1))', [allyId, otherAllyId]);
 		} catch(err) {
 			log(err, 'error');
 		}
