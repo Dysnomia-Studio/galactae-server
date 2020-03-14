@@ -330,21 +330,27 @@ module.exports = class Alliances {
 		// @TODO: notify alliance members & sync them
 	}
 
-	static async askToPact(plyId, allyId, otherAllyId) {
+	static async askToPact(plyId, allyId, otherAllyName) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			return;
 		}
 
-		if(allyId === otherAllyId) {
+		const alliance = await db.alliance.findByName(otherAllyName);
+
+		if(!alliance) {
 			return;
 		}
 
-		db.alliance.askPact(allyId, otherAllyId);
+		if(allyId === alliance.id) {
+			return;
+		}
 
-		log(allyId + ' stopped pact with alliance ' + otherAllyId);
+		db.alliance.askPact(allyId, alliance.id);
+
+		log(allyId + ' asked to pact with alliance ' + otherAllyName);
 
 		Alliances.reSyncAllAllyMembers(allyId);
-		Alliances.reSyncAllAllyMembers(otherAllyId);
+		Alliances.reSyncAllAllyMembers(alliance.id);
 
 		// @TODO: notify target staff
 	}
