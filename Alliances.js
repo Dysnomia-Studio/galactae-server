@@ -180,6 +180,8 @@ module.exports = class Alliances {
 		await db.alliance.removeJoinAsk(playerName, allyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
+
+		// @TODO: resync player
 	}
 
 	static async invite(currPlayer, invitedPlayerName, allyId) {
@@ -201,7 +203,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		if(await db.alliance.hasBeenInvited(currPlayer.id, allyId)) {
+		if(await db.alliance.hasBeenInvited(currPlayer.name, allyId)) {
 			if(choice) {
 				Alliances.addPlayerToAlliance(currPlayer, allyId);
 

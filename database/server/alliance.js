@@ -143,13 +143,6 @@ module.exports = {
 	/**
 	 * Invitations
 	 */
-	isInvited: async (playerName, allyId) => {
-		try {
-			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
 	getInvitations: async(allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE alliance = $1', [allyId])).rows;
@@ -165,7 +158,7 @@ module.exports = {
 		}
 	},
 	invite: async (playerName, allyId) => {
-		if(await db.alliance.isInvited(playerName, allyId)) {
+		if(await db.alliance.hasBeenInvited(playerName, allyId)) {
 			return;
 		}
 
@@ -175,9 +168,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	hasBeenInvited: async (playerId, allyId) => {
+	hasBeenInvited: async (playerName, allyId) => {
 		try {
-			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerId, allyId]).rows.length > 0);
+			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
 		} catch(err) {
 			log(err, 'error');
 		}
