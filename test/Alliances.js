@@ -1044,6 +1044,10 @@ describe('• Alliances', () => {
 				return {};
 			};
 
+			db.alliance.findByName = () => {
+				assert(false);
+			};
+
 			db.alliance.askPact = () => {
 				assert(false);
 			};
@@ -1056,6 +1060,10 @@ describe('• Alliances', () => {
 				return { diplomacy: true };
 			};
 
+			db.alliance.findByName = () => {
+				return { id: 'ally', foo: 'bar' };
+			};
+
 			db.alliance.askPact = () => {
 				assert(false);
 			};
@@ -1063,9 +1071,29 @@ describe('• Alliances', () => {
 			Alliances.askToPact('id', 'ally', 'ally');
 		});
 
+		it('Alliance not existing', () => {
+			db.alliance.getPermissions = () => {
+				return { diplomacy: true };
+			};
+
+			db.alliance.findByName = () => {
+				return;
+			};
+
+			db.alliance.askPact = () => {
+				assert(false);
+			};
+
+			Alliances.askToPact('id', 'ally', 'ally2');
+		});
+
 		it('Should Work', () => {
 			db.alliance.getPermissions = () => {
 				return { diplomacy: true };
+			};
+
+			db.alliance.findByName = () => {
+				return { id: 'ally2', foo: 'bar' };
 			};
 
 			db.alliance.askPact = (ally, otherAlly) => {
