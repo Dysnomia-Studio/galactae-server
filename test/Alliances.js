@@ -372,7 +372,7 @@ describe('• Alliances', () => {
 				ally: 'MyAllyId',
 			};
 
-			db.alliance.askedToJoin = () => {
+			db.alliance.hasAskedToJoin = () => {
 				steps++;
 				return true;
 			};
@@ -431,7 +431,7 @@ describe('• Alliances', () => {
 				ally: 'MyAllyId',
 			};
 
-			db.alliance.askedToJoin = () => {
+			db.alliance.hasAskedToJoin = () => {
 				steps++;
 				return true;
 			};
@@ -483,8 +483,8 @@ describe('• Alliances', () => {
 			Alliances.choiceAskToJoin(currPlayer, playerName, false);
 		});
 
-		it('askedToJoin = false', () => {
-			db.alliance.askedToJoin = () => {
+		it('hasAskedToJoin = false', () => {
+			db.alliance.hasAskedToJoin = () => {
 				return false;
 			};
 

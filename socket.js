@@ -78,7 +78,7 @@ module.exports = class Websocket {
 
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
-					Player.disconnect(userData);
+					Player.disconnect(user);
 				});
 			});
 

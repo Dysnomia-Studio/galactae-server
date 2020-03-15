@@ -66,7 +66,7 @@ module.exports = {
 	createPermissions: async (playerId, allyId) => {
 		try {
 			await serverClient.query(
-				'INSERT INTO alliances_permissions (ally, player, founder, leader, diplomacy) VALUES ($1, $2, 0, 0, 0)',
+				'INSERT INTO alliances_permissions (ally, player, founder, leader, diplomacy) VALUES ($1, $2, false, false, false)',
 				[allyId, playerId]
 			);
 		} catch(err) {
@@ -118,13 +118,6 @@ module.exports = {
 
 		try {
 			await serverClient.query('INSERT INTO alliances_join (player, alliance) VALUES ($1, $2)', [playerName, allyId]);
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	askedToJoin: async (playerName, allyId) => {
-		try {
-			return (await serverClient.query('SELECT * FROM alliances_join WHERE player = $1 AND alliance = $2', [playerName, allyId]).rows.length > 0);
 		} catch(err) {
 			log(err, 'error');
 		}

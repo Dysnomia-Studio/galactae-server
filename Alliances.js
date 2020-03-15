@@ -149,7 +149,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		if(await db.alliance.askedToJoin(playerName, currPlayer.ally)) {
+		if(await db.alliance.hasAskedToJoin(playerName, currPlayer.ally)) {
 			const playerData = await db.player.findByName(playerName);
 
 			if(choice) {
