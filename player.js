@@ -173,19 +173,9 @@ module.exports = class Player {
 	}
 
 	/* Disconnect Player */
-	static disconnect(data) {
-		if(!isset(data.sid, 'string')) {
-			return;
-		}
-
-		db.player.searchBySid(data.sid,function(dataReturned) {
-			if(!isset(dataReturned, 'string')) {
-				return;
-			}
-
-			dataReturned.sid = '-1';
-			db.player.update(dataReturned);
-		});
+	static disconnect(userData) {
+		userData.sid = '-1';
+		db.player.update(userData);
 	}
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		if(i===0) {

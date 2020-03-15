@@ -43,17 +43,17 @@ module.exports = class Websocket {
 
 				// User
 				user.sid = socket.id;
-				Player.isValid(user,function(user) { // Verify identity
-					if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) {
+				Player.isValid(user,function(userData) { // Verify identity
+					if(!isset(userData, 'object') || !isset(userData.name, 'string') || !isset(userData.id,'string')) {
 						return;
 					}
 
 
-					playerList.delete(user.name);
+					playerList.delete(userData.name);
 
 					// Log
 					log(user.username + ' (' + socket.id + ') disconnected');
-					Player.disconnect(user);
+					Player.disconnect(userData);
 				});
 			});
 
@@ -78,7 +78,7 @@ module.exports = class Websocket {
 
 					// Log
 					log(user.name + ' ('+socket.id+') disconnected');
-					Player.disconnect(user);
+					Player.disconnect(userData);
 				});
 			});
 
@@ -93,8 +93,8 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, async(data) => { // Verify identity
-					data = await Player.getAlly(data);
+				Player.isValid(data, async(userData) => { // Verify identity
+					data.ally = userData.ally;
 
 					Chat.analyse(data);
 				});
@@ -111,7 +111,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					if(globalCfg.dev) {
 						log('Asking planet');
 					}
@@ -129,7 +129,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					if(globalCfg.dev) {
 						log('Asking map');
 					}
@@ -148,7 +148,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Planet.build(data);
 				});
 			});
@@ -162,7 +162,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Planet.rename(data);
 				});
 			});
@@ -176,7 +176,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					log(data.username + ' wants to change research on ' + data.pid + ' to ' + data.research,'info');
 					Research.ChangePlanetResearch(data,data.research);
 				});
@@ -189,7 +189,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Research.sync(data);
 				});
 			});
@@ -203,7 +203,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Units.createType(data);
 				});
 			});
@@ -215,7 +215,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Units.renameType(data);
 				});
 			});
@@ -227,7 +227,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Units.deleteType(data);
 				});
 			});
@@ -240,7 +240,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Units.build(data);
 				});
 			});
@@ -257,7 +257,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Units.refresh(data);
 					Fleets.refresh(data.address,data.sid);
 					Tactics.refresh(data.id, data.sid);
@@ -272,7 +272,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Planet.setPriorityFleet(data.planet, data.fleet, data.sid);
 				});
 			});
@@ -285,7 +285,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Fleets.moveTo(data, data.fleetId, data.destination, data.moveType);
 				});
 			});
@@ -297,7 +297,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Fleets.renameFleet(data);
 				});
 			});
@@ -309,7 +309,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Fleets.mergeFleet(data.from, data.to, data);
 				});
 			});
@@ -321,7 +321,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Fleets.transferSomeUnits(data.from, data.to, data);
 				});
 			});
@@ -333,7 +333,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Fleets.transferFuelBetweenFleets(data.from, data.to, data);
 				});
 			});
@@ -346,7 +346,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					if(isset(data.tactic.id)) {
 						Tactics.update(data, data.tactic);
 					} else {
@@ -362,7 +362,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Tactics.delete(data, data.tacticId);
 				});
 			});
@@ -374,7 +374,7 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data,function(data) { // Verify identity
+				Player.isValid(data,function(userData) { // Verify identity
 					Tactics.assign(data, data.fleetId, data.tacticId);
 				});
 			});
@@ -389,9 +389,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, function(user) { // Verify identity
-					db.player.searchBySid(user.sid,function(dataReturned) {
-						Player.dayBonus(dataReturned,user,data.choice);
-					});
+					Player.dayBonus(user,data,data.choice);
 				});
 			});
 
@@ -404,29 +402,27 @@ module.exports = class Websocket {
 
 				// User
 				data.sid = socket.id;
-				Player.isValid(data, function(user) { // Verify identity
-					db.player.searchBySid(user.sid,function(userReturned) {
-						data.pid = userReturned.planetlist[0];
+				Player.isValid(data, function(userReturned) { // Verify identity
+					data.pid = userReturned.planetlist[0];
 
-						Planet.refresh(data, (planetReturned) => {
-							db.fleet.findByMotherPlanet(planetReturned.id, (fleetsList) => {
-								db.unit.findByOwner(userReturned.id, (unitsList) => {
-									if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
-										return;
-									}
+					Planet.refresh(data, (planetReturned) => {
+						db.fleet.findByMotherPlanet(planetReturned.id, (fleetsList) => {
+							db.unit.findByOwner(userReturned.id, (unitsList) => {
+								if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
+									return;
+								}
 
-									userReturned.tutorials[data.tutorial] = true;
+								userReturned.tutorials[data.tutorial] = true;
 
-									db.player.update({
-										id: data.id,
-										tutorials: userReturned.tutorials,
-									}, () => {
-										Planet.refresh(data);
-									});
+								db.player.update({
+									id: data.id,
+									tutorials: userReturned.tutorials,
+								}, () => {
+									Planet.refresh(data);
 								});
 							});
-						}, true);
-					});
+						});
+					}, true);
 				});
 			});
 
