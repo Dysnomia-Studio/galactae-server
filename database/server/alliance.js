@@ -111,6 +111,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	getPlayerAskToJoin: async(playerName) => {
+		try {
+			return (await serverClient.query('SELECT alliances_join.*, alliances.name as alliance_name FROM alliances_join INNER JOIN alliances ON alliances.id = alliance WHERE player = $1', [playerName])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	askToJoin: async (playerName, allyId) => {
 		if(await db.alliance.hasAskedToJoin(playerName, allyId)) {
 			return;
@@ -146,6 +153,13 @@ module.exports = {
 	getInvitations: async(allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE alliance = $1', [allyId])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	getPlayerInvitations: async(playerName) => {
+		try {
+			return (await serverClient.query('SELECT alliances_invitations.*, alliances.name as alliance_name FROM alliances_invitations INNER JOIN alliances ON alliances.id = alliance WHERE player = $1', [playerName])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}

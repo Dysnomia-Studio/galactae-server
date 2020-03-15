@@ -74,7 +74,7 @@ describe('• Alliances', () => {
 	});
 
 	describe('# sendToPlayer()', () => {
-		it('should work', () => {
+		it('have alliance', () => {
 			const allianceData = {
 				id: 'MyId',
 				name: 'name',
@@ -115,6 +115,31 @@ describe('• Alliances', () => {
 					name: allianceData.name,
 					description: allianceData.description,
 				},
+				foo: 'bar',
+			});
+		});
+
+		it('does not have alliance', () => {
+			db.alliance.getPlayerAskToJoin = (plyName) => [];
+			db.alliance.getPlayerInvitations = (plyName) => [];
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert.deepEqual(content, {
+								invitations: [],
+								askToJoin: [],
+							});
+						}
+					},
+				};
+			};
+
+			Alliances.sendToPlayer({
+				id: 'test',
+				name: 'foo',
+				ally: {},
 				foo: 'bar',
 			});
 		});

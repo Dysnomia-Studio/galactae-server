@@ -1,13 +1,6 @@
 module.exports = class Alliances {
-	static async reSyncAllAllyMembers(allyId) {
-		const alliance = await db.alliance.find(allyId);
-		if(!alliance) {
-			return;
-		}
-
-		const players = await db.player.findByAlly(allyId);
-
-		const ally = {
+	static async buildAllyInfos(alliance) {
+		return {
 			id: alliance.id,
 			name: alliance.name,
 			description: alliance.description,
@@ -16,6 +9,17 @@ module.exports = class Alliances {
 			members: (await db.alliance.getMembers(alliance.id)),
 			pacts: (await db.alliance.getPacts(alliance.id)),
 		};
+	}
+
+	static async reSyncAllAllyMembers(allyId) {
+		const alliance = await db.alliance.find(allyId);
+		if(!alliance) {
+			return;
+		}
+
+		const players = await db.player.findByAlly(allyId);
+
+		const ally = await Alliances.buildAllyInfos(alliance);
 
 		for(const player of players) {
 			io.to(player.sid).emit('player-alliance-data', ally);
@@ -23,15 +27,15 @@ module.exports = class Alliances {
 	}
 
 	static async sendToPlayer(player) {
-		const ally = {
-			id: player.ally.id,
-			name: player.ally.name,
-			description: player.ally.description,
-			askToJoin: (await db.alliance.getAskToJoin(player.ally.id)),
-			invitations: (await db.alliance.getInvitations(player.ally.id)),
-			members: (await db.alliance.getMembers(player.ally.id)),
-			pacts: (await db.alliance.getPacts(player.ally.id)),
-		};
+		let ally;
+		if(!player.ally.name) {
+			ally = {
+				invitations: (await db.alliance.getPlayerInvitations(player.name)),
+				askToJoin: (await db.alliance.getPlayerAskToJoin(player.name)),
+			};
+		} else {
+			ally = await Alliances.buildAllyInfos(player.ally);
+		}
 
 		io.to(player.sid).emit('player-alliance-data', ally);
 	}
@@ -268,7 +272,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		log(currPlayer.name + ' edited ' + targetPlayerName + 'permissions (' + founder + ',' + leader + ',' + diplomacy + ')');
+		log(currPlayer.name + ' edited ' + targetPlayerName + ' permissions (' + founder + ',' + leader + ',' + diplomacy + ')');
 
 		await db.alliance.setPermissions(
 			targetPlayer.id,
