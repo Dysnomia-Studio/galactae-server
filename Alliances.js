@@ -239,7 +239,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		log(targetPlayerName + 'was kicked from its alliance by' + currPlayer.name);
+		log(targetPlayerName + ' was kicked from its alliance by ' + currPlayer.name);
 
 		Alliances.removePlayerFromAlliance(targetPlayer);
 
