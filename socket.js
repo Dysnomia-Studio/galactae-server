@@ -524,14 +524,14 @@ module.exports = class Websocket {
 			// Ask to join Alliance
 			socket.on('alliance-join-ask', (data) => {
 				// Vars
-				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyId, 'string')) {
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyName, 'string')) {
 					return;
 				}
 
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.askToJoin(user, user.name, data.allyId);
+					Alliances.askToJoin(user, user.name, data.allyName);
 				});
 			});
 
@@ -559,7 +559,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, async(user) => { // Verify identity
-					Alliances.removeAskToJoin(user.name, data.allyId);
+					Alliances.removeAskToJoin(user, user.name, data.allyId);
 				});
 			});
 
@@ -657,7 +657,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, (user) => { // Verify identity
-					Alliances.leave(data.id);
+					Alliances.leave(user, data.id);
 				});
 			});
 
@@ -671,7 +671,7 @@ module.exports = class Websocket {
 				// User
 				data.sid = socket.id;
 				Player.isValid(data, (user) => { // Verify identity
-					Alliances.disslove(user.id, user.ally);
+					Alliances.dissolve(user, user.id, user.ally);
 				});
 			});
 

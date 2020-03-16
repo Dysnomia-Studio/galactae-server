@@ -22,7 +22,7 @@ module.exports = {
 	},
 	update: async (id, name, desc) => {
 		try {
-			await serverClient.query('UPDATE alliances SET desc = $1, name = $2 WHERE id = $3', [desc, name, id]);
+			await serverClient.query('UPDATE alliances SET description = $1, name = $2 WHERE id = $3', [desc, name, id]);
 		} catch(err) {
 			log(err, 'error');
 		}

@@ -134,18 +134,26 @@ module.exports = class Alliances {
 		Alliances.sendToPlayer(userData);
 	}
 
-	static async askToJoin(userData, playerName, allyId) {
+	static async askToJoin(userData, playerName, allyName) {
 		if(userData.ally !== null) {
 			return;
 		}
 
-		log(userData.name + ' asked to join alliance "' + allyId + '".');
+		const alliance = await db.alliance.findByName(allyName);
 
-		db.alliance.askToJoin(playerName, allyId);
+		if(!alliance) {
+			return;
+		}
 
-		Alliances.reSyncAllAllyMembers(allyId);
+		log(userData.name + ' asked to join alliance "' + alliance.id + '".');
+
+		db.alliance.askToJoin(playerName, alliance.id);
+
+		Alliances.reSyncAllAllyMembers(alliance.id);
 
 		// @TODO: notify alliance staff
+
+		Alliances.sendToPlayer(userData);
 	}
 
 	static async choiceAskToJoin(currPlayer, playerName, choice) {
@@ -174,14 +182,14 @@ module.exports = class Alliances {
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 	}
 
-	static async removeAskToJoin(playerName, allyId) {
+	static async removeAskToJoin(currPlayer, playerName, allyId) {
 		log(playerName + ' no longer want to join alliance "' + allyId + '".');
 
 		await db.alliance.removeJoinAsk(playerName, allyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
 
-		// @TODO: resync player
+		Alliances.sendToPlayer(currPlayer);
 	}
 
 	static async invite(currPlayer, invitedPlayerName, allyId) {
@@ -194,6 +202,8 @@ module.exports = class Alliances {
 		db.alliance.invite(invitedPlayerName, allyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
+
+		Alliances.sendToPlayer(currPlayer);
 
 		// @TODO: notify player
 	}
@@ -252,7 +262,8 @@ module.exports = class Alliances {
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
 		// @TODO: notify alliance members
-		// @TODO: notify player and sync him
+		// @TODO: notify player
+		Alliances.sendToPlayer(currPlayer);
 	}
 
 	static async editPermissions(currPlayer, targetPlayerName, founder, leader, diplomacy) {
@@ -308,7 +319,7 @@ module.exports = class Alliances {
 		// @TODO: notify player
 	}
 
-	static async leave(plyId) {
+	static async leave(currPlayer, plyId) {
 		if(await Alliances.hasFounderPermissions(plyId)) {
 			return;
 		}
@@ -321,10 +332,11 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(targetPlayer.ally);
 
-		// @TODO: notify player & sync him
+		// @TODO: notify player
+		Alliances.sendToPlayer(currPlayer);
 	}
 
-	static async dissolve(plyId, allyId) {
+	static async dissolve(currPlayer, plyId, allyId) {
 		if(!(await Alliances.hasFounderPermissions(plyId))) {
 			return;
 		}
@@ -333,7 +345,8 @@ module.exports = class Alliances {
 
 		db.alliance.delete(allyId);
 
-		// @TODO: notify alliance members & sync them
+		// @TODO: notify player
+		Alliances.sendToPlayer(currPlayer);
 	}
 
 	static async askToPact(plyId, allyId, otherAllyName) {
