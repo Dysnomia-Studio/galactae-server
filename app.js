@@ -28,6 +28,7 @@ require('./console')();
 global.db         = require('./database');
 global.Discord    = require('./discord');
 // Then include other classes
+global.Alliances  = require('./Alliances');
 global.Buildings  = require('./Buildings');
 global.Chat       = require('./chat');
 global.Combat     = require('./combat');

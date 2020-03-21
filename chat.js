@@ -39,7 +39,7 @@ module.exports = class Chat {
 					if(data.message.charAt(0) === '!' && data.lvl > 1) {
 						data = Chat.sendCommand(data);
 					} else if(data.message.charAt(0) === '@') { // Messages privés
-						const words =data.message.split(new RegExp('[ ,;]+', 'g'));
+						const words = data.message.split(new RegExp('[ ,;]+', 'g'));
 
 						const playerTarget = await db.player.findByName(words[0].substr(1).toLowerCase());
 
@@ -86,9 +86,21 @@ module.exports = class Chat {
 						log('[' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						io.emit('chat-message', { message: data.message, channel: data.channel });
 						Discord.sendChatMessage(data.channel,discordmsg);
-					} else if(data.ally !== undefined) { // Allies messages
-						log('[' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
-						// @TODO : Ally messages
+					} else { // Allies messages
+						let ally = data.ally;
+						if(!data.ally) {
+							data.ally = null;
+							ally = 'N/A';
+						}
+
+						log('[' + data.channel.substr(9) + ' / ' + ally + '] '+logname+': ' +logmsg);
+
+						const allyMembers = (await db.player.findByAlly(data.ally))
+							.filter((ply) => ply.sid !== '-1');
+
+						for(const member of allyMembers) {
+							io.to(member.sid).emit('chat-message', { message: data.message, channel: data.channel });
+						}
 					}
 
 				});

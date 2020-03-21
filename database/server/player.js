@@ -16,9 +16,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByName: async (id) => {
+	findByName: async (name) => {
 		try {
-			return (await serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [id])).rows[0];
+			return (await serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -50,6 +50,13 @@ module.exports = {
 			callback(objReturned.rows[0]);
 		});
 	},
+	updateAlly: async(user) => {
+		try {
+			await serverClient.query('UPDATE users SET ally = $1 WHERE id = $2', [user.ally, user.id]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	update: (inputUser, callback) => {
 		const user = Object.assign({}, inputUser);
 		const id = user.id;
@@ -58,6 +65,7 @@ module.exports = {
 		delete user.sectorPointsAddresses;
 		delete user.sectorPointsValue;
 		delete user.sectorPointsPcount;
+		delete user.ally;
 
 		let [query, values] = db.buildUpdateQuery('users', user);
 		values.push(id);
@@ -73,6 +81,16 @@ module.exports = {
 				callback();
 			}
 		});
+	},
+	joinAlly: async (userId, allyId) => {
+		try {
+			await serverClient.query(
+				'UPDATE users SET ally = $2 WHERE id = $1',
+				[userId, allyId]
+			);
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	clearList: () => {
 		log('Clearing player list ...');

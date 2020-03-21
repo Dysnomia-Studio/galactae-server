@@ -90,6 +90,7 @@ module.exports = {
 	/**
 	 * Game Server queries
 	 */
+	alliance: require('./database/server/alliance'),
 	battleLog: require('./database/server/battleLog'),
 	battleLogAccess: require('./database/server/battleLogAccess'),
 	fleet: require('./database/server/fleet'),
