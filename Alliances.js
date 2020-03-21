@@ -28,7 +28,7 @@ module.exports = class Alliances {
 
 	static async sendToPlayer(player) {
 		let ally;
-		if(!player.ally.name) {
+		if(!player.ally || !player.ally.name) {
 			ally = {
 				invitations: (await db.alliance.getPlayerInvitations(player.name)),
 				askToJoin: (await db.alliance.getPlayerAskToJoin(player.name)),
@@ -147,7 +147,7 @@ module.exports = class Alliances {
 
 		log(userData.name + ' asked to join alliance "' + alliance.id + '".');
 
-		db.alliance.askToJoin(playerName, alliance.id);
+		await db.alliance.askToJoin(playerName, alliance.id);
 
 		Alliances.reSyncAllAllyMembers(alliance.id);
 
