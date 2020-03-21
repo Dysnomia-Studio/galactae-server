@@ -124,7 +124,17 @@ module.exports = class Alliances {
 			description,
 		});
 
+		if(!allyId) {
+			// @TODO: error message
+			return;
+		}
+
 		await Alliances.addPlayerToAlliance(userData, allyId);
+
+		await db.alliance.setPermissions(
+			userData.id,
+			true, false, false
+		);
 
 		userData.ally = {
 			id: allyId,

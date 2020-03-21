@@ -15,7 +15,8 @@ module.exports = {
 	},
 	create: async (ally) => {
 		try {
-			await serverClient.query('INSERT INTO alliances (name, desc) VALUES ($1, $2)', [ally.name, ally.desc]);
+			await serverClient.query('INSERT INTO alliances (name, description) VALUES ($1, $2)', [ally.name, ally.description]);
+			return (await db.alliance.findByName(ally.name)).id;
 		} catch(err) {
 			log(err, 'error');
 		}
