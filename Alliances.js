@@ -124,7 +124,7 @@ module.exports = class Alliances {
 			description,
 		});
 
-		Alliances.addPlayerToAlliance(userData, allyId);
+		await Alliances.addPlayerToAlliance(userData, allyId);
 
 		userData.ally = {
 			id: allyId,
@@ -168,7 +168,7 @@ module.exports = class Alliances {
 			const playerData = await db.player.findByName(playerName);
 
 			if(choice) {
-				Alliances.addPlayerToAlliance(playerData, currPlayer.ally);
+				await Alliances.addPlayerToAlliance(playerData, currPlayer.ally);
 
 				log(playerName + ' was granted to join alliance "' + currPlayer.ally + '" by ' + currPlayer.name + '.');
 			} else {
@@ -202,7 +202,7 @@ module.exports = class Alliances {
 
 		log(invitedPlayerName + ' was invited to join alliance "' + allyId + '" by ' + currPlayer.name + '.');
 
-		db.alliance.invite(invitedPlayerName, allyId);
+		await db.alliance.invite(invitedPlayerName, allyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
 
@@ -218,7 +218,7 @@ module.exports = class Alliances {
 
 		if(await db.alliance.hasBeenInvited(currPlayer.name, allyId)) {
 			if(choice) {
-				Alliances.addPlayerToAlliance(currPlayer, allyId);
+				await Alliances.addPlayerToAlliance(currPlayer, allyId);
 
 				log(currPlayer.name + ' accepted to join alliance "' + allyId + '.');
 			} else {
@@ -260,7 +260,7 @@ module.exports = class Alliances {
 
 		log(targetPlayerName + ' was kicked from its alliance by ' + currPlayer.name);
 
-		Alliances.removePlayerFromAlliance(targetPlayer);
+		await Alliances.removePlayerFromAlliance(targetPlayer);
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
@@ -315,7 +315,7 @@ module.exports = class Alliances {
 
 		log(currPlayer.name + ' edited its alliance (' + newName + ', ' + newDescription + ')');
 
-		db.alliance.update(currPlayer.ally, newName, newDescription);
+		await db.alliance.update(currPlayer.ally, newName, newDescription);
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
@@ -331,7 +331,7 @@ module.exports = class Alliances {
 
 		const targetPlayer = await db.player.find(plyId);
 
-		Alliances.removePlayerFromAlliance(targetPlayer);
+		await Alliances.removePlayerFromAlliance(targetPlayer);
 
 		Alliances.reSyncAllAllyMembers(targetPlayer.ally);
 
@@ -367,7 +367,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		db.alliance.askPact(allyId, alliance.id);
+		await db.alliance.askPact(allyId, alliance.id);
 
 		log(allyId + ' asked to pact with alliance ' + otherAllyName);
 
@@ -383,10 +383,10 @@ module.exports = class Alliances {
 		}
 
 		if(choice) {
-			db.alliance.acceptPact(allyId, otherAllyId);
+			await db.alliance.acceptPact(allyId, otherAllyId);
 			log(allyId + ' accepted pact with ' + otherAllyId);
 		} else {
-			db.alliance.removePact(allyId, otherAllyId);
+			await db.alliance.removePact(allyId, otherAllyId);
 			log(allyId + ' refused pact with ' + otherAllyId);
 		}
 
@@ -403,7 +403,7 @@ module.exports = class Alliances {
 
 		log(allyId + ' cancelled pact invitation with alliance ' + otherAllyId);
 
-		db.alliance.removePact(allyId, otherAllyId);
+		await db.alliance.removePact(allyId, otherAllyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
 		Alliances.reSyncAllAllyMembers(otherAllyId);
@@ -416,7 +416,7 @@ module.exports = class Alliances {
 
 		log(allyId + ' stopped pact with alliance ' + otherAllyId);
 
-		db.alliance.removePact(allyId, otherAllyId);
+		await db.alliance.removePact(allyId, otherAllyId);
 
 		Alliances.reSyncAllAllyMembers(allyId);
 		Alliances.reSyncAllAllyMembers(otherAllyId);
