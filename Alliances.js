@@ -116,6 +116,9 @@ module.exports = class Alliances {
 			return;
 		}
 
+		name = filterUnwantedChars(name);
+		description = filterUnwantedChars(description);
+
 		const allyId = await db.alliance.create({
 			name,
 			description,
