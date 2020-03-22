@@ -1,14 +1,14 @@
 module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static async sendtoPlayer(FleetList, newPlanet, sid, address) {
-		if(!isset(newPlanet)) {
-			newPlanet = {};
+		if(!isset(newPlanet, 'object')) {
+			newPlanet = await db.planet.findbyAddress(address);
+		} else {
+			await db.planet.update({
+				id: newPlanet.id,
+				resources: newPlanet.resources,
+			});
 		}
-
-		db.planet.update({
-			id: newPlanet.id,
-			resources: newPlanet.resources,
-		});
 
 		if(newPlanet.address === address) {
 			Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
@@ -16,7 +16,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			if(globalCfg.dev) {
 				log('Sending fleet');
 			}
-
 
 			for(const fleetId in FleetList) {
 				if(FleetList[fleetId].ownerId !== newPlanet.owner) {
