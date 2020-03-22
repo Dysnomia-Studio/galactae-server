@@ -312,7 +312,7 @@
 		 */
 		static calcPlanetMorale(buildings) {
 			return Math.min(
-				0.5 + 0.5 * buildings[2] / buildings[3],
+				0.5 + 0.5 * buildings[3] / buildings[2],
 				2
 			);
 		}
