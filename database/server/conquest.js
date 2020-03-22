@@ -13,7 +13,7 @@ module.exports = {
 	beginConquest: async (planet, prevOwner, newOwner) => {
 		try {
 			const endDate = new Date();
-			endDate.setDate(endDate.getDate() + 1);
+			endDate.setDate(endDate.getDate() + 1); // @TODO: use config to determine speed
 
 			await serverClient.query(
 				'INSERT INTO public."conquest" ("prevOwner", "newOwner", planet, "endDate") VALUES ($1, $2, $3, $4)',

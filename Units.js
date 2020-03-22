@@ -262,8 +262,14 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		}
 
 		// Check if planet, unit & fleet belong to player
-		Planet.find(inputData,inputData.planet,0,function(planetReturned,userReturned,fleetList) {
+		Planet.find(inputData,inputData.planet,0,async function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) {
+				return;
+			}
+
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetReturned.address);
+			if(conquestList.length > 0) {
+				log(data.username+' failed to build units because the planet is being conquested.','fail');
 				return;
 			}
 

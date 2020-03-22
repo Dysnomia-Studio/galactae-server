@@ -146,11 +146,18 @@ module.exports = class Planet {
 			return;
 		}
 
-		Planet.find(data,data.planet,0,function(planetReturned,userReturned,fleetReturned) {
+		Planet.find(data,data.planet,0,async function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
 					' (' + planetReturned.address + ') to next level because he doesn\'t own it !','fail');
+				return;
+			}
+
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetReturned.address);
+			if(conquestList.length > 0) {
+				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
+					' (' + planetReturned.address + ') to next level because the planet is being conquested.','fail');
 				return;
 			}
 
