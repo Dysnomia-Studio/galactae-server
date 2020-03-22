@@ -46,7 +46,9 @@ module.exports = function() {
 	/**
 	 * Buildings
 	 */
-	this.buildingMaxLvl = [
+	this.buildingMaxLvl = [];
+	// Terre
+	this.buildingMaxLvl[0] = this.buildingMaxLvl[1] = this.buildingMaxLvl[2] = this.buildingMaxLvl[3] = this.buildingMaxLvl[4] = this.buildingMaxLvl[5] = this.buildingMaxLvl[6] = this.buildingMaxLvl[7] = this.buildingMaxLvl[8] = this.buildingMaxLvl[9] = [
 		25,	// Carriere
 		25,	// Metallurgie
 		25,	// Habitations
@@ -56,6 +58,159 @@ module.exports = function() {
 		5,	// Etat Major
 		35,	// Centre de lancement
 		30,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Lave
+	this.buildingMaxLvl[101] = this.buildingMaxLvl[104] = [
+		15,	// Carriere
+		30,	// Metallurgie
+		22,	// Habitations
+		22,	// Serres
+		26,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre Grise
+	this.buildingMaxLvl[102] = this.buildingMaxLvl[113] = [
+		30,	// Carriere
+		20,	// Metallurgie
+		21,	// Habitations
+		21,	// Serres
+		25,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		40,	// Centre de lancement
+		30,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Glace
+	this.buildingMaxLvl[103] = [
+		15,	// Carriere
+		15,	// Metallurgie
+		18,	// Habitations
+		18,	// Serres
+		17,	// Centrales Solaires
+		15,	// Entrepôts
+		5,	// Etat Major
+		20,	// Centre de lancement
+		20,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Pierre rouge
+	this.buildingMaxLvl[105] = this.buildingMaxLvl[109] = [
+		25,	// Carriere
+		25,	// Metallurgie
+		23,	// Habitations
+		23,	// Serres
+		26,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Montagnes, forets
+	this.buildingMaxLvl[106] = this.buildingMaxLvl[107] = [
+		30,	// Carriere
+		30,	// Metallurgie
+		25,	// Habitations
+		25,	// Serres
+		29,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Montagnes, glace
+	this.buildingMaxLvl[108] = [
+		25,	// Carriere
+		15,	// Metallurgie
+		20,	// Habitations
+		20,	// Serres
+		21,	// Centrales Solaires
+		15,	// Entrepôts
+		5,	// Etat Major
+		20,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		20,	// Reservoir
+		20,	// Chantier naval
+		15,	// Commerce
+		20,	// Mine He3
+	];
+	// Pierre marron
+	this.buildingMaxLvl[110] = [
+		20,	// Carriere
+		20,	// Metallurgie
+		21,	// Habitations
+		21,	// Serres
+		22,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre couleur rouille
+	this.buildingMaxLvl[111] = [
+		30,	// Carriere
+		30,	// Metallurgie
+		24,	// Habitations
+		24,	// Serres
+		29,	// Centrales Solaires
+		25,	// Entrepôts
+		5,	// Etat Major
+		30,	// Centre de lancement
+		25,	// Centre de recherches
+		10,	// Radar
+		25,	// Reservoir
+		25,	// Chantier naval
+		15,	// Commerce
+		25,	// Mine He3
+	];
+	// Pierre bleue et blanche
+	this.buildingMaxLvl[112] = [
+		25,	// Carriere
+		25,	// Metallurgie
+		22,	// Habitations
+		22,	// Serres
+		25,	// Centrales Solaires
+		20,	// Entrepôts
+		5,	// Etat Major
+		25,	// Centre de lancement
+		25,	// Centre de recherches
 		10,	// Radar
 		25,	// Reservoir
 		25,	// Chantier naval
@@ -106,11 +261,15 @@ module.exports = function() {
 	 */
 	this.researchProduction = [-0.05,12,-8];
 	this.researchBonus = {
-		// Bonus construction
+		// Construction bonus
 		cp_mecanisation: -0.05,
 		cp_tracteur: 	 -0.05,
 		cp_materielTp: 	 -0.1,
 		cp_molecular_compression: 1.1,
+
+		// Combat bonus
+		prop_manoeuvre: 0.02,
+		prop_advManoeuvre: 0.03, // Note: added to prop_manoeuvre bonus
 	};
 
 	this.researchPos = {
@@ -187,72 +346,174 @@ module.exports = function() {
 	this.researchList = {
 		// Noeud Central
 		researchCenter: 			{ cost: 0, 		parents: [] },
-		industrialistion: 			{ cost: 8, 		parents: ['researchCenter'] },
-		phyContemporaine: 			{ cost: 20, 	parents: ['researchCenter'] },
-		thermodynamique: 			{ cost: 13, 	parents: ['researchCenter'] },
+		industrialistion: 			{ cost: 8, 		parents: [{ type: 'research', name: 'researchCenter' }] },
+		phyContemporaine: 			{ cost: 20, 	parents: [{ type: 'research', name: 'researchCenter' }] },
+		thermodynamique: 			{ cost: 13, 	parents: [{ type: 'research', name: 'researchCenter' }] },
 		// Mise en orbite et propulsion
-		prop_main: 					{ cost: 380, 	parents: ['thermodynamique','misc_mecStellaire', [7,3] ] },
-		prop_vSolaire: 				{ cost: 2300, 	parents: ['prop_main','misc_phySolaire'] },
-		prop_ions: 					{ cost: 2000, 	parents: ['prop_main','misc_phyQuantique'] },
-		prop_plasma:				{ cost: 2500, 	parents: ['prop_ions','misc_phyQuantique'] },
-		prop_vsl: 					{ cost: 15000, 	parents: ['prop_ions','misc_advTelemetrie', [11, 5], [8, 10] ] },
-		prop_wd: 					{ cost: 24000, 	parents: ['prop_vsl', [11,10], ['planet', 2] ] },
-		prop_hyperespace: 			{ cost: 35000, 	parents: ['prop_wd', [11,20], ['planet', 5] ] },
-		prop_manoeuvre: 			{ cost: 450, 	parents: ['prop_main'] },
-		prop_advManoeuvre: 			{ cost: 700, 	parents: ['prop_manoeuvre'] },
-		prop_suprastability:		{ cost: 5000, 	parents: ['prop_vsl'] },
+		prop_main: 					{ cost: 380, 	parents: [
+			{ type: 'research', name: 'thermodynamique' },
+			{ type: 'research', name: 'misc_mecStellaire' },
+			{ type: 'building', id: 7, lvl: 3 },
+		]},
+		prop_vSolaire: 				{ cost: 2300, 	parents: [
+			{ type: 'research', name: 'prop_main' },
+			{ type: 'research', name: 'misc_phySolaire' },
+		]},
+		prop_ions: 					{ cost: 2000, 	parents: [
+			{ type: 'research', name: 'prop_main' },
+			{ type: 'research', name: 'misc_phyQuantique' },
+		]},
+		prop_plasma:				{ cost: 2500, 	parents: [
+			{ type: 'research', name: 'prop_ions' },
+			{ type: 'research', name: 'misc_phyQuantique' },
+		]},
+		prop_vsl: 					{ cost: 15000, 	parents: [
+			{ type: 'research', name: 'prop_ions' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+			{ type: 'building', id: 11, lvl: 5 },
+			{ type: 'building', id: 8, lvl: 10 },
+		]},
+		prop_wd: 					{ cost: 24000, 	parents: [
+			{ type: 'research', name: 'prop_vsl' },
+			{ type: 'building', id: 11, lvl: 10 },
+			{ type: 'planetCount', count: 2 },
+		]},
+		prop_hyperespace: 			{ cost: 35000, 	parents: [
+			{ type: 'research', name: 'prop_wd' },
+			{ type: 'building', id: 11, lvl: 20 },
+			{ type: 'planetCount', count: 5 },
+		]},
+		prop_manoeuvre: 			{ cost: 450, 	parents: [{ type: 'research', name: 'prop_main' }] },
+		prop_advManoeuvre: 			{ cost: 700, 	parents: [{ type: 'research', name: 'prop_manoeuvre' }] },
+		prop_suprastability:		{ cost: 5000, 	parents: [{ type: 'research', name: 'prop_vsl' }] },
 		// Construction et production
-		cp_mecanisation: 			{ cost: 120, 	parents: ['industrialistion'] },
-		cp_tracteur: 	 			{ cost: 150, 	parents: ['industrialistion', [9,1] ] },
-		cp_materielTp: 				{ cost: 350, 	parents: ['cp_tracteur','misc_advTelemetrie'] },
-		cp_dbRaffinage: 			{ cost: 100, 	parents: ['industrialistion'] },
-		cp_molecular_compression:	{ cost: 180, 	parents: ['industrialistion','misc_phyQuantique'] },
+		cp_mecanisation: 			{ cost: 120, 	parents: [{ type: 'research', name: 'industrialistion' }] },
+		cp_tracteur: 	 			{ cost: 150, 	parents: [
+			{ type: 'research', name: 'industrialistion' },
+			{ type: 'building', id: 9, lvl: 1 },
+		]},
+		cp_materielTp: 				{ cost: 350, 	parents: [
+			{ type: 'research', name: 'cp_tracteur' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+		]},
+		cp_dbRaffinage: 			{ cost: 100, 	parents: [{ type: 'research', name: 'industrialistion' }] },
+		cp_molecular_compression:	{ cost: 180, 	parents: [
+			{ type: 'research', name: 'industrialistion' },
+			{ type: 'research', name: 'misc_phyQuantique' },
+		]},
 		// Armes
-		wep_railgun:				{ cost: 50, 	parents: ['phyContemporaine'] },
-		wep_nuke:					{ cost: 180, 	parents: ['wep_railgun'] },
-		wep_laser:					{ cost: 260, 	parents: ['wep_railgun','misc_phyQuantique'] },
-		wep_plasma:					{ cost: 480, 	parents: ['wep_laser'] },
+		wep_railgun:				{ cost: 50, 	parents: [{ type: 'research', name: 'phyContemporaine' }] },
+		wep_nuke:					{ cost: 180, 	parents: [{ type: 'research', name: 'wep_railgun' }] },
+		wep_laser:					{ cost: 260, 	parents: [
+			{ type: 'research', name: 'wep_railgun' },
+			{ type: 'research', name: 'misc_phyQuantique' },
+		]},
+		wep_plasma:					{ cost: 480, 	parents: [{ type: 'research', name: 'wep_laser' }] },
 		// Shields & Defenses
-		def_turret:					{ cost: 450, 	parents: ['wep_railgun','misc_advTelemetrie'] },
-		def_shield_magnetic:		{ cost: 750, 	parents: ['def_turret','misc_em'] },
-		def_shield_projector:		{ cost: 1150, 	parents: ['def_shield_magnetic'] },
-		def_shield_singularity:		{ cost: 1550, 	parents: ['def_shield_magnetic','misc_calcGravit'] },
+		def_turret:					{ cost: 450, 	parents: [
+			{ type: 'research', name: 'wep_railgun' },
+			{ type: 'research', name: 'misc_advTelemetrie'},
+		]},
+		def_shield_magnetic:		{ cost: 750, 	parents: [
+			{ type: 'research', name: 'def_turret' },
+			{ type: 'research', name: 'misc_em' },
+		]},
+		def_shield_projector:		{ cost: 1150, 	parents: [{ type: 'research', name: 'def_shield_magnetic' }] },
+		def_shield_singularity:		{ cost: 1550, 	parents: [
+			{ type: 'research', name: 'def_shield_magnetic' },
+			{ type: 'research', name: 'misc_calcGravit' },
+		]},
 		// Hangars
-		hangarDouble: 				{ cost: 2200, 	parents: ['carrier_small'] },
+		hangarDouble: 				{ cost: 2200, 	parents: [{ type: 'research', name: 'carrier_small' }] },
 		// Mines spatiales
-		wep_mines: 					{ cost: 380, 	parents: ['misc_calcGravit','misc_telemetrie', [7,5] ] },
-		wep_mines_nuke:				{ cost: 750, 	parents: ['wep_mines','wep_nuke', [7,10]] },
-		wep_mines_iem:				{ cost: 550, 	parents: ['wep_mines','misc_em', [7,15]] },
+		wep_mines: 					{ cost: 380, 	parents: [
+			{ type: 'research', name: 'misc_calcGravit' },
+			{ type: 'research', name: 'misc_telemetrie' },
+			{ type: 'building', id: 7, lvl: 5 },
+		]},
+		wep_mines_nuke:				{ cost: 750, 	parents: [
+			{ type: 'research', name: 'wep_mines' },
+			{ type: 'research', name: 'wep_nuke' },
+			{ type: 'building', id: 7, lvl: 10 },
+		]},
+		wep_mines_iem:				{ cost: 550, 	parents: [
+			{ type: 'research', name: 'wep_mines' },
+			{ type: 'research', name: 'misc_em' },
+			{ type: 'building', id: 7, lvl: 15 },
+		]},
 		// Figther
-		figther_light_interceptor: 	{ cost: 550, 	parents: ['prop_main', 'misc_advTelemetrie'] },
-		figther_heavy_interceptor: 	{ cost: 850, 	parents: ['figther_light_interceptor'] },
-		figther_bomber: 			{ cost: 1320, 	parents: ['figther_heavy_interceptor', 'wep_nuke'] },
+		figther_light_interceptor: 	{ cost: 550, 	parents: [
+			{ type: 'research', name: 'prop_main' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+		]},
+		figther_heavy_interceptor: 	{ cost: 850, 	parents: [{ type: 'research', name: 'figther_light_interceptor' }] },
+		figther_bomber: 			{ cost: 1320, 	parents: [
+			{ type: 'research', name: 'figther_heavy_interceptor' },
+			{ type: 'research', name: 'wep_nuke' },
+		]},
 		// Battlecruiser
-		battlecruiser_atrios: 		{ cost: 2550, 	parents: ['prop_ions','misc_advTelemetrie'] },
+		battlecruiser_atrios: 		{ cost: 2550, 	parents: [
+			{ type: 'research', name: 'prop_ions' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+		]},
 		// Cuirasse
-		cuirasse_small: 			{ cost: 2580, 	parents: ['prop_ions','misc_advTelemetrie'] },
+		cuirasse_small: 			{ cost: 2580, 	parents: [
+			{ type: 'research', name: 'prop_ions' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+		]},
 		// Corvet
-		corvet_aegis: 				{ cost: 680, 	parents: ['prop_main', 'misc_advTelemetrie'] },
+		corvet_aegis: 				{ cost: 680, 	parents: [
+			{ type: 'research', name: 'prop_main' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+		]},
 		// Carrier
-		carrier_small: 				{ cost: 2580, 	parents: ['figther_light_interceptor','prop_ions'] },
-		carrier_medium: 			{ cost: 2850, 	parents: ['carrier_small'] },
+		carrier_small: 				{ cost: 2580, 	parents: [
+			{ type: 'research', name: 'figther_light_interceptor' },
+			{ type: 'research', name: 'prop_ions' },
+		]},
+		carrier_medium: 			{ cost: 2850, 	parents: [{ type: 'research', name: 'carrier_small' }] },
 		// Colony ship
-		colony_ship:  				{ cost: 3500,	parents: ['prop_vsl', 'misc_colony', 'cp_molecular_compression', [11,10] ]},
-		heavy_colony_ship: 			{ cost: 8500, 	parents: ['colony_ship', [11,15] ]},
+		colony_ship:  				{ cost: 3500,	parents: [
+			{ type: 'research', name: 'prop_vsl' },
+			{ type: 'research', name: 'misc_colony' },
+			{ type: 'research', name: 'cp_molecular_compression' },
+			{ type: 'building', id: 11, lvl: 10 },
+		]},
+		heavy_colony_ship: 			{ cost: 8500, 	parents: [
+			{ type: 'research', name: 'colony_ship' },
+			{ type: 'building', id: 11, lvl: 15 },
+		]},
 		// Satellites
-		wep_sat_ag1:				{ cost: 360, 	parents: ['misc_calcGravit','misc_telemetrie', [7,5] ] },
-		wep_sat_ag2:				{ cost: 650, 	parents: ['wep_sat_ag1','misc_advTelemetrie', [7,10]] },
-		wep_sat_ag3:				{ cost: 1500, 	parents: ['wep_sat_ag2', [7,15] ] },
+		wep_sat_ag1:				{ cost: 360, 	parents: [
+			{ type: 'research', name: 'misc_calcGravit' },
+			{ type: 'research', name: 'misc_telemetrie' },
+			{ type: 'building', id: 7, lvl: 5 },
+		]},
+		wep_sat_ag2:				{ cost: 650, 	parents: [
+			{ type: 'research', name: 'wep_sat_ag1' },
+			{ type: 'research', name: 'misc_advTelemetrie' },
+			{ type: 'building', id: 7, lvl: 10 },
+		]},
+		wep_sat_ag3:				{ cost: 1500, 	parents: [
+			{ type: 'research', name: 'wep_sat_ag2' },
+			{ type: 'building', id: 7, lvl: 15 },
+		]},
 		// Autres recherches
-		misc_astronomie:			{ cost: 45, 	parents: ['phyContemporaine'] },
-		misc_telemetrie: 			{ cost: 90, 	parents: ['misc_astronomie'] },
-		misc_advTelemetrie:			{ cost: 320, 	parents: ['misc_telemetrie'] },
-		misc_mecStellaire: 			{ cost: 600, 	parents: ['misc_calcGravit', 'misc_phySolaire'] },
-		misc_phyQuantique: 			{ cost: 120, 	parents: ['phyContemporaine', [8,3] ] },
-		misc_phySolaire: 			{ cost: 280, 	parents: ['misc_phyQuantique'] },
-		misc_calcGravit: 			{ cost: 240, 	parents: ['misc_astronomie'] },
-		misc_em: 					{ cost: 110, 	parents: ['phyContemporaine'] },
-		misc_colony: 				{ cost: 850,    parents: ['misc_mecStellaire'] },
+		misc_astronomie:			{ cost: 45, 	parents: [{ type: 'research', name: 'phyContemporaine' }] },
+		misc_telemetrie: 			{ cost: 90, 	parents: [{ type: 'research', name: 'misc_astronomie' }] },
+		misc_advTelemetrie:			{ cost: 320, 	parents: [{ type: 'research', name: 'misc_telemetrie' }] },
+		misc_mecStellaire: 			{ cost: 600, 	parents: [
+			{ type: 'research', name: 'misc_calcGravit' },
+			{ type: 'research', name: 'misc_phySolaire' },
+		]},
+		misc_phyQuantique: 			{ cost: 120, 	parents: [
+			{ type: 'research', name: 'phyContemporaine' },
+			{ type: 'building', id: 8, lvl: 3 },
+		]},
+		misc_phySolaire: 			{ cost: 280, 	parents: [{ type: 'research', name: 'misc_phyQuantique' }] },
+		misc_calcGravit: 			{ cost: 240, 	parents: [{ type: 'research', name: 'misc_astronomie' }] },
+		misc_em: 					{ cost: 110, 	parents: [{ type: 'research', name: 'phyContemporaine' }] },
+		misc_colony: 				{ cost: 850,    parents: [{ type: 'research', name: 'misc_mecStellaire' }] },
 	};
 
 	/**
@@ -532,7 +793,7 @@ module.exports = function() {
 				},
 				partCount: 5,
 			},
-		}
+		},
 	};
 	this.shipCosts =  { // [Al,Fe,Ti,Cu,Time,Population]
 		/**
@@ -762,128 +1023,131 @@ module.exports = function() {
 		'energy':
 			[{
 				type: 'tutorial',
-				tutorial: 'welcome',
+				name: 'welcome',
 			}],
 		'inhabitants':
 			[{
 				type: 'tutorial',
-				tutorial: 'energy',
+				name: 'energy',
 			}],
 		'resources':
 			[{
 				type: 'tutorial',
-				tutorial: 'inhabitants',
+				name: 'inhabitants',
 			}],
 		'research':
 			[{
 				type: 'tutorial',
-				tutorial: 'resources',
+				name: 'resources',
 			}],
 		'endFirstPart':
 			[{
 				type: 'tutorial',
-				tutorial: 'research',
+				name: 'research',
 			}],
 		'unitsCreate':[
 			{
-				type: 'oneOfManyResearch',
-				researchList: [
-					'figther_light_interceptor',
-					'figther_heavy_interceptor',
-					'figther_bomber',
+				type: 'atLeastOne',
+				name: 'researchList',
+				subDependencies: [
+					{ type: 'research', name: 'figther_light_interceptor' },
+					{ type: 'research', name: 'figther_heavy_interceptor' },
+					{ type: 'research', name: 'figther_bomber' },
 
-					'battlecruiser_atrios',
-					'cuirasse_small',
+					{ type: 'research', name: 'battlecruiser_atrios' },
+					{ type: 'research', name: 'cuirasse_small' },
 
-					'corvet_aegis',
+					{ type: 'research', name: 'corvet_aegis' },
 
-					'carrier_small',
-					'carrier_medium',
+					{ type: 'research', name: 'carrier_small' },
+					{ type: 'research', name: 'carrier_medium' },
 
-					'wep_sat_ag1',
-					'wep_sat_ag2',
-					'wep_sat_ag3',
+					{ type: 'research', name: 'wep_sat_ag1' },
+					{ type: 'research', name: 'wep_sat_ag2' },
+					{ type: 'research', name: 'wep_sat_ag3' },
 				],
 			},
 		],
 		'unitsBuild':
 			[{ //@TODO: prendre en compte les mines
 				type: 'tutorial',
-				tutorial: 'unitsCreate',
+				name: 'unitsCreate',
 			}],
 		// 'buyAndSell':[],
 		'interplanetaryFlight':[
 			{
 				type: 'tutorial',
-				tutorial: 'unitsBuild',
+				name: 'unitsBuild',
 			},
 			{
-				type: 'oneOfManyResearch',
-				researchList: [
-					'prop_vSolaire',
-					'prop_ions',
+				type: 'atLeastOne',
+				name: 'researchList',
+				subDependencies: [
+					{ type: 'research', name: 'prop_vSolaire' },
+					{ type: 'research', name: 'prop_ions' },
 				],
 			},
 		],
 		'interstellarFlight':[
 			{
 				type: 'tutorial',
-				tutorial: 'unitsBuild',
+				name: 'unitsBuild',
 			},
 			{
 				type: 'research',
-				research: 'prop_vsl',
+				name: 'prop_vsl',
 			},
 		],
 		/*'spy':
 			[{ //@TODO: prendre en compte corvette
 				type: 'tutorial',
-				tutorial: 'unitsBuild',
+				name: 'unitsBuild',
 			}],*/
 		'battle':
 			[{
 				type: 'tutorial',
-				tutorial: 'interplanetaryFlight',
+				name: 'interplanetaryFlight',
 			}],
 		// 'joinAlly':[],
 		// 'quests':[],
 		// 'secondPlanet':[],
 	};
-	this.tutorialObjectives ={
+	this.tutorialObjectives = {
 		'welcome': [],
 		'energy':
 		[{
 			type: 'building',
-			building: 4,
-			level: 2,
+			id: 4,
+			lvl: 2,
 		}],
 		'inhabitants':
 		[{
 			type: 'building',
-			building: 2,
-			level: 2,
+			id: 2,
+			lvl: 2,
 		},{
 			type: 'building',
-			building: 3,
-			level: 2,
+			id: 3,
+			lvl: 2,
 		}],
 		'resources':
 		[{
 			type: 'building',
-			building: 0,
-			level: 2,
+			id: 0,
+			lvl: 2,
 		},{
 			type: 'building',
-			building: 1,
-			level: 2,
+			id: 1,
+			lvl: 2,
 		}],
 		'research':
 		[{
-			type: 'oneOfManyResearch',
-			researchList: [
-				'thermodynamique',
-				'phyContemporaine',
-				'industrialistion',
+			type: 'atLeastOne',
+			name: 'researchList',
+			subDependencies: [
+				{ type: 'research', name: 'thermodynamique' },
+				{ type: 'research', name: 'phyContemporaine' },
+				{ type: 'research', name: 'industrialistion' },
 			],
 		}],
 		'endFirstPart': [],
@@ -898,19 +1162,22 @@ module.exports = function() {
 		// 'buyAndSell': [],
 		'interplanetaryFlight': [{
 			type: 'move',
-			moveType: 'move',
+			moveType: FLEET_MOVE_TYPE.MOVE,
 			location: 'all',
+			count: 1,
 		}],
 		'interstellarFlight': [{
 			type: 'move',
-			moveType: 'move',
+			moveType: FLEET_MOVE_TYPE.MOVE,
 			location: 'outerSystem',
+			count: 1,
 		}],
 		//'spy': [],
 		'battle': [{
 			type: 'move',
-			moveType: 'attack',
+			moveType: FLEET_MOVE_TYPE.ATTACK,
 			location: 'all',
+			count: 1,
 		}],
 		// 'joinAlly': [],
 		// 'quests': [],

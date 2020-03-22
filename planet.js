@@ -7,7 +7,7 @@ module.exports = class Planet {
 	 * @param      {number}    decalage  decalage de n°
 	 * @param      {Function}  callback  Function needed to call back
 	 */
-	static async find(user,pid,decalage,callback) {
+	static async find(user, pid, decalage, callback) {
 		const userReturned = await db.player.find(user.id);
 
 		if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
@@ -129,6 +129,7 @@ module.exports = class Planet {
 		}
 
 		delete data.id;
+		delete data.data.id;
 
 		io.to(data.sid).emit('planet-recieve-data', data );
 	}
@@ -155,7 +156,7 @@ module.exports = class Planet {
 
 			let timeSpeed = 1;
 
-			const currTime = Date.now();
+			const currTime = new Date();
 
 			// Calc new planet data
 			const newData = Planet.update(planetReturned,userReturned,fleetReturned);
@@ -188,7 +189,7 @@ module.exports = class Planet {
 				newData.resources[4] -= cost.copper;
 				newData.resources[5] -= cost.titanium;
 
-				newData.nextBuildingTime = currTime+Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed);
+				newData.nextBuildingTime = new Date(currTime.getTime() + Math.round(cost.time*TIME.HOUR_TO_MS*timeSpeed));
 				newData.nextBuilding = data.building;
 
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'BUILD_OK'});
@@ -215,9 +216,8 @@ module.exports = class Planet {
 	 */
 	static UpdateUnits(planetIn,user,currTime) {
 		const newPlanet = Object.assign({}, planetIn);
-		newPlanet.unitBuildingEndTime = parseInt(newPlanet.unitBuildingEndTime);
 
-		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID) {
+		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID || !newPlanet.unitBuildingEndTime) {
 			return;
 		}
 
@@ -246,18 +246,17 @@ module.exports = class Planet {
 				}
 
 				let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
-				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*newPlanet.Buildings[7]));
+				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
 
-				if(currTime>newPlanet.unitBuildingEndTime) { // total add
-					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
+				const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
+				if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add
 					unitCount = restantDepuisSynchro;
 
 					fleetReturned.inBuilding = false;
 
 					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
 				} else { // Partial add
-					const restant = Math.ceil((newPlanet.unitBuildingEndTime - currTime)/timeCost);
-					const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime - newPlanet.lastUnitUpdate)/timeCost);
+					const restant = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - currTime.getTime())/timeCost);
 					unitCount = restantDepuisSynchro - restant;
 				}
 
@@ -300,7 +299,7 @@ module.exports = class Planet {
 	 * @return     {<type>}  the updated data
 	 */
 	static update(planetData,user,fleetList) {
-		const currTime = Date.now();
+		const currTime = new Date();
 
 		// Update resources
 		planetData.resources = Planet.UpdateResources(planetData,user);
@@ -312,25 +311,25 @@ module.exports = class Planet {
 		planetData.points = Math.round(planetData.points);
 
 		// Update buildings
-		if(currTime>planetData.nextBuildingTime && planetData.nextBuilding !== -1) {
+		if(planetData.nextBuildingTime !== null && currTime.getTime() > planetData.nextBuildingTime.getTime() && planetData.nextBuilding !== -1) {
 			planetData.Buildings[planetData.nextBuilding]++;
 
 			Websocket.sendNotification(user.sid, 'building', { building: planetData.nextBuilding, lvl: planetData.Buildings[planetData.nextBuilding] });
 
-			planetData.nextBuildingTime = -1;
+			planetData.nextBuildingTime = null;
 			planetData.nextBuilding = -1;
 		}
 
 		// Update units
-		if(planetData.unitBuildingEndTime !== -1) {
-			Planet.UpdateUnits(Object.assign({}, planetData),user,currTime);
-		}
+		if(planetData.unitBuildingEndTime !== null) {
+			Planet.UpdateUnits(Object.assign({}, planetData), user, currTime);
 
-		if(currTime>planetData.unitBuildingEndTime) {
-			planetData.unitBuildingEndTime = -1;
-			planetData.unitBuildingID = null;
-			planetData.unitBuildingCount = 0;
-			planetData.unitBuildingFleetID = null;
+			if(currTime.getTime() > planetData.unitBuildingEndTime.getTime()) {
+				planetData.unitBuildingEndTime = null;
+				planetData.unitBuildingID = null;
+				planetData.unitBuildingCount = 0;
+				planetData.unitBuildingFleetID = null;
+			}
 		}
 
 		planetData.lastUnitUpdate = currTime;
@@ -390,14 +389,15 @@ module.exports = class Planet {
 	 * @param      {<type>}  planetData  Input planet data
 	 */
 	static UpdateResources(planetData,user) {
-		const Dtime = Date.now()-planetData.nextBuildingTime;
+		const nextBuildingTime = (planetData.nextBuildingTime === null) ? -1 : planetData.nextBuildingTime.getTime();
+		const Dtime = Date.now()-nextBuildingTime;
 		let resources = planetData.resources;
 
-		if(Dtime<0 || parseInt(planetData.nextBuildingTime) === -1) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
+		if(Dtime<0 || !planetData.nextBuildingTime) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (planetData.nextBuildingTime-planetData.lastResourcesUpdate), user, planetData.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (nextBuildingTime-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
 			// Calcul avec les nouveaux bâtiments
 			const tmpBuildings = planetData.Buildings.slice();
 			tmpBuildings[planetData.nextBuilding]++;

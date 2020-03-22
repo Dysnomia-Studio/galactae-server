@@ -34,7 +34,7 @@ module.exports = {
 						currLog.unitDestination,
 						currLog.unitDestinationId,
 						currLog.damage,
-						currLog.details
+						currLog.details,
 					]);
 				}
 
@@ -83,5 +83,5 @@ module.exports = {
 		} catch(err) {
 			log(err, 'error');
 		}
-	}
+	},
 };

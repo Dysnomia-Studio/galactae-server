@@ -4,9 +4,9 @@ module.exports = class Player {
 		db.player.searchBySid(user.sid, (playerData) => {
 			if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
 				if(Player.canAct(playerData)) { // Don't spam
-					callback(user);
+					callback(playerData);
 
-					playerData.lastAction = Date.now();
+					playerData.lastAction = new Date();
 					db.player.update(playerData);
 				}
 			} else {
@@ -20,7 +20,7 @@ module.exports = class Player {
 	static canAct(user) {
 		const minTime = 100; //time in ms
 
-		return ((Date.now()-user.lastAction)>minTime);
+		return ((Date.now()-user.lastAction.getTime())>minTime);
 	}
 
 	/* Get player ally */
@@ -54,7 +54,7 @@ module.exports = class Player {
 				if(isset(banObj, 'object')) {
 					const now = Date.now();
 					for(let i=0; i<banObj.length; i++) {
-						if(banObj[i].ban_end > now) {
+						if(banObj[i].ban_end.getTime() > now) {
 							log('Error: ' + data.username + ' is banned.');
 							io.to(data.sid).emit('server-kick','ERR_BANNED');
 							return;
@@ -110,6 +110,16 @@ module.exports = class Player {
 			//log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
+		if(playerData.ally !== null) {
+			playerData.ally = await db.alliance.find(playerData.ally);
+		} 
+
+		if(!isset(playerData.ally, 'object')) {
+			playerData.ally = {
+				name: null,
+			};
+		}
+
 		playerData.sid = data.sid;
 
 		const jour = TIME.DAY_TO_MS;
@@ -130,7 +140,7 @@ module.exports = class Player {
 			io.to(data.sid).emit('day-bonus',{days: dayStreak, best: bonusBest});
 		}
 
-		playerData.lastConnected = Date.now();
+		playerData.lastConnected = new Date();
 
 		io.to(data.sid).emit('player-recieve-data',{
 			planetlist: playerData.planetlist,
@@ -139,6 +149,7 @@ module.exports = class Player {
 			tutorials: playerData.tutorials,
 		});
 
+		Alliances.sendToPlayer(playerData);
 		Units.refresh(data);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
@@ -162,19 +173,9 @@ module.exports = class Player {
 	}
 
 	/* Disconnect Player */
-	static disconnect(data) {
-		if(!isset(data.sid, 'string')) {
-			return;
-		}
-
-		db.player.searchBySid(data.sid,function(dataReturned) {
-			if(!isset(dataReturned, 'string')) {
-				return;
-			}
-
-			dataReturned.sid = '-1';
-			db.player.update(dataReturned);
-		});
+	static disconnect(userData) {
+		userData.sid = '-1';
+		db.player.update(userData);
 	}
 	static calcTotalPlanetPoints(user,callback,i,points,sector) {
 		if(i===0) {
@@ -252,7 +253,7 @@ module.exports = class Player {
 			newUserData.points = Math.round(newUserData.points);
 
 			// MaJ des BDD Globales
-			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name);
+			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name, newUserData.ally.name);
 
 			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
 				db.sectorRank.update(
@@ -260,7 +261,8 @@ module.exports = class Player {
 					newUserData.sectorPointsAddresses[sector],
 					newUserData.sectorPointsValue[sector],
 					newUserData.sectorPointsPcount[sector],
-					newUserData.name
+					newUserData.name,
+					newUserData.ally.name
 				);
 			}
 
@@ -284,7 +286,7 @@ module.exports = class Player {
 			bonus.newPlayerData.id = userData.id;
 			bonus.newPlayerData.dayBonusStreak = userData.dayBonusStreak+1;
 			bonus.newPlayerData.dayBonusBest = userData.dayBonusBest;
-			bonus.newPlayerData.lastBonus = Date.now();
+			bonus.newPlayerData.lastBonus = new Date();
 
 			if(userData.lastBonus < hierMinuit) { // Si pas hier
 				bonus.newPlayerData.dayBonusStreak = 1;

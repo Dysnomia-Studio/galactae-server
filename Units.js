@@ -270,11 +270,12 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
-			if(newPlanet.unitBuildingEndTime > Date.now()) {
+			if(newPlanet.unitBuildingEndTime !== null && newPlanet.unitBuildingEndTime.getTime() > Date.now()) {
 				log(inputData.username +' failed to build units because another is already building.');
 				Websocket.SendMessageToClient({ sid: inputData.sid, message: 'UNIT_ERROR_ALREADY' });
 				return;
 			}
+
 			const id = (specialUnitsUID[inputData.unit] !== undefined)?specialUnitsUID[inputData.unit]:inputData.unit;
 			db.unit.find(id, function(unitReturned) {
 				if(specialUnitsUID[inputData.unit] !== undefined && shipCosts[inputData.unit] !== undefined) {
@@ -284,6 +285,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 					unitReturned.cost = shipCosts[inputData.unit];
 					unitReturned.ownerId = inputData.id;
 				}
+
 				if(!isset(unitReturned, 'object') || !isset(unitReturned.ownerId, 'string') || ''+unitReturned.ownerId !== ''+inputData.id) {
 					return;
 				}
@@ -343,11 +345,11 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 				// Check fleet
 				function callBackAfterfleet(newPlanet,fleetReturned,userReturned,unitData,totalCost,inputData) {
-					const currTime = Date.now();
+					const currTime = new Date();
 
 					// Create entry in planet db for in-build unit
 					newPlanet.unitBuildingID = inputData.unit;
-					newPlanet.unitBuildingEndTime = currTime + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11]))) * TIME.HOUR_TO_MS);
+					newPlanet.unitBuildingEndTime = new Date(currTime.getTime() + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11]))) * TIME.HOUR_TO_MS));
 					newPlanet.unitBuildingCount = inputData.count;
 					newPlanet.unitBuildingFleetID = fleetReturned.id;
 

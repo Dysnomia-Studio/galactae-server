@@ -295,20 +295,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: -1 }],
-					[]
-				), false
-			);
-
-			assert.equal(
-				Tutorials.hasCompletedTutorial(
-					'interplanetaryFlight',
-					{
-						tutorials: { unitsBuild: true },
-						research: { prop_ions: -1 },
-					},
-					{},
-					[ { orbitPosition: 1, endMoveTime: 1 }],
+					[],
 					[]
 				), false
 			);
@@ -323,7 +310,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1 }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), true
 			);
@@ -338,20 +325,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: -1, motherPlanetAddress: '1-2-P3', position: '1-2-P1' }],
-					[]
-				), false
-			);
-
-			assert.equal(
-				Tutorials.hasCompletedTutorial(
-					'interstellarFlight',
-					{
-						tutorials: { unitsBuild: true },
-						research: { prop_vsl: -1 },
-					},
-					{},
-					[ { orbitPosition: 1, endMoveTime: 1, motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: null, ownerId: '', motherPlanetAddress: '1-1-2-P3', position: '1-1-2-P1' }],
 					[]
 				), false
 			);
@@ -366,7 +340,7 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_vsl: -1 },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1, motherPlanetAddress: '1-2-P3', position: '1-3-P1' }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '', motherPlanetAddress: '1-1-2-P3', position: '1-1-3-P1' }],
 					[]
 				), true
 			);
@@ -380,7 +354,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: 2, endMoveTime: 1 }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), false
 			);
@@ -394,7 +368,7 @@ describe('• Tutorials (shared)', () => {
 						tutorials: { interplanetaryFlight: true },
 					},
 					{},
-					[ { orbitPosition: 1, endMoveTime: 1 }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.ATTACK, endMoveTime: new Date(), ownerId: '' }],
 					[]
 				), true
 			);

@@ -8,11 +8,35 @@ describe('• Planet', () => {
 			);
 		});
 
-		it('no all lvl max', () => {
-			const buildings = buildingMaxLvl;
+		it('no all lvl max planet 0', () => {
+			const buildings = buildingMaxLvl[0];
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
 				1560
+			);
+		});
+
+		it('no all lvl max planet 101', () => {
+			const buildings = buildingMaxLvl[101];
+			assert.equal(
+				Planet.calcPlanetPoints({Buildings: buildings}),
+				1414
+			);
+		});
+
+		it('no all lvl max planet 113', () => {
+			const buildings = buildingMaxLvl[113];
+			assert.equal(
+				Planet.calcPlanetPoints({Buildings: buildings}),
+				1535
+			);
+		});
+
+		it('no all lvl max planet 103', () => {
+			const buildings = buildingMaxLvl[103];
+			assert.equal(
+				Planet.calcPlanetPoints({Buildings: buildings}),
+				1108
 			);
 		});
 	});

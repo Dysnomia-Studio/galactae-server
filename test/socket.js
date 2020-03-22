@@ -7,6 +7,7 @@ describe('• Websocket', () => {
 			assert(isset(socketEvents['game-disconnect']), true);
 			assert(isset(socketEvents['disconnect']), true);
 			assert(isset(socketEvents['chat-send']), true);
+
 			assert(isset(socketEvents['planet-ask-data']), true);
 			assert(isset(socketEvents['system-ask-mapData']), true);
 			assert(isset(socketEvents['planet-build']), true);
@@ -41,6 +42,20 @@ describe('• Websocket', () => {
 			assert(isset(socketEvents['player-report-set-read']), true);
 			assert(isset(socketEvents['player-report-set-unread']), true);
 
+			assert(isset(socketEvents['alliance-search']), true);
+			assert(isset(socketEvents['alliance-create']), true);
+			assert(isset(socketEvents['alliance-join-ask']), true);
+			assert(isset(socketEvents['alliance-join-choice']), true);
+			assert(isset(socketEvents['alliance-invite-ask']), true);
+			assert(isset(socketEvents['alliance-invite-choice']), true);
+			assert(isset(socketEvents['alliance-members-kick']), true);
+			assert(isset(socketEvents['alliance-members-permissionsEdit']), true);
+			assert(isset(socketEvents['alliance-edit']), true);
+			assert(isset(socketEvents['alliance-leave']), true);
+			assert(isset(socketEvents['alliance-disslove']), true);
+			assert(isset(socketEvents['alliance-pact-ask']), true);
+			assert(isset(socketEvents['alliance-pact-choice']), true);
+
 			assert(isset(socketEvents['server-monitore-connect']), true);
 			assert(isset(socketEvents['admin-request-cmd']), true);
 		});
@@ -59,7 +74,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, payload.sid);
 						assert.equal(event, 'server-alert');
 						assert.equal(data, payload.message);
-					}
+					},
 				};
 			};
 
@@ -98,7 +113,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, sid);
 						assert.equal(event, 'notification');
 						assert.deepEqual(data, payload);
-					}
+					},
 				};
 			};
 
@@ -113,7 +128,7 @@ describe('• Websocket', () => {
 	describe('# sendTutorial', () => {
 		it('sendTutorial(normal data)', () => {
 			const user = {
-				sid: 'MyAmazingSid'
+				sid: 'MyAmazingSid',
 			};
 
 			const payload = {
@@ -127,7 +142,7 @@ describe('• Websocket', () => {
 						assert.equal(sid, user.sid);
 						assert.equal(event, 'tutorial');
 						assert.deepEqual(data, payload);
-					}
+					},
 				};
 			};
 

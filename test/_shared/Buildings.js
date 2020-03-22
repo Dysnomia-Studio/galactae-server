@@ -300,66 +300,59 @@ describe('• Buildings (shared)', () => {
 			}
 		});
 
-		it('2 hab 1 food', () => {
+		it('1 hab 2 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,2,1]),
+				Buildings.calcPlanetMorale([0,0,1,2]),
 				1.5
+			);
+		});
+
+		it('1 hab 25 food', () => {
+			assert.equal(
+				Buildings.calcPlanetMorale([0,0,1,25]),
+				2
 			);
 		});
 
 		it('25 hab 1 food', () => {
 			assert.equal(
 				Buildings.calcPlanetMorale([0,0,25,1]),
-				2
-			);
-		});
-
-		it('1 hab 25 food', () => {
-			assert.equal(
-				Buildings.calcPlanetMorale([0,0,1,25]),
 				0.52
 			);
 		});
 
-		it('6 hab 9 food', () => {
+		it('9 hab 6 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,6,9]).toFixed(4),
+				Buildings.calcPlanetMorale([0,0,9,6]).toFixed(4),
 				0.8333
 			);
 		});
 
-		it('10 hab 15 food', () => {
+		it('15 hab 10 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,10,15]).toFixed(4),
+				Buildings.calcPlanetMorale([0,0,15,10]).toFixed(4),
 				0.8333
 			);
 		});
 
-		it('12 hab 17 food', () => {
+		it('17 hab 12 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,12,17]).toFixed(4),
+				Buildings.calcPlanetMorale([0,0,17,12]).toFixed(4),
 				0.8529
 			);
 		});
 
-		it('19 hab 17 food', () => {
+		it('17 hab 19 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,19,17]).toFixed(4),
+				Buildings.calcPlanetMorale([0,0,17,19]).toFixed(4),
 				1.0588
 			);
 		});
 
-		it('22 hab 23 food', () => {
+		it('23 hab 22 food', () => {
 			assert.equal(
-				Buildings.calcPlanetMorale([0,0,22,23]).toFixed(4),
+				Buildings.calcPlanetMorale([0,0,23,22]).toFixed(4),
 				0.9783
-			);
-		});
-
-		it('1 hab 25 food', () => {
-			assert.equal(
-				Buildings.calcPlanetMorale([0,0,1,25]),
-				0.52
 			);
 		});
 	});
@@ -422,9 +415,10 @@ describe('• Buildings (shared)', () => {
 	describe('# checkIfCanBuild()', () => {
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -434,7 +428,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				''
 			);
@@ -444,9 +438,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy), no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -456,7 +451,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_PEOPLE'
 			);
@@ -466,9 +461,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1, no fleets, beginner, building 0 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -478,7 +474,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_ENERGY'
 			);
@@ -488,9 +484,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - empty resources', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [0,0,0,0,0,0]
+				resources: [0,0,0,0,0,0],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -500,7 +497,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(12,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_COST'
 			);
@@ -512,9 +509,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 12 lvl 2', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -524,7 +522,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(12,2),
 					12,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_DEPENDENCIES'
 			);
@@ -534,9 +532,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 1 (except energy and people), no fleets, beginner, building 0 lvl 2 - currently building', () => {
 			const planetData = {
-				nextBuildingTime: Date.now() + 100000,
+				nextBuildingTime: new Date(Date.now() + 100000),
 				Buildings: [1, 1, 2, 1, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-				resources: [10000,10000,10000,10000,10000,10000]
+				resources: [10000,10000,10000,10000,10000,10000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -546,7 +545,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,2),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_ALREADY'
 			);
@@ -556,9 +555,10 @@ describe('• Buildings (shared)', () => {
 
 		it('all lvl 35, no fleets, beginner, building 0 lvl 36', () => {
 			const planetData = {
-				nextBuildingTime: -1,
+				nextBuildingTime: null,
 				Buildings: [35, 35, 35, 35, 35, 35, 35, 35, 35, 0, 0, 0, 0, 0],
-				resources: [1000000,1000000,1000000,1000000,1000000,1000000]
+				resources: [1000000,1000000,1000000,1000000,1000000,1000000],
+				planetType: 0,
 			};
 
 			assert.deepEqual(
@@ -568,7 +568,7 @@ describe('• Buildings (shared)', () => {
 					{ research: [] },
 					Buildings.GetCost(0,36),
 					0,
-					Date.now()
+					new Date()
 				),
 				'BUILDING_ERROR_MAXIMUM'
 			);

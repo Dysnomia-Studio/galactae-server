@@ -39,7 +39,7 @@ module.exports = class Chat {
 					if(data.message.charAt(0) === '!' && data.lvl > 1) {
 						data = Chat.sendCommand(data);
 					} else if(data.message.charAt(0) === '@') { // Messages privés
-						const words =data.message.split(new RegExp('[ ,;]+', 'g'));
+						const words = data.message.split(new RegExp('[ ,;]+', 'g'));
 
 						const playerTarget = await db.player.findByName(words[0].substr(1).toLowerCase());
 
@@ -70,12 +70,12 @@ module.exports = class Chat {
 						}
 
 						if(!data.noname) {
-							data.message = '<strong>'+ data.username +' :</strong> '+ data.message;
+							data.message = '<strong>'+ data.username + ' :</strong> '+ data.message;
 						}
 					}
 
 					if(!data.send) {
-						log('(Blocked) [' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+						log('(Blocked) [' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						return;
 					}
 					if(data.message === '' || !isset(data.message, 'string')) {
@@ -83,12 +83,24 @@ module.exports = class Chat {
 					}
 
 					if(data.channel !== 'hud-chat-ally') { // Normal chat
-						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
+						log('[' + data.channel.substr(9) + '] ' + logname + ': ' + logmsg);
 						io.emit('chat-message', { message: data.message, channel: data.channel });
 						Discord.sendChatMessage(data.channel,discordmsg);
-					} else if(data.ally !== undefined) { // Allies messages
-						log('[' + data.channel.substr(9) + '] '+logname+': ' +logmsg);
-						// @TODO : Ally messages
+					} else { // Allies messages
+						let ally = data.ally;
+						if(!data.ally) {
+							data.ally = null;
+							ally = 'N/A';
+						}
+
+						log('[' + data.channel.substr(9) + ' / ' + ally + '] '+logname+': ' +logmsg);
+
+						const allyMembers = (await db.player.findByAlly(data.ally))
+							.filter((ply) => ply.sid !== '-1');
+
+						for(const member of allyMembers) {
+							io.to(member.sid).emit('chat-message', { message: data.message, channel: data.channel });
+						}
 					}
 
 				});
@@ -186,7 +198,7 @@ module.exports = class Chat {
 						log('Invalid Time');
 						return;
 					}
-					const now = Date.now();
+					const now = new Date();
 
 					log('Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
 					Chat.sendSM(data.sid,'Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
@@ -196,7 +208,7 @@ module.exports = class Chat {
 						server_name: globalCfg.serverGlobalName,
 						ban_type: 2,
 						ban_start: now,
-						ban_end: now + banTime,
+						ban_end: new Date(now.getTime() + banTime),
 						ban_reason: banMessage,
 						admin_id: data.user_id,
 					});
@@ -219,7 +231,7 @@ module.exports = class Chat {
 						log('Invalid Time');
 						return;
 					}
-					const now = Date.now();
+					const now = new Date();
 
 					log('Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
 					Chat.sendSM(data.sid,'Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
@@ -229,7 +241,7 @@ module.exports = class Chat {
 						server_name: globalCfg['serverGlobalName'],
 						ban_type: 1,
 						ban_start: now,
-						ban_end: now + muteTime,
+						ban_end: new Date(now.getTime() + muteTime),
 						ban_reason: muteMessage,
 						admin_id: data.user_id,
 					});

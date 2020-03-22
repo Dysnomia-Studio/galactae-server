@@ -63,7 +63,7 @@ describe('• Research (shared)', () => {
 
 		it('0 researched', () => {
 			assert.equal(
-				Research.researchedParent({ research: {} }, {}, 'prop_main'),
+				Research.researchedParent({ research: {} }, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }, 'prop_main'),
 				false
 			);
 		});
@@ -160,7 +160,7 @@ describe('• Research (shared)', () => {
 
 		it('0 researched', () => {
 			assert.equal(
-				Research.researchedParent({ research: {} }, {}, 'prop_main', true),
+				Research.researchedParent({ research: {} }, { Buildings: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0] }, 'prop_main', true),
 				false
 			);
 		});

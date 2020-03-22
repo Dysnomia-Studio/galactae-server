@@ -194,16 +194,126 @@ describe('• Fleets', () => {
 					name: 'name',
 					bar: 'foo',
 					position: 'position',
-					endMoveTime: 'endMoveTime',
+					endMoveTime: null,
 				}, 'playerName'), {
 					id: 'id',
 					name: 'name',
 					owner: 'playerName',
 					position: 'position',
-					endMoveTime: 'endMoveTime',
+					endMoveTime: null,
 					units: [], // @TODO
 				}
 			);
+		});
+	});
+
+	/**
+	 * fetchFleets()
+	 */
+	describe('fetchFleets()', () => {
+		it('fetchFleets(object, object, ?)', (done) => {
+			db.fleet.find = () => {
+				throw 'Should not be called';
+			};
+
+			const fleetA = {
+				bar: 'foo',
+			};
+			const fleetB = {
+				foo: 'bar',
+			};
+			const data = {
+				test: 4,
+			};
+
+			Fleets.fetchFleets(fleetA, fleetB, data, (newFleetA, newFleetB, newData) => {
+				assert.equal(fleetA, newFleetA);
+				assert.equal(fleetB, newFleetB);
+				assert.equal(data, newData);
+
+				done();
+			});
+		});
+
+		it('fetchFleets(string, object, ?)', (done) => {
+			const dbValue = {
+				fetched: true,
+				name: 'test',
+				ownerId: 'ownerId',
+			};
+
+			db.fleet.find = (id, callback) => {
+				callback(dbValue);
+			};
+
+			const fleetB = {
+				foo: 'bar',
+			};
+			const data = {
+				test: 4,
+				id: 'ownerId',
+			};
+
+			Fleets.fetchFleets('fleetA', fleetB, data, (newFleetA, newFleetB, newData) => {
+				assert.equal(dbValue, newFleetA);
+				assert.equal(fleetB, newFleetB);
+				assert.equal(data, newData);
+
+				done();
+			});
+		});
+
+		it('fetchFleets(object, string, ?)', (done) => {
+			const dbValue = {
+				fetched: true,
+				name: 'test',
+				ownerId: 'ownerId',
+			};
+
+			db.fleet.find = (id, callback) => {
+				callback(dbValue);
+			};
+
+			const fleetA = {
+				foo: 'bar',
+			};
+			const data = {
+				test: 4,
+				id: 'ownerId',
+			};
+
+			Fleets.fetchFleets(fleetA, 'fleetB', data, (newFleetA, newFleetB, newData) => {
+				assert.equal(fleetA, newFleetA);
+				assert.equal(dbValue, newFleetB);
+				assert.equal(data, newData);
+
+				done();
+			});
+		});
+
+		it('fetchFleets(string, string, ?)', (done) => {
+			const dbValue = {
+				fetched: true,
+				name: 'test',
+				ownerId: 'ownerId',
+			};
+
+			db.fleet.find = (id, callback) => {
+				callback(dbValue);
+			};
+
+			const data = {
+				test: 4,
+				id: 'ownerId',
+			};
+
+			Fleets.fetchFleets('fleetA', 'fleetB', data, (newFleetA, newFleetB, newData) => {
+				assert.equal(dbValue, newFleetA);
+				assert.equal(dbValue, newFleetB);
+				assert.equal(data, newData);
+
+				done();
+			});
 		});
 	});
 });

@@ -236,7 +236,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -308,7 +308,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -363,7 +363,7 @@ describe('• Fleets (shared)', () => {
 				parts: [
 					{type: 'cannon', name: 'cannon_1', tech: 'railgun'},
 					{type: 'cannon', name: 'cannon_2', tech: 'railgun'},
-					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'}
+					{type: 'sub_propulsion', name: 'prop_1', tech: 'ion'},
 				],
 			},
 			{
@@ -448,7 +448,7 @@ describe('• Fleets (shared)', () => {
 					{ 'u4': 1 },
 				),
 				{
-					speed: []
+					speed: [],
 				}
 			);
 		});
@@ -501,7 +501,7 @@ describe('• Fleets (shared)', () => {
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
-						endMoveTime: Math.round((Math.random() * (Date.now() * 2)) - Date.now())
+						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -715,84 +715,44 @@ describe('• Fleets (shared)', () => {
 	});
 
 	describe('# isImmobile()', () => {
-		it('Mobile (string)', () => {
+		it('Mobile', () => {
 			assert.equal(
 				Fleets.isImmobile(
-					{ endMoveTime: '100' }
+					{ endMoveTime: new Date(Date.now() + 10000) }
 				), false
 			);
 		});
 
-		it('Mobile (int)', () => {
+		it('Immobile', () => {
 			assert.equal(
 				Fleets.isImmobile(
-					{ endMoveTime: 100 }
-				), false
-			);
-		});
-
-		it('Immobile (string)', () => {
-			assert.equal(
-				Fleets.isImmobile(
-					{ endMoveTime: '-1' }
-				), true
-			);
-		});
-
-		it('Immobile (int)', () => {
-			assert.equal(
-				Fleets.isImmobile(
-					{ endMoveTime: -1 }
+					{ endMoveTime: null }
 				), true
 			);
 		});
 	});
 
 	describe('# hasEndedMove()', () => {
-		it('Mobile, arrived (string)', () => {
+		it('Mobile, arrived', () => {
 			assert.equal(
 				Fleets.hasEndedMove(
-					{ endMoveTime: '100' }
+					{ endMoveTime: new Date(Date.now() - 10000) }
 				), true
 			);
 		});
 
-		it('Mobile, arrived (int)', () => {
+		it('Mobile, not arrived', () => {
 			assert.equal(
 				Fleets.hasEndedMove(
-					{ endMoveTime: 100 }
-				), true
-			);
-		});
-
-		it('Mobile, not arrived (string)', () => {
-			assert.equal(
-				Fleets.hasEndedMove(
-					{ endMoveTime: '' + (Date.now() + 10000) }
+					{ endMoveTime: new Date(Date.now() + 10000) }
 				), false
 			);
 		});
 
-		it('Mobile, not arrived (int)', () => {
+		it('Immobile', () => {
 			assert.equal(
 				Fleets.hasEndedMove(
-					{ endMoveTime: (Date.now() + 10000) }
-				), false
-			);
-		});
-
-		it('Immobile (string)', () => {
-			assert.equal(
-				Fleets.hasEndedMove(
-					{ endMoveTime: '-1' }
-				), false
-			);
-		});
-
-		it('Immobile (int)', () => {
-			assert.equal(
-				Fleets.hasEndedMove(
-					{ endMoveTime: -1 }
+					{ endMoveTime: null }
 				), false
 			);
 		});

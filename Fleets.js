@@ -1,32 +1,32 @@
 module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static async sendtoPlayer(FleetList, newPlanet, sid, address) {
-		if(!isset(newPlanet)) {
-			newPlanet = {};
+		if(!isset(newPlanet, 'object')) {
+			newPlanet = await db.planet.findbyAddress(address);
+		} else {
+			await db.planet.update({
+				id: newPlanet.id,
+				resources: newPlanet.resources,
+			});
 		}
-
-		db.planet.update({
-			id: newPlanet.id,
-			resources: newPlanet.resources,
-		});
 
 		if(newPlanet.address === address) {
 			Planet.sendPlanetDataToUser({data: {resources: newPlanet.resources}, planet: newPlanet.address, id: newPlanet.owner, sid: sid });
-		}
 
-		if(globalCfg.dev) {
-			log('Sending fleet');
-		}
-
-		for(const fleetId in FleetList) {
-			if(FleetList[fleetId].ownerId !== newPlanet.owner) {
-				const player = await db.player.find(FleetList[fleetId].ownerId);
-
-				FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+			if(globalCfg.dev) {
+				log('Sending fleet');
 			}
-		}
 
-		io.to(sid).emit('fleet-recieve-data', { FleetList });
+			for(const fleetId in FleetList) {
+				if(FleetList[fleetId].ownerId !== newPlanet.owner) {
+					const player = await db.player.find(FleetList[fleetId].ownerId);
+
+					FleetList[fleetId] = Fleets.extractOrbitPublicInfo(FleetList[fleetId], player.name);
+				}
+			}
+
+			io.to(sid).emit('fleet-recieve-data', { FleetList });
+		}
 	}
 
 	/**
@@ -50,11 +50,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
 		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
-			if(originalFList === undefined) {
+			if(!originalFList) {
 				originalFList = [];
 			}
 
-			Fleets.recalcFuel(originalFList, async(FleetList, newPlanet) => {
+			Fleets.recalcFuel(address, originalFList, async(FleetList, newPlanet) => {
 				if(!newPlanet) {
 					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 					return;
@@ -71,9 +71,8 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						continue;
 					}
 
-					FleetList[id].endMoveTime = parseInt(FleetList[id].endMoveTime);
-					if(FleetList[id].endMoveTime !== -1 && FleetList[id].endMoveTime <= Date.now()) {
-						FleetList[id].endMoveTime = -1;
+					if(FleetList[id].endMoveTime !== null && FleetList[id].endMoveTime.getTime() <= Date.now()) {
+						FleetList[id].endMoveTime = null;
 
 						if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
 							const atkUser = await db.player.find(newPlanet.owner);
@@ -124,14 +123,14 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		});
 	}
 
-	static recalcFuel(fleetList, callback) {
+	static recalcFuel(address, fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) {
 				fleetList[i].fuel = 0;
 			}
 
-			if(fleetList[i].fuel < fleetList[i].maxFuel && fleetList[i].position === fleetList[i].motherPlanetAddress) {
+			if(fleetList[i].fuel < fleetList[i].maxFuel) {
 				haveToUpdate = true;
 			}
 		}
@@ -141,7 +140,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.planet.find(fleetList[0].motherPlanetAddress, function(planetData) {
+		db.planet.find(address, function(planetData) {
 			if(!haveToUpdate) {
 				callback(fleetList, planetData);
 				return;
@@ -197,7 +196,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				position: planetData.address,
 				orbitPosition: FLEET_MOVE_TYPE.DEFEND,
 				points: 0,
-				endMoveTime: -1,
+				endMoveTime: null,
 				units: [],
 				population: 0,
 				fuel: 0,
@@ -262,7 +261,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	}
 
 	static moveTo(user, fleetId, destination, moveType) {
-		const now = Date.now();
+		const now = new Date();
 
 		if(moveType !== Math.round(moveType)) {
 			moveType = -1;
@@ -296,7 +295,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				return;
 			}
 
-			if(fleetReturned.endMoveTime > 0) { // Is this fleet moving ?
+			if(fleetReturned.endMoveTime !== null) { // Is this fleet moving ?
 				log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
 				Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' });
 				return;
@@ -346,7 +345,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						if(moveType === FLEET_MOVE_TYPE.ATTACK) {
 							defUser = await db.player.find(planeteArrivee.owner);
 
-							if(isset(defUser, 'object') && defUser.beginnerProtectEnd > Date.now()) {
+							if(isset(defUser, 'object') && defUser.beginnerProtectEnd.getTime() > now.getTime()) {
 								log(user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.');
 								Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_IS_PROTECTED' });
 								return;
@@ -364,7 +363,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 							const baseDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
-								now/1000);
+								now.getTime()/1000);
 							if(Number.isNaN(baseDist) || baseDist < 0) {
 								return;
 							}
@@ -373,7 +372,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 							const previewDist = GameMap.getPlanetDistance(
 								planeteDepart,
 								planeteArrivee,
-								now/1000 + Math.round(baseTravelTime*360000)/100);
+								now.getTime()/1000 + Math.round(baseTravelTime*360000)/100);
 							if(Number.isNaN(previewDist) || previewDist < 0) {
 								return;
 							}
@@ -414,7 +413,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 							instability /= 2;
 						}
 
-						fleetReturned.endMoveTime = Date.now() + Math.round((time + instability) * TIME.HOUR_TO_MS);
+						fleetReturned.endMoveTime = new Date(now.getTime() + Math.round((time + instability) * TIME.HOUR_TO_MS));
 						fleetReturned.position = destination;
 						fleetReturned.orbitPosition = moveType;
 						if(destination === fleetReturned.motherPlanetAddress) {
@@ -484,23 +483,19 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		if(!to.units[unitId]) {
 			to.units[unitId] = 0;
 		}
+		from.units[unitId] -= count;
 		to.units[unitId] += count;
 
 		return [from, to];
 	}
 
-	static transferSomeUnits(from, to, data) {
-		data.unitCount = parseInt(data.unitCount);
-		if(Number.isNaN(data.unitCount)) {
-			return;
-		}
-
+	static fetchFleets(from, to, data, callback) {
 		if(typeof(from) === 'string') {
 			db.fleet.find(from, function(fleetData) {
 				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
 					return;
 				}
-				Fleets.transferSomeUnits(fleetData, to, data);
+				Fleets.fetchFleets(fleetData, to, data, callback);
 			});
 			return;
 		}
@@ -509,12 +504,25 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
 					return;
 				}
-				Fleets.transferSomeUnits(from, fleetData, data);
+				Fleets.fetchFleets(from, fleetData, data, callback);
 			});
 			return;
 		}
 
-		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+		callback(from, to, data);
+	}
+
+	static transferSomeUnits(from, to, data) {
+		data.unitCount = parseInt(data.unitCount);
+		if(Number.isNaN(data.unitCount)) {
+			return;
+		}
+
+		if(typeof(from) === 'string' || typeof(to) === 'string') {
+			Fleets.fetchFleets(from, to, data, Fleets.transferSomeUnits);
+		}
+
+		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {
 			log(data.username + ' has failed to tranfer units from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;
@@ -559,26 +567,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	}
 
 	static mergeFleet(from, to, data) {
-		if(typeof(from) === 'string') {
-			db.fleet.find(from, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
-					return;
-				}
-				Fleets.mergeFleet(fleetData, to, data);
-			});
-			return;
-		}
-		if(typeof(to) === 'string') {
-			db.fleet.find(to, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
-					return;
-				}
-				Fleets.mergeFleet(from, fleetData, data);
-			});
-			return;
+		if(typeof(from) === 'string' || typeof(to) === 'string') {
+			Fleets.fetchFleets(from, to, data, Fleets.mergeFleet);
 		}
 
-		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {
 			log(data.username + ' has failed merging fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;
@@ -611,26 +604,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	}
 
 	static transferFuelBetweenFleets(from, to, data) {
-		if(typeof(from) === 'string') {
-			db.fleet.find(from, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
-					return;
-				}
-				Fleets.transferFuelBetweenFleets(fleetData, to, data);
-			});
-			return;
-		}
-		if(typeof(to) === 'string') {
-			db.fleet.find(to, function(fleetData) {
-				if(!isset(fleetData, 'object') || !isset(fleetData.name, 'string') || fleetData.name === 'SHIP_DEF' || ''+fleetData.ownerId !== data.id) {
-					return;
-				}
-				Fleets.transferFuelBetweenFleets(from, fleetData, data);
-			});
-			return;
+		if(typeof(from) === 'string' || typeof(to) === 'string') {
+			Fleets.fetchFleets(from, to, data, Fleets.transferFuelBetweenFleets);
 		}
 
-		if(from.position !== to.position || from.endMoveTime > 0 || to.endMoveTime > 0) {
+		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {
 			log(data.username + ' has failed tranfering fuel from fleet ' + from.name + ' to ' + to.name + ' because wasn\'t at the same position.', 'fail');
 			Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_AT_DIFFERENT_POSITIONS' });
 			return;

@@ -5,7 +5,7 @@ module.exports = class Privileges {
 			if(isset(banObj, 'array')) {
 				for(let i=0; i < banObj.length; i++) {
 
-					if(banObj[i].ban_end > Date.now()) {
+					if(banObj[i].ban_end.getTime() > Date.now()) {
 						callback(true);
 						return;
 					}
