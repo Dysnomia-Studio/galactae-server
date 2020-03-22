@@ -93,7 +93,7 @@ module.exports = {
 	alliance: require('./database/server/alliance'),
 	battleLog: require('./database/server/battleLog'),
 	battleLogAccess: require('./database/server/battleLogAccess'),
-	conquest: require('./database/conquest'),
+	conquest: require('./database/server/conquest'),
 	fleet: require('./database/server/fleet'),
 	player: require('./database/server/player'),
 	planet: require('./database/server/planet'),
