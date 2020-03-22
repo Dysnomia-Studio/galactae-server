@@ -268,12 +268,13 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 			}
 
 			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetReturned.address);
+
 			if(conquestList.length > 0) {
-				log(data.username+' failed to build units because the planet is being conquested.','fail');
+				log(inputData.username + ' failed to build units because the planet (' + planetReturned.address + ') is being conquested.','fail');
 				return;
 			}
 
-			const newPlanet = Planet.update(planetReturned,userReturned,fleetList);
+			const newPlanet = await Planet.update(planetReturned,userReturned,fleetList);
 
 			// Check no fleet is currently building
 			if(newPlanet.unitBuildingEndTime !== null && newPlanet.unitBuildingEndTime.getTime() > Date.now()) {

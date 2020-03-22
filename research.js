@@ -56,13 +56,13 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 				return;
 			}
 
-			Research.refreshUserResearch(userReturned, function(userNewResearch) {
+			Research.refreshUserResearch(userReturned, async function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
 				const researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
 
-				const newData = Planet.update(planetReturned,userReturned,fleetReturned);
+				const newData = await Planet.update(planetReturned,userReturned,fleetReturned);
 
 				if(researchedParent) { // Just check if it exists ...
 					newData.currResearch = researchName;

@@ -332,14 +332,14 @@ module.exports = class Player {
 		} = Player.getDayBonus(data, choice);
 
 		if(choice===2 && helium!==0) {
-			Planet.find(inputData,inputData.pid,0,function(planetReturned) {
+			Planet.find(inputData,inputData.pid,0,async function(planetReturned) {
 				if(inputData.pid !== planetReturned.address) { // Stop if not belonging
 					Websocket.SendMessageToClient({ sid: inputData.sid, message: 'ERROR_NOT_BELONGING' });
 					log(inputData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+inputData.pid+') because he doesn\'t own it !','fail');
 					return;
 				}
 
-				const newPlanetData = Planet.update(planetReturned, data, []);
+				const newPlanetData = await Planet.update(planetReturned, data, []);
 
 				newPlanetData.resources[1]+=helium;
 

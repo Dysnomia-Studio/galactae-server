@@ -55,8 +55,8 @@ module.exports = class Planet {
 
 		db.planet.findByOwner(inputData.id, (planetsReturned) => {
 			for(const currPlanet of planetsReturned) {
-				db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
-					const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
+				db.fleet.findByMotherPlanet(currPlanet.id, async function(fleetsReturned) {
+					const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 
 					db.planet.update(newPlanet);
 
@@ -166,7 +166,7 @@ module.exports = class Planet {
 			const currTime = new Date();
 
 			// Calc new planet data
-			const newData = Planet.update(planetReturned,userReturned,fleetReturned);
+			const newData = await Planet.update(planetReturned,userReturned,fleetReturned);
 
 			// Vars for this building tests
 			const cost = Buildings.GetCost(data.building,newData.Buildings[data.building]+1);
@@ -305,11 +305,15 @@ module.exports = class Planet {
 	 * @param      {<type>}  user      The user
 	 * @return     {<type>}  the updated data
 	 */
-	static update(planetData,user,fleetList) {
+	static async update(planetData,user,fleetList) {
 		const currTime = new Date();
 
+		const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetData.address);
+
 		// Update resources
-		planetData.resources = Planet.UpdateResources(planetData,user);
+		if(conquestList.length === 0) {
+			planetData.resources = Planet.UpdateResources(planetData,user);
+		}
 		planetData.lastResourcesUpdate = currTime;
 
 		// Update points
@@ -318,7 +322,7 @@ module.exports = class Planet {
 		planetData.points = Math.round(planetData.points);
 
 		// Update buildings
-		if(planetData.nextBuildingTime !== null && currTime.getTime() > planetData.nextBuildingTime.getTime() && planetData.nextBuilding !== -1) {
+		if(conquestList.length === 0 && planetData.nextBuildingTime !== null && currTime.getTime() > planetData.nextBuildingTime.getTime() && planetData.nextBuilding !== -1) {
 			planetData.Buildings[planetData.nextBuilding]++;
 
 			Websocket.sendNotification(user.sid, 'building', { building: planetData.nextBuilding, lvl: planetData.Buildings[planetData.nextBuilding] });
@@ -328,7 +332,7 @@ module.exports = class Planet {
 		}
 
 		// Update units
-		if(planetData.unitBuildingEndTime !== null) {
+		if(conquestList.length === 0 && planetData.unitBuildingEndTime !== null) {
 			Planet.UpdateUnits(Object.assign({}, planetData), user, currTime);
 
 			if(currTime.getTime() > planetData.unitBuildingEndTime.getTime()) {

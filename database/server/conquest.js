@@ -1,10 +1,10 @@
 module.exports = {
 	getActiveConquestsOnPlanet: async (address) => {
 		try {
-			return await serverClient.query(
-				'SELECT * FROM public."conquest" WHERE "planet" = $1',
-				[address]
-			).rows;
+			return (await serverClient.query(
+				'SELECT * FROM public."conquest" WHERE "planet" = $1 AND "endDate" > $2',
+				[address, new Date()]
+			)).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
