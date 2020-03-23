@@ -308,6 +308,7 @@ describe('• Alliances', () => {
 			db.alliance.getPacts = (allyId) => allianceData.pacts;
 			db.alliance.getAskToJoin = (allyId) => allianceData.askToJoin;
 			db.alliance.getInvitations = (allyId) => allianceData.invitations;
+			db.alliance.setPermissions = () => {};
 
 			const userData = {
 				id: 'PlyId',
@@ -367,25 +368,52 @@ describe('• Alliances', () => {
 	describe('# askToJoin()', () => {
 		it('ally = null', () => {
 			const playerId = 'plyId';
-			const allianceId = 'allyId';
+			const alliance = {
+				id: 'allyId',
+				name: 'allyName',
+			};
+
+			db.alliance.findByName = () => alliance;
 
 			db.alliance.askToJoin = (plyId, allyId) => {
 				assert.equal(playerId, plyId);
-				assert.equal(allianceId, allyId);
+				assert.equal(alliance.id, allyId);
 			};
 
-			Alliances.askToJoin({ name: 'bar', ally: null }, playerId, allianceId);
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
+			Alliances.askToJoin({ name: 'bar', ally: null }, playerId, alliance.name);
 		});
 
 		it('ally != null', () => {
 			const playerId = 'plyId';
 			const allianceId = 'allyId';
 
+			db.alliance.findByName = () => null;
+
 			db.alliance.askToJoin = (plyId, allyId) => {
 				assert(false);
 			};
 
-			Alliances.askToJoin({ name: 'bar', ally: 'foo' }, playerId, allianceId);
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.askToJoin({ name: 'bar', ally: 'foo' }, playerId, 'allyName');
 		});
 	});
 
@@ -555,7 +583,17 @@ describe('• Alliances', () => {
 				assert.equal(allyId, ally);
 			};
 
-			Alliances.removeAskToJoin(plyName, allyId);
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
+			Alliances.removeAskToJoin({}, plyName, allyId);
 		});
 	});
 
@@ -573,6 +611,16 @@ describe('• Alliances', () => {
 				assert.equal(allianceId, allyId);
 			};
 
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
 			Alliances.invite({ name: 'plyName' }, playerId, allianceId);
 		});
 
@@ -586,6 +634,16 @@ describe('• Alliances', () => {
 
 			db.alliance.invite = (plyId, allyId) => {
 				assert(false);
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
 			};
 
 			Alliances.invite({ name: 'plyName' }, playerId, allianceId);
@@ -772,6 +830,16 @@ describe('• Alliances', () => {
 				assert.equal(id, userData.id);
 			};
 
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
 			Alliances.kick({ id: 'currPlayer' }, 'playerName');
 		});
 
@@ -786,6 +854,16 @@ describe('• Alliances', () => {
 
 			db.alliance.dropPermissions = () => {
 				assert(false);
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
 			};
 
 			Alliances.kick({}, 'playerName');
@@ -1001,6 +1079,16 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
 			Alliances.leave('');
 		});
 
@@ -1029,6 +1117,16 @@ describe('• Alliances', () => {
 				assert.equal(id, userData.id);
 			};
 
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
 			Alliances.leave('user');
 		});
 	});
@@ -1043,7 +1141,17 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.dissolve('id', 'ally');
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.dissolve({}, 'id', 'ally');
 		});
 
 		it('Should Work', () => {
@@ -1059,7 +1167,17 @@ describe('• Alliances', () => {
 				assert.equal(allyId, userData.ally);
 			};
 
-			Alliances.dissolve(userData.id, userData.ally);
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(true);
+						}
+					},
+				};
+			};
+
+			Alliances.dissolve({}, userData.id, userData.ally);
 		});
 	});
 
