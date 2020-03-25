@@ -21,8 +21,15 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	static recalc(user,researchData,callback,i=0) {
 		const time = (Date.now() - user.lastResearchUpdate.getTime())/TIME.HOUR_TO_MS;
 
-		db.planet.find(user.planetlist[i],function(planetData) {
-			if(isset(planetData.currResearch, 'string') && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost, 'number') && researchData[planetData.currResearch] !== -1) {
+		db.planet.find(user.planetlist[i],async function(planetData) {
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetReturned.address);
+
+			if(isset(planetData.currResearch, 'string') &&
+				planetData.currResearch !== 'researchCenter' &&
+				isset(researchList[planetData.currResearch].cost, 'number') &&
+				researchData[planetData.currResearch] !== -1 &&
+				conquestList.length === 0
+			) {
 				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
 
 				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
