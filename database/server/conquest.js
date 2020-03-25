@@ -12,15 +12,43 @@ module.exports = {
 
 	beginConquest: async (planet, prevOwner, newOwner) => {
 		try {
+			await serverClient.query('BEGIN');
+
 			const endDate = new Date();
 			endDate.setDate(endDate.getDate() + 1); // @TODO: use config to determine speed
 
+			// Get latest end of conquest on this planet
+			const conquestsList = await db.alliance.getActiveConquestsOnPlanet(planet);
+
+			let conquestReportTime = TIME.DAY_TO_MS; // @TODO: use config to determine speed
+			let lastConquest = endDate.getTime();
+
+			for(const conquest of conquestsList) {
+				if(lastConquest < conquest.endDate.getTime()) {
+					lastConquest = conquest.getTime();
+					conquestReportTime = endDate.Time() - conquest.endDate.getTime();
+				}
+			}
+
+			// Report times on planet
+			const planetData = await db.planet.findbyAddress(planet);
+			const updatedPlanet = {
+				address: planetData.address,
+				nextBuildingTime: new Date((new Date(planetData.nextBuildingTime)).getTime() + conquestReportTime),
+				unitBuildingEndTime: new Date((new Date(planetData.unitBuildingEndTime)).getTime() + conquestReportTime),
+			};
+			await db.planet.update(updatedPlanet);
+
+			// Create conquest on database
 			await serverClient.query(
 				'INSERT INTO public."conquest" ("prevOwner", "newOwner", planet, "endDate") VALUES ($1, $2, $3, $4)',
 				[prevOwner, newOwner, planet, endDate]
 			);
+
+			await serverClient.query('COMMIT');
 		} catch(err) {
 			log(err, 'error');
+			await serverClient.query('ROLLBACK');
 		}
 	}
 };
