@@ -322,6 +322,19 @@ module.exports = class Combat {
 				missChance += researchBonus['prop_advManoeuvre'];
 			}
 		}
+
+		for(let i=0; i<this.unitCache[target.unit].parts.length; i++) {
+			if(this.unitCache[target.unit].parts[i].tech === 'none' || this.unitCache[target.unit].parts[i].tech === 'noPartResearched') { continue; }
+
+			switch(this.unitCache[target.unit].parts[i].type) {
+				case 'hangar':
+					missChance += hangarMiss[this.unitCache[target.unit].parts[i].tech];
+					break;
+				default:
+					// Do nothing
+			}
+		}
+
 		const [damage, logs] = this.simulateDamage(currUnitId, target.unit, missChance);
 
 		// @TODO: apply research bonuses

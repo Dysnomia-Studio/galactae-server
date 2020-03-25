@@ -943,8 +943,8 @@ module.exports = function() {
 	};
 
 	this.hangarMiss = {
-		hangarSimple:  -2,
-		hangarDouble: -10,
+		hangarSimple: -0.01,
+		hangarDouble: -0.03,
 	};
 
 	this.weaponDamage = {
