@@ -1,4 +1,15 @@
 module.exports = {
+	getConquestsByPlayer: async (plyId) => {
+		try {
+			return (await serverClient.query(
+				'SELECT prev_player.name as prevPlayer, new_player.name as newPlayer, conquest.planet, conquest."endDate" FROM public."conquest" INNER JOIN users AS prev_player ON prev_player.id = "prevOwner" INNER JOIN users AS new_player ON new_player.id = "newOwner" WHERE "prevOwner" = $1 OR "newOwner" = $1',
+				[plyId]
+			)).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+
 	getActiveConquestsOnPlanet: async (address) => {
 		try {
 			return (await serverClient.query(

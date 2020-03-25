@@ -150,9 +150,10 @@ module.exports = class Player {
 		});
 
 		Alliances.sendToPlayer(playerData);
-		Units.refresh(data);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
+		Conquest.syncPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
+		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				db.player.update(userNewResearch, function() {

@@ -22,7 +22,7 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 		const time = (Date.now() - user.lastResearchUpdate.getTime())/TIME.HOUR_TO_MS;
 
 		db.planet.find(user.planetlist[i],async function(planetData) {
-			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetReturned.address);
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetData.address);
 
 			if(isset(planetData.currResearch, 'string') &&
 				planetData.currResearch !== 'researchCenter' &&
