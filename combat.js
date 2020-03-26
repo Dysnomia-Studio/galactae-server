@@ -619,34 +619,33 @@ module.exports = class Combat {
 		}
 	}
 
-	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
+	static async beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
 		log('Begin of fight simulation - Planet: ' + defPlanet.address, 'info');
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
 		const currTime = Date.now();
 
-		db.fleet.findByPosition(defPlanet.address, (fleetList) => {
-			const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
+		const fleetList = await db.fleet.findByPosition(defPlanet.address);
+		const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
 
-			// Add all fleets to fight
-			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
-					continue;
-				}
-
-				if(fleetList[i].orbitPosition === 0) {
-					battle.joinTeam('def', fleetList[i]);
-				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUser.id) {
-					// @TODO: Add ally check
-					battle.joinTeam('atk', fleetList[i]);
-				}
+		// Add all fleets to fight
+		for(const i in fleetList) {
+			if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
+				continue;
 			}
 
-			preventRestarts++;
+			if(fleetList[i].orbitPosition === 0) {
+				battle.joinTeam('def', fleetList[i]);
+			} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUser.id) {
+				// @TODO: Add ally check
+				battle.joinTeam('atk', fleetList[i]);
+			}
+		}
 
-			battle.fight();
-		});
+		preventRestarts++;
+
+		battle.fight();
 	}
 
 	static async getAttacksAgainstPlayer(plyId, plySid) {

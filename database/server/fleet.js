@@ -47,15 +47,12 @@ module.exports = {
 			callback(obj.rows);
 		});
 	},
-	findByPosition: (address,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE position=$1', [address], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByPosition: async(address) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE position=$1', [address])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	findAllFleetReferingToPosition: (address,callback) => {
 		serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address], (err, obj) => {

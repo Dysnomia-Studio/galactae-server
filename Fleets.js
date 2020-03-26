@@ -139,7 +139,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.planet.find(address, function(planetData) {
+		db.planet.find(address, async function(planetData) {
 			if(!haveToUpdate) {
 				callback(fleetList, planetData);
 				return;
@@ -154,13 +154,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			}
 
 			// Current in-orbit fleets
-			db.fleet.findByPosition(fleetList[0].motherPlanetId, function(FleetList) {
-				// @TODO: Same owner, same ally, trade
+			const FleetList = await db.fleet.findByPosition(fleetList[0].motherPlanetId);
 
-				callback(fleetList, newPlanet);
-			});
+			// @TODO: Same owner, same ally, trade
 
-
+			callback(fleetList, newPlanet);
 		});
 	}
 
