@@ -32,10 +32,9 @@ module.exports = class Planet {
 			if(!valid) {
 				pid = userReturned.planetlist[0];
 			}
-			db.planet.find(pid,function(planetReturned) {
-				db.fleet.findByMotherPlanet(planetReturned.id, function(fleetReturned) {
-					callback(planetReturned,userReturned,fleetReturned);
-				});
+			db.planet.find(pid,async function(planetReturned) {
+				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.id);
+				callback(planetReturned,userReturned,fleetReturned);
 			});
 		}
 	}
@@ -55,38 +54,37 @@ module.exports = class Planet {
 
 		db.planet.findByOwner(inputData.id, (planetsReturned) => {
 			for(const currPlanet of planetsReturned) {
-				db.fleet.findByMotherPlanet(currPlanet.id, function(fleetsReturned) {
-					const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
+				const fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
+				const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
 
-					db.planet.update(newPlanet);
+				db.planet.update(newPlanet);
 
-					Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
+				Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
 
-					if(inputData.pid === currPlanet.address) {
-						if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
-							db.unit.findByOwner(userReturned.id, (unitsList) => {
-								const oldCount = Object.keys(userReturned.tutorials).length;
+				if(inputData.pid === currPlanet.address) {
+					if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
+						db.unit.findByOwner(userReturned.id, (unitsList) => {
+							const oldCount = Object.keys(userReturned.tutorials).length;
 
-								userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
+							userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
-								if(Object.keys(userReturned.tutorials).length !== oldCount) {
-									db.player.update({
-										id: userReturned.id,
-										tutorials: userReturned.tutorials,
-									});
-								}
+							if(Object.keys(userReturned.tutorials).length !== oldCount) {
+								db.player.update({
+									id: userReturned.id,
+									tutorials: userReturned.tutorials,
+								});
+							}
 
-								Tutorials.checkTutorials(userReturned, newPlanet);
-							});
-						}
-
-						if(callback) {
-							callback(newPlanet);
-						} else {
-							Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
-						}
+							Tutorials.checkTutorials(userReturned, newPlanet);
+						});
 					}
-				});
+
+					if(callback) {
+						callback(newPlanet);
+					} else {
+						Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+					}
+				}
 			}
 		});
 	}

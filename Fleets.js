@@ -162,57 +162,56 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		});
 	}
 
-	static create(data,planetData,callback) {
+	static async create(data,planetData,callback) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findByMotherPlanet(planetData.id, function(fleetReturned) {
-			// Check max count
-			if(fleetReturned.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
-				log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because it has maximal fleet count.');
-				Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_MAX_REACHED' });
+		const oldFleetList = await db.fleet.findByMotherPlanet(planetData.id);
+
+		// Check max count
+		if(oldFleetList.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
+			log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because it has maximal fleet count.');
+			Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_MAX_REACHED' });
+			return;
+		}
+
+		// Check name
+		for(let i=0; i<oldFleetList.length; i++) {
+			if(oldFleetList[i].name === data.fleetName) {
+				log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because a fleet with this name already exists.');
+				Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_NAME_ALREADY_EXISTS' });
 				return;
 			}
+		}
 
-			// Check name
-			for(let i=0; i<fleetReturned.length; i++) {
-				if(fleetReturned[i].name === data.fleetName) {
-					log(data.username + ' failed to create a new fleet on ' + planetData.name + ' because a fleet with this name already exists.');
-					Websocket.SendMessageToClient({ sid: data.sid, message: 'FLEET_NAME_ALREADY_EXISTS' });
-					return;
-				}
+		// Add it to db
+		const newFleet = {
+			name: data.fleetName,
+			ownerId: data.id,
+			motherPlanetId: planetData.id,
+			motherPlanetAddress: planetData.address,
+			position: planetData.address,
+			orbitPosition: FLEET_MOVE_TYPE.DEFEND,
+			points: 0,
+			endMoveTime: null,
+			units: [],
+			population: 0,
+			fuel: 0,
+			maxFuel: 0,
+			inBuilding: false,
+		};
+
+		db.fleet.create(newFleet, async(createdFleet) => {
+			// Send new list to client
+			Fleets.refresh(planetData.address,data.sid);
+
+			if(callback) {
+				callback(
+					(await db.fleet.findByMotherPlanet(planetData.id))
+						.filter((f) => f.name === data.fleetName)[0]
+				);
 			}
-
-			// Add it to db
-			const newFleet = {
-				name: data.fleetName,
-				ownerId: data.id,
-				motherPlanetId: planetData.id,
-				motherPlanetAddress: planetData.address,
-				position: planetData.address,
-				orbitPosition: FLEET_MOVE_TYPE.DEFEND,
-				points: 0,
-				endMoveTime: null,
-				units: [],
-				population: 0,
-				fuel: 0,
-				maxFuel: 0,
-				inBuilding: false,
-			};
-
-			db.fleet.create(newFleet, (createdFleet) => {
-				// Send new list to client
-				Fleets.refresh(planetData.address,data.sid);
-
-				if(callback) {
-					db.fleet.findByMotherPlanet(planetData.id, (fleetList) => {
-						const outFleet = fleetList.filter((f) => f.name === data.fleetName)[0];
-
-						callback(outFleet);
-					});
-				}
-			});
 		});
 	}
 
