@@ -243,7 +243,7 @@ describe('• Fleets', () => {
 			};
 
 			db.fleet.find = (id, callback) => {
-				callback(dbValue);
+				return dbValue;
 			};
 
 			const fleetB = {
@@ -271,7 +271,7 @@ describe('• Fleets', () => {
 			};
 
 			db.fleet.find = (id, callback) => {
-				callback(dbValue);
+				return dbValue;
 			};
 
 			const fleetA = {
@@ -299,7 +299,7 @@ describe('• Fleets', () => {
 			};
 
 			db.fleet.find = (id, callback) => {
-				callback(dbValue);
+				return dbValue;
 			};
 
 			const data = {

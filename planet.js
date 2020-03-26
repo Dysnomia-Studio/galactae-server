@@ -214,78 +214,78 @@ module.exports = class Planet {
 	 * @param      {<type>}  planetIn  data needed to be updated
 	 * @param      {<type>}  user      The user
 	 */
-	static UpdateUnits(planetIn,user,currTime) {
+	static async UpdateUnits(planetIn,user,currTime) {
 		const newPlanet = Object.assign({}, planetIn);
 
 		if(!newPlanet.unitBuildingID || !newPlanet.unitBuildingFleetID || !newPlanet.unitBuildingEndTime) {
 			return;
 		}
 
-		db.fleet.find(newPlanet.unitBuildingFleetID, function(fleetReturned) {
-			if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) {
+		const fleetReturned = await db.fleet.find(newPlanet.unitBuildingFleetID);
+
+		if(!isset(fleetReturned, 'object') || !isset(fleetReturned.ownerId, 'string') || fleetReturned.ownerId !== user.id) {
+			return;
+		}
+
+		db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
+			const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
+			if(key !== undefined) {
+				newPlanet.unitBuildingID = key;
+
+				unitReturned = {};
+				unitReturned.id = newPlanet.unitBuildingID;
+				unitReturned.shipType = 'SHIP_DEF';
+				unitReturned.name = key;
+				unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
+				unitReturned.ownerId = user.id;
+			}
+
+			let unitCount = 0;
+
+			if(fleetReturned.maxFuel === undefined) {
+				fleetReturned.maxFuel = 0;
+			}
+
+			let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
+			timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
+
+			const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
+			if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add
+				unitCount = restantDepuisSynchro;
+
+				fleetReturned.inBuilding = false;
+
+				Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
+			} else { // Partial add
+				const restant = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - currTime.getTime())/timeCost);
+				unitCount = restantDepuisSynchro - restant;
+			}
+
+			if(unitCount === 0) { // Prevent some bugs
 				return;
 			}
 
-			db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
-				const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
-				if(key !== undefined) {
-					newPlanet.unitBuildingID = key;
+			if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
+				unitCount = newPlanet.unitBuildingCount;
+			}
 
-					unitReturned = {};
-					unitReturned.id = newPlanet.unitBuildingID;
-					unitReturned.shipType = 'SHIP_DEF';
-					unitReturned.name = key;
-					unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
-					unitReturned.ownerId = user.id;
-				}
+			if(!fleetReturned.units[newPlanet.unitBuildingID]) {
+				fleetReturned.units[newPlanet.unitBuildingID] = 0;
+			}
+			fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
 
-				let unitCount = 0;
+			if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
+				fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
+			}
 
-				if(fleetReturned.maxFuel === undefined) {
-					fleetReturned.maxFuel = 0;
-				}
+			const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
+			fleetReturned.points = parseFloat(fleetReturned.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
+			fleetReturned.points = '' + fleetReturned.points;
 
-				let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
-				timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
-
-				const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
-				if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add
-					unitCount = restantDepuisSynchro;
-
-					fleetReturned.inBuilding = false;
-
-					Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
-				} else { // Partial add
-					const restant = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - currTime.getTime())/timeCost);
-					unitCount = restantDepuisSynchro - restant;
-				}
-
-				if(unitCount === 0) { // Prevent some bugs
-					return;
-				}
-
-				if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
-					unitCount = newPlanet.unitBuildingCount;
-				}
-
-				if(!fleetReturned.units[newPlanet.unitBuildingID]) {
-					fleetReturned.units[newPlanet.unitBuildingID] = 0;
-				}
-				fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
-
-				if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
-					fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
-				}
-
-				const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
-				fleetReturned.points = parseFloat(fleetReturned.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
-				fleetReturned.points = '' + fleetReturned.points;
-
-				db.fleet.update(fleetReturned, function() {
-					Units.refresh(user);
-					Fleets.refresh(newPlanet.address,user.sid);
-					Tactics.refresh(user.id, user.sid);
-				});
+			db.fleet.update(fleetReturned, function() {
+				Units.refresh(user);
+				Fleets.refresh(newPlanet.address,user.sid);
+				Tactics.refresh(user.id, user.sid);
 			});
 		});
 	}

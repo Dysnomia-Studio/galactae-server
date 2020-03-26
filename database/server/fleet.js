@@ -1,29 +1,26 @@
 module.exports = {
-	find: (id,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+	find: async(id) => {
+		try {
+			const dbObj = await serverClient.query('SELECT * FROM fleets WHERE id=$1',[id]);
 
-			if(callback) {
-				const fleet = obj.rows[0];
+			const fleet = obj.rows[0];
 
-				if(isset(fleet, 'object')) {
-					fleet.fuel = parseInt(fleet.fuel);
-					fleet.maxFuel = parseInt(fleet.maxFuel);
+			if(isset(fleet, 'object')) {
+				fleet.fuel = parseInt(fleet.fuel);
+				fleet.maxFuel = parseInt(fleet.maxFuel);
 
-					if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
-						log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');
-						return;
-					}
+				if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
+					log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');
+					return;
 				}
-
-				callback(fleet);
 			}
-		});
+
+			return fleet;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findAll: async(callback) => {
+	findAll: async() => {
 		try {
 			return (await serverClient.query('SELECT * FROM fleets')).rows;
 		} catch(err) {
