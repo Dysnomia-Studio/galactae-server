@@ -52,7 +52,7 @@ module.exports = class Planet {
 			return;
 		}
 
-		db.planet.findByOwner(inputData.id, (planetsReturned) => {
+		db.planet.findByOwner(inputData.id, async(planetsReturned) => {
 			for(const currPlanet of planetsReturned) {
 				const fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
 				const newPlanet = Planet.update(currPlanet,userReturned,fleetsReturned);
