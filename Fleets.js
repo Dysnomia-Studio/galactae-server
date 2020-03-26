@@ -36,7 +36,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	 * @param      {object}  sid     user socket id
 	 * @return     {socket}  units   list of units types
 	 */
-	static refresh(address,sid,playerAddress='') {
+	static async refresh(address,sid,playerAddress='') {
 		if(playerAddress === '') {
 			playerAddress = address;
 		}
@@ -49,64 +49,64 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		db.fleet.findAllFleetReferingToPosition(address, function(originalFList) {
-			if(!originalFList) {
-				originalFList = [];
+		const originalFList = await db.fleet.findAllFleetReferingToPosition(address);
+
+		if(!originalFList) {
+			originalFList = [];
+		}
+
+		Fleets.recalcFuel(address, originalFList, async(FleetList, newPlanet) => {
+			if(!newPlanet) {
+				Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
+				return;
 			}
 
-			Fleets.recalcFuel(address, originalFList, async(FleetList, newPlanet) => {
-				if(!newPlanet) {
-					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
-					return;
+			let haveToDone = 0;
+			let done = 0;
+			for(let i=0; i<FleetList.length; i++) {
+				const id = i;
+
+				// Autoremove fleet if needed
+				if(FleetList[id].units.length === 0 && newPlanet.unitBuildingFleetID !== FleetList[id].id) {
+					db.fleet.remove(FleetList[id].id);
+					continue;
 				}
 
-				let haveToDone = 0;
-				let done = 0;
-				for(let i=0; i<FleetList.length; i++) {
-					const id = i;
+				if(FleetList[id].endMoveTime !== null && FleetList[id].endMoveTime.getTime() <= Date.now()) {
+					FleetList[id].endMoveTime = null;
 
-					// Autoremove fleet if needed
-					if(FleetList[id].units.length === 0 && newPlanet.unitBuildingFleetID !== FleetList[id].id) {
-						db.fleet.remove(FleetList[id].id);
+					if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
+						const atkUser = await db.player.find(newPlanet.owner);
+
+						const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
+						const defUser = await db.player.find(defPlanet.owner);
+
+						Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
 						continue;
 					}
 
-					if(FleetList[id].endMoveTime !== null && FleetList[id].endMoveTime.getTime() <= Date.now()) {
-						FleetList[id].endMoveTime = null;
+					Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
+				}
 
-						if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
-							const atkUser = await db.player.find(newPlanet.owner);
+				haveToDone++;
 
-							const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
-							const defUser = await db.player.find(defPlanet.owner);
+				const newFleet = {
+					id: FleetList[id].id,
+					endMoveTime: FleetList[id].endMoveTime,
+					fuel: FleetList[id].fuel,
+				};
 
-							Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
-							continue;
-						}
-
-						Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
+				db.fleet.update(newFleet, function() {
+					++done;
+					if(done === haveToDone) {
+						Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 					}
+				});
+			}
 
-					haveToDone++;
-
-					const newFleet = {
-						id: FleetList[id].id,
-						endMoveTime: FleetList[id].endMoveTime,
-						fuel: FleetList[id].fuel,
-					};
-
-					db.fleet.update(newFleet, function() {
-						++done;
-						if(done === haveToDone) {
-							Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
-						}
-					});
-				}
-
-				if(haveToDone === 0) {
-					Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
-				}
-			});
+			if(haveToDone === 0) {
+				Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
+			}
 		});
 	}
 

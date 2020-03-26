@@ -73,15 +73,14 @@ module.exports = class Tactics {
 		return true;
 	}
 
-	static checkFleetUsage(tid, user, callback) {
-		db.fleet.findByTactic(tid, (list) => {
-			if(list.length === 0) {
-				callback();
-			} else {
-				log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
-			}
-		});
+	static async checkFleetUsage(tid, user, callback) {
+		const list = await db.fleet.findByTactic(tid);
+		if(list.length === 0) {
+			callback();
+		} else {
+			log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
+			Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
+		}
 	}
 
 	static create(user, tactic) {

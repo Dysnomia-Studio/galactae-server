@@ -41,25 +41,19 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findAllFleetReferingToPosition: (address,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findAllFleetReferingToPosition: async(address,callback) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findByTactic: (tid,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByTactic: async(tid,callback) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);

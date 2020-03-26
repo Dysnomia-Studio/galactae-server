@@ -660,7 +660,7 @@ describe('• Combat', () => {
 
 
 		global.db.fleet.findByPosition = (pid, callback) => {
-			callback(globalFleetList);
+			return globalFleetList;
 		};
 
 		it('No defending units', (done) => {
