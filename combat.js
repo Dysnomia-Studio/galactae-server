@@ -637,9 +637,16 @@ module.exports = class Combat {
 
 			if(fleetList[i].orbitPosition === 0) {
 				battle.joinTeam('def', fleetList[i]);
-			} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUser.id) {
-				// @TODO: Add ally check
-				battle.joinTeam('atk', fleetList[i]);
+			} else if(fleetList[i].orbitPosition === 1) {
+				let ok = true;
+				if(fleetList[i].ownerId !== atkUser.id) {
+					const fleetPlayer = await db.player.find(fleetList[i].ownerId);
+					ok = (atkUser.ally === fleetPlayer.ally);
+				}
+
+				if(ok) {
+					battle.joinTeam('atk', fleetList[i]);
+				}
 			}
 		}
 
