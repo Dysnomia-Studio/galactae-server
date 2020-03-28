@@ -43,7 +43,13 @@ module.exports = {
 	},
 	findAllFleetReferingToPosition: async(address,callback) => {
 		try {
-			return (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
+			const fleetList = (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
+
+			for(const fleet of fleetList) {
+				fleet.owner = await db.player.find(fleet.ownerId);
+			}
+
+			return fleetList;
 		} catch(err) {
 			log(err, 'error');
 		}

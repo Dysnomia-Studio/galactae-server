@@ -238,7 +238,7 @@
 		 * @param      {<type>}  fleetList  Old fleet list
 		 * @return     {<type>}  [New planet data, New fleet list]
 		 */
-		static distributeFuel(planet, fleetList) {
+		static distributeFuel(planet, fleetList, user) {
 			let planetFleets = [];
 			let ownerFleets = [];
 			let allyFleets = [];
@@ -255,9 +255,9 @@
 						planetFleets.push(fleetList[i].id);
 					} else if(fleetList[i].ownerId === planet.owner) {
 						ownerFleets.push(fleetList[i].id);
+					} else if(fleetList[i].owner.ally === user.ally) {
+						allyFleets.push(fleetList[i].id);
 					}
-
-					// @TODO: ally check
 				}
 			}
 

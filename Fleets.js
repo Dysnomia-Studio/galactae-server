@@ -145,20 +145,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				return;
 			}
 
-			let newPlanet, empty;
-			[newPlanet, fleetList, empty] = Fleets.distributeFuel(planetData, fleetList.slice(0));
+			const userData = await db.player.find(planetData.owner);
 
-			if(empty) {
-				callback(fleetList, planetData);
-				return;
-			}
+			let newPlanet;
+			[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
 
-			// Current in-orbit fleets
-			const FleetList = await db.fleet.findByPosition(fleetList[0].motherPlanetId);
-
-			// @TODO: Same owner, same ally, trade
-
-			callback(fleetList, newPlanet);
+			callback(fleetList, planetData);
 		});
 	}
 
