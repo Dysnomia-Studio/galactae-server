@@ -49,7 +49,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		const originalFList = await db.fleet.findAllFleetReferingToPosition(address);
+		let originalFList = await db.fleet.findAllFleetReferingToPosition(address);
 
 		if(!originalFList) {
 			originalFList = [];
