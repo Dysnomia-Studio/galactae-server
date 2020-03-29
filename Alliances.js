@@ -125,7 +125,10 @@ module.exports = class Alliances {
 		});
 
 		if(!allyId) {
-			// @TODO: error message
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_CREATE_ERROR'
+			});
 			return;
 		}
 
@@ -155,6 +158,10 @@ module.exports = class Alliances {
 		const alliance = await db.alliance.findByName(allyName);
 
 		if(!alliance) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_DOES_NOT_EXISTS'
+			});
 			return;
 		}
 
@@ -370,6 +377,10 @@ module.exports = class Alliances {
 		const alliance = await db.alliance.findByName(otherAllyName);
 
 		if(!alliance) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_DOES_NOT_EXISTS'
+			});
 			return;
 		}
 
