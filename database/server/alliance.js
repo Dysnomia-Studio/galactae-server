@@ -148,6 +148,9 @@ module.exports = {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE alliance = $1', [allyId])).rows;
 		} catch(err) {
+			if(err.includes('alliances_invitations_player_fkey')) {
+				return;
+			}
 			log(err, 'error');
 		}
 	},
