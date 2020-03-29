@@ -322,6 +322,19 @@ module.exports = class Combat {
 				missChance += researchBonus['prop_advManoeuvre'];
 			}
 		}
+
+		for(let i=0; i<this.unitCache[target.unit].parts.length; i++) {
+			if(this.unitCache[target.unit].parts[i].tech === 'none' || this.unitCache[target.unit].parts[i].tech === 'noPartResearched') { continue; }
+
+			switch(this.unitCache[target.unit].parts[i].type) {
+				case 'hangar':
+					missChance += hangarMiss[this.unitCache[target.unit].parts[i].tech];
+					break;
+				default:
+					// Do nothing
+			}
+		}
+
 		const [damage, logs] = this.simulateDamage(currUnitId, target.unit, missChance);
 
 		// @TODO: apply research bonuses
@@ -606,34 +619,40 @@ module.exports = class Combat {
 		}
 	}
 
-	static beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
+	static async beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
 		log('Begin of fight simulation - Planet: ' + defPlanet.address, 'info');
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
 		const currTime = Date.now();
 
-		db.fleet.findByPosition(defPlanet.address, (fleetList) => {
-			const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
+		const fleetList = await db.fleet.findByPosition(defPlanet.address);
+		const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
 
-			// Add all fleets to fight
-			for(const i in fleetList) {
-				if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
-					continue;
+		// Add all fleets to fight
+		for(const i in fleetList) {
+			if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
+				continue;
+			}
+
+			if(fleetList[i].orbitPosition === 0) {
+				battle.joinTeam('def', fleetList[i]);
+			} else if(fleetList[i].orbitPosition === 1) {
+				let ok = true;
+				if(fleetList[i].ownerId !== atkUser.id) {
+					const fleetPlayer = await db.player.find(fleetList[i].ownerId);
+					ok = (atkUser.ally === fleetPlayer.ally);
 				}
 
-				if(fleetList[i].orbitPosition === 0) {
-					battle.joinTeam('def', fleetList[i]);
-				} else if(fleetList[i].orbitPosition === 1 && fleetList[i].ownerId === atkUser.id) {
-					// @TODO: Add ally check
+				if(ok) {
 					battle.joinTeam('atk', fleetList[i]);
 				}
 			}
+		}
 
-			preventRestarts++;
+		preventRestarts++;
 
-			battle.fight();
-		});
+		battle.fight();
 	}
 
 	static async getAttacksAgainstPlayer(plyId, plySid) {

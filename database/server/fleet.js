@@ -1,84 +1,65 @@
 module.exports = {
-	find: (id,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE id=$1',[id], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+	find: async(id) => {
+		try {
+			const dbObj = await serverClient.query('SELECT * FROM fleets WHERE id=$1',[id]);
 
-			if(callback) {
-				const fleet = obj.rows[0];
+			const fleet = obj.rows[0];
 
-				if(isset(fleet, 'object')) {
-					fleet.fuel = parseInt(fleet.fuel);
-					fleet.maxFuel = parseInt(fleet.maxFuel);
+			if(isset(fleet, 'object')) {
+				fleet.fuel = parseInt(fleet.fuel);
+				fleet.maxFuel = parseInt(fleet.maxFuel);
 
-					if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
-						log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');
-						return;
-					}
+				if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
+					log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');
+					return;
 				}
-
-				callback(fleet);
 			}
-		});
+
+			return fleet;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findAll: async(callback) => {
+	findAll: async() => {
 		try {
 			return (await serverClient.query('SELECT * FROM fleets')).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	findByOwner: (id,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE "ownerId"=$1', [id], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByMotherPlanet: async(planetId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findByMotherPlanet: (planetId,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByPosition: async(address) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE position=$1', [address])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findByPosition: (address,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE position=$1', [address], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
+	findAllFleetReferingToPosition: async(address,callback) => {
+		try {
+			const fleetList = (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
+
+			for(const fleet of fleetList) {
+				fleet.owner = await db.player.find(fleet.ownerId);
 			}
 
-			callback(obj.rows);
-		});
+			return fleetList;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	findAllFleetReferingToPosition: (address,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
-	},
-	findByTactic: (tid,callback) => {
-		serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByTactic: async(tid,callback) => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);

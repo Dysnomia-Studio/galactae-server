@@ -5,15 +5,8 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: (callback) => {
-		global.generalPool = new Pool({
-			user: '***REMOVED***',
-			host: '***REMOVED***',
-			database: 'galactae',
-			password: '***REMOVED***',
-			port: 5432,
-		});
-
-		global.serverPool = new Pool(globalCfg.db);
+		global.generalPool = new Pool(globalCfg.generalDb);
+		global.serverPool = new Pool(globalCfg.serverDb);
 
 		/**
 		 * Events
@@ -90,6 +83,7 @@ module.exports = {
 	/**
 	 * Game Server queries
 	 */
+	alliance: require('./database/server/alliance'),
 	battleLog: require('./database/server/battleLog'),
 	battleLogAccess: require('./database/server/battleLogAccess'),
 	fleet: require('./database/server/fleet'),
