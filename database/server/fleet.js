@@ -3,7 +3,7 @@ module.exports = {
 		try {
 			const dbObj = await serverClient.query('SELECT * FROM fleets WHERE id=$1',[id]);
 
-			const fleet = obj.rows[0];
+			const fleet = dbObj.rows[0];
 
 			if(isset(fleet, 'object')) {
 				fleet.fuel = parseInt(fleet.fuel);
