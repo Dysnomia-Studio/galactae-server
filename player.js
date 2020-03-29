@@ -1,13 +1,16 @@
 module.exports = class Player {
 	/* Is Valid ? */
 	static isValid(user,callback) {
-		db.player.searchBySid(user.sid, (playerData) => {
+		db.player.searchBySid(user.sid, async(playerData) => {
 			if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
 				if(Player.canAct(playerData)) { // Don't spam
-					callback(playerData);
 
-					playerData.lastAction = new Date();
-					db.player.update(playerData);
+					await db.player.update({
+						id: playerData.id,
+						lastAction: new Date(),
+					});
+
+					callback(playerData);
 				}
 			} else {
 				// Kick that Hacker ...
