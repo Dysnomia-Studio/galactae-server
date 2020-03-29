@@ -255,7 +255,7 @@
 						planetFleets.push(fleetList[i].id);
 					} else if(fleetList[i].ownerId === planet.owner) {
 						ownerFleets.push(fleetList[i].id);
-					} else if(fleetList[i].owner.ally === user.ally) {
+					} else if(fleetList[i].owner.ally !== null && fleetList[i].owner.ally === user.ally) {
 						allyFleets.push(fleetList[i].id);
 					}
 				}
