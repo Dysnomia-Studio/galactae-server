@@ -41,6 +41,8 @@ module.exports = function() {
 	this.electricity = [2080000,165000,550000];
 	this.habGen = [25447,419910,-170000];
 
+	this.buildingSlowDown = 0.7; // 70%
+
 	this.buildLvlUnitBuildingSpeedBonus = 0.004;
 
 	/**

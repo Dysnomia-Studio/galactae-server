@@ -48,31 +48,41 @@
 			const [ mineralStorageBase, metalsStorageBase, storageHelium ] = Buildings.calcStorageCapacity(buildings[5], buildings[10], Research.isSearched(user, 'cp_molecular_compression'));
 
 			//Minerals
-			if(currentBuilding !== 0) {
+			if(currentBuilding === 0) {
+				resources[0] += mineralProdBase*time*buildingSlowDown;
+			} else {
 				resources[0] += mineralProdBase*time;
 			}
 
 			//Helium 3
-			if(buildings[13] !== 0 && currentBuilding !== 13) {
-				resources[1] += heliumProdBase*time;
+			if(buildings[13] !== 0) {
+				if(currentBuilding === 13) {
+					resources[1] += heliumProdBase*time*buildingSlowDown;
+				} else {
+					resources[1] += heliumProdBase*time;
+				}
 			}
 
 			//Metals
-			if(currentBuilding !== 1) {
-				if(resources[0]-(metalProdBase*time) > 0) { //Verify if you can use basic ressources
-					for(let i=2; i<6; i++) {
-						resources[i] += (metalProdBase*time)*ratios[i-2];
-					}
-
-					resources[0] -= (metalProdBase*time); //Consomation Algorithm
-				} else { // Do the max we can
-					for(let i=2; i<6; i++) {
-						resources[i] += resources[0]*ratios[i-2];
-					}
-
-					resources[0] = 0;
-				}
+			let metalSlowDown = 1;
+			if(currentBuilding === 1) {
+				metalSlowDown = buildingSlowDown;
 			}
+
+			if(resources[0]-(metalProdBase * time * metalSlowDown) > 0) { //Verify if you can use basic ressources
+				for(let i=2; i<6; i++) {
+					resources[i] += (metalProdBase * time * metalSlowDown)*ratios[i-2];
+				}
+
+				resources[0] -= (metalProdBase * time * metalSlowDown); //Consomation Algorithm
+			} else { // Do the max we can
+				for(let i=2; i<6; i++) {
+					resources[i] += resources[0]*ratios[i-2];
+				}
+
+				resources[0] = 0;
+			}
+
 
 			// Si Max de tout les metaux
 			if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
