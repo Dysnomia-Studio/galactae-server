@@ -78,7 +78,15 @@ describe('• Resources (shared)', () => {
 
 		it('Minerals building, no resources, planet lvl 1, 1h, no research', () => {
 			const resources = Resources.CalcNewResources([0,0,0,0,0,0], [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], 0, TIME.HOUR_TO_MS, { research: {} }, 0);
-			const expected = [0,266,0,0,0,0];
+			const mineralProd = 147 *  buildingSlowDown;
+			const expected = [
+				0,
+				266,
+				mineralProd * 0.35,
+				mineralProd * 0.5,
+				mineralProd * 0.04,
+				mineralProd * 0.1
+			];
 
 			for(let i=0; i<expected.length; i++) {
 				assert.equal(
@@ -91,7 +99,15 @@ describe('• Resources (shared)', () => {
 
 		it('Metal building, no resources, planet lvl 1, 1h, no research', () => {
 			const resources = Resources.CalcNewResources([0,0,0,0,0,0], [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], 0, TIME.HOUR_TO_MS, { research: {} }, 1);
-			const expected = [147,266,0,0,0,0];
+			const metalProd = 138 *  buildingSlowDown;
+			const expected = [
+				147 - metalProd,
+				266,
+				metalProd * 0.35,
+				metalProd * 0.5,
+				metalProd * 0.04,
+				metalProd * 0.1
+			];
 
 			for(let i=0; i<expected.length; i++) {
 				assert.equal(
@@ -102,9 +118,9 @@ describe('• Resources (shared)', () => {
 			}
 		});
 
-		it('No currently building, no resources, planet lvl 1, 1h, no research', () => {
+		it('Helium building, no resources, planet lvl 1, 1h, no research', () => {
 			const resources = Resources.CalcNewResources([0,0,0,0,0,0], [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], 0, TIME.HOUR_TO_MS, { research: {} }, 13);
-			const expected = [9,0,48,68,5,13];
+			const expected = [9,266 * buildingSlowDown,48,68,5,13];
 
 			for(let i=0; i<expected.length; i++) {
 				assert.equal(
