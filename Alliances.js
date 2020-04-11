@@ -223,7 +223,8 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(allyId);
 
-		Alliances.sendToPlayer(currPlayer);
+		const targetPlayer = await db.player.findByName(invitedPlayerName);
+		Alliances.sendToPlayer(targetPlayer);
 
 		// @TODO: notify player
 	}
