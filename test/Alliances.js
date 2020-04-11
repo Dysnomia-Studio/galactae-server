@@ -284,30 +284,38 @@ describe('• Alliances', () => {
 	});
 
 	describe('# create()', () => {
+		const createAllianceData = {
+			id: 'MyId',
+			name: 'name',
+			description: 'description',
+			members: [
+				{ name: 'Elanis', founder: true, leader: false, diplomacy: false },
+				{ name: 'Foo', founder: false, leader: false, diplomacy: false },
+				{ name: 'Bar', founder: false, leader: true, diplomacy: false },
+			],
+			pacts: [
+				{ first: 'MyId', second: 'ally2', accepted: true },
+				{ first: 'MyId', second: 'ally3', accepted: false },
+			],
+			askToJoin: [],
+			invitations: [],
+		};
+
+		const createUserData = {
+			id: 'PlyId',
+			name: 'PlyName',
+			sid: 'sid',
+			ally: null,
+		};
+
+
 		it('ally = null', () => {
 			let steps = 0;
 
-			const allianceData = {
-				id: 'MyId',
-				name: 'name',
-				description: 'description',
-				members: [
-					{ name: 'Elanis', founder: true, leader: false, diplomacy: false },
-					{ name: 'Foo', founder: false, leader: false, diplomacy: false },
-					{ name: 'Bar', founder: false, leader: true, diplomacy: false },
-				],
-				pacts: [
-					{ first: 'MyId', second: 'ally2', accepted: true },
-					{ first: 'MyId', second: 'ally3', accepted: false },
-				],
-				askToJoin: [],
-				invitations: [],
-			};
-
-			db.alliance.getMembers = (allyId) => allianceData.members;
-			db.alliance.getPacts = (allyId) => allianceData.pacts;
-			db.alliance.getAskToJoin = (allyId) => allianceData.askToJoin;
-			db.alliance.getInvitations = (allyId) => allianceData.invitations;
+			db.alliance.getMembers = (allyId) => createAllianceData.members;
+			db.alliance.getPacts = (allyId) => createAllianceData.pacts;
+			db.alliance.getAskToJoin = (allyId) => createAllianceData.askToJoin;
+			db.alliance.getInvitations = (allyId) => createAllianceData.invitations;
 			db.alliance.setPermissions = () => {};
 
 			const userData = {
@@ -320,17 +328,17 @@ describe('• Alliances', () => {
 			db.alliance.createPermissions = () => { steps++; };
 
 			db.alliance.create = (obj) => {
-				assert.equal(obj.name, allianceData.name);
-				assert.equal(obj.description, allianceData.description);
+				assert.equal(obj.name, createAllianceData.name);
+				assert.equal(obj.description, createAllianceData.description);
 
 				steps++;
 
-				return allianceData.id;
+				return createAllianceData.id;
 			};
 
 			db.player.updateAlly = (user) => {
-				assert.equal(user.id, userData.id);
-				assert.equal(user.ally, allianceData.id);
+				assert.equal(user.id, createUserData.id);
+				assert.equal(user.ally, createAllianceData.id);
 
 				steps++;
 			};
@@ -340,14 +348,14 @@ describe('• Alliances', () => {
 				return {
 					emit: (event, content) => {
 						if(event === 'player-alliance-data') {
-							assert.deepEqual(content, allianceData);
+							assert.deepEqual(content, createAllianceData);
 							assert.equal(steps, 3);
 						}
 					},
 				};
 			};
 
-			Alliances.create(userData.sid, userData, allianceData.name, allianceData.description);
+			Alliances.create(createUserData.sid, createUserData, createAllianceData.name, createAllianceData.description);
 		});
 
 		it('ally != null', () => {
@@ -362,6 +370,26 @@ describe('• Alliances', () => {
 			};
 
 			Alliances.create('sid', { ally: 'foo' }, 'name', 'description');
+		});
+
+		it('no ally id', () => {
+			createUserData.ally = null;
+
+			db.alliance.create = (text) => {
+				return;
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.create(createUserData.sid, createUserData, createAllianceData.name, createAllianceData.description);
 		});
 	});
 
@@ -414,6 +442,32 @@ describe('• Alliances', () => {
 			};
 
 			Alliances.askToJoin({ name: 'bar', ally: 'foo' }, playerId, 'allyName');
+		});
+
+		it('ally does not exists', () => {
+			const playerId = 'plyId';
+			const alliance = {
+				id: 'allyId',
+				name: 'allyName',
+			};
+
+			db.alliance.findByName = () => { return; };
+
+			db.alliance.askToJoin = (plyId, allyId) => {
+				assert(false);
+			};
+
+			io.to = (sid) => {
+				return {
+					emit: (event, content) => {
+						if(event === 'player-alliance-data') {
+							assert(false);
+						}
+					},
+				};
+			};
+
+			Alliances.askToJoin({ name: 'bar', ally: null }, playerId, alliance.name);
 		});
 	});
 

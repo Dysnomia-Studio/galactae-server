@@ -38,7 +38,10 @@ module.exports = function() {
 				text = redText('WARNING: ') + yellowText(text);
 				break;
 			case 'error':
-				console.trace(redText('ERROR: ') + redText(text));
+				console.log(redText('ERROR: ') + redText(text));
+				if(msg.stack) {
+					console.log(redText(msg.stack));
+				}
 				return;
 			case 'fail':
 				text = yellowText(text);

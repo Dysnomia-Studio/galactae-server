@@ -5,15 +5,8 @@ module.exports = {
 	 * Used to connect to database
 	 */
 	connect: (callback) => {
-		global.generalPool = new Pool({
-			user: '***REMOVED***',
-			host: '***REMOVED***',
-			database: 'galactae',
-			password: '***REMOVED***',
-			port: 5432,
-		});
-
-		global.serverPool = new Pool(globalCfg.db);
+		global.generalPool = new Pool(globalCfg.generalDb);
+		global.serverPool = new Pool(globalCfg.serverDb);
 
 		/**
 		 * Events
