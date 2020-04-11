@@ -49,27 +49,25 @@ module.exports = class Websocket {
 	/**
 	 * Begins a server maintenance
 	 */
-	static beginMaintenance() {
+	static async beginMaintenance() {
 		io.emit('server-maintenance');
 		Websocket.SendGeneralMessage('MAINTENANCE');
 		maintenance = true;
 
-		db.server.find(function(server) {
-			server.server_maintenance = true;
-			db.server.update(server);
-		});
+		const server = await db.server.find();
+		server.server_maintenance = true;
+		db.server.update(server);
 	}
 	/**
 	 * Ends a server maintenance
 	 */
-	static endMaintenance() {
+	static async endMaintenance() {
 		io.emit('server-maintenance-off');
 		maintenance = false;
 
-		db.server.find(function(server) {
-			server.server_maintenance = false;
-			db.server.update(server);
-		});
+		const server = await db.server.find();
+		server.server_maintenance = false;
+		db.server.update(server);
 	}
 
 	/**
