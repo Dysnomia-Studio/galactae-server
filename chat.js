@@ -191,7 +191,7 @@ module.exports = class Chat {
 					return data;
 				}
 
-				Chat.searchTarget(data, args[1], (target) => {
+				Chat.searchTarget(data, args[1], async(target) => {
 					const banMessage = args.splice(3,args.length).join(' ');
 					const banTime = parseChatTime(args[2]);
 					if(banTime < 1) {
@@ -203,7 +203,7 @@ module.exports = class Chat {
 					log('Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
 					Chat.sendSM(data.sid,'Banned ' + banTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + banMessage);
 
-					db.ban.create({
+					await db.ban.create({
 						user_id: target.id,
 						server_name: globalCfg.serverGlobalName,
 						ban_type: 2,
@@ -216,7 +216,7 @@ module.exports = class Chat {
 					io.to('' + target.sid).emit('server-kick', banMessage);
 
 					target.sid = -1;
-					db.player.update(target);
+					await db.player.update(target);
 				});
 				break;
 			case '!mute':
@@ -224,7 +224,7 @@ module.exports = class Chat {
 					return data;
 				}
 
-				Chat.searchTarget(data, args[1], (target) => {
+				Chat.searchTarget(data, args[1], async(target) => {
 					const muteMessage = args.splice(3,args.length).join(' ');
 					const muteTime = parseChatTime(args[2]);
 					if(muteTime < 1) {
@@ -236,7 +236,7 @@ module.exports = class Chat {
 					log('Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
 					Chat.sendSM(data.sid,'Muted ' + muteTime/TIME.SECONDS_TO_MS + ' seconds (' + args[2] + ') ' + target.name + ' for reason: ' + muteMessage);
 
-					db.ban.create({
+					await db.ban.create({
 						user_id: target.id,
 						server_name: globalCfg['serverGlobalName'],
 						ban_type: 1,
