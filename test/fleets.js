@@ -242,7 +242,7 @@ describe('• Fleets', () => {
 				ownerId: 'ownerId',
 			};
 
-			db.fleet.find = (id, callback) => {
+			db.fleet.find = (id) => {
 				return dbValue;
 			};
 
@@ -270,7 +270,7 @@ describe('• Fleets', () => {
 				ownerId: 'ownerId',
 			};
 
-			db.fleet.find = (id, callback) => {
+			db.fleet.find = (id) => {
 				return dbValue;
 			};
 
@@ -298,7 +298,7 @@ describe('• Fleets', () => {
 				ownerId: 'ownerId',
 			};
 
-			db.fleet.find = (id, callback) => {
+			db.fleet.find = (id) => {
 				return dbValue;
 			};
 

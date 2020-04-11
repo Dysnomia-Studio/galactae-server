@@ -73,7 +73,7 @@ module.exports = class Websocket {
 	/**
 	 * Restart server
 	 */
-	static restart(callback) {
+	static restart() {
 		preventConnection = true;
 		preventConnectionMsg = 'RESTARTING_SERVER';
 		io.emit('server-reboot');

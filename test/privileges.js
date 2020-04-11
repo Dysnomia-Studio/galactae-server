@@ -7,7 +7,7 @@ describe('• Privileges', () => {
 			{ user_id: 'u4', ban_end: new Date(Date.now() + 100000) },
 		];
 
-		db.ban.find = async(userId, type, callback) => {
+		db.ban.find = async(userId, type) => {
 			return bans.filter((b) => b.user_id === userId);
 		};
 
