@@ -41,50 +41,41 @@ module.exports = class Player {
 	}
 
 	/* Connect Player */
-	static connect(data) {
-		db.userGameId.find(data.id, async function(userGameIdObj) {
-			if(!isset(userGameIdObj, 'object') || !isset(userGameIdObj.game_id, 'string') || !isset(userGameIdObj.user_id, 'string')) {
-				log('Error: Invalid user');
-				// Kick that Hacker ...
-				io.to(data.sid).emit('server-kick','INVALID_SESSION');
-				return;
-			}
+	static async connect(data) {
+		const userGameIdObj = await db.userGameId.find(data.id);
 
-			data.game_id = userGameIdObj.game_id;
-			data.user_id = userGameIdObj.user_id;
+		if(!isset(userGameIdObj, 'object') || !isset(userGameIdObj.game_id, 'string') || !isset(userGameIdObj.user_id, 'string')) {
+			log('Error: Invalid user');
+			// Kick that Hacker ...
+			io.to(data.sid).emit('server-kick','INVALID_SESSION');
+			return;
+		}
 
-			const banObj = await db.ban.find(data.game_id, 2);
-			if(isset(banObj, 'object')) {
-				const now = Date.now();
-				for(let i=0; i<banObj.length; i++) {
-					if(banObj[i].ban_end.getTime() > now) {
-						log('Error: ' + data.username + ' is banned.');
-						io.to(data.sid).emit('server-kick','ERR_BANNED');
-						return;
-					}
+		data.game_id = userGameIdObj.game_id;
+		data.user_id = userGameIdObj.user_id;
+
+		const banObj = await db.ban.find(data.game_id, 2);
+		if(isset(banObj, 'object')) {
+			const now = Date.now();
+			for(let i=0; i<banObj.length; i++) {
+				if(banObj[i].ban_end.getTime() > now) {
+					log('Error: ' + data.username + ' is banned.');
+					io.to(data.sid).emit('server-kick','ERR_BANNED');
+					return;
 				}
 			}
+		}
 
-			if(maintenance) { // Check whitelist
-				db.privilege.find(data.user_id, function(userPrivileges) {
-					if(!isset(userPrivileges, 'array') || !isset(userPrivileges[0], 'object') ||
-						!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
+		if(maintenance) { // Check whitelist
+			db.privilege.find(data.user_id, function(userPrivileges) {
+				if(!isset(userPrivileges, 'array') || !isset(userPrivileges[0], 'object') ||
+					!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
 
-						log('Error: ' + data.username + ' isn\'t whitelisted.');
-						io.to(data.sid).emit('server-kick','ERR_WHITELIST');
-						return;
-					}
+					log('Error: ' + data.username + ' isn\'t whitelisted.');
+					io.to(data.sid).emit('server-kick','ERR_WHITELIST');
+					return;
+				}
 
-					db.player.searchByName(data.username,function(dataReturned) {
-						if(!isset(dataReturned, 'object')) {
-							console.error('User: ' + data.username + ' not found !');
-							return;
-						}
-
-						Player.traitementsConnexion(data, dataReturned);
-					});
-				}); // Privileges db query
-			} else { // Normal behavior
 				db.player.searchByName(data.username,function(dataReturned) {
 					if(!isset(dataReturned, 'object')) {
 						console.error('User: ' + data.username + ' not found !');
@@ -93,8 +84,17 @@ module.exports = class Player {
 
 					Player.traitementsConnexion(data, dataReturned);
 				});
-			}
-		}); // Gamedata db query
+			}); // Privileges db query
+		} else { // Normal behavior
+			db.player.searchByName(data.username,function(dataReturned) {
+				if(!isset(dataReturned, 'object')) {
+					console.error('User: ' + data.username + ' not found !');
+					return;
+				}
+
+				Player.traitementsConnexion(data, dataReturned);
+			});
+		}
 	}
 
 	static async traitementsConnexion(data, playerData) {
