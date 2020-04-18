@@ -12,6 +12,7 @@ require('../misc')();
 global.Alliances    = require('../Alliances');
 global.Buildings    		= require('../Buildings');
 global.Combat 				= require('../combat');
+global.Conquest 			= require('../Conquest');
 global.Chat 				= require('../chat');
 global.DependencyEngine   	= require('../DependencyEngine');
 global.Discord   			= require('../discord');
