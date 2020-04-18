@@ -102,6 +102,7 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	static sendResearchDataToUser(data, planet, user) {
 		io.to(data.sid).emit('player-recieve-data', {
 			research: user.research,
+			points: user.points,
 		});
 	}
 };

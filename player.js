@@ -146,6 +146,7 @@ module.exports = class Player {
 		io.to(data.sid).emit('player-recieve-data',{
 			planetlist: playerData.planetlist,
 			money: playerData.money,
+			points: playerData.points,
 			gvt: playerData.gvt,
 			tutorials: playerData.tutorials,
 		});
@@ -360,6 +361,7 @@ module.exports = class Player {
 			db.player.update(newPlayerData);
 			io.to(inputData.sid).emit('player-recieve-data',{
 				money: newPlayerData.money,
+				points: newPlayerData.points,
 			});
 		}
 	}
