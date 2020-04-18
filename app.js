@@ -51,7 +51,7 @@ global.Websocket  = require('./socket');
 /**
  * Launch server !
  */
-db.connect(function(success,general=false) {
+db.connect(async function(success,general=false) {
 	if(!success) {
 		log('Failed to connect to db ! Blocking user connections ...','warn');
 		preventConnection = true;
@@ -63,13 +63,12 @@ db.connect(function(success,general=false) {
 	}
 
 	if(general) {
-		db.server.find(function(server) {
-			maintenance = server.server_maintenance;
+		const server = await db.server.find();
+		maintenance = server.server_maintenance;
 
-			if(maintenance) {
-				log('Server maintenance enabled by database configuration', 'warn');
-			}
-		});
+		if(maintenance) {
+			log('Server maintenance enabled by database configuration', 'warn');
+		}
 	}
 
 	if(!general) {
