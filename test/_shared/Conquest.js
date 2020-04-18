@@ -20,31 +20,31 @@ describe('• Conquest (shared)', () => {
 		it('points = 1000, count = 1', () => {
 			assert.equal(
 				Conquest.getPlanetMaxCount(1000),
-				1
+				2
 			);
 		});
 		it('points = 5000, count = 1', () => {
 			assert.equal(
 				Conquest.getPlanetMaxCount(5000),
-				3
+				4
 			);
 		});
 		it('points = 10000, count = 1', () => {
 			assert.equal(
 				Conquest.getPlanetMaxCount(10000),
-				7
+				8
 			);
 		});
 		it('points = 100000, count = 1', () => {
 			assert.equal(
 				Conquest.getPlanetMaxCount(100000),
-				69
+				70
 			);
 		});
 		it('points = 500000, count = 1', () => {
 			assert.equal(
 				Conquest.getPlanetMaxCount(500000),
-				260
+				261
 			);
 		});
 	});
