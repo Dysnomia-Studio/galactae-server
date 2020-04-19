@@ -659,7 +659,7 @@ describe('• Combat', () => {
 		}; // Real log content
 
 
-		global.db.fleet.findByPosition = (pid, callback) => {
+		global.db.fleet.findByPosition = (pid) => {
 			return globalFleetList;
 		};
 

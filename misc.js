@@ -63,35 +63,35 @@ const charList = [
 ];
 
 const smileys = [
-	[':D','😃'],
-	[':-D','😃'],
+	[' :D ',' 😃 '],
+	[' :-D ',' 😃 '],
 
-	['xD','😆'],
-	['XD','😆'],
-	['xd','😆'],
-	['Xd','😆'],
+	[' xD ',' 😆 '],
+	[' XD ',' 😆 '],
+	[' xd ',' 😆 '],
+	[' Xd ',' 😆 '],
 
-	['X(','😣'],
-	['x(','😣'],
+	[' X( ',' 😣 '],
+	[' x( ',' 😣 '],
 
-	['XP','😝'],
-	['Xp','😝'],
-	['xP','😝'],
-	['xp','😝'],
+	[' XP ',' 😝 '],
+	[' Xp ',' 😝 '],
+	[' xP ',' 😝 '],
+	[' xp ',' 😝 '],
 
-	[':p','😛'],
-	[':P','😛'],
+	[' :p ',' 😛 '],
+	[' :P ',' 😛 '],
 
-	[';)','😉'],
-	[';D','😉'],
+	[' ;) ',' 😉 '],
+	[' ;D ',' 😉 '],
 
-	[':)','🙂'],
+	[' :) ',' 🙂 '],
 
-	[':(','🙁'],
+	[' :( ',' 🙁 '],
 
-	['^^','😄'],
+	[' ^^ ',' 😄 '],
 
-	['<3','😍'],
+	[' <3 ',' 😍 '],
 ];
 
 module.exports = function() {
@@ -215,11 +215,13 @@ module.exports = function() {
 	 * @return	 {string}  parsed text
 	 */
 	this.textToSmileys = function(str) {
+		str = ' ' + str + ' ';
+
 		for(let i=0; i<smileys.length; i++) {
 			str = str.split(smileys[i][0]).join(smileys[i][1]);
 		}
 
-		return str;
+		return str.trim();
 	};
 
 	this.filterUnwantedChars = function(str) {

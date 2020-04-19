@@ -213,6 +213,18 @@ describe('• misc', () => {
 				': test )'
 			);
 		});
+		it('"explanation" => "explanation"', () => {
+			assert.equal(
+				textToSmileys('explanation'),
+				'explanation'
+			);
+		});
+		it('"explanation" => "explanation"', () => {
+			assert.equal(
+				textToSmileys('explanation :) test'),
+				'explanation 🙂 test'
+			);
+		});
 		it('textToSmileys (text to smiley)', () => {
 			assert.equal(
 				textToSmileys(':D test :)'),

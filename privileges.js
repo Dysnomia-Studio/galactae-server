@@ -1,19 +1,18 @@
 module.exports = class Privileges {
-	static isBannedFromChat(userId, callback) {
-		db.ban.find(userId, 1, (banObj) => {
+	static async isBannedFromChat(userId, callback) {
+		const banObj = await db.ban.find(userId, 1);
 
-			if(isset(banObj, 'array')) {
-				for(let i=0; i < banObj.length; i++) {
+		if(isset(banObj, 'array')) {
+			for(let i=0; i < banObj.length; i++) {
 
-					if(banObj[i].ban_end.getTime() > Date.now()) {
-						callback(true);
-						return;
-					}
+				if(banObj[i].ban_end.getTime() > Date.now()) {
+					callback(true);
+					return;
 				}
 			}
+		}
 
-			callback(false);
-		});
+		callback(false);
 	}
 
 	static getChatRank(lvl) {
