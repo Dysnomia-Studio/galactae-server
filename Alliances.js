@@ -40,6 +40,32 @@ module.exports = class Alliances {
 		io.to(player.sid).emit('player-alliance-data', ally);
 	}
 
+	static async sendNotifToAllianceStaff(allyId, type, args, diplomacy=false) {
+		const members = await db.alliance.getExtendedMemberList(allyId);
+
+		for(const member of members) {
+			if(member.founder || member.leader || (diplomacy && member.diplomacy)) {
+				Websocket.sendNotification(
+					member.sid,
+					type,
+					args
+				);
+			}
+		}
+	}
+
+	static async sendNotifToAllianceMembers(allyId, type, args) {
+		const members = await db.alliance.getExtendedMemberList(allyId);
+
+		for(const member of members) {
+			Websocket.sendNotification(
+				member.sid,
+				type,
+				args
+			);
+		}
+	}
+
 	/**
 	 * Permissions
 	 */
@@ -113,6 +139,10 @@ module.exports = class Alliances {
 
 	static async create(sid, userData, name, description) {
 		if(userData.ally !== null) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_YOU_ALREADY_HAVE'
+			});
 			return;
 		}
 
@@ -152,6 +182,10 @@ module.exports = class Alliances {
 
 	static async askToJoin(userData, playerName, allyName) {
 		if(userData.ally !== null) {
+			Websocket.SendMessageToClient({
+				sid: userData.sid,
+				message: 'ALLIANCE_YOU_ALREADY_HAVE'
+			});
 			return;
 		}
 
@@ -159,7 +193,7 @@ module.exports = class Alliances {
 
 		if(!alliance) {
 			Websocket.SendMessageToClient({
-				sid,
+				sid: userData.sid,
 				message: 'ALLIANCE_DOES_NOT_EXISTS'
 			});
 			return;
@@ -171,15 +205,25 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(alliance.id);
 
-		// @TODO: notify alliance staff
+		Alliances.sendNotifToAllianceStaff(
+			alliance.id,
+			'ally_askToJoin',
+			{ playerName }
+		);
 
 		Alliances.sendToPlayer(userData);
 	}
 
 	static async choiceAskToJoin(currPlayer, playerName, choice) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
+
+		const currAlly = await db.alliance.find(currPlayer.ally);
 
 		if(await db.alliance.hasAskedToJoin(playerName, currPlayer.ally)) {
 			const playerData = await db.player.findByName(playerName);
@@ -188,11 +232,21 @@ module.exports = class Alliances {
 				await Alliances.addPlayerToAlliance(playerData, currPlayer.ally);
 
 				log(playerName + ' was granted to join alliance "' + currPlayer.ally + '" by ' + currPlayer.name + '.');
+
+				Websocket.sendNotification(
+					currPlayer.sid,
+					'ally_accepted',
+					{ name: currAlly.name}
+				);
 			} else {
 				log(playerName + ' wasn\'t granted to join alliance "' + currPlayer.ally + '" by ' + currPlayer.name + '.');
-			}
 
-			// @TODO: notify player
+				Websocket.sendNotification(
+					currPlayer.sid,
+					'ally_refused',
+					{ name: currAlly.name}
+				);
+			}
 
 			await db.alliance.removeJoinAsk(playerName);
 
@@ -214,6 +268,10 @@ module.exports = class Alliances {
 
 	static async invite(currPlayer, invitedPlayerName, allyId) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -226,11 +284,20 @@ module.exports = class Alliances {
 		const targetPlayer = await db.player.findByName(invitedPlayerName);
 		Alliances.sendToPlayer(targetPlayer);
 
-		// @TODO: notify player
+		const currAlly = await db.alliance.find(currPlayer.ally);
+		Websocket.sendNotification(
+			currPlayer.sid,
+			'ally_invited',
+			{ name: currAlly.name}
+		);
 	}
 
 	static async choiceInvite(currPlayer, allyId, choice) {
 		if(currPlayer.ally !== null) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_YOU_ALREADY_HAVE'
+			});
 			return;
 		}
 
@@ -239,15 +306,25 @@ module.exports = class Alliances {
 				await Alliances.addPlayerToAlliance(currPlayer, allyId);
 
 				log(currPlayer.name + ' accepted to join alliance "' + allyId + '.');
+
+				Alliances.sendNotifToAllianceMembers(
+					allyId,
+					'ally_joined',
+					{ playerName: currPlayer.name }
+				);
 			} else {
 				log(currPlayer.name + ' refused to join alliance "' + allyId + '.');
+
+				Alliances.sendNotifToAllianceStaff(
+					allyId,
+					'ally_refuse_join',
+					{ playerName: currPlayer.name }
+				);
 			}
 
 			await db.alliance.removeInvitations(currPlayer.name);
 
 			currPlayer.ally = await db.alliance.find(currPlayer.ally);
-
-			// @TODO: notify alliance members
 		}
 
 		Alliances.reSyncAllAllyMembers(allyId);
@@ -255,6 +332,10 @@ module.exports = class Alliances {
 
 	static async removeInvite(currPlayer, invitedPlayerName, allyId) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -267,12 +348,20 @@ module.exports = class Alliances {
 
 	static async kick(currPlayer, targetPlayerName) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
 		const targetPlayer = await db.player.findByName(targetPlayerName);
 
 		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -282,27 +371,54 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
-		// @TODO: notify alliance members
-		// @TODO: notify player
+		Alliances.sendNotifToAllianceMembers(
+			currPlayer.ally,
+			'ally_member_kicked',
+			{ playerName: targetPlayerName, staffName: currPlayer.name }
+		);
+
+		const currAlly = await db.alliance.find(currPlayer.ally);
+		Websocket.sendNotification(
+			currPlayer.sid,
+			'ally_kicked',
+			{ name: currAlly.name, staffName: currPlayer.name }
+		);
+
 		Alliances.sendToPlayer(currPlayer);
 	}
 
 	static async editPermissions(currPlayer, targetPlayerName, founder, leader, diplomacy) {
 		if((founder + leader + diplomacy) > 1) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_INVALID_PLAYER_PERMISSIONS'
+			});
 			return;
 		}
 
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
 		if((founder || leader) && !(await Alliances.hasFounderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
 		const targetPlayer = await db.player.findByName(targetPlayerName);
 
 		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -323,11 +439,20 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
-		// @TODO: notify player
+		const currAlly = await db.alliance.find(currPlayer.ally);
+		Websocket.sendNotification(
+			currPlayer.sid,
+			'ally_newPerms',
+			{}
+		);
 	}
 
 	static async edit(currPlayer, newName, newDescription) {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -337,11 +462,19 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
-		// @TODO: notify player
+		Alliances.sendNotifToAllianceMembers(
+			currPlayer.ally,
+			'ally_edited',
+			{ playerName: currPlayer.name }
+		);
 	}
 
 	static async leave(currPlayer, plyId) {
 		if(await Alliances.hasFounderPermissions(plyId)) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -353,28 +486,47 @@ module.exports = class Alliances {
 
 		Alliances.reSyncAllAllyMembers(targetPlayer.ally);
 
-		// @TODO: notify player
+		Alliances.sendNotifToAllianceMembers(
+			currPlayer.ally,
+			'ally_member_leaved',
+			{ playerName: currPlayer.name }
+		);
+
 		Alliances.sendToPlayer(currPlayer);
 	}
 
 	static async dissolve(currPlayer, plyId, allyId) {
 		if(!(await Alliances.hasFounderPermissions(plyId))) {
+			Websocket.SendMessageToClient({
+				sid: currPlayer.sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
 		log(allyId + ' was dissolved.');
 
+		await Alliances.sendNotifToAllianceMembers(
+			allyId,
+			'ally_dissolved',
+			{ }
+		);
+
 		db.alliance.delete(allyId);
 
-		// @TODO: notify player
 		Alliances.sendToPlayer(currPlayer);
 	}
 
-	static async askToPact(plyId, allyId, otherAllyName) {
+	static async askToPact(sid, plyId, allyId, otherAllyName) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
+		const currAlly = await db.alliance.find(allyId);
 		const alliance = await db.alliance.findByName(otherAllyName);
 
 		if(!alliance) {
@@ -386,6 +538,10 @@ module.exports = class Alliances {
 		}
 
 		if(allyId === alliance.id) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_ERR_SAME_ALLY'
+			});
 			return;
 		}
 
@@ -396,30 +552,67 @@ module.exports = class Alliances {
 		Alliances.reSyncAllAllyMembers(allyId);
 		Alliances.reSyncAllAllyMembers(alliance.id);
 
-		// @TODO: notify target staff
+		Alliances.sendNotifToAllianceStaff(
+			alliance.id,
+			'ally_askToPact',
+			{ name: currAlly.name }
+		);
 	}
 
-	static async pactChoice(plyId, allyId, otherAllyId, choice) {
+	static async pactChoice(sid, plyId, allyId, otherAllyId, choice) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
+
+		const currAlly = await db.alliance.find(allyId);
+		const otherAlly = await db.alliance.find(otherAllyId);
 
 		if(choice) {
 			await db.alliance.acceptPact(allyId, otherAllyId);
 			log(allyId + ' accepted pact with ' + otherAllyId);
+
+			Alliances.sendNotifToAllianceStaff(
+				currAlly.id,
+				'ally_newPact',
+				{ name: otherAlly.name }
+			);
+
+			Alliances.sendNotifToAllianceStaff(
+				otherAlly.id,
+				'ally_newPact',
+				{ name: currAlly.name }
+			);
 		} else {
 			await db.alliance.removePact(allyId, otherAllyId);
 			log(allyId + ' refused pact with ' + otherAllyId);
+
+			Alliances.sendNotifToAllianceStaff(
+				currAlly.id,
+				'ally_refusedPact',
+				{ name: otherAlly.name }
+			);
+
+			Alliances.sendNotifToAllianceStaff(
+				otherAlly.id,
+				'ally_newPact',
+				{ name: currAlly.name }
+			);
 		}
 
 		Alliances.reSyncAllAllyMembers(allyId);
 		Alliances.reSyncAllAllyMembers(otherAllyId);
-
-		// @TODO: notify both staff
 	}
 
-	static async cancelPactInvitation(plyId, allyId, otherAllyId) {
+	static async cancelPactInvitation(sid, plyId, allyId, otherAllyId) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -431,8 +624,12 @@ module.exports = class Alliances {
 		Alliances.reSyncAllAllyMembers(otherAllyId);
 	}
 
-	static async stopPact(plyId, allyId, otherAllyId) {
+	static async stopPact(sid, plyId, allyId, otherAllyId) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
+			Websocket.SendMessageToClient({
+				sid,
+				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+			});
 			return;
 		}
 
@@ -443,6 +640,20 @@ module.exports = class Alliances {
 		Alliances.reSyncAllAllyMembers(allyId);
 		Alliances.reSyncAllAllyMembers(otherAllyId);
 
-		// @TODO: notify both staff
+		// Notify them
+		const currAlly = await db.alliance.find(allyId);
+		const otherAlly = await db.alliance.find(otherAllyId);
+
+		Alliances.sendNotifToAllianceStaff(
+			currAlly.id,
+			'ally_stopPact',
+			{ name: otherAlly.name, otherStopped: false }
+		);
+
+		Alliances.sendNotifToAllianceStaff(
+			otherAlly.id,
+			'ally_stopPact',
+			{ name: currAlly.name, otherStopped: true }
+		);
 	}
 };
