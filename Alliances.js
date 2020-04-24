@@ -218,7 +218,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -270,7 +270,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -334,7 +334,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -350,7 +350,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -360,7 +360,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -399,7 +399,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -407,7 +407,7 @@ module.exports = class Alliances {
 		if((founder || leader) && !(await Alliances.hasFounderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -417,7 +417,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasEnoughRightsOnTarget(currPlayer.id, targetPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -451,7 +451,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasLeaderPermissions(currPlayer.id))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -473,7 +473,7 @@ module.exports = class Alliances {
 		if(await Alliances.hasFounderPermissions(plyId)) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -499,7 +499,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasFounderPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid: currPlayer.sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -521,7 +521,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -563,7 +563,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -611,7 +611,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
@@ -628,7 +628,7 @@ module.exports = class Alliances {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid,
-				message: 'ALLIANCE_NOT_ENOUGHT_RIGHTS'
+				message: 'ALLIANCE_NOT_ENOUGH_RIGHTS'
 			});
 			return;
 		}
