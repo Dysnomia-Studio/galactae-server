@@ -617,6 +617,11 @@ module.exports = class Combat {
 		for(const ply in this.playerList) {
 			Reports.refresh(ply.id, ply.sid);
 		}
+
+		const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
+		if(Fleets.hasColonyShip(atkFleet, this.unitCache)) {
+			db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
+		}
 	}
 
 	static async beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
