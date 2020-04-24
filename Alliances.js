@@ -443,7 +443,7 @@ module.exports = class Alliances {
 		Websocket.sendNotification(
 			currPlayer.sid,
 			'ally_newPerms',
-			{}
+			{ staffName: currPlayer.name }
 		);
 	}
 
@@ -488,7 +488,7 @@ module.exports = class Alliances {
 
 		Alliances.sendNotifToAllianceMembers(
 			currPlayer.ally,
-			'ally_member_leaved',
+			'ally_member_left',
 			{ playerName: currPlayer.name }
 		);
 
