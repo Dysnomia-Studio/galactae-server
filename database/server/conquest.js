@@ -61,5 +61,16 @@ module.exports = {
 			log(err, 'error');
 			await serverClient.query('ROLLBACK');
 		}
-	}
+	},
+
+	abortAllMilitaryConquest: async (planet) => {
+		try {
+			return (await serverClient.query(
+				'UPDATE public."conquest" SET aborted = true WHERE "planet" = $1',
+				[address] // @TODO: filter by type
+			)).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 };

@@ -539,6 +539,20 @@ module.exports = class Combat {
 		if(defWins) {
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		} else {
+			db.conquest.abortAllMilitaryConquest(this.location);
+
+			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
+			if(Fleets.hasColonyShip(atkFleet, this.unitCache)) {
+				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
+
+				for(const fleet of this.atkFleets) {
+					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
+				}
+			} else {
+				// @TODO: attack fleets should go back to their planet (if enough fuel)
+			}
+
+
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
 
@@ -616,11 +630,6 @@ module.exports = class Combat {
 
 		for(const ply in this.playerList) {
 			Reports.refresh(ply.id, ply.sid);
-		}
-
-		const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
-		if(Fleets.hasColonyShip(atkFleet, this.unitCache)) {
-			db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
 		}
 	}
 
