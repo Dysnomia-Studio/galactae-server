@@ -549,7 +549,18 @@ module.exports = class Combat {
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
 				}
 			} else {
-				// @TODO: attack fleets should go back to their planet (if enough fuel)
+				for(const fleet of this.atkFleets) {
+					try {
+						Fleets.moveToWithThrow(
+							this.playerList[fleet.ownerId],
+							fleet.id,
+							fleet.motherPlanetAddress,
+							FLEET_MOVE_TYPE.DEFEND
+						);
+					} catch(e) {
+						// Do nothing if it can't move
+					}
+				}
 			}
 
 

@@ -55,6 +55,7 @@ global.db = {
 	ban: {},
 	battleLog: {},
 	battleLogAccess: { fetchByPlayer: () => {} },
+	conquest: {},
 	fleet: {},
 	player: {},
 	tactics: {},

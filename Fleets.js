@@ -248,7 +248,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		});
 	}
 
-	static async moveTo(user, fleetId, destination, moveType) {
+	static async moveToWithThrow(user, fleetId, destination, moveType) {
 		const now = new Date();
 
 		if(moveType !== Math.round(moveType)) {
@@ -279,21 +279,30 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		}
 
 		if(fleetReturned.inBuilding !== undefined && fleetReturned.inBuilding) { // Are units building in this fleet ?
-			log(user.username + ' failed to move fleet because units are building in this fleet.');
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'IN_BUILDING_FLEET' });
-			return;
+			const error = new Error();
+
+			error.name = 'IN_BUILDING_FLEET';
+			error.message = user.username + ' failed to move fleet because units are building in this fleet.';
+
+			throw error;
 		}
 
 		if(fleetReturned.endMoveTime !== null) { // Is this fleet moving ?
-			log(user.username + ' failed to move fleet because fleet is already moving to a planet.');
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_MOVING_FLEET' });
-			return;
+			const error = new Error();
+
+			error.name = 'ALREADY_MOVING_FLEET';
+			error.message = user.username + ' failed to move fleet because fleet is already moving to a planet.';
+
+			throw error;
 		}
 
 		if(fleetReturned.position === destination) { // Current planet
-			log(user.username + ' failed to move fleet because fleet is already at destination.');
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'ALREADY_AT_DESTINATION' });
-			return;
+			const error = new Error();
+
+			error.name = 'ALREADY_AT_DESTINATION';
+			error.message = user.username + ' failed to move fleet because fleet is already at destination.';
+
+			throw error;
 		}
 
 		const systemeDepart = GameMap.getSystemFromAdress(fleetReturned.position);
@@ -301,9 +310,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
 			if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
-				log(user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGHT_CARRIER' });
-				return;
+				const error = new Error();
+
+				error.name = 'NO_ENOUGHT_CARRIER';
+				error.message = user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.';
+
+				throw error;
 			}
 
 			let minSpeed;
@@ -314,20 +326,30 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			}
 
 			if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
-				log(user.username + ' failed to move fleet because some units can\'t make supraspeed move.');
-				Websocket.SendMessageToClient({ sid: user.sid, message: 'CANT_MAKE_SUPRAMOVE' });
-				return;
+				const error = new Error();
+
+				error.name = 'CANT_MAKE_SUPRAMOVE';
+				error.message = user.username + ' failed to move fleet because some units can\'t make supraspeed move.';
+
+				throw error;
 			} else if(minSpeed.speed[0] === undefined) {
-				log(user.username + ' failed to move fleet because some units haven\'t speed data.');
-				return;
+				const error = new Error();
+
+				error.name = '';
+				error.message = user.username + ' failed to move fleet because some units haven\'t speed data.';
+
+				throw error;
 			}
 
 			db.planet.find(fleetReturned.position, function(planeteDepart) {
 				db.planet.find(destination, async (planeteArrivee) => {
 					if(!isset(planeteArrivee, 'object')) {
-						log(user.username + ' failed to move fleet because destination ('+destination+') does not exists.');
-						Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_NOT_EXISTS' });
-						return;
+						const error = new Error();
+
+						error.name = 'DESTINATION_NOT_EXISTS';
+						error.message = user.username + ' failed to move fleet because destination ('+destination+') does not exists.';
+
+						throw error;
 					}
 
 					let defUser;
@@ -335,15 +357,21 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 						defUser = await db.player.find(planeteArrivee.owner);
 
 						if(isset(defUser, 'object') && defUser.beginnerProtectEnd.getTime() > now.getTime()) {
-							log(user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: 'DESTINATION_IS_PROTECTED' });
-							return;
+							const error = new Error();
+
+							error.name = 'DESTINATION_IS_PROTECTED';
+							error.message = user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.';
+
+							throw error;
 						}
 
 						if(isset(defUser, 'object') && defUser.id === user.id) {
-							log(user.username + ' failed to move fleet because defender is the same player as attacker.');
-							Websocket.SendMessageToClient({ sid: user.sid, message: 'DEFENDER_IS_ATTACKER' });
-							return;
+							const error = new Error();
+
+							error.name = 'DEFENDER_IS_ATTACKER';
+							error.message = user.username + ' failed to move fleet because defender is the same player as attacker.';
+
+							throw error;
 						}
 					}
 
@@ -385,9 +413,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 					const fuel = Fleets.calcFuelCost(minSpeed.engines);
 					if(!isset(fleetReturned.fuel, 'number') || fleetReturned.fuel < (fuel * time)) {
-						log(user.username + ' failed to move fleet because fleet hasn\'t enough fuel.');
-						Websocket.SendMessageToClient({ sid: user.sid, message: 'NO_ENOUGH_FUEL' });
-						return;
+						const error = new Error();
+
+						error.name = 'NO_ENOUGH_FUEL';
+						error.message = user.username + ' failed to move fleet because fleet hasn\'t enough fuel.';
+
+						throw error;
 					}
 
 					fleetReturned.fuel -= fuel * time;
@@ -435,6 +466,20 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				});
 			});
 		});
+	}
+
+	static async moveTo(user, fleetId, destination, moveType) {
+		try {
+			return await moveToWithThrow(user, fleetId, destination, moveType);
+		} catch(e) {
+			if(e.message !== '') {
+				log(e.message);
+			}
+
+			if(e.name !== '') {
+				Websocket.SendMessageToClient({ sid: user.sid, message: e.name });
+			}
+		}
 	}
 
 	static async renameFleet(data) {
