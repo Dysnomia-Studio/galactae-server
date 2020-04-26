@@ -39,6 +39,45 @@ module.exports = class Planet {
 		}
 	}
 
+	static async traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback) {
+		let fleetsReturned = [];
+		if(currPlanet.owner === inputData.id) {
+			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
+		}
+		const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
+
+		db.planet.update(newPlanet);
+
+		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
+
+		if(inputData.pid === currPlanet.address) {
+			if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
+				db.unit.findByOwner(userReturned.id, (unitsList) => {
+					const oldCount = Object.keys(userReturned.tutorials).length;
+
+					userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
+
+					if(Object.keys(userReturned.tutorials).length !== oldCount) {
+						db.player.update({
+							id: userReturned.id,
+							tutorials: userReturned.tutorials,
+						});
+					}
+
+					Tutorials.checkTutorials(userReturned, newPlanet);
+				});
+			}
+
+			if(callback) {
+				callback(newPlanet);
+			} else {
+				Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+			}
+
+			return true;
+		}
+	}
+
 	/**
 	 * Get, update then send planet data
 	 *
@@ -46,43 +85,30 @@ module.exports = class Planet {
 	 * @param      {number}  decalage  le decalage de planete
 	 */
 	static async refresh(inputData, callback, disableTutorials=false) {
-		let userReturned = await db.player.find(inputData.id);
+		const userReturned = await db.player.find(inputData.id);
 
 		if(!isset(userReturned, 'object')) {
 			return;
 		}
 
+		let found = false;
 		db.planet.findByOwner(inputData.id, async(planetsReturned) => {
 			for(const currPlanet of planetsReturned) {
-				const fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
-				const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
+				if(await Planet.traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback)) {
+					found = true;
+				}
+			}
 
-				db.planet.update(newPlanet);
+			if(!found) {
+				const conquestList = await db.conquest.getActiveConquestsOnPlanet(inputData.pid);
 
-				Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
+				for(const conquest of conquestList) {
+					if(conquest.newOwner === inputData.id) {
+						const currPlanet = await db.planet.findbyAddress(conquest.planet);
 
-				if(inputData.pid === currPlanet.address) {
-					if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
-						db.unit.findByOwner(userReturned.id, (unitsList) => {
-							const oldCount = Object.keys(userReturned.tutorials).length;
+						delete currPlanet.owner;
 
-							userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
-
-							if(Object.keys(userReturned.tutorials).length !== oldCount) {
-								db.player.update({
-									id: userReturned.id,
-									tutorials: userReturned.tutorials,
-								});
-							}
-
-							Tutorials.checkTutorials(userReturned, newPlanet);
-						});
-					}
-
-					if(callback) {
-						callback(newPlanet);
-					} else {
-						Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
+						Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
 					}
 				}
 			}
