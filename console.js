@@ -20,6 +20,9 @@ module.exports = function() {
 	this.yellowText = function(str) {
 		return '\u001b[33m' + str + '\u001b[39m';
 	};
+	this.purpleText = function(str) {
+		return '\u001b[35m' + str + '\u001b[39m';
+	};
 	this.blueText = function(str) {
 		return '\u001b[36m' + str + '\u001b[39m';
 	};
@@ -51,6 +54,9 @@ module.exports = function() {
 				break;
 			case 'info':
 				text = greenText(text);
+				break;
+			case 'clientError':
+				text = purpleText(text);
 				break;
 			default:
 		}
