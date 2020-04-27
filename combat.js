@@ -542,7 +542,8 @@ module.exports = class Combat {
 			db.conquest.abortAllMilitaryConquest(this.location);
 
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
-			if(Fleets.hasColonyShip(atkFleet, this.unitCache)) {
+			const conquestList = await db.conquest.getActiveConquestsByPlayer(this.atkUser.id);
+			if(Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList + this.atkUser.planetlist < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
 
 				for(const fleet of this.atkFleets) {
