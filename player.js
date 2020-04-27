@@ -146,14 +146,16 @@ module.exports = class Player {
 		io.to(data.sid).emit('player-recieve-data',{
 			planetlist: playerData.planetlist,
 			money: playerData.money,
+			points: playerData.points,
 			gvt: playerData.gvt,
 			tutorials: playerData.tutorials,
 		});
 
 		Alliances.sendToPlayer(playerData);
-		Units.refresh(data);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
+		Conquest.syncPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
+		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
 				db.player.update(userNewResearch, function() {
@@ -166,7 +168,7 @@ module.exports = class Player {
 					db.planet.find(data.pid, function(planetReturned) {
 						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 
-						Planet.refresh(data, 0); // THIS HAVE TO BE AFTER RESEARCHS
+						Conquest.refresh(data.sid, data.id); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
 					});
 				});
 			});
@@ -333,14 +335,14 @@ module.exports = class Player {
 		} = Player.getDayBonus(data, choice);
 
 		if(choice===2 && helium!==0) {
-			Planet.find(inputData,inputData.pid,0,function(planetReturned) {
+			Planet.find(inputData,inputData.pid,0,async function(planetReturned) {
 				if(inputData.pid !== planetReturned.address) { // Stop if not belonging
 					Websocket.SendMessageToClient({ sid: inputData.sid, message: 'ERROR_NOT_BELONGING' });
 					log(inputData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+inputData.pid+') because he doesn\'t own it !','fail');
 					return;
 				}
 
-				const newPlanetData = Planet.update(planetReturned, data, []);
+				const newPlanetData = await Planet.update(planetReturned, data, []);
 
 				newPlanetData.resources[1]+=helium;
 
@@ -359,6 +361,7 @@ module.exports = class Player {
 			db.player.update(newPlayerData);
 			io.to(inputData.sid).emit('player-recieve-data',{
 				money: newPlayerData.money,
+				points: newPlayerData.points,
 			});
 		}
 	}

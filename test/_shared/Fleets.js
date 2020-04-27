@@ -757,4 +757,67 @@ describe('• Fleets (shared)', () => {
 			);
 		});
 	});
+
+	describe('# hasColonyShip', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {} }, []),
+				false
+			);
+		});
+
+		it('No colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_FIGHTER' },
+				}),
+				false
+			);
+		});
+
+		it('0 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 0,
+					'SHIP_WEP_MINES': 3
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+					'00000000-0000-0000-0000-000000000001': { id: '00000000-0000-0000-0000-000000000001', shipType: 'SHIP_WEP_MINES' },
+				}),
+				false
+			);
+		});
+
+		it('1 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 1,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				true
+			);
+		});
+
+		it('10 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				true
+			);
+		});
+	});
 });

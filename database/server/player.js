@@ -104,4 +104,29 @@ module.exports = {
 			log('List cleared !') ;
 		});
 	},
+	delPlanet: async (ply, planet) => {
+		const player = await db.player.find(ply);
+		player.planetlist = player.planetlist.filter((elt) => elt !== planet);
+
+		if(player.planetlist === 0) {
+			const planetAddress = db.player.assignNewPlanet(ply);
+			player.planetlist = [planetAddress];
+		}
+
+		try {
+			await serverClient.query('UPDATE users SET planetlist = $2 WHERE id = $1', [ply, player.planetlist]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	addPlanet: async (ply, planet) => {
+		const player = await db.player.find(ply);
+		player.planetlist = Array.from(new Set([...player.planetlist, planet]));
+
+		try {
+			await serverClient.query('UPDATE users SET planetlist = $2 WHERE id = $1', [ply, player.planetlist]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 };

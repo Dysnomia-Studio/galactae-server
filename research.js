@@ -21,8 +21,15 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	static recalc(user,researchData,callback,i=0) {
 		const time = (Date.now() - user.lastResearchUpdate.getTime())/TIME.HOUR_TO_MS;
 
-		db.planet.find(user.planetlist[i],function(planetData) {
-			if(isset(planetData.currResearch, 'string') && planetData.currResearch !== 'researchCenter' && isset(researchList[planetData.currResearch].cost, 'number') && researchData[planetData.currResearch] !== -1) {
+		db.planet.find(user.planetlist[i],async function(planetData) {
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetData.address);
+
+			if(isset(planetData.currResearch, 'string') &&
+				planetData.currResearch !== 'researchCenter' &&
+				isset(researchList[planetData.currResearch].cost, 'number') &&
+				researchData[planetData.currResearch] !== -1 &&
+				conquestList.length === 0
+			) {
 				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
 
 				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
@@ -56,13 +63,13 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 				return;
 			}
 
-			Research.refreshUserResearch(userReturned, function(userNewResearch) {
+			Research.refreshUserResearch(userReturned, async function(userNewResearch) {
 				db.player.update(userNewResearch);
 
 				// Check if you have parent research
 				const researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
 
-				const newData = Planet.update(planetReturned,userReturned,fleetReturned);
+				const newData = await Planet.update(planetReturned,userReturned,fleetReturned);
 
 				if(researchedParent) { // Just check if it exists ...
 					newData.currResearch = researchName;
@@ -95,6 +102,7 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	static sendResearchDataToUser(data, planet, user) {
 		io.to(data.sid).emit('player-recieve-data', {
 			research: user.research,
+			points: user.points,
 		});
 	}
 };

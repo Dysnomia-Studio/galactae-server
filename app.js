@@ -32,6 +32,7 @@ global.Alliances  = require('./Alliances');
 global.Buildings  = require('./Buildings');
 global.Chat       = require('./chat');
 global.Combat     = require('./combat');
+global.Conquest   = require('./Conquest');
 global.DependencyEngine = require('./DependencyEngine');
 global.Fleets 	  = require('./Fleets');
 global.GameMap    = require('./GameMap');

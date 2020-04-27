@@ -106,6 +106,8 @@ describe('• Combat', () => {
 		callback(unitsList);
 	};
 
+	db.conquest.abortAllMilitaryConquest = () => { };
+
 	const findPlayer = async(id) => {
 		return [
 			{ id: 'u1', name: 'User 1', research: {} },
@@ -661,6 +663,10 @@ describe('• Combat', () => {
 
 		global.db.fleet.findByPosition = (pid) => {
 			return globalFleetList;
+		};
+
+		global.db.fleet.find = (id) => {
+			return {};
 		};
 
 		it('No defending units', (done) => {

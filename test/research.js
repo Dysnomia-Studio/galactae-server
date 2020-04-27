@@ -42,6 +42,7 @@ describe('• Research', () => {
 					researchCenter: -1,
 					phyContemporaine: -1,
 				},
+				points: 1000,
 			};
 
 			const data = {
@@ -50,7 +51,7 @@ describe('• Research', () => {
 
 			const stepEnd = (sid, event, content) => {
 				assert.equal(event, 'player-recieve-data');
-				assert.deepEqual(content, { research: user.research });
+				assert.deepEqual(content, { research: user.research, points: user.points });
 				assert.equal(sid, data.sid);
 
 				done();

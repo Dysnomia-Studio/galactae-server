@@ -72,4 +72,27 @@ module.exports = {
 		}
 		callback(planetList);
 	},
+	setOwner: async(planet, owner) => {
+		try {
+			await serverClient.query('UPDATE planets SET owner = $1 WHERE address = $2', [owner, planet]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	assignNewPlanet: async(plyId) => {
+		try {
+			await serverClient.query('BEGIN');
+
+			const planetAddress = (await serverClient.query('SELECT * FROM planets WHERE "owner" = \'00000000-0000-0000-0000-000000000001\' LIMIT 1')).rows[0].address;
+
+			await serverClient.query('UPDATE planets SET owner = $1 WHERE address = $2', [plyId, planetAddress]);
+
+			await serverClient.query('COMMIT');
+
+			return planetAddress;
+		} catch(err) {
+			log(err, 'error');
+			await serverClient.query('ROLLBACK');
+		}
+	},
 };
