@@ -114,7 +114,7 @@ module.exports = {
 		}
 
 		try {
-			await serverClient.query('UPDATE users SET planetlist = $1 WHERE id = $2', [ply, player.planetlist]);
+			await serverClient.query('UPDATE users SET planetlist = $2 WHERE id = $1', [ply, player.planetlist]);
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -124,7 +124,7 @@ module.exports = {
 		player.planetlist = Array.from(new Set([...player.planetlist, planet]));
 
 		try {
-			await serverClient.query('UPDATE users SET planetlist = $1 WHERE id = $2', [ply, player.planetlist]);
+			await serverClient.query('UPDATE users SET planetlist = $2 WHERE id = $1', [ply, player.planetlist]);
 		} catch(err) {
 			log(err, 'error');
 		}

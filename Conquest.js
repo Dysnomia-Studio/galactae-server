@@ -11,12 +11,15 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 		let   lastUpdatedPlanet = pid;
 
 		for(const conquest of conquestList) {
+			const prevOwner = await db.player.findByName(conquest.prevplayer);
+			const newOwner = await db.player.findByName(conquest.newplayer);
+
 			await db.conquest.setDone(conquest.planet);
 
-			await db.planet.setOwner(conquest.planet, conquest.newOwner);
+			await db.planet.setOwner(conquest.planet, newOwner.id);
 
-			await db.player.delPlanet(conquest.prevOwner, conquest.planet);
-			await db.player.addPlanet(conquest.newOwner, conquest.planet);
+			await db.player.delPlanet(prevOwner.id, conquest.planet);
+			await db.player.addPlanet(newOwner.id, conquest.planet);
 
 			// @TODO: notif
 
