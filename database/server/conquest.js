@@ -1,4 +1,26 @@
 module.exports = {
+	getActiveConquestsByPlayer: async (plyId) => {
+		try {
+			return (await serverClient.query(
+				'SELECT prev_player.name as prevPlayer, new_player.name as newPlayer, conquest.planet, conquest."endDate" FROM public."conquest" INNER JOIN users AS prev_player ON prev_player.id = "prevOwner" INNER JOIN users AS new_player ON new_player.id = "newOwner" WHERE ("prevOwner" = $1 OR "newOwner" = $1) AND "endDate" < $2 AND done = false AND aborted = false',
+				[plyId, new Date()]
+			)).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+
+	setDone: async (planet) => {
+		try {
+			return (await serverClient.query(
+				'UPDATE conquest SET done = true WHERE planet = $1 AND done = false AND aborted = false',
+				[planet]
+			)).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+
 	getConquestsByPlayer: async (plyId) => {
 		try {
 			return (await serverClient.query(

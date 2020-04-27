@@ -168,7 +168,7 @@ module.exports = class Player {
 					db.planet.find(data.pid, function(planetReturned) {
 						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 
-						Planet.refresh(data, 0); // THIS HAVE TO BE AFTER RESEARCHS
+						Conquest.refresh(data.sid, data.id); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
 					});
 				});
 			});

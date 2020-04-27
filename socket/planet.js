@@ -19,6 +19,24 @@ module.exports = function(socket) {
 		});
 	});
 
+	// Conquest
+	socket.on('conquest-ask-refresh', function(data) {
+		// Vars
+		if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string') || !isset(data.pid, 'string')) {
+			return;
+		}
+
+		// User
+		data.sid = socket.id;
+		Player.isValid(data,function(userData) { // Verify identity
+			if(globalCfg.dev) {
+				log('Asking conquest refresh');
+			}
+
+			Conquest.refresh(data.sid, data.id, data.pid);
+		});
+	});
+
 	// Map
 	socket.on('system-ask-mapData', function(data) {
 		// Vars

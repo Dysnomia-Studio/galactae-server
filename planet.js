@@ -82,7 +82,7 @@ module.exports = class Planet {
 	 * Get, update then send planet data
 	 *
 	 * @param      {<type>}  data      data sent by user
-	 * @param      {number}  decalage  le decalage de planete
+	 * @param      {number}  decalage  next/prev
 	 */
 	static async refresh(inputData, callback, disableTutorials=false) {
 		const userReturned = await db.player.find(inputData.id);
