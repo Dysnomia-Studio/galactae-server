@@ -108,6 +108,9 @@ describe('• Combat', () => {
 
 	db.conquest.abortAllMilitaryConquest = () => { };
 
+	db.conquest.getActiveConquestsByPlayer = () => [];
+	db.conquest.getConquestsByPlayer = () => [];
+
 	const findPlayer = async(id) => {
 		return [
 			{ id: 'u1', name: 'User 1', research: {} },
