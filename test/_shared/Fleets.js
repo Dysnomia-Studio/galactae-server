@@ -1,4 +1,4 @@
-describe('• Fleets (shared)', () => {
+ describe('• Fleets (shared)', () => {
 	describe('# getSpeed()', () => {
 		it('One Ion', () => {
 			assert.deepEqual(Fleets.getSpeed([-1], 'ion'),
@@ -487,6 +487,14 @@ describe('• Fleets (shared)', () => {
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL = 10000000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL = 5000000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL = 5000000;
+		const ownerList = [
+			{ id: 'u1', ally: null },
+			{ id: 'u2', ally: 'a1' },
+			{ id: 'u3', ally: 'a1' },
+			{ id: 'u4', ally: 'a2' },
+			{ id: 'u5', ally: null },
+		];
+		const planetCount = 10;
 
 		it('Random tests (' + DISTRIBUTE_FUEL_RANDOMTESTS_COUNT + ')', () => {
 			for(let currentTest=1; currentTest<=DISTRIBUTE_FUEL_RANDOMTESTS_COUNT; currentTest++) {
@@ -496,12 +504,18 @@ describe('• Fleets (shared)', () => {
 				let totalFuel = 0;
 
 				for(let currentFleet=0; currentFleet<fleetCount; currentFleet++) {
+					const ownerRandom = Math.round(Math.random() * (ownerList.length - 1));
+
 					fleetList[currentFleet] = {
 						id: 'f' + currentFleet,
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
 						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
+						ownerId: ownerList[ownerRandom].id,
+						owner: ownerList[ownerRandom],
+						position: 'p' + Math.round(Math.random() * planetCount),
+						motherPlanetAddress: 'p' + Math.round(Math.random() * planetCount),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -515,17 +529,25 @@ describe('• Fleets (shared)', () => {
 					}
 				}
 
+				const owner = ownerList[Math.round(Math.random() * (ownerList.length - 1))];
+				const priorityFleet = Math.round(Math.random() * fleetCount * 2);
 				const planet = {
 					resources: [
 						0,
 						Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL),
 						0,0,0,0,
 					],
-					highPriorityFleet: 'f' + Math.round(Math.random() * fleetCount * 2),
+					highPriorityFleet: 'f' + priorityFleet,
+					owner: owner.id,
+					address: 'p0',
 				};
 
 				if(planet.highPriorityFleet === ('f' + fleetCount * 2)) {
 					planet.highPriorityFleet = undefined;
+				}
+
+				if(fleetList[priorityFleet] && Math.random() < 0.5) {
+					fleetList[priorityFleet].position = fleetList[priorityFleet].motherPlanetAddress = planet.address;
 				}
 
 				totalFuel += planet.resources[1];
@@ -534,7 +556,7 @@ describe('• Fleets (shared)', () => {
 				const [
 					newPlanet,
 					newFleetList
-				] = Fleets.distributeFuel(planet, fleetList);
+				] = Fleets.distributeFuel(planet, fleetList, owner);
 
 				// Check
 				let newTotalFuel = 0 + newPlanet.resources[1];
