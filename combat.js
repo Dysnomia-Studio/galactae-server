@@ -564,6 +564,8 @@ module.exports = class Combat {
 				}
 			}
 
+			Conquest.syncPlayer(this.atkUser.id, this.atkUser.sid);
+			Conquest.syncPlayer(this.defUser.id, this.defUser.sid);
 
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
