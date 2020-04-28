@@ -345,6 +345,10 @@
 
 			// Units builded and in-build
 			for(let i=0; i<fleetList.length; i++) {
+				if(fleetList[i].motherPlanetAddress !== currPlanet.address) {
+					continue;
+				}
+
 				cons += fleetList[i].population;
 			}
 
