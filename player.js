@@ -113,7 +113,7 @@ module.exports = class Player {
 
 		if(playerData.ally !== null) {
 			playerData.ally = await db.alliance.find(playerData.ally);
-		} 
+		}
 
 		if(!isset(playerData.ally, 'object')) {
 			playerData.ally = {
@@ -122,6 +122,12 @@ module.exports = class Player {
 		}
 
 		playerData.sid = data.sid;
+
+		// We need this to prevent next action being considered as "hacker" by validation system
+		db.player.update({
+			id: playerData.id,
+			sid: playerData.sid,
+		});
 
 		const jour = TIME.DAY_TO_MS;
 		const minuit = Date.now() - (Date.now()%jour);
@@ -168,7 +174,7 @@ module.exports = class Player {
 					db.planet.find(data.pid, function(planetReturned) {
 						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
 
-						Conquest.refresh(data.sid, data.id); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
+						Conquest.refresh(data.sid, data.id, data.pid); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
 					});
 				});
 			});

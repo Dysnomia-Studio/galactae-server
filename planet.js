@@ -109,8 +109,14 @@ module.exports = class Planet {
 						delete currPlanet.owner;
 
 						Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
+
+						found = true;
 					}
 				}
+			}
+
+			if(!found) {
+				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
 			}
 		});
 	}
