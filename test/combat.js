@@ -110,6 +110,7 @@ describe('• Combat', () => {
 
 	db.conquest.getActiveConquestsByPlayer = () => [];
 	db.conquest.getConquestsByPlayer = () => [];
+	db.planet.findbyAddress = () => { return { owner: 'u1' }; };
 
 	const findPlayer = async(id) => {
 		return [

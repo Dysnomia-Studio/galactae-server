@@ -58,6 +58,7 @@ global.db = {
 	conquest: {},
 	fleet: {},
 	player: {},
+	planet: {},
 	tactics: {},
 	unit: {},
 };
