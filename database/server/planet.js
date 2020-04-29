@@ -87,6 +87,8 @@ module.exports = {
 
 			await serverClient.query('UPDATE planets SET owner = $1 WHERE address = $2', [plyId, planetAddress]);
 
+			await serverClient.query('UPDATE planets SET "lastResourcesUpdate" = NOW(), "lastUnitUpdate" = NOW() WHERE address = $1 AND "lastResourcesUpdate" IS NULL', [planetAddress]);
+
 			await serverClient.query('COMMIT');
 
 			return planetAddress;
