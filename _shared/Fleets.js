@@ -358,5 +358,17 @@
 
 			return false;
 		}
+
+		static cargoSize(currFleet, unitCache) {
+			let total = 0;
+
+			for(const currUnit in currFleet.units) {
+				total += Units.cargoSize(
+					unitCache[currUnit].shipShape
+				) * currFleet.units[currUnit];
+			}
+
+			return total;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

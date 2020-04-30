@@ -1,4 +1,4 @@
- describe('• Fleets (shared)', () => {
+describe('• Fleets (shared)', () => {
 	describe('# getSpeed()', () => {
 		it('One Ion', () => {
 			assert.deepEqual(Fleets.getSpeed([-1], 'ion'),
@@ -839,6 +839,73 @@
 					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
 				}),
 				true
+			);
+		});
+	});
+
+	describe('# cargoSize()', () => {
+		it('No cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 10
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					}
+				}),
+				0
+			);
+		});
+
+		it('One without, one with cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 15,
+						'test2': 10
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					},
+					test2: {
+						shipShape: 'SHIP_BATTLECRUISER_ATRIOS'
+					}
+				}),
+				1250 * 10
+			);
+		});
+
+		it('Multiple without, multiple with cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 15,
+						'test2': 10,
+						'test3': 5,
+						'test4': 5,
+						'test5': 12,
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					},
+					test2: {
+						shipShape: 'SHIP_BATTLECRUISER_ATRIOS'
+					},
+					test3: {
+						shipShape: 'SHIP_CUIRASSE_SMALL'
+					},
+					test4: {
+						shipShape: 'SHIP_CUIRASSE_SMALL'
+					},
+					test5: {
+						shipShape: 'SHIP_COLONY'
+					}
+				}),
+				1250 * 10 + 750 * 5 + 750 * 5
 			);
 		});
 	});
