@@ -470,7 +470,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 	static async moveTo(user, fleetId, destination, moveType) {
 		try {
-			return await moveToWithThrow(user, fleetId, destination, moveType);
+			return await Fleets.moveToWithThrow(user, fleetId, destination, moveType);
 		} catch(e) {
 			if(e.message !== '') {
 				log(e.message);
