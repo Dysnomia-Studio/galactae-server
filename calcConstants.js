@@ -925,6 +925,9 @@ module.exports = function() {
 
 		SHIP_CARRIER_SMALL: 180000,
 		SHIP_CARRIER_MEDIUM: 320000,
+
+		SHIP_COLONY: 75000,
+		SHIP_COLONY_HEAVY: 100000,
 	};
 
 	this.fighterWeight = {
@@ -982,6 +985,9 @@ module.exports = function() {
 
 		SHIP_CARRIER_SMALL: 		500,
 		SHIP_CARRIER_MEDIUM: 		800,
+
+		SHIP_COLONY: 350,
+		SHIP_COLONY_HEAVY: 650,
 	};
 
 	/**
