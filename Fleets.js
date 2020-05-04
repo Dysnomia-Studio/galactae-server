@@ -233,19 +233,18 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		return fighterCount <= fighterCap;
 	}
 
-	static getUnitsList(unitIdList, callback, i=0, unitList=[]) {
-		if(i>=unitIdList.length) {
-			callback(unitList);
-			return;
-		}
+	static async getUnitsList(unitIdList) {
+		const unitList = [];
 
-		// Find next unit
-		db.unit.find(unitIdList[i], function(unitReturned) {
+		for(let i = 0; i < unitIdList.length; i++) {
+			const unitReturned = await db.unit.findById(unitIdList[i]);
+
 			if(isset(unitReturned, 'object')) {
 				unitList.push(unitReturned);
 			}
-			Fleets.getUnitsList(unitIdList, callback, i+1, unitList);
-		});
+		}
+
+		return unitList;
 	}
 
 	static async moveToWithThrow(user, fleetId, destination, moveType) {
@@ -308,163 +307,161 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		const systemeDepart = GameMap.getSystemFromAdress(fleetReturned.position);
 		const systemeArrivee = GameMap.getSystemFromAdress(destination);
 
-		Fleets.getUnitsList(Object.keys(fleetReturned.units), function(unitList) {
-			if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
+		const unitList = await Fleets.getUnitsList(Object.keys(fleetReturned.units));
+		if(systemeDepart !== systemeArrivee && !Fleets.hasEnoughCarrier(fleetReturned, unitList)) {
+			const error = new Error();
+
+			error.name = 'NO_ENOUGHT_CARRIER';
+			error.message = user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.';
+
+			throw error;
+		}
+
+		let minSpeed;
+		if(systemeDepart === systemeArrivee) {
+			minSpeed = Fleets.getMinSubSpeed(unitList, fleetReturned.units);
+		} else {
+			minSpeed = Fleets.getMinSupraSpeed(unitList, fleetReturned.units);
+		}
+
+		if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
+			const error = new Error();
+
+			error.name = 'CANT_MAKE_SUPRAMOVE';
+			error.message = user.username + ' failed to move fleet because some units can\'t make supraspeed move.';
+
+			throw error;
+		} else if(minSpeed.speed[0] === undefined) {
+			const error = new Error();
+
+			error.name = '';
+			error.message = user.username + ' failed to move fleet because some units haven\'t speed data.';
+
+			throw error;
+		}
+
+		const planeteDepart = await db.planet.findbyAddress(fleetReturned.position);
+		const planeteArrivee = await db.planet.findbyAddress(destination);
+
+		if(!isset(planeteArrivee, 'object')) {
+			const error = new Error();
+
+			error.name = 'DESTINATION_NOT_EXISTS';
+			error.message = user.username + ' failed to move fleet because destination ('+destination+') does not exists.';
+
+			throw error;
+		}
+
+		let defUser;
+		if(moveType === FLEET_MOVE_TYPE.ATTACK) {
+			defUser = await db.player.find(planeteArrivee.owner);
+
+			if(isset(defUser, 'object') && defUser.beginnerProtectEnd.getTime() > now.getTime()) {
 				const error = new Error();
 
-				error.name = 'NO_ENOUGHT_CARRIER';
-				error.message = user.username + ' failed to move fleet because fleet hasn\'t enough carrier capacity.';
+				error.name = 'DESTINATION_IS_PROTECTED';
+				error.message = user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.';
 
 				throw error;
 			}
 
-			let minSpeed;
-			if(systemeDepart === systemeArrivee) {
-				minSpeed = Fleets.getMinSubSpeed(unitList, fleetReturned.units);
-			} else {
-				minSpeed = Fleets.getMinSupraSpeed(unitList, fleetReturned.units);
-			}
-
-			if(systemeDepart !== systemeArrivee && minSpeed.speed[0] === undefined) {
+			if(isset(defUser, 'object') && defUser.id === user.id) {
 				const error = new Error();
 
-				error.name = 'CANT_MAKE_SUPRAMOVE';
-				error.message = user.username + ' failed to move fleet because some units can\'t make supraspeed move.';
-
-				throw error;
-			} else if(minSpeed.speed[0] === undefined) {
-				const error = new Error();
-
-				error.name = '';
-				error.message = user.username + ' failed to move fleet because some units haven\'t speed data.';
+				error.name = 'DEFENDER_IS_ATTACKER';
+				error.message = user.username + ' failed to move fleet because defender is the same player as attacker.';
 
 				throw error;
 			}
+		}
 
-			db.planet.find(fleetReturned.position, function(planeteDepart) {
-				db.planet.find(destination, async (planeteArrivee) => {
-					if(!isset(planeteArrivee, 'object')) {
-						const error = new Error();
+		let time;
+		if(systemeDepart === systemeArrivee) {
+			const baseDist = GameMap.getPlanetDistance(
+				planeteDepart,
+				planeteArrivee,
+				now.getTime()/1000);
+			if(Number.isNaN(baseDist) || baseDist < 0) {
+				return;
+			}
+			const baseTravelTime = Fleets.calcMoveTime(baseDist, minSpeed.speed);
 
-						error.name = 'DESTINATION_NOT_EXISTS';
-						error.message = user.username + ' failed to move fleet because destination ('+destination+') does not exists.';
+			const previewDist = GameMap.getPlanetDistance(
+				planeteDepart,
+				planeteArrivee,
+				now.getTime()/1000 + Math.round(baseTravelTime*360000)/100);
+			if(Number.isNaN(previewDist) || previewDist < 0) {
+				return;
+			}
+			const previewTime = Fleets.calcMoveTime(previewDist, minSpeed.speed);
 
-						throw error;
-					}
+			/* Final travel time:
+				Average of ...
+				 Time to travel to planet where it's now
+				and
+				 Time to travel to planet where it'll be when we arrive to this previous position
+			*/
+			time = (baseTravelTime + previewTime)/2;
+		} else {
+			const dist = Math.sqrt(
+				Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
+				Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
+			);
 
-					let defUser;
-					if(moveType === FLEET_MOVE_TYPE.ATTACK) {
-						defUser = await db.player.find(planeteArrivee.owner);
+			time = Fleets.calcMoveTime(dist, minSpeed.speed);
+		}
 
-						if(isset(defUser, 'object') && defUser.beginnerProtectEnd.getTime() > now.getTime()) {
-							const error = new Error();
+		const fuel = Fleets.calcFuelCost(minSpeed.engines);
+		if(!isset(fleetReturned.fuel, 'number') || fleetReturned.fuel < (fuel * time)) {
+			const error = new Error();
 
-							error.name = 'DESTINATION_IS_PROTECTED';
-							error.message = user.username + ' failed to move fleet because defender ('+defUser.name+') has beginner protection.';
+			error.name = 'NO_ENOUGH_FUEL';
+			error.message = user.username + ' failed to move fleet because fleet hasn\'t enough fuel.';
 
-							throw error;
-						}
+			throw error;
+		}
 
-						if(isset(defUser, 'object') && defUser.id === user.id) {
-							const error = new Error();
+		fleetReturned.fuel -= fuel * time;
 
-							error.name = 'DEFENDER_IS_ATTACKER';
-							error.message = user.username + ' failed to move fleet because defender is the same player as attacker.';
+		const atkUser = await db.player.find(user.id);
+		if(!isset(atkUser, 'object')) {
+			return;
+		}
 
-							throw error;
-						}
-					}
+		let instability = time * 0.001 * (Math.random() - 0.5);
+		if(Research.isSearched(atkUser, 'prop_suprastability')) {
+			instability /= 2;
+		}
 
-					let time;
-					if(systemeDepart === systemeArrivee) {
-						const baseDist = GameMap.getPlanetDistance(
-							planeteDepart,
-							planeteArrivee,
-							now.getTime()/1000);
-						if(Number.isNaN(baseDist) || baseDist < 0) {
-							return;
-						}
-						const baseTravelTime = Fleets.calcMoveTime(baseDist, minSpeed.speed);
+		fleetReturned.endMoveTime = new Date(now.getTime() + Math.round((time + instability) * TIME.HOUR_TO_MS));
+		fleetReturned.position = destination;
+		fleetReturned.orbitPosition = moveType;
+		if(destination === fleetReturned.motherPlanetAddress) {
+			fleetReturned.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
+		}
 
-						const previewDist = GameMap.getPlanetDistance(
-							planeteDepart,
-							planeteArrivee,
-							now.getTime()/1000 + Math.round(baseTravelTime*360000)/100);
-						if(Number.isNaN(previewDist) || previewDist < 0) {
-							return;
-						}
-						const previewTime = Fleets.calcMoveTime(previewDist, minSpeed.speed);
+		let textDestination = destination;
+		if(typeof planeteArrivee.name !== 'undefined') {
+			textDestination = planeteArrivee.name + ' (' + destination + ')';
+		}
 
-						/* Final travel time:
-							Average of ...
-							 Time to travel to planet where it's now
-							and
-							 Time to travel to planet where it'll be when we arrive to this previous position
-						*/
-						time = (baseTravelTime + previewTime)/2;
-					} else {
-						const dist = Math.sqrt(
-							Math.pow(planeteDepart.galacticPos[0] - planeteArrivee.galacticPos[0],2) +
-							Math.pow(planeteDepart.galacticPos[1] - planeteArrivee.galacticPos[1],2)
-						);
+		const endTime = new Date(fleetReturned.endMoveTime);
 
-						time = Fleets.calcMoveTime(dist, minSpeed.speed);
-					}
+		log(user.username + ' began to move fleet (type: ' + moveType + ') ' + fleetReturned.name + ' to ' + textDestination +
+			'. ETA: ' + getDateTime(endTime));
 
-					const fuel = Fleets.calcFuelCost(minSpeed.engines);
-					if(!isset(fleetReturned.fuel, 'number') || fleetReturned.fuel < (fuel * time)) {
-						const error = new Error();
-
-						error.name = 'NO_ENOUGH_FUEL';
-						error.message = user.username + ' failed to move fleet because fleet hasn\'t enough fuel.';
-
-						throw error;
-					}
-
-					fleetReturned.fuel -= fuel * time;
-
-					const atkUser = await db.player.find(user.id);
-					if(!isset(atkUser, 'object')) {
-						return;
-					}
-
-					let instability = time * 0.001 * (Math.random() - 0.5);
-					if(Research.isSearched(atkUser, 'prop_suprastability')) {
-						instability /= 2;
-					}
-
-					fleetReturned.endMoveTime = new Date(now.getTime() + Math.round((time + instability) * TIME.HOUR_TO_MS));
-					fleetReturned.position = destination;
-					fleetReturned.orbitPosition = moveType;
-					if(destination === fleetReturned.motherPlanetAddress) {
-						fleetReturned.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
-					}
-
-					let textDestination = destination;
-					if(typeof planeteArrivee.name !== 'undefined') {
-						textDestination = planeteArrivee.name + ' (' + destination + ')';
-					}
-
-					const endTime = new Date(fleetReturned.endMoveTime);
-
-					log(user.username + ' began to move fleet (type: ' + moveType + ') ' + fleetReturned.name + ' to ' + textDestination +
-						'. ETA: ' + getDateTime(endTime));
-
-					if(moveType === FLEET_MOVE_TYPE.ATTACK && isset(defUser)) {
-						Websocket.sendNotification(defUser.sid, 'attack', {
-							player: atkUser.name,
-							origin: (planeteDepart.name) ? planeteDepart.name : planeteDepart.address,
-							destination: (planeteArrivee.name) ? planeteArrivee.name : planeteArrivee.address,
-							arriveTime: endTime,
-						});
-					}
-
-					db.fleet.update(fleetReturned, function() {
-						Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-						Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
-					});
-				});
+		if(moveType === FLEET_MOVE_TYPE.ATTACK && isset(defUser)) {
+			Websocket.sendNotification(defUser.sid, 'attack', {
+				player: atkUser.name,
+				origin: (planeteDepart.name) ? planeteDepart.name : planeteDepart.address,
+				destination: (planeteArrivee.name) ? planeteArrivee.name : planeteArrivee.address,
+				arriveTime: endTime,
 			});
+		}
+
+		db.fleet.update(fleetReturned, function() {
+			Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
+			Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
 		});
 	}
 

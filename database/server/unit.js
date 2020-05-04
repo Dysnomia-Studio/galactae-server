@@ -25,6 +25,13 @@ module.exports = {
 			}
 		});
 	},
+	findById: async(id) => {
+		try {
+			return (await serverClient.query('SELECT * FROM units WHERE id=$1',[id])).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	findByOwner: (id,callback) => {
 		serverClient.query('SELECT * FROM units WHERE "ownerId"=$1',[id], (err, obj) => {
 			if(err) {

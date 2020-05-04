@@ -86,22 +86,24 @@ module.exports = {
 			'"endMoveTime" = NULL, ' +
 			'points = newFleets.points, ' +
 			'population = newFleets.population, ' +
-			'units = newFleets.units ' +
+			'units = newFleets.units, ' +
+			'"orbitPosition" = newFleets."orbitPosition" ' +
 			'FROM (VALUES ';
 
 		let i = 0;
 		const queryParameters = [];
 		for(const fleet of fleets) {
-			query += '($' + (++i) + '::real, $' + (++i) + '::integer, $' + (++i) + '::json, $' + (++i) + '::uuid), ';
+			query += '($' + (++i) + '::real, $' + (++i) + '::integer, $' + (++i) + '::json, $' + (++i) + '::integer, $' + (++i) + '::uuid), ';
 
 			queryParameters.push(fleet.points);
 			queryParameters.push(fleet.population);
 			queryParameters.push(fleet.units);
+			queryParameters.push(fleet.orbitPosition);
 			queryParameters.push(fleet.id);
 		}
 		query = query.substring(0, query.length - 2);
 
-		query += ' ) as newFleets(points, population, units, id) ';
+		query += ' ) as newFleets(points, population, units, "orbitPosition", id) ';
 		query += 'WHERE fleets.id = newFleets.id';
 
 		try {

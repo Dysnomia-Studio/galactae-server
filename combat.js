@@ -545,13 +545,17 @@ module.exports = class Combat {
 
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
 			const conquestList = await db.conquest.getActiveConquestsByPlayer(this.atkUser.id);
-			if(planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList + this.atkUser.planetlist < Conquest.getPlanetMaxCount(this.atkUser.points))) {
+			if(planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
 
 				for(const fleet of this.atkFleets) {
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
 				}
+
+				await db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
 			} else {
+				await db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
+
 				for(const fleet of this.atkFleets) {
 					try {
 						Fleets.moveToWithThrow(
@@ -571,8 +575,6 @@ module.exports = class Combat {
 
 			log('End of fight simulation - Planet: ' + this.location + ' - Atk wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		}
-
-		db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
 
 		// @TODO: steal resources
 
