@@ -261,7 +261,7 @@ module.exports = function() {
 	/**
 	 * Research
 	 */
-	this.researchProduction = [-0.05,12,-8];
+	this.researchProduction = [-0.05,12,-4];
 	this.researchBonus = {
 		// Construction bonus
 		cp_mecanisation: -0.05,
