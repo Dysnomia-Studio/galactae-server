@@ -191,7 +191,7 @@ module.exports = function(socket) {
 		// User
 		data.sid = socket.id;
 		Player.isValid(data, (user) => { // Verify identity
-			Alliances.askToPact(data.id, user.ally, data.allyName);
+			Alliances.askToPact(data.sid, data.id, user.ally, data.allyName);
 		});
 	});
 
@@ -205,7 +205,7 @@ module.exports = function(socket) {
 		// User
 		data.sid = socket.id;
 		Player.isValid(data, (user) => { // Verify identity
-			Alliances.pactChoice(data.id, user.ally, data.allyId, data.choice);
+			Alliances.pactChoice(data.sid, data.id, user.ally, data.allyId, data.choice);
 		});
 	});
 
@@ -219,7 +219,7 @@ module.exports = function(socket) {
 		// User
 		data.sid = socket.id;
 		Player.isValid(data, (user) => { // Verify identity
-			Alliances.cancelPactInvitation(data.id, user.ally, data.allyId);
+			Alliances.cancelPactInvitation(data.sid, data.id, user.ally, data.allyId);
 		});
 	});
 
@@ -233,7 +233,7 @@ module.exports = function(socket) {
 		// User
 		data.sid = socket.id;
 		Player.isValid(data, (user) => { // Verify identity
-			Alliances.stopPact(data.id, user.ally, data.allyId);
+			Alliances.stopPact(data.sid, data.id, user.ally, data.allyId);
 		});
 	});
 };

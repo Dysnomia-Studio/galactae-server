@@ -54,7 +54,7 @@ module.exports = function(socket) {
 		}
 
 		// Vars
-		if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string') || !isset(data.address, 'string')) {
+		if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.planet, 'string')) {
 			return;
 		}
 
@@ -63,7 +63,7 @@ module.exports = function(socket) {
 
 		Player.isValid(data,function(userData) { // Verify identity
 			Units.refresh(data);
-			Fleets.refresh(data.address,data.sid);
+			Fleets.refresh(data.planet,data.sid);
 			Tactics.refresh(data.id, data.sid);
 		});
 	});

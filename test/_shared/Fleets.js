@@ -487,6 +487,14 @@ describe('• Fleets (shared)', () => {
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL = 10000000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL = 5000000;
 		const DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL = 5000000;
+		const ownerList = [
+			{ id: 'u1', ally: null },
+			{ id: 'u2', ally: 'a1' },
+			{ id: 'u3', ally: 'a1' },
+			{ id: 'u4', ally: 'a2' },
+			{ id: 'u5', ally: null },
+		];
+		const planetCount = 10;
 
 		it('Random tests (' + DISTRIBUTE_FUEL_RANDOMTESTS_COUNT + ')', () => {
 			for(let currentTest=1; currentTest<=DISTRIBUTE_FUEL_RANDOMTESTS_COUNT; currentTest++) {
@@ -496,12 +504,18 @@ describe('• Fleets (shared)', () => {
 				let totalFuel = 0;
 
 				for(let currentFleet=0; currentFleet<fleetCount; currentFleet++) {
+					const ownerRandom = Math.round(Math.random() * (ownerList.length - 1));
+
 					fleetList[currentFleet] = {
 						id: 'f' + currentFleet,
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
 						orbitPosition: Math.round(Math.random() * 4),
 						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
+						ownerId: ownerList[ownerRandom].id,
+						owner: ownerList[ownerRandom],
+						position: 'p' + Math.round(Math.random() * planetCount),
+						motherPlanetAddress: 'p' + Math.round(Math.random() * planetCount),
 					};
 
 					fleetList[currentFleet].fuel = Math.min(fleetList[currentFleet].fuel, fleetList[currentFleet].maxFuel);
@@ -515,17 +529,25 @@ describe('• Fleets (shared)', () => {
 					}
 				}
 
+				const owner = ownerList[Math.round(Math.random() * (ownerList.length - 1))];
+				const priorityFleet = Math.round(Math.random() * fleetCount * 2);
 				const planet = {
 					resources: [
 						0,
 						Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_PLANETFUEL),
 						0,0,0,0,
 					],
-					highPriorityFleet: 'f' + Math.round(Math.random() * fleetCount * 2),
+					highPriorityFleet: 'f' + priorityFleet,
+					owner: owner.id,
+					address: 'p0',
 				};
 
 				if(planet.highPriorityFleet === ('f' + fleetCount * 2)) {
 					planet.highPriorityFleet = undefined;
+				}
+
+				if(fleetList[priorityFleet] && Math.random() < 0.5) {
+					fleetList[priorityFleet].position = fleetList[priorityFleet].motherPlanetAddress = planet.address;
 				}
 
 				totalFuel += planet.resources[1];
@@ -534,7 +556,7 @@ describe('• Fleets (shared)', () => {
 				const [
 					newPlanet,
 					newFleetList
-				] = Fleets.distributeFuel(planet, fleetList);
+				] = Fleets.distributeFuel(planet, fleetList, owner);
 
 				// Check
 				let newTotalFuel = 0 + newPlanet.resources[1];
@@ -754,6 +776,136 @@ describe('• Fleets (shared)', () => {
 				Fleets.hasEndedMove(
 					{ endMoveTime: null }
 				), false
+			);
+		});
+	});
+
+	describe('# hasColonyShip', () => {
+		it('Empty fleet', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {} }, []),
+				false
+			);
+		});
+
+		it('No colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_FIGHTER' },
+				}),
+				false
+			);
+		});
+
+		it('0 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 0,
+					'SHIP_WEP_MINES': 3
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+					'00000000-0000-0000-0000-000000000001': { id: '00000000-0000-0000-0000-000000000001', shipType: 'SHIP_WEP_MINES' },
+				}),
+				false
+			);
+		});
+
+		it('1 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 1,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				true
+			);
+		});
+
+		it('10 colony ship', () => {
+			assert.equal(
+				Fleets.hasColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				true
+			);
+		});
+	});
+
+	describe('# cargoSize()', () => {
+		it('No cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 10
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					}
+				}),
+				0
+			);
+		});
+
+		it('One without, one with cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 15,
+						'test2': 10
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					},
+					test2: {
+						shipShape: 'SHIP_BATTLECRUISER_ATRIOS'
+					}
+				}),
+				1250 * 10
+			);
+		});
+
+		it('Multiple without, multiple with cargo', () => {
+			assert.equal(
+				Fleets.cargoSize({
+					units: {
+						'test': 15,
+						'test2': 10,
+						'test3': 5,
+						'test4': 5,
+						'test5': 12,
+					}
+				}, {
+					test: {
+						shipShape: 'SHIP_FIGHTER_MEDIUM'
+					},
+					test2: {
+						shipShape: 'SHIP_BATTLECRUISER_ATRIOS'
+					},
+					test3: {
+						shipShape: 'SHIP_CUIRASSE_SMALL'
+					},
+					test4: {
+						shipShape: 'SHIP_CUIRASSE_SMALL'
+					},
+					test5: {
+						shipShape: 'SHIP_COLONY'
+					}
+				}),
+				1250 * 10 + 750 * 5 + 750 * 5
 			);
 		});
 	});

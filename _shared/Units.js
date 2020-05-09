@@ -157,5 +157,30 @@
 		static getShields(unit) {
 			return unit.parts.filter((part) => part.type === 'shield');
 		}
+
+		/**
+		 * Returns the default cargo size of a ship by its shape
+		 *
+		 * @param      {string}  shipShape  The ship shape
+		 * @return     {number}  The cargo size
+		 */
+		static cargoSize(shipShape) {
+			const cargo = {
+				SHIP_BATTLECRUISER_ATRIOS: 1250,
+
+				SHIP_CUIRASSE_SMALL: 750,
+
+				SHIP_CORVET_AEGIS: 400,
+
+				SHIP_CARRIER_SMALL: 750,
+				SHIP_CARRIER_MEDIUM: 1500,
+			};
+
+			if(cargo[shipShape]) {
+				return cargo[shipShape];
+			}
+
+			return 0;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

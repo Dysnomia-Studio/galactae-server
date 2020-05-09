@@ -145,6 +145,85 @@ describe('• Alliances', () => {
 		});
 	});
 
+	describe('# sendNotifToAllianceStaff()', () => {
+		it('Not to diplomacy', () => {
+			const members = [
+				{ founder: false, leader: false, diplomacy: false, sid: 'no' },
+				{ founder: false, leader: false, diplomacy: true, sid: 'no' },
+				{ founder: false, leader: true, diplomacy: false, sid: 'yes' },
+				{ founder: true, leader: false, diplomacy: false, sid: 'yes' },
+			];
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						if(event === 'notification') {
+							assert.equal(sid, 'yes');
+						}
+					},
+				};
+			};
+
+			db.alliance.getExtendedMemberList = () => {
+				return members;
+			};
+
+			Alliances.sendNotifToAllianceStaff('allyId', '', {});
+		});
+
+		it('Including to diplomacy', () => {
+			const members = [
+				{ founder: false, leader: false, diplomacy: false, sid: 'no' },
+				{ founder: false, leader: false, diplomacy: true, sid: 'yes' },
+				{ founder: false, leader: true, diplomacy: false, sid: 'yes' },
+				{ founder: true, leader: false, diplomacy: false, sid: 'yes' },
+			];
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						if(event === 'notification') {
+							assert.equal(sid, 'yes');
+						}
+					},
+				};
+			};
+
+			db.alliance.getExtendedMemberList = () => {
+				return members;
+			};
+
+			Alliances.sendNotifToAllianceStaff('allyId', '', {}, true);
+		});
+	});
+
+	describe('# sendNotifToAllianceMembers()', () => {
+		it('Should work', () => {
+			const members = [
+				{ founder: false, leader: false, diplomacy: false, sid: 'yes' },
+				{ founder: false, leader: false, diplomacy: true, sid: 'yes' },
+				{ founder: false, leader: true, diplomacy: false, sid: 'yes' },
+				{ founder: true, leader: false, diplomacy: false, sid: 'yes' },
+			];
+
+			io.to = (sid) => {
+				return {
+					emit: (event, data) => {
+						if(event === 'notification') {
+							assert.equal(sid, 'yes');
+						}
+					},
+				};
+			};
+
+			db.alliance.getExtendedMemberList = () => {
+				return members;
+			};
+
+			Alliances.sendNotifToAllianceMembers('allyId', '', {});
+		});
+	});
+
 	describe('# hasFounderPermissions()', () => {
 		it('Founder perms', async() => {
 			db.alliance.getPermissions = () => {
@@ -406,6 +485,10 @@ describe('• Alliances', () => {
 			db.alliance.askToJoin = (plyId, allyId) => {
 				assert.equal(playerId, plyId);
 				assert.equal(alliance.id, allyId);
+			};
+
+			db.alliance.getExtendedMemberList = () => {
+				return [];
 			};
 
 			io.to = (sid) => {
@@ -1249,7 +1332,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.askToPact('id', 'ally', 'ally2');
+			Alliances.askToPact('sid', 'id', 'ally', 'ally2');
 		});
 
 		it('Same alliance', () => {
@@ -1265,7 +1348,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.askToPact('id', 'ally', 'ally');
+			Alliances.askToPact('sid', 'id', 'ally', 'ally');
 		});
 
 		it('Alliance not existing', () => {
@@ -1281,7 +1364,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.askToPact('id', 'ally', 'ally2');
+			Alliances.askToPact('sid', 'id', 'ally', 'ally2');
 		});
 
 		it('Should Work', () => {
@@ -1298,7 +1381,7 @@ describe('• Alliances', () => {
 				assert.equal(otherAlly, 'ally2');
 			};
 
-			Alliances.askToPact('id', 'ally', 'ally2');
+			Alliances.askToPact('sid', 'id', 'ally', 'ally2');
 		});
 	});
 
@@ -1315,7 +1398,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.pactChoice('id', 'ally', 'ally2');
+			Alliances.pactChoice('sid', 'id', 'ally', 'ally2');
 		});
 
 		it('Choice true', () => {
@@ -1326,7 +1409,7 @@ describe('• Alliances', () => {
 			db.alliance.acceptPact = () => assert(true);
 			db.alliance.removePact = () => assert(false);
 
-			Alliances.pactChoice('id', 'ally', 'ally2', true);
+			Alliances.pactChoice('sid', 'id', 'ally', 'ally2', true);
 		});
 
 		it('Choice false', () => {
@@ -1337,7 +1420,7 @@ describe('• Alliances', () => {
 			db.alliance.acceptPact = () => assert(false);
 			db.alliance.removePact = () => assert(true);
 
-			Alliances.pactChoice('id', 'ally', 'ally2', false);
+			Alliances.pactChoice('sid', 'id', 'ally', 'ally2', false);
 		});
 	});
 
@@ -1351,7 +1434,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.cancelPactInvitation('id', 'ally', 'ally2');
+			Alliances.cancelPactInvitation('sid', 'id', 'ally', 'ally2');
 		});
 
 		it('Should Work', () => {
@@ -1364,7 +1447,7 @@ describe('• Alliances', () => {
 				assert.equal(otherId, 'ally2');
 			};
 
-			Alliances.cancelPactInvitation('id', 'ally', 'ally2');
+			Alliances.cancelPactInvitation('sid', 'id', 'ally', 'ally2');
 		});
 	});
 
@@ -1378,7 +1461,7 @@ describe('• Alliances', () => {
 				assert(false);
 			};
 
-			Alliances.stopPact('id', 'ally', 'ally2');
+			Alliances.stopPact('sid', 'id', 'ally', 'ally2');
 		});
 
 		it('Should Work', () => {
@@ -1391,7 +1474,7 @@ describe('• Alliances', () => {
 				assert.equal(otherId, 'ally2');
 			};
 
-			Alliances.stopPact('id', 'ally', 'ally2');
+			Alliances.stopPact('sid', 'id', 'ally', 'ally2');
 		});
 	});
 });

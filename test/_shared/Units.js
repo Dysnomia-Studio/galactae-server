@@ -269,4 +269,20 @@ describe('• Units (shared)', () => {
 			);
 		});
 	});
+
+	describe('# cargoSize()', () => {
+		it('no cargo / invalid unit shape', () => {
+			assert.equal(
+				Units.cargoSize('test'),
+				0
+			);
+		});
+
+		it('valid cargo ship', () => {
+			assert.equal(
+				Units.cargoSize('SHIP_BATTLECRUISER_ATRIOS'),
+				1250
+			);
+		});
+	});
 });

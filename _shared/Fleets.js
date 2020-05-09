@@ -343,5 +343,32 @@
 		static hasEndedMove(fleet) {
 			return !Fleets.isImmobile(fleet) && fleet.endMoveTime.getTime() <= new Date();
 		}
+
+		static hasColonyShip(currFleet, unitCache) {
+			for(const currUnit in currFleet.units) {
+				let realUnitId = currUnit;
+				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
+					realUnitId = specialUnitsUID[realUnitId];
+				}
+
+				if(unitCache[realUnitId].shipType === 'SHIP_COLONY' && currFleet.units[currUnit] > 0) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static cargoSize(currFleet, unitCache) {
+			let total = 0;
+
+			for(const currUnit in currFleet.units) {
+				total += Units.cargoSize(
+					unitCache[currUnit].shipShape
+				) * currFleet.units[currUnit];
+			}
+
+			return total;
+		}
 	};
 })(typeof exports === 'undefined'? window : exports);

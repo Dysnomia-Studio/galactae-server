@@ -106,6 +106,12 @@ describe('• Combat', () => {
 		callback(unitsList);
 	};
 
+	db.conquest.abortAllMilitaryConquest = () => { };
+
+	db.conquest.getActiveConquestsByPlayer = () => [];
+	db.conquest.getConquestsByPlayer = () => [];
+	db.planet.findbyAddress = () => { return { owner: 'u1' }; };
+
 	const findPlayer = async(id) => {
 		return [
 			{ id: 'u1', name: 'User 1', research: {} },
@@ -661,6 +667,10 @@ describe('• Combat', () => {
 
 		global.db.fleet.findByPosition = (pid) => {
 			return globalFleetList;
+		};
+
+		global.db.fleet.find = (id) => {
+			return {};
 		};
 
 		it('No defending units', (done) => {

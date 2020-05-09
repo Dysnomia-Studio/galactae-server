@@ -13,6 +13,21 @@ module.exports = class Websocket {
 			require('./socket/report')(socket);
 			require('./socket/tactic')(socket);
 			require('./socket/unit')(socket);
+
+			socket.on('client-error', (data) => {
+				// Vars
+				if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.errorName, 'string')  || !isset(data.errorMessage, 'string')  || !isset(data.errorStack, 'string')) {
+					return;
+				}
+
+				// User
+				data.sid = socket.id;
+				Player.isValid(data, async(user) => { // Verify identity
+					log(data.username + ' - ' + data.errorName + ': ' + data.errorMessage + '\n' + data.errorStack,
+						'clientError'
+					);
+				});
+			});
 		});
 	}
 	/**
