@@ -28,14 +28,10 @@ module.exports = function(socket) {
 		});
 	});
 	socket.on('fleet-tactics-assign', (data) => {
-		console.log(data);
-
 		// Vars
 		if(!isset(data, 'object') || !isset(data.id) || !isset(data.username) || !isset(data.pid, 'string') || !isset(data.fleetId) || !isset(data.tacticId)) {
 			return;
 		}
-
-		console.log(data);
 
 		// User
 		data.sid = socket.id;
