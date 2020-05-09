@@ -909,4 +909,80 @@ describe('• Fleets (shared)', () => {
 			);
 		});
 	});
+
+	describe('# hasColonyShip', () => {
+		it('Empty fleet', () => {
+			assert.deepEqual(
+				Fleets.removeColonyShip({ units: {} }, []),
+				{}
+			);
+		});
+
+		it('No colony ship', () => {
+			assert.deepEqual(
+				Fleets.removeColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_FIGHTER' },
+				}),
+				{
+					'test': 2,
+					'test2': 10,
+				}
+			);
+		});
+
+		it('0 colony ship', () => {
+			assert.deepEqual(
+				Fleets.removeColonyShip({ units: {
+					'test': 2,
+					'test2': 0,
+					'SHIP_WEP_MINES': 3
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+					'00000000-0000-0000-0000-000000000001': { id: '00000000-0000-0000-0000-000000000001', shipType: 'SHIP_WEP_MINES' },
+				}),
+				{
+					'test': 2,
+					'test2': 0,
+					'SHIP_WEP_MINES': 3
+				}
+			);
+		});
+
+		it('1 colony ship', () => {
+			assert.deepEqual(
+				Fleets.removeColonyShip({ units: {
+					'test': 2,
+					'test2': 1,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				{
+					'test': 2,
+					'test2': 0,
+				}
+			);
+		});
+
+		it('10 colony ship', () => {
+			assert.deepEqual(
+				Fleets.removeColonyShip({ units: {
+					'test': 2,
+					'test2': 10,
+				} }, {
+					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				}),
+				{
+					'test': 2,
+					'test2': 9,
+				}
+			);
+		});
+	});
 });
