@@ -548,6 +548,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		if(typeof(from) === 'string' || typeof(to) === 'string') {
 			Fleets.fetchFleets(from, to, data, Fleets.transferSomeUnits);
+			return;
 		}
 
 		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {
@@ -597,6 +598,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static mergeFleet(from, to, data) {
 		if(typeof(from) === 'string' || typeof(to) === 'string') {
 			Fleets.fetchFleets(from, to, data, Fleets.mergeFleet);
+			return;
 		}
 
 		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {
@@ -634,6 +636,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	static transferFuelBetweenFleets(from, to, data) {
 		if(typeof(from) === 'string' || typeof(to) === 'string') {
 			Fleets.fetchFleets(from, to, data, Fleets.transferFuelBetweenFleets);
+			return;
 		}
 
 		if(from.position !== to.position || from.endMoveTime !== null || to.endMoveTime !== null) {

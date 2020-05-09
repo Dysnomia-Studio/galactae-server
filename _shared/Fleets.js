@@ -359,6 +359,22 @@
 			return false;
 		}
 
+		static removeColonyShip(currFleet, unitCache) {
+			for(const currUnit in currFleet.units) {
+				let realUnitId = currUnit;
+				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
+					realUnitId = specialUnitsUID[realUnitId];
+				}
+
+				if(unitCache[realUnitId].shipType === 'SHIP_COLONY' && currFleet.units[currUnit] > 0) {
+					currFleet.units[currUnit]--;
+					break;
+				}
+			}
+
+			return currFleet.units;
+		}
+
 		static cargoSize(currFleet, unitCache) {
 			let total = 0;
 
