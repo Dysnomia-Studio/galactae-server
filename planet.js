@@ -116,6 +116,7 @@ module.exports = class Planet {
 			}
 
 			if(!found) {
+				inputData.pid = planetsReturned[0].address;
 				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
 			}
 		});

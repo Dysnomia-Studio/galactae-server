@@ -66,7 +66,7 @@ module.exports = {
 	},
 	getExtendedMemberList: async (id) => {
 		try {
-			return (await serverClient.query('SELECT users.name, user.sid, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
+			return (await serverClient.query('SELECT users.name, users.sid, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
