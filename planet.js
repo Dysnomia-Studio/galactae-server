@@ -33,7 +33,7 @@ module.exports = class Planet {
 				pid = userReturned.planetlist[0];
 			}
 			db.planet.find(pid,async function(planetReturned) {
-				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.id);
+				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
 				callback(planetReturned,userReturned,fleetReturned);
 			});
 		}
@@ -42,7 +42,7 @@ module.exports = class Planet {
 	static async traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback) {
 		let fleetsReturned = [];
 		if(currPlanet.owner === inputData.id) {
-			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
+			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.address);
 		}
 		const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 

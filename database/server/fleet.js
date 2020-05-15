@@ -27,9 +27,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByMotherPlanet: async(planetId) => {
+	findByMotherPlanet: async(address) => {
 		try {
-			return (await serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId])).rows;
+			return (await serverClient.query('SELECT * FROM fleets WHERE "motherPlanetAddress"=$1', [address])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}

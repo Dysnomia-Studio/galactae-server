@@ -411,7 +411,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 						return;
 					}
-					if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) {
+					if(choosenFleet.motherPlanetAddress !== newPlanet.address) {
 						return;
 					}
 

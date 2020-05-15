@@ -159,7 +159,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		const oldFleetList = await db.fleet.findByMotherPlanet(planetData.id);
+		const oldFleetList = await db.fleet.findByMotherPlanet(planetData.address);
 
 		// Check max count
 		if(oldFleetList.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
@@ -181,7 +181,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		const newFleet = {
 			name: data.fleetName,
 			ownerId: data.id,
-			motherPlanetId: planetData.id,
 			motherPlanetAddress: planetData.address,
 			position: planetData.address,
 			orbitPosition: FLEET_MOVE_TYPE.DEFEND,
@@ -200,7 +199,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			if(callback) {
 				callback(
-					(await db.fleet.findByMotherPlanet(planetData.id))
+					(await db.fleet.findByMotherPlanet(planetData.address))
 						.filter((f) => f.name === data.fleetName)[0]
 				);
 			}

@@ -104,7 +104,7 @@ module.exports = function(socket) {
 			data.pid = userReturned.planetlist[0];
 
 			Planet.refresh(data, async(planetReturned) => {
-				const fleetsList = await db.fleet.findByMotherPlanet(planetReturned.id);
+				const fleetsList = await db.fleet.findByMotherPlanet(planetReturned.address);
 
 				db.unit.findByOwner(userReturned.id, (unitsList) => {
 					if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
