@@ -73,17 +73,17 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				}
 
 				if(FleetList[id].endMoveTime !== null && FleetList[id].endMoveTime.getTime() <= Date.now()) {
-					FleetList[id].endMoveTime = null;
-
 					if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
 						const atkUser = await db.player.find(newPlanet.owner);
 
 						const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
 						const defUser = await db.player.find(defPlanet.owner);
 
-						Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
+						Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id, new Date(FleetList[id].endMoveTime));
 						continue;
 					}
+
+					FleetList[id].endMoveTime = null;
 
 					Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
 				}

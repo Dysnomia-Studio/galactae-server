@@ -43,11 +43,11 @@ module.exports = {
 		}
 	},
 
-	beginConquest: async (planet, prevOwner, newOwner) => {
+	beginConquest: async (planet, prevOwner, newOwner, battleDate) => {
 		try {
 			await serverClient.query('BEGIN');
 
-			const endDate = new Date();
+			const endDate = new Date(battleDate);
 			endDate.setDate(endDate.getDate() + 1); // @TODO: use config to determine speed
 
 			// Get latest end of conquest on this planet
@@ -59,7 +59,7 @@ module.exports = {
 			for(const conquest of conquestsList) {
 				if(lastConquest < conquest.endDate.getTime()) {
 					lastConquest = conquest.getTime();
-					conquestReportTime = endDate.Time() - conquest.endDate.getTime();
+					conquestReportTime = endDate.getTime() - conquest.endDate.getTime();
 				}
 			}
 
@@ -85,11 +85,11 @@ module.exports = {
 		}
 	},
 
-	abortAllMilitaryConquest: async (planet) => {
+	abortAllMilitaryConquest: async (planet, beginDate) => {
 		try {
 			return (await serverClient.query(
-				'UPDATE public."conquest" SET aborted = true WHERE "planet" = $1',
-				[planet] // @TODO: filter by type
+				'UPDATE public."conquest" SET aborted = true WHERE "planet" = $1 AND "endDate" != $2',
+				[planet, beginDate] // @TODO: filter by type
 			)).rows;
 		} catch(err) {
 			log(err, 'error');
