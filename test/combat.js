@@ -729,7 +729,7 @@ describe('• Combat', () => {
 			}, {
 				id: 'u1',
 				name:'User 1',
-			}, 'f3');
+			}, 'f3', new Date());
 		});
 
 		it('Normal battle n°1', (done) => {
@@ -804,7 +804,7 @@ describe('• Combat', () => {
 			}, {
 				id: 'u1',
 				name:'User 1',
-			}, 'f3');
+			}, 'f3', new Date());
 		});
 
 		it('Normal battle n°2', (done) => {
@@ -931,7 +931,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80661808-5775-11e9-82cb-7b8f6e03caec',
 				name:'Firestorm',
-			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
+			}, '62716d0e-586d-11e9-86fb-b30be47b62e1', new Date());
 		});
 
 		it('Normal battle n°3', (done) => {
@@ -1063,7 +1063,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80658302-5775-11e9-86a1-7f506956c446',
 				name:'junkyfox',
-			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
+			}, '62716d0e-586d-11e9-86fb-b30be47b62e1', new Date());
 		});
 
 		it('Normal battle n°4', (done) => {
@@ -1174,7 +1174,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80661808-5775-11e9-82cb-7b8f6e03caec',
 				name:'Firestorm',
-			}, '6279b126-586d-11e9-a633-0723427ef961');
+			}, '6279b126-586d-11e9-a633-0723427ef961', new Date());
 		});
 
 		it('Normal battle n°5', (done) => {
@@ -1282,7 +1282,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80660e8a-5775-11e9-9959-e7363221e85e',
 				name:'damlanil',
-			}, '6272e472-586d-11e9-b743-2bbdb01acdd3');
+			}, '6272e472-586d-11e9-b743-2bbdb01acdd3', new Date());
 		});
 	});
 

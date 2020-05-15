@@ -665,7 +665,7 @@ module.exports = class Combat {
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
-		const currTime = this.battleDate.getTime();
+		const currTime = battleDate.getTime();
 
 		const fleetList = await db.fleet.findByPosition(defPlanet.address);
 		const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address, battleDate);
