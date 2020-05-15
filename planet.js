@@ -316,10 +316,6 @@ module.exports = class Planet {
 				fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
 			}
 
-			const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
-			fleetReturned.points = parseFloat(fleetReturned.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
-			fleetReturned.points = '' + fleetReturned.points;
-
 			db.fleet.update(fleetReturned, function() {
 				Units.refresh(user);
 				Fleets.refresh(newPlanet.address,user.sid);
