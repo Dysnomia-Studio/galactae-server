@@ -536,6 +536,9 @@ module.exports = class Combat {
 
 		await this.saveLogs(defWins);
 
+		this.atkFleets = Fleets.updateFleetFuel(this.atkFleets, this.unitCache);
+		this.defFleets = Fleets.updateFleetFuel(this.defFleets, this.unitCache);
+
 		const planetData = await db.planet.findbyAddress(this.location);
 
 		if(defWins) {

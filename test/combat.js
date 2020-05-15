@@ -634,9 +634,9 @@ describe('• Combat', () => {
 	 */
 	describe('# beginFight', () => {
 		let globalFleetList = [
-			{ id: 'f1', name: 'Fleet 1', endMoveTime: null, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f2', name: 'Fleet 2', endMoveTime: null, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f3', name: 'Fleet 3', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
+			{ id: 'f1', name: 'Fleet 1', endMoveTime: null, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
+			{ id: 'f2', name: 'Fleet 2', endMoveTime: null, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
+			{ id: 'f3', name: 'Fleet 3', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
 		];
 
 		db.fleet.bulkUpdate = async() => { };
@@ -734,13 +734,13 @@ describe('• Combat', () => {
 
 		it('Normal battle n°1', (done) => {
 			globalFleetList.push(
-				{ id: 'f4', name: 'Fleet 4', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
+				{ id: 'f4', name: 'Fleet 4', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
 			);
 			globalFleetList.push(
-				{ id: 'f5', name: 'Fleet 5', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 } }
+				{ id: 'f5', name: 'Fleet 5', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 }, maxFuel: 0, fuel: 0 },
 			);
 			globalFleetList.push(
-				{ id: 'f6', name: 'Fleet 6', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
+				{ id: 'f6', name: 'Fleet 6', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 }, maxFuel: 0, fuel: 0 },
 			);
 
 			const units = {

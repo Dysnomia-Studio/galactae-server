@@ -301,6 +301,22 @@
 			];
 		}
 
+		static updateFleetFuel(fleets, units) {
+			for(const fleet of fleets) {
+				fleet.maxFuel = 0;
+
+				for(const unitId in fleet.units) {
+					fleet.maxFuel += fleet.units[unitId] * fuelStorage[units[unitId].shipShape];
+				}
+
+				if(fleet.fuel > fleet.maxFuel) {
+					fleet.fuel = fleet.maxFuel;
+				}
+			}
+
+			return fleets;
+		}
+
 		static removeEmptyUnits(fleet) {
 			for(const unit in fleet.units) {
 				if(fleet.units[unit] <= 0) {
