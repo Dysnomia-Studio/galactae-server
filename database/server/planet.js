@@ -68,7 +68,7 @@ module.exports = {
 			if(isset(user, 'object') && !user.name.includes('Colonisable')) {
 				planetList[i].ownerName = user.name;
 				if(user.ally) {
-					const ally = db.alliance.find(user.ally);
+					const ally = await db.alliance.find(user.ally);
 
 					if(ally && ally.name) {
 						planetList[i].ally = ally.name;
