@@ -26,7 +26,7 @@ module.exports = function() {
 
 		SECONDS_TO_MS: 1000,
 
-		SECOND_MARGIN: 5,
+		SECOND_MARGIN: 1,
 	};
 	/**
 	 * Production
