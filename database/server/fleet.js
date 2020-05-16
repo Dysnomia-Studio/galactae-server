@@ -61,6 +61,20 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	getNextFleetToSync: async() => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets ORDER BY "endMoveTime" ASC NULLS LAST LIMIT 1')).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	endMove: async(fleetId) => {
+		try {
+			await serverClient.query('UPDATE fleets SET "endMoveTime" = NULL WHERE id = $1', [fleetId]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;

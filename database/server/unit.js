@@ -32,15 +32,12 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwner: (id,callback) => {
-		serverClient.query('SELECT * FROM units WHERE "ownerId"=$1',[id], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(obj.rows);
-		});
+	findByOwner: async(id) => {
+		try {
+			return (await serverClient.query('SELECT * FROM units WHERE "ownerId"=$1',[id])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	findAll: async() => {
 		try {

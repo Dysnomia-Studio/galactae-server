@@ -106,19 +106,18 @@ module.exports = function(socket) {
 			Planet.refresh(data, async(planetReturned) => {
 				const fleetsList = await db.fleet.findByMotherPlanet(planetReturned.address);
 
-				db.unit.findByOwner(userReturned.id, (unitsList) => {
-					if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
-						return;
-					}
+				const unitsList = await db.unit.findByOwner(userReturned.id);
+				if(!Tutorials.hasCompletedTutorial(data.tutorial, userReturned, planetReturned, fleetsList, unitsList , false)) {
+					return;
+				}
 
-					userReturned.tutorials[data.tutorial] = true;
+				userReturned.tutorials[data.tutorial] = true;
 
-					db.player.update({
-						id: data.id,
-						tutorials: userReturned.tutorials,
-					}, () => {
-						Planet.refresh(data);
-					});
+				db.player.update({
+					id: data.id,
+					tutorials: userReturned.tutorials,
+				}, () => {
+					Planet.refresh(data);
 				});
 			}, true);
 		});

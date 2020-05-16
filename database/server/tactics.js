@@ -21,61 +21,38 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	find: (tid, callback) => {
+	find: async(tid, callback) => {
 		if(tid === '') {
-			callback();
 			return;
 		}
 
-		serverClient.query('SELECT * FROM tactics WHERE id=$1', [tid], (err, tacticListQuery) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			const tactic = (await serverClient.query('SELECT * FROM tactics WHERE id=$1')).rows[0];
 
-			if(tacticListQuery.rows.length === 0) {
-				callback();
-				return;
-			}
+			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 
-			const tactic = tacticListQuery.rows[0];
-			db.tacticsOrders.findByTactic(tactic.id, (orders) => {
-				tactic.orders = orders;
-
-				callback(tactic);
-			});
-		});
+			return tactic;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	findByOwner: (owner, callback) => {
-		serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], (err, tacticListQuery) => {
+		serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], async(err, tacticListQuery) => {
 			if(err) {
 				log(err, 'error');
 				return;
 			}
 
 			const tacticList = tacticListQuery.rows;
-			let todo = 0;
-			let done = 0;
 			for(const tactic of tacticList) {
-				todo++;
-
-				db.tacticsOrders.findByTactic(tactic.id, (orders) => {
-					done++;
-					tactic.orders = orders;
-
-					if(todo === done) {
-						callback(tacticList);
-					}
-				});
+				tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 			}
 
-			if(tacticList.length === 0) {
-				callback([]);
-			}
+			callback(tacticList);
 		});
 	},
 	findByOwnerAndName: (tactic, callback) => {
-		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], (err, tacticListQuery) => {
+		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], async(err, tacticListQuery) => {
 			if(err) {
 				log(err, 'error');
 				return;
@@ -87,11 +64,9 @@ module.exports = {
 			}
 
 			const tactic = tacticListQuery.rows[0];
-			db.tacticsOrders.findByTactic(tactic.id, (orders) => {
-				tactic.orders = orders;
+			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 
-				callback(tactic);
-			});
+			callback(tactic);
 		});
 	},
 	upsert: (inputTactic, callback) => {
@@ -103,26 +78,25 @@ module.exports = {
 			});
 		}
 
-		serverClient.query('BEGIN', (err) => {
+		serverClient.query('BEGIN', async(err) => {
 			if(err) {
 				rollback();
 			}
 
-			db.tactics.find(inputTactic.id, (tactic) => {
-				if(!isset(tactic)) {
-					db.tactics.insert(inputTactic, () => {
-						db.tactics.findByOwnerAndName(inputTactic, (newTactic) => {
-							db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
-						});
+			const tactic = await db.tactics.find(inputTactic.id);
+			if(!isset(tactic)) {
+				db.tactics.insert(inputTactic, () => {
+					db.tactics.findByOwnerAndName(inputTactic, (newTactic) => {
+						db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
 					});
-				} else if(tactic.name !== inputTactic.name) {
-					db.tactics.updateName(inputTactic, () =>
-						db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback)
-					);
-				} else {
-					db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback);
-				}
-			});
+				});
+			} else if(tactic.name !== inputTactic.name) {
+				db.tactics.updateName(inputTactic, () =>
+					db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback)
+				);
+			} else {
+				db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback);
+			}
 		});
 
 	},

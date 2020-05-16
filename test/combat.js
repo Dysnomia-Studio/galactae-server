@@ -98,12 +98,12 @@ for(const unit of unitsList) {
 }
 
 describe('• Combat', () => {
-	db.tactics.find = (id, callback) => {
-		callback(tactics.filter((t) => t.id === id)[0]);
+	db.tactics.find = (id) => {
+		return tactics.filter((t) => t.id === id)[0];
 	};
 
-	db.unit.findByOwner = (id, callback) => {
-		callback(unitsList);
+	db.unit.findByOwner = (id) => {
+		return unitsList;
 	};
 
 	db.conquest.abortAllMilitaryConquest = () => { };
@@ -510,7 +510,7 @@ describe('• Combat', () => {
 	 * getAllTactics
 	 */
 	describe('# getAllTactics()', () => {
-		it('getAllTactics(_)', () => {
+		it('getAllTactics(_)', async() => {
 			const battleArena = new Combat('f1');
 			battleArena.atkFleets = [
 				{ tactic: 't1' },
@@ -523,12 +523,12 @@ describe('• Combat', () => {
 				't2': tactics[1],
 			};
 
-			battleArena.getAllTactics(() => {
-				assert.deepEqual(
-					battleArena.tacticCache,
-					expected
-				);
-			});
+			await battleArena.getAllTactics();
+
+			assert.deepEqual(
+				battleArena.tacticCache,
+				expected
+			);
 		});
 	});
 
@@ -536,7 +536,7 @@ describe('• Combat', () => {
 	 * getAllUnits
 	 */
 	describe('# getAllUnits()', () => {
-		it('getAllUnits(_)', (done) => {
+		it('getAllUnits(_)', async() => {
 			const battleArena = new Combat('f1');
 			battleArena.atkFleets = [
 				{ units: {'u1': 12, 'u2': 89 } },
@@ -544,24 +544,12 @@ describe('• Combat', () => {
 				{ units: { [specialUnitsUID.SHIP_WEP_MINES]: 24, 'u2': 78 } },
 			];
 
-			const timeout = setTimeout(
-				() => {
-					assert(false);
-					done();
-				}, 2500
+			await battleArena.getAllUnits();
+
+			assert.deepEqual(
+				battleArena.unitCache,
+				Object.assign({}, units)
 			);
-
-
-			battleArena.getAllUnits(() => {
-				clearTimeout(timeout);
-
-				assert.deepEqual(
-					battleArena.unitCache,
-					Object.assign({}, units)
-				);
-
-				done();
-			});
 		});
 	});
 

@@ -437,10 +437,8 @@ module.exports = class Combat {
 
 	/**
 	 * Gets all ai settings from database
-	 *
-	 * @param      {Function}  callback  Function to call back after these calls
 	 */
-	getAllTactics(callback) {
+	async getAllTactics() {
 		// Get units id list
 		const tacticsIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
@@ -451,48 +449,28 @@ module.exports = class Combat {
 			tacticsIdList.add(currFleet.tactic);
 		}
 
-		let added = 0;
 		// Get all units from db
 		for(const tacticId of tacticsIdList) {
-			db.tactics.find(tacticId, (tactic) => {
-				this.tacticCache[tactic.id] = tactic;
-
-				if(tacticsIdList.size <= ++added) {
-					callback();
-				}
-			});
-		}
-
-		if(tacticsIdList.size === 0) {
-			callback();
+			this.tacticCache[tacticId] = await db.tactics.find(tacticId);
 		}
 	}
 
 	/**
 	 * Gets all units from database
-	 *
-	 * @param      {Function}  callback  Function to call back after these calls
 	 */
-	getAllUnits(callback) {
+	async getAllUnits() {
 		// Get owner id list
 		const ownerList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
 			ownerList.add(currFleet.ownerId);
 		}
 
-		let added = 0;
-
 		// Get all units from db
 		for(const ownerId of ownerList) {
-			db.unit.findByOwner(ownerId, (unitList) => {
-				for(const currUnit of unitList) {
-					this.unitCache[currUnit.id] = currUnit;
-				}
-
-				if(ownerList.size === ++added) {
-					callback();
-				}
-			});
+			const unitList = await db.unit.findByOwner(ownerId);
+			for(const currUnit of unitList) {
+				this.unitCache[currUnit.id] = currUnit;
+			}
 		}
 	}
 
@@ -512,24 +490,22 @@ module.exports = class Combat {
 	/**
 	 * Simulate the whole fight
 	 */
-	fight() {
+	async fight() {
 		this.removeDuplicateFleets();
 		this.sortFleets();
 
 		// Get all db data & Fight
-		this.getAllTactics(() => {
-			this.getAllUnits(async() => {
-				await this.getAllPlayers();
+		await this.getAllTactics();
+		await this.getAllUnits();
+		await this.getAllPlayers();
 
-				this.saveFleetsBeforeSimulation();
+		this.saveFleetsBeforeSimulation();
 
-				while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
-					this.simulateTurn();
-				}
+		while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
+			this.simulateTurn();
+		}
 
-				this.endFight();
-			});
-		});
+		await this.endFight();
 	}
 
 	async endFight() {
@@ -692,7 +668,7 @@ module.exports = class Combat {
 
 		preventRestarts++;
 
-		battle.fight();
+		await battle.fight();
 	}
 
 	static async getAttacksAgainstPlayer(plyId, plySid) {

@@ -5,17 +5,17 @@ module.exports = class Tactics {
 		});
 	}
 
-	static checkOwner(uid, tacticId, callback) {
+	static async checkOwner(uid, tacticId, callback) {
 		if(tacticId === '-1') {
 			callback();
 			return;
 		}
 
-		db.tactics.find(tacticId, (obj) => {
-			if(obj.owner === uid) {
-				callback();
-			}
-		});
+		const obj = await db.tactics.find(tacticId);
+
+		if(obj.owner === uid) {
+			callback();
+		}
 	}
 
 	static checkTactic(tactic, user) {
