@@ -118,9 +118,7 @@ module.exports = {
 	 * General Server queries
 	 */
 	ban: require('./database/general/ban'),
-	globalRank: require('./database/general/globalRank'),
 	privilege: require('./database/general/privilege'),
 	server: require('./database/general/server'),
-	sectorRank: require('./database/general/sectorRank'),
 	userGameId: require('./database/general/userGameId'),
 };

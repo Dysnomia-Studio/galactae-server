@@ -62,9 +62,6 @@ module.exports = {
 		const id = user.id;
 		delete user.id;
 
-		delete user.sectorPointsAddresses;
-		delete user.sectorPointsValue;
-		delete user.sectorPointsPcount;
 		delete user.ally;
 
 		let [query, values] = db.buildUpdateQuery('users', user);

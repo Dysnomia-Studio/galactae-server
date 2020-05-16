@@ -186,50 +186,18 @@ module.exports = class Player {
 		userData.sid = '-1';
 		db.player.update(userData);
 	}
-	static calcTotalPlanetPoints(user,callback,i,points,sector) {
-		if(i===0) {
-			sector = {
-				'points': {},
-				'pcount': {},
-			};
-		}
-
+	static calcTotalPlanetPoints(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
 			points += planetReturned.points;
 
 			i++;
 
-			const sectorAddress = GameMap.getSectorFromAdress(planetReturned.address);
-
-			if(sector.points[sectorAddress] === undefined) {
-				sector.points[sectorAddress] = 0;
-			}
-			if(sector.pcount[sectorAddress] === undefined) {
-				sector.pcount[sectorAddress] = 0;
-			}
-			sector.points[sectorAddress] += planetReturned.points;
-			sector.pcount[sectorAddress]++;
-
 			if(i<user.planetlist.length) {
-				Player.calcTotalPlanetPoints(user,callback,i,points,sector);
+				Player.calcTotalPlanetPoints(user,callback,i,points);
 			} else {
 				points *= pointsCoef.planet;
 
-				const newSector = {
-					address: [],
-					points: [],
-					pcount: [],
-				};
-				for(const j in sector.points) {
-					newSector.address.push(j);
-					newSector.points.push(sector.points[j] * pointsCoef.planet);
-					newSector.pcount.push(sector.pcount[j]);
-				}
-
 				user.points = points;
-				user.sectorPointsAddresses  = newSector.address;
-				user.sectorPointsValue = newSector.points;
-				user.sectorPointsPcount = newSector.pcount;
 				callback(user);
 			}
 		});
@@ -264,20 +232,6 @@ module.exports = class Player {
 			let allyName = null;
 			if(newUserData.ally) {
 				allyName = newUserData.ally.name;
-			}
-
-			// MaJ des BDD Globales
-			db.globalRank.update(user.id, newUserData.points, newUserData.planetlist.length, newUserData.name, allyName);
-
-			for(let sector = 0; sector<newUserData.sectorPointsAddresses.length; sector++) {
-				db.sectorRank.update(
-					user.id,
-					newUserData.sectorPointsAddresses[sector],
-					newUserData.sectorPointsValue[sector],
-					newUserData.sectorPointsPcount[sector],
-					newUserData.name,
-					allyName
-				);
 			}
 
 			callback(newUserData);

@@ -184,7 +184,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			motherPlanetAddress: planetData.address,
 			position: planetData.address,
 			orbitPosition: FLEET_MOVE_TYPE.DEFEND,
-			points: 0,
 			endMoveTime: null,
 			units: [],
 			population: 0,

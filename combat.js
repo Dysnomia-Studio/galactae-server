@@ -373,7 +373,6 @@ module.exports = class Combat {
 
 		if(Math.floor(destinationFleets[fleetIndex].units[target.unit]) < Math.floor(oldHealth)) {
 			destinationFleets[fleetIndex].population -= this.unitCache[action.unitDestinationId].cost[5];
-			destinationFleets[fleetIndex].points -= (this.unitCache[action.unitDestinationId].cost[5] * pointsCoef.units);
 
 			this.unitCache[action.unitDestinationId].owned--;
 		}
