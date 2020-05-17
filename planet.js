@@ -48,7 +48,7 @@ module.exports = class Planet {
 
 		db.planet.update(newPlanet);
 
-		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
+		await Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
 
 		if(inputData.pid === currPlanet.address) {
 			if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
@@ -118,6 +118,10 @@ module.exports = class Planet {
 				inputData.pid = planetsReturned[0].address;
 				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
 			}
+
+			Player.refreshPoints(inputData, (playerData) => {
+				db.player.update(playerData);
+			});
 		});
 	}
 
