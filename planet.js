@@ -109,8 +109,10 @@ module.exports = class Planet {
 				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
 			}
 
-			Player.refreshPoints(inputData, (playerData) => {
-				db.player.update(playerData);
+			const playerData = await db.player.find(inputData.id);
+
+			Player.refreshPoints(playerData, (newPlayerData) => {
+				db.player.update(newPlayerData);
 			});
 		});
 	}
