@@ -261,7 +261,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		}
 
 		// Check if planet, unit & fleet belong to player
-		Planet.find(inputData,inputData.planet,0,async function(planetReturned,userReturned,fleetList) {
+		Planet.find(inputData,inputData.planet,async function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) {
 				return;
 			}

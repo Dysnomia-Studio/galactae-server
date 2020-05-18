@@ -229,13 +229,24 @@ module.exports = class Player {
 
 			newUserData.points = Math.round(newUserData.points);
 
-			let allyName = null;
-			if(newUserData.ally) {
-				allyName = newUserData.ally.name;
-			}
-
 			callback(newUserData);
 		},0,0);
+	}
+
+	static async updateAfterConquest(playerName) {
+		const playerData = await db.player.findByName(playerName);
+
+		Player.refreshPoins(playerData, (newPlayerData) => {
+			if(newPlayerData.sid === null || newPlayerData.sid === '-1') {
+				return;
+			}
+
+			io.to(newPlayerData.sid).emit('player-recieve-data',{
+				planetlist: newPlayerData.planetlist,
+				money: newPlayerData.money,
+				points: newPlayerData.points
+			});
+		});
 	}
 
 	static getDayBonus(userData, choice) {
@@ -300,7 +311,7 @@ module.exports = class Player {
 		} = Player.getDayBonus(data, choice);
 
 		if(choice===2 && helium!==0) {
-			Planet.find(inputData,inputData.pid,0,async function(planetReturned) {
+			Planet.find(inputData,inputData.pid,async function(planetReturned) {
 				if(inputData.pid !== planetReturned.address) { // Stop if not belonging
 					Websocket.SendMessageToClient({ sid: inputData.sid, message: 'ERROR_NOT_BELONGING' });
 					log(inputData.username+' failed to get bonus on planet ' + planetReturned.name + ' ('+inputData.pid+') because he doesn\'t own it !','fail');

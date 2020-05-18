@@ -4,10 +4,9 @@ module.exports = class Planet {
 	 *
 	 * @param      {object}    user      User who asks for
 	 * @param      {string}    pid       Planet ID
-	 * @param      {number}    decalage  decalage de n°
 	 * @param      {Function}  callback  Function needed to call back
 	 */
-	static async find(user, pid, decalage, callback) {
+	static async find(user, pid, callback) {
 		const userReturned = await db.player.find(user.id);
 
 		if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
@@ -16,14 +15,6 @@ module.exports = class Planet {
 
 			for(let i=0; i<nbPlanetes; i++) {
 				if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-					if(i===0 && decalage < 0) {
-						pid = userReturned.planetlist[nbPlanetes+decalage];
-					} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
-						pid = userReturned.planetlist[decalage-1];
-					} else {
-						pid = userReturned.planetlist[i+decalage];
-					}
-
 					valid = true;
 					break;
 				}
@@ -48,7 +39,7 @@ module.exports = class Planet {
 
 		db.planet.update(newPlanet);
 
-		await Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
+		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
 
 		if(inputData.pid === currPlanet.address) {
 			if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
@@ -81,7 +72,6 @@ module.exports = class Planet {
 	 * Get, update then send planet data
 	 *
 	 * @param      {<type>}  data      data sent by user
-	 * @param      {number}  decalage  next/prev
 	 */
 	static async refresh(inputData, callback, disableTutorials=false) {
 		const userReturned = await db.player.find(inputData.id);
@@ -180,7 +170,7 @@ module.exports = class Planet {
 			return;
 		}
 
-		Planet.find(data,data.planet,0,async function(planetReturned,userReturned,fleetReturned) {
+		Planet.find(data,data.planet,async function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
@@ -385,7 +375,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data    data
 	 */
 	static rename(data) {
-		Planet.find(data,data.planet,0,function(planetReturned) {
+		Planet.find(data,data.planet,function(planetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');

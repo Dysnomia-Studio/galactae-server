@@ -35,5 +35,9 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 			id: plyId,
 			pid: lastUpdatedPlanet,
 		});
+
+		// Update planetList of both players
+		Player.updateAfterConquest(conquest.prevplayer);
+		Player.updateAfterConquest(conquest.newplayer);
 	}
 };

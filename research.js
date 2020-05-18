@@ -58,7 +58,7 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 			return;
 		}
 
-		Planet.find(data,data.pid,0,function(planetReturned,userReturned,fleetReturned) {
+		Planet.find(data,data.pid,function(planetReturned,userReturned,fleetReturned) {
 			if(!isset(planetReturned, 'object') || !isset(userReturned, 'object')) {
 				return;
 			}
