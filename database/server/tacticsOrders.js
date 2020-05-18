@@ -18,15 +18,12 @@ module.exports = {
 			callback(tacticOrdersQuery.rows);
 		});
 	},
-	findByTactic: (id, callback) => {
-		serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1', [id], (err, tacticOrdersQuery) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback(tacticOrdersQuery.rows);
-		});
+	findByTactic: async(id) => {
+		try {
+			return (await serverClient.query('SELECT * FROM tactics_orders WHERE tactic_id=$1', [id])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	upsertAll: (orders, tid, callback) => {
 		db.tacticsOrders.delete(tid, () => {
