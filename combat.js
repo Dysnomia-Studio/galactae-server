@@ -529,6 +529,7 @@ module.exports = class Combat {
 				for(const fleet of this.atkFleets) {
 					if(fleet.id === this.atkFleetId) {
 						fleet.units = Fleets.removeColonyShip(fleet, this.unitCache);
+						// TODO: this.unitCache[unitId].owned--;
 					}
 
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;

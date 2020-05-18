@@ -18,6 +18,24 @@ module.exports = {
 				return;
 			}
 
+			if(globalCfg.dev) {
+				const oldPoolQuery = client.query;
+				client.query = (...args) => {
+					let stack;
+
+					try {
+						throw new Error('');
+					}
+					catch (error) {
+						stack = error.stack || '';
+					}
+
+					console.log('QUERY:', args, stack);
+
+					return oldPoolQuery.apply(client, args);
+				};
+			}
+
 			global.serverClient = client;
 
 			log('Successfuly connected to server database.');
