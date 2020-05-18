@@ -99,6 +99,7 @@ db.connect(async function(success,general=false) {
 		Websocket.init();
 		Discord.connect();
 		log('Server is listening on *:' + globalCfg.serverPort);
+		Fleets.syncNextFleet();
 	}
 });
 

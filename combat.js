@@ -2,7 +2,7 @@ module.exports = class Combat {
 	/**
 	 * Constructs the object.
 	 */
-	constructor(atkFleetId, atkUser, defUser, sid, location) {
+	constructor(atkFleetId, atkUser, defUser, sid, location, battleDate) {
 		// Flottes
 		this.atkFleets = [];
 		this.defFleets = [];
@@ -30,6 +30,8 @@ module.exports = class Combat {
 		this.atkFleetId = atkFleetId;
 
 		this.location = location;
+
+		this.battleDate = battleDate;
 	}
 
 	removeDuplicateFleets() {
@@ -371,7 +373,6 @@ module.exports = class Combat {
 
 		if(Math.floor(destinationFleets[fleetIndex].units[target.unit]) < Math.floor(oldHealth)) {
 			destinationFleets[fleetIndex].population -= this.unitCache[action.unitDestinationId].cost[5];
-			destinationFleets[fleetIndex].points -= (this.unitCache[action.unitDestinationId].cost[5] * pointsCoef.units);
 
 			this.unitCache[action.unitDestinationId].owned--;
 		}
@@ -436,10 +437,8 @@ module.exports = class Combat {
 
 	/**
 	 * Gets all ai settings from database
-	 *
-	 * @param      {Function}  callback  Function to call back after these calls
 	 */
-	getAllTactics(callback) {
+	async getAllTactics() {
 		// Get units id list
 		const tacticsIdList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
@@ -450,48 +449,28 @@ module.exports = class Combat {
 			tacticsIdList.add(currFleet.tactic);
 		}
 
-		let added = 0;
 		// Get all units from db
 		for(const tacticId of tacticsIdList) {
-			db.tactics.find(tacticId, (tactic) => {
-				this.tacticCache[tactic.id] = tactic;
-
-				if(tacticsIdList.size <= ++added) {
-					callback();
-				}
-			});
-		}
-
-		if(tacticsIdList.size === 0) {
-			callback();
+			this.tacticCache[tacticId] = await db.tactics.find(tacticId);
 		}
 	}
 
 	/**
 	 * Gets all units from database
-	 *
-	 * @param      {Function}  callback  Function to call back after these calls
 	 */
-	getAllUnits(callback) {
+	async getAllUnits() {
 		// Get owner id list
 		const ownerList = new Set();
 		for(const currFleet of [].concat(this.atkFleets, this.defFleets)) {
 			ownerList.add(currFleet.ownerId);
 		}
 
-		let added = 0;
-
 		// Get all units from db
 		for(const ownerId of ownerList) {
-			db.unit.findByOwner(ownerId, (unitList) => {
-				for(const currUnit of unitList) {
-					this.unitCache[currUnit.id] = currUnit;
-				}
-
-				if(ownerList.size === ++added) {
-					callback();
-				}
-			});
+			const unitList = await db.unit.findByOwner(ownerId);
+			for(const currUnit of unitList) {
+				this.unitCache[currUnit.id] = currUnit;
+			}
 		}
 	}
 
@@ -511,24 +490,22 @@ module.exports = class Combat {
 	/**
 	 * Simulate the whole fight
 	 */
-	fight() {
+	async fight() {
 		this.removeDuplicateFleets();
 		this.sortFleets();
 
 		// Get all db data & Fight
-		this.getAllTactics(() => {
-			this.getAllUnits(async() => {
-				await this.getAllPlayers();
+		await this.getAllTactics();
+		await this.getAllUnits();
+		await this.getAllPlayers();
 
-				this.saveFleetsBeforeSimulation();
+		this.saveFleetsBeforeSimulation();
 
-				while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
-					this.simulateTurn();
-				}
+		while(Fleets.groupHasOffensiveCapacity(this.atkFleets, this.unitCache) && Fleets.groupHasOffensiveCapacity(this.defFleets, this.unitCache)) {
+			this.simulateTurn();
+		}
 
-				this.endFight();
-			});
-		});
+		await this.endFight();
 	}
 
 	async endFight() {
@@ -536,21 +513,23 @@ module.exports = class Combat {
 
 		await this.saveLogs(defWins);
 
+		this.atkFleets = Fleets.updateFleetFuel(this.atkFleets, this.unitCache);
+		this.defFleets = Fleets.updateFleetFuel(this.defFleets, this.unitCache);
+
 		const planetData = await db.planet.findbyAddress(this.location);
 
 		if(defWins) {
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		} else {
-			db.conquest.abortAllMilitaryConquest(this.location);
-
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
 			const conquestList = await db.conquest.getActiveConquestsByPlayer(this.atkUser.id);
 			if(planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
-				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id);
+				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
 				for(const fleet of this.atkFleets) {
 					if(fleet.id === this.atkFleetId) {
 						fleet.units = Fleets.removeColonyShip(fleet, this.unitCache);
+						// TODO: this.unitCache[unitId].owned--;
 					}
 
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;
@@ -573,6 +552,8 @@ module.exports = class Combat {
 					}
 				}
 			}
+
+			await db.conquest.abortAllMilitaryConquest(this.location, this.beginDate);
 
 			Conquest.syncPlayer(this.atkUser.id, this.atkUser.sid);
 			Conquest.syncPlayer(this.defUser.id, this.defUser.sid);
@@ -629,7 +610,7 @@ module.exports = class Combat {
 
 				defWins,
 
-				date: new Date(),
+				date: this.battleDate,
 
 				location: this.location,
 				// @TODO: save planet name
@@ -655,15 +636,15 @@ module.exports = class Combat {
 		}
 	}
 
-	static async beginFight(sid, defPlanet, atkUser, defUser, atkFleetId) {
+	static async beginFight(sid, defPlanet, atkUser, defUser, atkFleetId, battleDate) {
 		log('Begin of fight simulation - Planet: ' + defPlanet.address, 'info');
 		log('Attacking fleet leader: ' + atkUser.name, 'info');
 		log('Defensing planet leader: ' + defUser.name, 'info');
 
-		const currTime = Date.now();
+		const currTime = battleDate.getTime();
 
 		const fleetList = await db.fleet.findByPosition(defPlanet.address);
-		const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address);
+		const battle = new Combat(atkFleetId, atkUser, defUser, sid, defPlanet.address, battleDate);
 
 		// Add all fleets to fight
 		for(const i in fleetList) {
@@ -688,7 +669,7 @@ module.exports = class Combat {
 
 		preventRestarts++;
 
-		battle.fight();
+		await battle.fight();
 	}
 
 	static async getAttacksAgainstPlayer(plyId, plySid) {

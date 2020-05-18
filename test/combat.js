@@ -98,12 +98,12 @@ for(const unit of unitsList) {
 }
 
 describe('• Combat', () => {
-	db.tactics.find = (id, callback) => {
-		callback(tactics.filter((t) => t.id === id)[0]);
+	db.tactics.find = (id) => {
+		return tactics.filter((t) => t.id === id)[0];
 	};
 
-	db.unit.findByOwner = (id, callback) => {
-		callback(unitsList);
+	db.unit.findByOwner = (id) => {
+		return unitsList;
 	};
 
 	db.conquest.abortAllMilitaryConquest = () => { };
@@ -510,7 +510,7 @@ describe('• Combat', () => {
 	 * getAllTactics
 	 */
 	describe('# getAllTactics()', () => {
-		it('getAllTactics(_)', () => {
+		it('getAllTactics(_)', async() => {
 			const battleArena = new Combat('f1');
 			battleArena.atkFleets = [
 				{ tactic: 't1' },
@@ -523,12 +523,12 @@ describe('• Combat', () => {
 				't2': tactics[1],
 			};
 
-			battleArena.getAllTactics(() => {
-				assert.deepEqual(
-					battleArena.tacticCache,
-					expected
-				);
-			});
+			await battleArena.getAllTactics();
+
+			assert.deepEqual(
+				battleArena.tacticCache,
+				expected
+			);
 		});
 	});
 
@@ -536,7 +536,7 @@ describe('• Combat', () => {
 	 * getAllUnits
 	 */
 	describe('# getAllUnits()', () => {
-		it('getAllUnits(_)', (done) => {
+		it('getAllUnits(_)', async() => {
 			const battleArena = new Combat('f1');
 			battleArena.atkFleets = [
 				{ units: {'u1': 12, 'u2': 89 } },
@@ -544,24 +544,12 @@ describe('• Combat', () => {
 				{ units: { [specialUnitsUID.SHIP_WEP_MINES]: 24, 'u2': 78 } },
 			];
 
-			const timeout = setTimeout(
-				() => {
-					assert(false);
-					done();
-				}, 2500
+			await battleArena.getAllUnits();
+
+			assert.deepEqual(
+				battleArena.unitCache,
+				Object.assign({}, units)
 			);
-
-
-			battleArena.getAllUnits(() => {
-				clearTimeout(timeout);
-
-				assert.deepEqual(
-					battleArena.unitCache,
-					Object.assign({}, units)
-				);
-
-				done();
-			});
 		});
 	});
 
@@ -634,9 +622,9 @@ describe('• Combat', () => {
 	 */
 	describe('# beginFight', () => {
 		let globalFleetList = [
-			{ id: 'f1', name: 'Fleet 1', endMoveTime: null, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f2', name: 'Fleet 2', endMoveTime: null, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
-			{ id: 'f3', name: 'Fleet 3', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } },
+			{ id: 'f1', name: 'Fleet 1', endMoveTime: null, population: 0, points: 0, tactic: 't1', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
+			{ id: 'f2', name: 'Fleet 2', endMoveTime: null, population: 0, points: 0, tactic: 't2', ownerId: 'u2', orbitPosition: 1, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
+			{ id: 'f3', name: 'Fleet 3', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u2', orbitPosition: 1, units: { 'u1': 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
 		];
 
 		db.fleet.bulkUpdate = async() => { };
@@ -729,18 +717,18 @@ describe('• Combat', () => {
 			}, {
 				id: 'u1',
 				name:'User 1',
-			}, 'f3');
+			}, 'f3', new Date());
 		});
 
 		it('Normal battle n°1', (done) => {
 			globalFleetList.push(
-				{ id: 'f4', name: 'Fleet 4', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 } }
+				{ id: 'f4', name: 'Fleet 4', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { [specialUnitsUID.SHIP_WEP_MINES_NUKE]: 123, [specialUnitsUID.SHIP_WEP_MINES]: 42 }, maxFuel: 0, fuel: 0 },
 			);
 			globalFleetList.push(
-				{ id: 'f5', name: 'Fleet 5', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 } }
+				{ id: 'f5', name: 'Fleet 5', endMoveTime: null, population: 0, points: 0, tactic: '', ownerId: 'u1', orbitPosition: 0, units: { 'u2': 56, 'u1': 54 }, maxFuel: 0, fuel: 0 },
 			);
 			globalFleetList.push(
-				{ id: 'f6', name: 'Fleet 6', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 } }
+				{ id: 'f6', name: 'Fleet 6', endMoveTime: null, population: 0, points: 0, tactic: 't3', ownerId: 'u1', orbitPosition: 0, units: { 'u1': 45 }, maxFuel: 0, fuel: 0 },
 			);
 
 			const units = {
@@ -804,7 +792,7 @@ describe('• Combat', () => {
 			}, {
 				id: 'u1',
 				name:'User 1',
-			}, 'f3');
+			}, 'f3', new Date());
 		});
 
 		it('Normal battle n°2', (done) => {
@@ -827,7 +815,6 @@ describe('• Combat', () => {
 					},
 					'population': 62917,
 					'inBuilding': false,
-					'motherPlanetId': 'ce2802b2-5776-11e9-88de-cf5ab62b4afb',
 					'maxFuel': 58545000,
 					'fuel': 56110700,
 					'tactic': null,
@@ -850,7 +837,6 @@ describe('• Combat', () => {
 					},
 					'population': 192565,
 					'inBuilding': false,
-					'motherPlanetId': 'cb795124-5776-11e9-88de-ef6bfaf53683',
 					'maxFuel': 123000000,
 					'fuel': 122562000,
 					'tactic': '9923a48e-71ae-11e9-b1b6-0f0a67399da5',
@@ -933,7 +919,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80661808-5775-11e9-82cb-7b8f6e03caec',
 				name:'Firestorm',
-			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
+			}, '62716d0e-586d-11e9-86fb-b30be47b62e1', new Date());
 		});
 
 		it('Normal battle n°3', (done) => {
@@ -956,7 +942,6 @@ describe('• Combat', () => {
 					},
 					'population': 62917,
 					'inBuilding': false,
-					'motherPlanetId': 'ce2802b2-5776-11e9-88de-cf5ab62b4afb',
 					'maxFuel': 58545000,
 					'fuel': 56110700,
 					'tactic': null,
@@ -1066,7 +1051,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80658302-5775-11e9-86a1-7f506956c446',
 				name:'junkyfox',
-			}, '62716d0e-586d-11e9-86fb-b30be47b62e1');
+			}, '62716d0e-586d-11e9-86fb-b30be47b62e1', new Date());
 		});
 
 		it('Normal battle n°4', (done) => {
@@ -1177,7 +1162,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80661808-5775-11e9-82cb-7b8f6e03caec',
 				name:'Firestorm',
-			}, '6279b126-586d-11e9-a633-0723427ef961');
+			}, '6279b126-586d-11e9-a633-0723427ef961', new Date());
 		});
 
 		it('Normal battle n°5', (done) => {
@@ -1285,7 +1270,7 @@ describe('• Combat', () => {
 			}, {
 				id: '80660e8a-5775-11e9-9959-e7363221e85e',
 				name:'damlanil',
-			}, '6272e472-586d-11e9-b743-2bbdb01acdd3');
+			}, '6272e472-586d-11e9-b743-2bbdb01acdd3', new Date());
 		});
 	});
 

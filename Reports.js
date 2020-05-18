@@ -7,12 +7,13 @@ module.exports = class Reports extends require('./_shared/Reports')._Reports {
 	 * @return     {Promise}
 	 */
 	static async refresh(plyId, sid) {
-		if(sid === '-1') {
+		if(sid === null || sid === '-1') {
 			return;
 		}
 
-		const result = await db.battleLogAccess.fetchByPlayer(plyId);
-
-		io.to(sid).emit('player-report-list', result);
+		io.to(sid).emit(
+			'player-report-list',
+			await db.battleLogAccess.fetchByPlayer(plyId)
+		);
 	}
 };

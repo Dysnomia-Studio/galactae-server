@@ -1,4 +1,39 @@
 module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
+	static async endMove(currentFleet) {
+		const ownerUser = await db.player.find(currentFleet.ownerId);
+
+		if(currentFleet.orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
+			const defPlanet = await db.planet.findbyAddress(currentFleet.position);
+			const defUser = await db.player.find(defPlanet.owner);
+
+			await Combat.beginFight(ownerUser.sid, defPlanet, ownerUser, defUser, currentFleet.id, new Date(currentFleet.endMoveTime));
+		} else {
+			await db.fleet.endMove(currentFleet.id);
+		}
+
+		Websocket.sendNotification(ownerUser.sid, 'fleetMove', { fleetName: currentFleet.name, destination: currentFleet.position });
+
+		Fleets.syncNextFleet();
+	}
+
+	static async syncNextFleet() {
+		clearTimeout(Fleets.nextFleetTimeout);
+
+		const nextFleet = await db.fleet.getNextFleetToSync();
+
+		if(nextFleet.endMoveTime === null) {
+			return;
+		}
+
+		if(nextFleet.endMoveTime.getTime() <= Date.now()) {
+			Fleets.endMove(nextFleet);
+		} else {
+			Fleets.nextFleetTimeout = setTimeout(() => {
+				Fleets.endMove(nextFleet);
+			}, nextFleet.endMoveTime.getTime() - Date.now());
+		}
+	}
+
 
 	static async sendtoPlayer(FleetList, newPlanet, sid, address) {
 		if(!isset(newPlanet, 'object')) {
@@ -72,27 +107,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					continue;
 				}
 
-				if(FleetList[id].endMoveTime !== null && FleetList[id].endMoveTime.getTime() <= Date.now()) {
-					FleetList[id].endMoveTime = null;
-
-					if(FleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
-						const atkUser = await db.player.find(newPlanet.owner);
-
-						const defPlanet = await db.planet.findbyAddress(FleetList[id].position);
-						const defUser = await db.player.find(defPlanet.owner);
-
-						Combat.beginFight(sid, defPlanet, atkUser, defUser, FleetList[id].id);
-						continue;
-					}
-
-					Websocket.sendNotification(sid, 'fleetMove', { fleetName: FleetList[id].name, destination: FleetList[id].position });
-				}
-
 				haveToDone++;
 
 				const newFleet = {
 					id: FleetList[id].id,
-					endMoveTime: FleetList[id].endMoveTime,
 					fuel: FleetList[id].fuel,
 				};
 
@@ -159,7 +177,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER AND PLANET BEFORE !
 		 */
-		const oldFleetList = await db.fleet.findByMotherPlanet(planetData.id);
+		const oldFleetList = await db.fleet.findByMotherPlanet(planetData.address);
 
 		// Check max count
 		if(oldFleetList.length >= hqFleetCount[planetData.Buildings[6] - 1]) {
@@ -181,11 +199,9 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		const newFleet = {
 			name: data.fleetName,
 			ownerId: data.id,
-			motherPlanetId: planetData.id,
 			motherPlanetAddress: planetData.address,
 			position: planetData.address,
 			orbitPosition: FLEET_MOVE_TYPE.DEFEND,
-			points: 0,
 			endMoveTime: null,
 			units: [],
 			population: 0,
@@ -200,7 +216,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 			if(callback) {
 				callback(
-					(await db.fleet.findByMotherPlanet(planetData.id))
+					(await db.fleet.findByMotherPlanet(planetData.address))
 						.filter((f) => f.name === data.fleetName)[0]
 				);
 			}
@@ -462,6 +478,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		db.fleet.update(fleetReturned, function() {
 			Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
 			Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
+			Fleets.syncNextFleet();
 		});
 	}
 

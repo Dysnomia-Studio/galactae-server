@@ -5,18 +5,18 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 	 * @param      {object}  data    user data
 	 * @return     {socket}  units   list of units types
 	 */
-	static refresh(data) {
+	static async refresh(data) {
 		/**
 		 * WARNING: NO SECURITY DETECTION IS MADE IN THAT FUNCTION
 		 * YOU NEED TO AUTH USER BEFORE !
 		 */
-		db.unit.findByOwner(data.id,function(unitList) {
-			if(unitList===undefined) {
-				unitList = [];
-			}
+		let unitList = await db.unit.findByOwner(data.id);
 
-			io.to(data.sid).emit('units-recieve-data', unitList);
-		});
+		if(!unitList) {
+			unitList = [];
+		}
+
+		io.to(data.sid).emit('units-recieve-data', unitList);
 	}
 
 	static checkShipParts(ship) {
@@ -179,24 +179,23 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 					return;
 				}
 
-				db.unit.findByOwner(data.id,function(unitList) {
-					const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
+				const unitList = await db.unit.findByOwner(data.id);
+				const [duplicate, duplicateName] = Units.checkIfDuplicate(unitList, shipToSave);
 
-					if(!duplicate && !duplicateName) {
-						db.unit.create(shipToSave, function() {
-							log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
-							Units.refresh(data);
-						});
-					} else if(duplicate) {
-						message = 'SHIP_TYPE_ALREADY_EXISTS';
-						log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-						Websocket.SendMessageToClient({sid: data.sid, message: message});
-					} else {
-						message = 'SHIP_NAME_ALREADY_EXISTS';
-						log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
-						Websocket.SendMessageToClient({sid: data.sid, message: message});
-					}
-				});
+				if(!duplicate && !duplicateName) {
+					db.unit.create(shipToSave, function() {
+						log(data.username + ' has succed to create new unit type named ' + ship.name,'success');
+						Units.refresh(data);
+					});
+				} else if(duplicate) {
+					message = 'SHIP_TYPE_ALREADY_EXISTS';
+					log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
+					Websocket.SendMessageToClient({sid: data.sid, message: message});
+				} else {
+					message = 'SHIP_NAME_ALREADY_EXISTS';
+					log(data.username + ' has failed to create unit type named ' + ship.name + ' because ' + message,'fail');
+					Websocket.SendMessageToClient({sid: data.sid, message: message});
+				}
 
 			} else {
 				// Notify client
@@ -262,7 +261,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 		}
 
 		// Check if planet, unit & fleet belong to player
-		Planet.find(inputData,inputData.planet,0,async function(planetReturned,userReturned,fleetList) {
+		Planet.find(inputData,inputData.planet,async function(planetReturned,userReturned,fleetList) {
 			if(!isset(planetReturned.owner, 'string') || ''+planetReturned.owner !== ''+inputData.id) {
 				return;
 			}
@@ -411,7 +410,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 						Websocket.SendMessageToClient({ sid: inputData.sid, message: 'FLEET_ISNT_IN_ORBIT' });
 						return;
 					}
-					if(''+choosenFleet.motherPlanetId !== ''+newPlanet.id) {
+					if(choosenFleet.motherPlanetAddress !== newPlanet.address) {
 						return;
 					}
 

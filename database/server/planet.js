@@ -62,12 +62,18 @@ module.exports = {
 		for(let i=0; i<planetList.length; i++) {
 			const user = await db.player.find(planetList[i].owner);
 
+			planetList[i].ownerName = null;
+			planetList[i].ally = '';
+
 			if(isset(user, 'object') && !user.name.includes('Colonisable')) {
 				planetList[i].ownerName = user.name;
-				planetList[i].ally = user.ally;
-			} else {
-				planetList[i].ownerName = null;
-				planetList[i].ally = null;
+				if(user.ally) {
+					const ally = await db.alliance.find(user.ally);
+
+					if(ally && ally.name) {
+						planetList[i].ally = ally.name;
+					}
+				}
 			}
 		}
 		callback(planetList);

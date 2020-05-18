@@ -18,6 +18,24 @@ module.exports = {
 				return;
 			}
 
+			if(globalCfg.dev) {
+				const oldPoolQuery = client.query;
+				client.query = (...args) => {
+					let stack;
+
+					try {
+						throw new Error('');
+					}
+					catch (error) {
+						stack = error.stack || '';
+					}
+
+					console.log('QUERY:', args, stack);
+
+					return oldPoolQuery.apply(client, args);
+				};
+			}
+
 			global.serverClient = client;
 
 			log('Successfuly connected to server database.');
@@ -118,9 +136,7 @@ module.exports = {
 	 * General Server queries
 	 */
 	ban: require('./database/general/ban'),
-	globalRank: require('./database/general/globalRank'),
 	privilege: require('./database/general/privilege'),
 	server: require('./database/general/server'),
-	sectorRank: require('./database/general/sectorRank'),
 	userGameId: require('./database/general/userGameId'),
 };

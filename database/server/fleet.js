@@ -27,9 +27,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByMotherPlanet: async(planetId) => {
+	findByMotherPlanet: async(address) => {
 		try {
-			return (await serverClient.query('SELECT * FROM fleets WHERE "motherPlanetId"=$1', [planetId])).rows;
+			return (await serverClient.query('SELECT * FROM fleets WHERE "motherPlanetAddress"=$1', [address])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -61,10 +61,25 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	getNextFleetToSync: async() => {
+		try {
+			return (await serverClient.query('SELECT * FROM fleets ORDER BY "endMoveTime" ASC NULLS LAST LIMIT 1')).rows[0];
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
+	endMove: async(fleetId) => {
+		try {
+			await serverClient.query('UPDATE fleets SET "endMoveTime" = NULL WHERE id = $1', [fleetId]);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
 		delete fleet.id;
+		delete fleet.points;
 
 		let [query, values] = db.buildUpdateQuery('fleets', fleet);
 		values.push(id);
@@ -84,7 +99,6 @@ module.exports = {
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +
 			'"endMoveTime" = NULL, ' +
-			'points = newFleets.points, ' +
 			'population = newFleets.population, ' +
 			'units = newFleets.units, ' +
 			'"orbitPosition" = newFleets."orbitPosition" ' +
@@ -93,9 +107,8 @@ module.exports = {
 		let i = 0;
 		const queryParameters = [];
 		for(const fleet of fleets) {
-			query += '($' + (++i) + '::real, $' + (++i) + '::integer, $' + (++i) + '::json, $' + (++i) + '::integer, $' + (++i) + '::uuid), ';
+			query += '($' + (++i) + '::integer, $' + (++i) + '::json, $' + (++i) + '::integer, $' + (++i) + '::uuid), ';
 
-			queryParameters.push(fleet.points);
 			queryParameters.push(fleet.population);
 			queryParameters.push(fleet.units);
 			queryParameters.push(fleet.orbitPosition);
@@ -103,7 +116,7 @@ module.exports = {
 		}
 		query = query.substring(0, query.length - 2);
 
-		query += ' ) as newFleets(points, population, units, "orbitPosition", id) ';
+		query += ' ) as newFleets(population, units, "orbitPosition", id) ';
 		query += 'WHERE fleets.id = newFleets.id';
 
 		try {

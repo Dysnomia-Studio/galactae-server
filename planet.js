@@ -4,10 +4,9 @@ module.exports = class Planet {
 	 *
 	 * @param      {object}    user      User who asks for
 	 * @param      {string}    pid       Planet ID
-	 * @param      {number}    decalage  decalage de n°
 	 * @param      {Function}  callback  Function needed to call back
 	 */
-	static async find(user, pid, decalage, callback) {
+	static async find(user, pid, callback) {
 		const userReturned = await db.player.find(user.id);
 
 		if(isset(userReturned, 'object') && isset(userReturned.planetlist, 'array') && isset(userReturned.planetlist[0], 'string')) {
@@ -16,14 +15,6 @@ module.exports = class Planet {
 
 			for(let i=0; i<nbPlanetes; i++) {
 				if(pid===userReturned.planetlist[i]) { // Cas où le joueur a les bonnes infos
-					if(i===0 && decalage < 0) {
-						pid = userReturned.planetlist[nbPlanetes+decalage];
-					} else if(i>=(nbPlanetes-decalage) && decalage > 0) {
-						pid = userReturned.planetlist[decalage-1];
-					} else {
-						pid = userReturned.planetlist[i+decalage];
-					}
-
 					valid = true;
 					break;
 				}
@@ -33,7 +24,7 @@ module.exports = class Planet {
 				pid = userReturned.planetlist[0];
 			}
 			db.planet.find(pid,async function(planetReturned) {
-				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.id);
+				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
 				callback(planetReturned,userReturned,fleetReturned);
 			});
 		}
@@ -42,7 +33,7 @@ module.exports = class Planet {
 	static async traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback) {
 		let fleetsReturned = [];
 		if(currPlanet.owner === inputData.id) {
-			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.id);
+			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.address);
 		}
 		const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 
@@ -52,20 +43,19 @@ module.exports = class Planet {
 
 		if(inputData.pid === currPlanet.address) {
 			if(!disableTutorials && !Tutorials.hasFinishedTutorials(userReturned)) {
-				db.unit.findByOwner(userReturned.id, (unitsList) => {
-					const oldCount = Object.keys(userReturned.tutorials).length;
+				const unitsList = await db.unit.findByOwner(userReturned.id);
+				const oldCount = Object.keys(userReturned.tutorials).length;
 
-					userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
+				userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
-					if(Object.keys(userReturned.tutorials).length !== oldCount) {
-						db.player.update({
-							id: userReturned.id,
-							tutorials: userReturned.tutorials,
-						});
-					}
+				if(Object.keys(userReturned.tutorials).length !== oldCount) {
+					db.player.update({
+						id: userReturned.id,
+						tutorials: userReturned.tutorials,
+					});
+				}
 
-					Tutorials.checkTutorials(userReturned, newPlanet);
-				});
+				Tutorials.checkTutorials(userReturned, newPlanet);
 			}
 
 			if(callback) {
@@ -82,7 +72,6 @@ module.exports = class Planet {
 	 * Get, update then send planet data
 	 *
 	 * @param      {<type>}  data      data sent by user
-	 * @param      {number}  decalage  next/prev
 	 */
 	static async refresh(inputData, callback, disableTutorials=false) {
 		const userReturned = await db.player.find(inputData.id);
@@ -119,6 +108,10 @@ module.exports = class Planet {
 				inputData.pid = planetsReturned[0].address;
 				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
 			}
+
+			Player.refreshPoints(inputData, (playerData) => {
+				db.player.update(playerData);
+			});
 		});
 	}
 
@@ -177,7 +170,7 @@ module.exports = class Planet {
 			return;
 		}
 
-		Planet.find(data,data.planet,0,async function(planetReturned,userReturned,fleetReturned) {
+		Planet.find(data,data.planet,async function(planetReturned,userReturned,fleetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to update his building ('+data.building+') on planet ' + planetReturned.name +
@@ -316,10 +309,6 @@ module.exports = class Planet {
 				fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
 			}
 
-			const popCost = (unitReturned.cost[5]>1)?unitReturned.cost[5]:1;
-			fleetReturned.points = parseFloat(fleetReturned.points) + parseFloat(unitCount * popCost) * pointsCoef.units;
-			fleetReturned.points = '' + fleetReturned.points;
-
 			db.fleet.update(fleetReturned, function() {
 				Units.refresh(user);
 				Fleets.refresh(newPlanet.address,user.sid);
@@ -386,7 +375,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data    data
 	 */
 	static rename(data) {
-		Planet.find(data,data.planet,0,function(planetReturned) {
+		Planet.find(data,data.planet,function(planetReturned) {
 			if(data.planet!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');
