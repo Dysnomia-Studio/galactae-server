@@ -32,12 +32,13 @@ module.exports = class Planet {
 
 	static async traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback) {
 		let fleetsReturned = [];
+		let newPlanet = Object.assign(currPlanet, {});
 		if(currPlanet.owner === inputData.id) {
 			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.address);
-		}
-		const newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
+			newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 
-		db.planet.update(newPlanet);
+			db.planet.update(newPlanet);
+		}
 
 		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
 
