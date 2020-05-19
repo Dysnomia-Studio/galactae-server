@@ -80,6 +80,7 @@ module.exports = {
 	},
 	setOwner: async(planet, owner) => {
 		try {
+			await serverClient.query('UPDATE planets SET "lastResourcesUpdate" = NOW(), "lastUnitUpdate" = NOW() WHERE address = $1 AND ("owner" = \'00000000-0000-0000-0000-000000000001\' OR "owner" = \'00000000-0000-0000-0000-000000000002\')', [planet]);
 			await serverClient.query('UPDATE planets SET owner = $1, "currResearch" = \'\' WHERE address = $2', [owner, planet]);
 		} catch(err) {
 			log(err, 'error');

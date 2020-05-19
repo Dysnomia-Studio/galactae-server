@@ -105,8 +105,8 @@ module.exports = {
 		const player = await db.player.find(ply);
 		player.planetlist = player.planetlist.filter((elt) => elt !== planet);
 
-		if(player.planetlist === 0) {
-			const planetAddress = db.player.assignNewPlanet(ply);
+		if(player.planetlist.length === 0) {
+			const planetAddress = await db.planet.assignNewPlanet(ply);
 			player.planetlist = [planetAddress];
 		}
 
