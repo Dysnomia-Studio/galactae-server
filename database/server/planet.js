@@ -91,9 +91,7 @@ module.exports = {
 
 			const planetAddress = (await serverClient.query('SELECT * FROM planets WHERE "owner" = \'00000000-0000-0000-0000-000000000001\' LIMIT 1')).rows[0].address;
 
-			await serverClient.query('UPDATE planets SET owner = $1 WHERE address = $2', [plyId, planetAddress]);
-
-			await serverClient.query('UPDATE planets SET "lastResourcesUpdate" = NOW(), "lastUnitUpdate" = NOW() WHERE address = $1 AND "lastResourcesUpdate" IS NULL', [planetAddress]);
+			await serverClient.query('UPDATE planets SET "lastResourcesUpdate" = NOW(), "lastUnitUpdate" = NOW(), owner = $1 WHERE address = $2', [plyId, planetAddress]);
 
 			await serverClient.query('COMMIT');
 
