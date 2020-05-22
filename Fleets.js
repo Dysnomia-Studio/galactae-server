@@ -380,15 +380,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 				throw error;
 			}
-
-			if(isset(defUser, 'object') && defUser.id === user.id) {
-				const error = new Error();
-
-				error.name = 'DEFENDER_IS_ATTACKER';
-				error.message = user.username + ' failed to move fleet because defender is the same player as attacker.';
-
-				throw error;
-			}
 		}
 
 		let time;
