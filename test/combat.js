@@ -587,7 +587,7 @@ describe('• Combat', () => {
 
 			const battleArena = new Combat('f1');
 			battleArena.atkFleets = [
-				{ id: 'f1', name: 'Fleet 1' },
+				{ id: 'f1', name: 'Fleet 1', maxFuel: 0, fuel: 0 },
 			];
 			battleArena.atkUser = {
 				id:'u2',
@@ -694,7 +694,6 @@ describe('• Combat', () => {
 
 				for(const fleet of [...logs.finalAtkFleets, ...logs.finalDefenseFleets]) {
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
@@ -769,7 +768,6 @@ describe('• Combat', () => {
 
 				for(const fleet of [...logs.finalAtkFleets, ...logs.finalDefenseFleets]) {
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
@@ -896,7 +894,6 @@ describe('• Combat', () => {
 
 				for(const fleet of [...logs.finalAtkFleets, ...logs.finalDefenseFleets]) {
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
@@ -1028,7 +1025,6 @@ describe('• Combat', () => {
 					}
 
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
@@ -1139,7 +1135,6 @@ describe('• Combat', () => {
 
 				for(const fleet of [...logs.finalAtkFleets, ...logs.finalDefenseFleets]) {
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
@@ -1247,7 +1242,6 @@ describe('• Combat', () => {
 
 				for(const fleet of [...logs.finalAtkFleets, ...logs.finalDefenseFleets]) {
 					assert(!Number.isNaN(fleet.population));
-					assert(!Number.isNaN(fleet.points));
 				}
 
 				delete logs.finalAtkFleets;
