@@ -526,7 +526,7 @@ module.exports = class Combat {
 		} else {
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
 			const conquestList = await db.conquest.getActiveConquestsByPlayer(this.atkUser.id);
-			if(planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
+			if(planetData.owner !== this.atkUser.id && planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
 				for(const fleet of this.atkFleets) {
