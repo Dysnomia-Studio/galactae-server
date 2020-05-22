@@ -309,28 +309,30 @@ module.exports = class Combat {
 			targetUnitIndex = specialUnitsUID[target.unit];
 		}
 
+		const targetFleet = destinationFleets.filter((elt) => elt.id = target.fleet)[0];
+
 		let missChance = 0;
-		if(this.playerList[this.unitCache[target.unit].ownerId]) {
+		if(this.playerList[targetFleet.ownerId]) {
 			if(Research.isSearched(
-				this.playerList[this.unitCache[target.unit].ownerId],
+				this.playerList[targetFleet.ownerId],
 				'prop_manoeuvre'
 			)) {
 				missChance += researchBonus['prop_manoeuvre'];
 			}
 			if(Research.isSearched(
-				this.playerList[this.unitCache[target.unit].ownerId],
+				this.playerList[targetFleet.ownerId],
 				'prop_advManoeuvre'
 			)) {
 				missChance += researchBonus['prop_advManoeuvre'];
 			}
 		}
 
-		for(let i=0; i<this.unitCache[target.unit].parts.length; i++) {
-			if(this.unitCache[target.unit].parts[i].tech === 'none' || this.unitCache[target.unit].parts[i].tech === 'noPartResearched') { continue; }
+		for(let i=0; i<this.unitCache[targetUnitIndex].parts.length; i++) {
+			if(this.unitCache[targetUnitIndex].parts[i].tech === 'none' || this.unitCache[targetUnitIndex].parts[i].tech === 'noPartResearched') { continue; }
 
-			switch(this.unitCache[target.unit].parts[i].type) {
+			switch(this.unitCache[targetUnitIndex].parts[i].type) {
 				case 'hangar':
-					missChance += hangarMiss[this.unitCache[target.unit].parts[i].tech];
+					missChance += hangarMiss[this.unitCache[targetUnitIndex].parts[i].tech];
 					break;
 				default:
 					// Do nothing
@@ -432,6 +434,8 @@ module.exports = class Combat {
 			atk = !atk;
 
 			this.battleLog.push(action);
+
+			action = {};
 		}
 	}
 
@@ -519,6 +523,8 @@ module.exports = class Combat {
 		const planetData = await db.planet.findbyAddress(this.location);
 
 		if(defWins) {
+			await db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
+
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		} else {
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
