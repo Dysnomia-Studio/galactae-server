@@ -22,12 +22,12 @@ module.exports = {
 		}
 	},
 	find: async(tid, callback) => {
-		if(tid === '') {
+		if(tid === '' || !tid) {
 			return;
 		}
 
 		try {
-			const tactic = (await serverClient.query('SELECT * FROM tactics WHERE id=$1')).rows[0];
+			const tactic = (await serverClient.query('SELECT * FROM tactics WHERE id=$1', [tid])).rows[0];
 
 			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 
