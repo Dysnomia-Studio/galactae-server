@@ -265,16 +265,15 @@ module.exports = class Combat {
 	}
 
 	simulateSide(sourceFleets, destinationFleets, fleetIterator) {
-		const currUnitId = sourceFleets[fleetIterator.fleetCounter].unitsId[fleetIterator.unitTypeCounter];
+		let currUnitId = sourceFleets[fleetIterator.fleetCounter].unitsId[fleetIterator.unitTypeCounter];
 
-		let currUnitIndex = currUnitId;
 		if(typeof specialUnitsUID[currUnitId] !== 'undefined') {
-			currUnitIndex = specialUnitsUID[currUnitId];
+			currUnitId = specialUnitsUID[currUnitId];
 		}
 
 		if(!sourceFleets[fleetIterator.fleetCounter].units[currUnitId] ||
-			sourceFleets[fleetIterator.fleetCounter].units[currUnitId].length <= fleetIterator.unitNbCounter ||
-			Units.getWeapons(this.unitCache[currUnitIndex]).length === 0) {
+			sourceFleets[fleetIterator.fleetCounter].units[currUnitId] <= fleetIterator.unitNbCounter ||
+			Units.getWeapons(this.unitCache[currUnitId]).length === 0) {
 
 			fleetIterator.unitTypeCounter++;
 			fleetIterator.unitNbCounter = 0;
@@ -304,21 +303,22 @@ module.exports = class Combat {
 			];
 		}
 
-		let targetUnitIndex = target.unit;
 		if(typeof specialUnitsUID[target.unit] !== 'undefined') {
-			targetUnitIndex = specialUnitsUID[target.unit];
+			target.unit = specialUnitsUID[target.unit];
 		}
 
+		const targetFleet = destinationFleets.filter((elt) => elt.id === target.fleet)[0];
+
 		let missChance = 0;
-		if(this.playerList[this.unitCache[target.unit].ownerId]) {
+		if(this.playerList[targetFleet.ownerId]) {
 			if(Research.isSearched(
-				this.playerList[this.unitCache[target.unit].ownerId],
+				this.playerList[targetFleet.ownerId],
 				'prop_manoeuvre'
 			)) {
 				missChance += researchBonus['prop_manoeuvre'];
 			}
 			if(Research.isSearched(
-				this.playerList[this.unitCache[target.unit].ownerId],
+				this.playerList[targetFleet.ownerId],
 				'prop_advManoeuvre'
 			)) {
 				missChance += researchBonus['prop_advManoeuvre'];
@@ -341,18 +341,17 @@ module.exports = class Combat {
 
 		// @TODO: apply research bonuses
 
-		if(this.unitCache[currUnitIndex].oneShot) {
+		if(this.unitCache[currUnitId].oneShot) {
 			sourceFleets[fleetIterator.fleetCounter].units[currUnitId]--;
+			sourceFleets[fleetIterator.fleetCounter].population -= this.unitCache[currUnitId].cost[5];
 		}
 
-		const fleetIndex = destinationFleets.map((f) => f.id).indexOf(target.fleet);
+		const oldHealth = targetFleet.units[target.unit];
+		targetFleet.units[target.unit] -= damage;
 
-		const oldHealth = destinationFleets[fleetIndex].units[target.unit];
-		destinationFleets[fleetIndex].units[target.unit] -= damage;
-
-		if(destinationFleets[fleetIndex].units[target.unit] <= 0) {
-			delete destinationFleets[fleetIndex].units[target.unit];
-			destinationFleets[fleetIndex].unitsId = Object.keys(destinationFleets[fleetIndex].units);
+		if(targetFleet.units[target.unit] <= 0) {
+			delete targetFleet.units[target.unit];
+			targetFleet.unitsId = Object.keys(targetFleet.units);
 		}
 
 		if(sourceFleets[fleetIterator.fleetCounter].units[currUnitId] <= 0) {
@@ -362,17 +361,17 @@ module.exports = class Combat {
 
 		const action = {
 			fleetSource: sourceFleets[fleetIterator.fleetCounter].name,
-			fleetDestination: destinationFleets[fleetIndex].name,
-			fleetDestinationId: destinationFleets[fleetIndex].id,
-			unitSource: this.unitCache[currUnitIndex].name,
-			unitDestination: this.unitCache[targetUnitIndex].name,
-			unitDestinationId: this.unitCache[targetUnitIndex].id,
+			fleetDestination: targetFleet.name,
+			fleetDestinationId: targetFleet.id,
+			unitSource: this.unitCache[currUnitId].name,
+			unitDestination: this.unitCache[target.unit].name,
+			unitDestinationId: this.unitCache[target.unit].id,
 			damage: damage,
 			details: logs,
 		};
 
-		if(Math.floor(destinationFleets[fleetIndex].units[target.unit]) < Math.floor(oldHealth)) {
-			destinationFleets[fleetIndex].population -= this.unitCache[action.unitDestinationId].cost[5];
+		if(Math.floor(targetFleet.units[target.unit]) < Math.floor(oldHealth)) {
+			targetFleet.population -= this.unitCache[action.unitDestinationId].cost[5];
 
 			this.unitCache[action.unitDestinationId].owned--;
 		}
@@ -432,6 +431,8 @@ module.exports = class Combat {
 			atk = !atk;
 
 			this.battleLog.push(action);
+
+			action = {};
 		}
 	}
 
@@ -519,11 +520,13 @@ module.exports = class Combat {
 		const planetData = await db.planet.findbyAddress(this.location);
 
 		if(defWins) {
+			await db.fleet.bulkUpdate([...this.atkFleets, ...this.defFleets]);
+
 			log('End of fight simulation - Planet: ' + this.location + ' - Def wins - ' + (Date.now() - this.simulationBeginTime) + 'ms', 'info');
 		} else {
 			const atkFleet = this.atkFleets.filter((currFleet) => currFleet.id === this.atkFleetId)[0];
 			const conquestList = await db.conquest.getActiveConquestsByPlayer(this.atkUser.id);
-			if(planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
+			if(planetData.owner !== this.atkUser.id && planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
 				for(const fleet of this.atkFleets) {
