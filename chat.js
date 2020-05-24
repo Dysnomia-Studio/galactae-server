@@ -172,6 +172,7 @@ module.exports = class Chat {
 		const str = data.message;
 		const args=str.split(new RegExp('[ ,;]+', 'g'));
 		const msg = '';
+		let target;
 
 		data.noname = false;
 		data.send = false;
@@ -188,7 +189,7 @@ module.exports = class Chat {
 					return data;
 				}
 
-				const target = await Chat.searchTarget(data, args[1]);
+				target = await Chat.searchTarget(data, args[1]);
 
 				if(target) {
 					const banMessage = args.splice(3,args.length).join(' ');
@@ -223,7 +224,7 @@ module.exports = class Chat {
 					return data;
 				}
 
-				const target = await Chat.searchTarget(data, args[1]);
+				target = await Chat.searchTarget(data, args[1]);
 
 				if(target) {
 					const muteMessage = args.splice(3,args.length).join(' ');
