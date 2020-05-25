@@ -384,7 +384,11 @@
 
 				if(unitCache[realUnitId].shipType === 'SHIP_COLONY' && currFleet.units[currUnit] > 0) {
 					currFleet.units[currUnit]--;
-					currFleet.population -= unitCache[currUnitId].cost[5];
+					currFleet.population -= unitCache[realUnitId].cost[5];
+
+					if(currFleet.units[currUnit] === 0) {
+						delete currFleet.units[currUnit];
+					}
 
 					unitCache[realUnitId].owned--;
 					break;

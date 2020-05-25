@@ -529,9 +529,10 @@ module.exports = class Combat {
 			if(planetData.owner !== this.atkUser.id && planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
-				for(const fleet of this.atkFleets) {
+				for(const fid in this.atkFleets) {
+					const fleet = this.atkFleets[fid];
 					if(fleet.id === this.atkFleetId) {
-						[ fleet, this.unitCache ] = Fleets.removeColonyShip(fleet, this.unitCache);
+						[ this.atkFleets[fid], this.unitCache ] = Fleets.removeColonyShip(fleet, this.unitCache);
 					}
 
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;

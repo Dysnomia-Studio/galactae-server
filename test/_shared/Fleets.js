@@ -910,79 +910,97 @@ describe('• Fleets (shared)', () => {
 		});
 	});
 
-	describe('# hasColonyShip', () => {
+	describe('# removeColonyShip', () => {
 		it('Empty fleet', () => {
 			assert.deepEqual(
 				Fleets.removeColonyShip({ units: {} }, []),
-				{}
+				[ { units: {} }, [] ]
 			);
 		});
 
 		it('No colony ship', () => {
+			const fleet = { units: {
+				'test': 2,
+				'test2': 10,
+			} };
+
+			const units = {
+				'test': 2,
+				'test2': 10,
+			};
+
 			assert.deepEqual(
-				Fleets.removeColonyShip({ units: {
-					'test': 2,
-					'test2': 10,
-				} }, {
-					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
-					test2: { id: 'test2', shipType: 'SHIP_FIGHTER' },
-				}),
-				{
-					'test': 2,
-					'test2': 10,
-				}
+				Fleets.removeColonyShip(fleet, units),
+				[ fleet, units ]
 			);
 		});
 
 		it('0 colony ship', () => {
+			const fleet = { units: {
+				'test': 2,
+				'test2': 0,
+				'SHIP_WEP_MINES': 3
+			} };
+
+			const units = {
+				test: { id: 'test', shipType: 'SHIP_FIGHTER' },
+				test2: { id: 'test2', shipType: 'SHIP_COLONY' },
+				'00000000-0000-0000-0000-000000000001': { id: '00000000-0000-0000-0000-000000000001', shipType: 'SHIP_WEP_MINES' },
+			};
+
 			assert.deepEqual(
-				Fleets.removeColonyShip({ units: {
-					'test': 2,
-					'test2': 0,
-					'SHIP_WEP_MINES': 3
-				} }, {
-					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
-					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
-					'00000000-0000-0000-0000-000000000001': { id: '00000000-0000-0000-0000-000000000001', shipType: 'SHIP_WEP_MINES' },
-				}),
-				{
-					'test': 2,
-					'test2': 0,
-					'SHIP_WEP_MINES': 3
-				}
+				Fleets.removeColonyShip(fleet, units),
+				[ fleet, units ]
 			);
 		});
 
 		it('1 colony ship', () => {
-			assert.deepEqual(
-				Fleets.removeColonyShip({ units: {
+			const fleet = {
+				units: {
 					'test': 2,
 					'test2': 1,
-				} }, {
-					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
-					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
-				}),
-				{
-					'test': 2,
-					'test2': 0,
-				}
-			);
+				},
+				population: 1150
+			};
+			const units = {
+				test: { id: 'test', shipType: 'SHIP_FIGHTER', owned: 10, cost: [0,0,0,0,0,10] },
+				test2: { id: 'test2', shipType: 'SHIP_COLONY', owned: 10, cost: [0,0,0,0,0,15] },
+			};
+
+			const result = Fleets.removeColonyShip(fleet, units);
+
+			assert.equal(result[0].units['test'], 2);
+			assert.equal(typeof result[0].units['test2'], 'undefined');
+
+			assert.equal(result[0].population, 1135);
+
+			assert.equal(result[1]['test'].owned, 10);
+			assert.equal(result[1]['test2'].owned, 9);
 		});
 
 		it('10 colony ship', () => {
-			assert.deepEqual(
-				Fleets.removeColonyShip({ units: {
+			const fleet = {
+				units: {
 					'test': 2,
 					'test2': 10,
-				} }, {
-					test: { id: 'test', shipType: 'SHIP_FIGHTER' },
-					test2: { id: 'test2', shipType: 'SHIP_COLONY' },
-				}),
-				{
-					'test': 2,
-					'test2': 9,
-				}
-			);
+				},
+				population: 1150
+			};
+			const units = {
+				test: { id: 'test', shipType: 'SHIP_FIGHTER', owned: 10, cost: [0,0,0,0,0,10] },
+				test2: { id: 'test2', shipType: 'SHIP_COLONY', owned: 10, cost: [0,0,0,0,0,15] },
+			};
+
+			const result = Fleets.removeColonyShip(fleet, units);
+
+			assert.equal(result[0].units['test'], 2);
+			assert.equal(typeof result[0].units['test2'], 'number');
+			assert.equal(result[0].units['test2'], 9);
+
+			assert.equal(result[0].population, 1135);
+
+			assert.equal(result[1]['test'].owned, 10);
+			assert.equal(result[1]['test2'].owned, 9);
 		});
 	});
 });
