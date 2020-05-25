@@ -482,6 +482,12 @@ module.exports = class Combat {
 			ownerList.add(currFleet.ownerId);
 		}
 
+		const conquestPlayers = await db.conquest.getActiveConquestsOnPlanet(this.location, this.battleDate);
+		for(const conquest of conquestPlayers) {
+			ownerList.add(conquest.prevOwner);
+			ownerList.add(conquest.newOwner);
+		}
+
 		// Get all units from db
 		for(const ownerId of ownerList) {
 			this.playerList[ownerId] = await db.player.find(ownerId);
