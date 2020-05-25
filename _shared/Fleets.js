@@ -210,7 +210,7 @@
 				for(let i=0; i<haveToUpdate.length; i++) {
 					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
 
-					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime === null) {
+					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime !== null) {
 						haveToUpdate[i] = -1;
 						continue;
 					}
@@ -265,7 +265,7 @@
 			if(typeof planet.highPriorityFleet === 'string') {
 				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
 
-				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
+				if(prioId !== -1 && fleetList[prioId].position === planet.address && fleetList[prioId].endMoveTime !== null) {
 					fleetList[prioId].fuel += planet.resources[1];
 
 					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
