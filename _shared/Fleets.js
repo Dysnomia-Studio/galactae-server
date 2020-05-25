@@ -384,11 +384,14 @@
 
 				if(unitCache[realUnitId].shipType === 'SHIP_COLONY' && currFleet.units[currUnit] > 0) {
 					currFleet.units[currUnit]--;
+					currFleet.population -= unitCache[currUnitId].cost[5];
+
+					unitCache[realUnitId].owned--;
 					break;
 				}
 			}
 
-			return currFleet.units;
+			return [ currFleet, unitCache ];
 		}
 
 		static cargoSize(currFleet, unitCache) {
