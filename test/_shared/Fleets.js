@@ -510,7 +510,7 @@ describe('• Fleets (shared)', () => {
 						id: 'f' + currentFleet,
 						maxFuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_MAXFUEL),
 						fuel: Math.round(Math.random() * DISTRIBUTE_FUEL_RANDOMTESTS_MAXRANDOM_FUEL),
-						orbitPosition: Math.round(Math.random() * 4),
+						orbitPosition: Math.round(Math.random() * 3),
 						endMoveTime: new Date(Math.round((Math.random() * (Date.now() * 2)) - Date.now())),
 						ownerId: ownerList[ownerRandom].id,
 						owner: ownerList[ownerRandom],
@@ -522,6 +522,10 @@ describe('• Fleets (shared)', () => {
 
 					if(Math.random() < 0.01) {
 						fleetList[currentFleet].fuel = undefined;
+					}
+
+					if(Math.random() < 0.5) {
+						fleetList[currentFleet].endMoveTime = null;
 					}
 
 					if(typeof fleetList[currentFleet].fuel !== 'undefined') {

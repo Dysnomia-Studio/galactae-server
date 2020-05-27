@@ -301,7 +301,7 @@ describe('• Tutorials (shared)', () => {
 			);
 		});
 
-		it('Check move all objective: true', () => {
+		it('Check move all objective: true (not moving)', () => {
 			assert.equal(
 				Tutorials.hasCompletedTutorial(
 					'interplanetaryFlight',
@@ -310,9 +310,39 @@ describe('• Tutorials (shared)', () => {
 						research: { prop_ions: -1 },
 					},
 					{},
-					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '' }],
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: null, ownerId: '', position: '5-5-10-P1', motherPlanetAddress: '5-5-10-P2' }],
 					[]
 				), true
+			);
+		});
+
+		it('Check move all objective: true (moving)', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
+					'interplanetaryFlight',
+					{
+						tutorials: { unitsBuild: true },
+						research: { prop_ions: -1 },
+					},
+					{},
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: new Date(), ownerId: '', position: '5-5-10-P1', motherPlanetAddress: '5-5-10-P2' }],
+					[]
+				), true
+			);
+		});
+
+		it('Check move outerSystem objective: false - Not belonging fleet', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
+					'interstellarFlight',
+					{
+						tutorials: { unitsBuild: true },
+						research: { prop_vsl: -1 },
+					},
+					{},
+					[ { orbitPosition: FLEET_MOVE_TYPE.MOVE, endMoveTime: null, motherPlanetAddress: '1-1-2-P3', position: '1-1-2-P1' }],
+					[]
+				), false
 			);
 		});
 
