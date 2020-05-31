@@ -6,13 +6,12 @@ module.exports = class Privileges {
 			for(let i=0; i < banObj.length; i++) {
 
 				if(banObj[i].ban_end.getTime() > Date.now()) {
-					callback(true);
-					return;
+					return true;
 				}
 			}
 		}
 
-		callback(false);
+		return false;
 	}
 
 	static getChatRank(lvl) {
