@@ -3,6 +3,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		const ownerUser = await db.player.find(currentFleet.ownerId);
 
 		if(currentFleet.orbitPosition === FLEET_MOVE_TYPE.ATTACK) {
+			await Planet.refresh({
+				id: ownerUser.id,
+				sid: ownerUser.sid,
+				username: ownerUser.name,
+				pid: currentFleet.position,
+			});
+
 			const defPlanet = await db.planet.findbyAddress(currentFleet.position);
 			const defUser = await db.player.find(defPlanet.owner);
 
