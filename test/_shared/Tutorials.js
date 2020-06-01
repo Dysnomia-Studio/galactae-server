@@ -403,5 +403,34 @@ describe('• Tutorials (shared)', () => {
 				), true
 			);
 		});
+
+		it('Check welcome objective, with manually: false', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
+					'welcome',
+					{
+						tutorials: { },
+					},
+					{},
+					[],
+					[]
+				), false
+			);
+		});
+
+		it('Check welcome objective, without manually: true', () => {
+			assert.equal(
+				Tutorials.hasCompletedTutorial(
+					'welcome',
+					{
+						tutorials: { },
+					},
+					{},
+					[],
+					[],
+					false
+				), true
+			);
+		});
 	});
 });
