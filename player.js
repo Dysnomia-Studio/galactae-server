@@ -160,6 +160,7 @@ module.exports = class Player {
 		Alliances.sendToPlayer(playerData);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
 		Conquest.syncPlayer(data.id, data.sid);
+		GameMap.syncPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {

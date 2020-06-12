@@ -55,6 +55,23 @@ module.exports = function(socket) {
 		});
 	});
 
+	// Map influence zones
+	socket.on('global-ask-influenceData', function(data) {
+		// Vars
+		if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string')) {
+			return;
+		}
+
+		// User
+		data.sid = socket.id;
+		Player.isValid(data,function(userData) { // Verify identity
+			if(globalCfg.dev) {
+				log('Asking influence zones data');
+			}
+
+			GameMap.syncPlayer(data.id, data.sid);
+		});
+	});
 
 	//Building
 	socket.on('planet-build', function(data) {
