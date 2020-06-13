@@ -115,6 +115,7 @@ describe('• Combat', () => {
 	db.conquest.abortAllMilitaryConquest = () => { };
 
 	db.conquest.getActiveConquestsByPlayer = async() => [];
+	db.conquest.getActiveConquestsOnPlanet = async() => [];
 	db.conquest.getConquestsByPlayer = () => [];
 	db.planet.findbyAddress = () => { return { owner: 'u1' }; };
 

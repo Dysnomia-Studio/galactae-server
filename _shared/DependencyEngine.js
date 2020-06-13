@@ -116,12 +116,6 @@
 					continue;
 				}
 
-				if(dependency.location === 'innerSystem' && (
-					GameMap.getSystemFromAdress(fleet.position) !== GameMap.getSystemFromAdress(fleet.motherPlanetAddress)
-				)) {
-					continue;
-				}
-
 				if(dependency.moveType !== fleet.orbitPosition) {
 					continue;
 				}

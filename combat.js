@@ -482,6 +482,12 @@ module.exports = class Combat {
 			ownerList.add(currFleet.ownerId);
 		}
 
+		const conquestPlayers = await db.conquest.getActiveConquestsOnPlanet(this.location, this.battleDate);
+		for(const conquest of conquestPlayers) {
+			ownerList.add(conquest.prevOwner);
+			ownerList.add(conquest.newOwner);
+		}
+
 		// Get all units from db
 		for(const ownerId of ownerList) {
 			this.playerList[ownerId] = await db.player.find(ownerId);
@@ -529,10 +535,10 @@ module.exports = class Combat {
 			if(planetData.owner !== this.atkUser.id && planetData.owner !== '00000000-0000-0000-0000-000000000003' && Fleets.hasColonyShip(atkFleet, this.unitCache) && (conquestList.length + this.atkUser.planetlist.length < Conquest.getPlanetMaxCount(this.atkUser.points))) {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
-				for(const fleet of this.atkFleets) {
+				for(const fid in this.atkFleets) {
+					const fleet = this.atkFleets[fid];
 					if(fleet.id === this.atkFleetId) {
-						fleet.units = Fleets.removeColonyShip(fleet, this.unitCache);
-						// TODO: this.unitCache[unitId].owned--;
+						[ this.atkFleets[fid], this.unitCache ] = Fleets.removeColonyShip(fleet, this.unitCache);
 					}
 
 					fleet.orbitPosition = FLEET_MOVE_TYPE.DEFEND;

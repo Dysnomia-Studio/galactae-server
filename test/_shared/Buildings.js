@@ -388,6 +388,13 @@ describe('• Buildings (shared)', () => {
 				[45699425,38937630]
 			);
 		});
+
+		it('all lvl 1, other player fleet', () => {
+			assert.deepEqual(
+				Buildings.getPeopleConsAndProd({ nextBuilding: -1, Buildings: [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0] }, [ { population: 1000.5, motherPlanetAddress: 'addr' }]),
+				[275357,232985]
+			);
+		});
 	});
 
 	/**

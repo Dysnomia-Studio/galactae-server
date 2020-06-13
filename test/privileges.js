@@ -11,28 +11,20 @@ describe('• Privileges', () => {
 			return bans.filter((b) => b.user_id === userId);
 		};
 
-		it('Should be banned', () => {
-			Privileges.isBannedFromChat('u1', (banned) => {
-				assert.equal(banned, true);
-			});
+		it('Should be banned', async() => {
+			assert.equal(await Privileges.isBannedFromChat('u1'), true);
 		});
 
-		it('Should not be banned (not existing ban)', () => {
-			Privileges.isBannedFromChat('u2', (banned) => {
-				assert.equal(banned, false);
-			});
+		it('Should not be banned (not existing ban)', async() => {
+			assert.equal(await Privileges.isBannedFromChat('u2'), false);
 		});
 
-		it('Should not be banned (expired ban)', () => {
-			Privileges.isBannedFromChat('u3', (banned) => {
-				assert.equal(banned, false);
-			});
+		it('Should not be banned (expired ban)', async() => {
+			assert.equal(await Privileges.isBannedFromChat('u3'), false);
 		});
 
-		it('Should be banned (one expired, the other not)', () => {
-			Privileges.isBannedFromChat('u4', (banned) => {
-				assert.equal(banned, true);
-			});
+		it('Should be banned (one expired, the other not)',  async() => {
+			assert.equal(await Privileges.isBannedFromChat('u1'), true);
 		});
 	});
 

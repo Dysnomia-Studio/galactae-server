@@ -67,24 +67,24 @@ module.exports = class Player {
 		}
 
 		if(maintenance) { // Check whitelist
-			db.privilege.find(data.user_id, function(userPrivileges) {
-				if(!isset(userPrivileges, 'array') || !isset(userPrivileges[0], 'object') ||
-					!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
+			const userPrivileges = await db.privilege.find(data.user_id);
 
-					log('Error: ' + data.username + ' isn\'t whitelisted.');
-					io.to(data.sid).emit('server-kick','ERR_WHITELIST');
+			if(!isset(userPrivileges, 'array') || !isset(userPrivileges[0], 'object') ||
+				!isset(userPrivileges[0].user_whitelist) || userPrivileges[0].user_whitelist !== true) {
+
+				log('Error: ' + data.username + ' isn\'t whitelisted.');
+				io.to(data.sid).emit('server-kick','ERR_WHITELIST');
+				return;
+			}
+
+			db.player.searchByName(data.username,function(dataReturned) {
+				if(!isset(dataReturned, 'object')) {
+					console.error('User: ' + data.username + ' not found !');
 					return;
 				}
 
-				db.player.searchByName(data.username,function(dataReturned) {
-					if(!isset(dataReturned, 'object')) {
-						console.error('User: ' + data.username + ' not found !');
-						return;
-					}
-
-					Player.traitementsConnexion(data, dataReturned);
-				});
-			}); // Privileges db query
+				Player.traitementsConnexion(data, dataReturned);
+			});
 		} else { // Normal behavior
 			db.player.searchByName(data.username,function(dataReturned) {
 				if(!isset(dataReturned, 'object')) {
@@ -160,6 +160,7 @@ module.exports = class Player {
 		Alliances.sendToPlayer(playerData);
 		Combat.getAttacksAgainstPlayer(data.id, data.sid);
 		Conquest.syncPlayer(data.id, data.sid);
+		GameMap.syncPlayer(data.id, data.sid);
 		Tactics.refresh(data.id, data.sid);
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {

@@ -210,7 +210,7 @@
 				for(let i=0; i<haveToUpdate.length; i++) {
 					const id = fleetList.map((f) => f.id).indexOf(haveToUpdate[i]);
 
-					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime === null) {
+					if(fleetList[id].orbitPosition === FLEET_MOVE_TYPE.ATTACK || fleetList[id].endMoveTime !== null) {
 						haveToUpdate[i] = -1;
 						continue;
 					}
@@ -265,7 +265,7 @@
 			if(typeof planet.highPriorityFleet === 'string') {
 				const prioId = fleetList.map((d) => d.id).indexOf(planet.highPriorityFleet);
 
-				if(prioId !== -1 && fleetList[prioId].position === planet.address) {
+				if(prioId !== -1 && fleetList[prioId].position === planet.address && fleetList[prioId].endMoveTime !== null) {
 					fleetList[prioId].fuel += planet.resources[1];
 
 					if(fleetList[prioId].fuel > fleetList[prioId].maxFuel) {
@@ -384,11 +384,18 @@
 
 				if(unitCache[realUnitId].shipType === 'SHIP_COLONY' && currFleet.units[currUnit] > 0) {
 					currFleet.units[currUnit]--;
+					currFleet.population -= unitCache[realUnitId].cost[5];
+
+					if(currFleet.units[currUnit] === 0) {
+						delete currFleet.units[currUnit];
+					}
+
+					unitCache[realUnitId].owned--;
 					break;
 				}
 			}
 
-			return currFleet.units;
+			return [ currFleet, unitCache ];
 		}
 
 		static cargoSize(currFleet, unitCache) {

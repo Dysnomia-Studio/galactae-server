@@ -102,4 +102,63 @@ module.exports = {
 			await serverClient.query('ROLLBACK');
 		}
 	},
+	getInfluenceZones: async(plyId) => {
+		try {
+			const systems = {};
+
+			const userData = await db.player.find(plyId);
+
+			systems.playerSystems = Array.from(
+				new Set(
+					userData.planetlist
+						.map(GameMap.getSystemFromAdress)
+				)
+			);
+
+			if(userData.ally !== null) {
+				// Current alliance
+				systems.alliedSystems = Array.from(
+					new Set(
+						await db.alliance.getMembersSystems(userData.ally)
+					)
+				);
+
+				// Allied alliances
+				const allyAllied = await db.alliance.getPacts(userData.ally);
+				systems.allyAlliedSystems = [];
+				for(const allied of allyAllied) {
+					let allyId = allied.first;
+					if(allied.first === userData.ally) {
+						allyId = allied.second;
+					}
+
+					systems.allyAlliedSystems = Array.from(
+						new Set([
+							...(await db.alliance.getMembersSystems(allyId)),
+							...systems.allyAlliedSystems
+						])
+					);
+				}
+
+				// @TODO: get ennemies
+				systems.ennemiesSystems = [];
+			} else {
+				systems.alliedSystems = [];
+				systems.allyAlliedSystems = [];
+				systems.ennemiesSystems = [];
+			}
+
+			// alliedSystems / playerSystems filter
+			systems.alliedSystems = systems.alliedSystems.filter((elt) => !systems.playerSystems.includes(elt));
+
+			// alliedAndEnnemiesSystems
+			systems.alliedAndEnnemiesSystems = systems.ennemiesSystems.filter((elt) => systems.alliedSystems.includes(elt) || systems.allyAlliedSystems.includes(elt));
+			systems.allyAlliedSystems = systems.allyAlliedSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
+			systems.ennemiesSystems = systems.ennemiesSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
+
+			return systems;
+		} catch(err) {
+			log(err, 'error');
+		}
+	}
 };

@@ -113,7 +113,11 @@ module.exports = class Planet {
 			const playerData = await db.player.find(inputData.id);
 
 			Player.refreshPoints(playerData, (newPlayerData) => {
-				db.player.update(newPlayerData);
+				db.player.update({
+					id: newPlayerData.id,
+					points: newPlayerData.points,
+					money: newPlayerData.money,
+				});
 			});
 		});
 	}
@@ -378,8 +382,8 @@ module.exports = class Planet {
 	 * @param      {<type>}  data    data
 	 */
 	static rename(data) {
-		Planet.find(data,data.planet,function(planetReturned) {
-			if(data.planet!==planetReturned.address) { // Stop if not belonging
+		Planet.find(data,data.pid,function(planetReturned) {
+			if(data.pid!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');
 				return;
@@ -407,9 +411,9 @@ module.exports = class Planet {
 				data.name = data.name.split(replace[i][0]).join(replace[i][1]);
 			}
 
-			log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.planet+'), new name: '+data.name);
+			log(data.username+' renamed its planet ' + planetReturned.name +' (' +data.pid+'), new name: '+data.name);
 
-			Planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.planet, id: data.id, sid: data.sid });
+			Planet.sendPlanetDataToUser({data: {name: data.name}, planet: data.pid, id: data.id, sid: data.sid });
 
 			planetReturned.name = data.name;
 

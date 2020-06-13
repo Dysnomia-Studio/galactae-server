@@ -64,6 +64,26 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	getMembersSystems: async (id) => {
+		try {
+			const allyMembers = (await serverClient.query('SELECT player FROM alliances_permissions WHERE ally = $1', [id])).rows;
+
+			const playerIds = allyMembers.map((elt) => elt.player);
+
+			const systems = (
+				await serverClient.query(
+					'SELECT address FROM planets ' +
+					'WHERE owner = ANY($1::uuid[])',
+					[playerIds])
+			).rows.map((elt) => GameMap.getSystemFromAdress(elt.address));
+
+			return Array.from(
+				new Set(systems)
+			);
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	getExtendedMemberList: async (id) => {
 		try {
 			return (await serverClient.query('SELECT users.name, users.sid, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
