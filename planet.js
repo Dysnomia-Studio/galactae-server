@@ -113,7 +113,11 @@ module.exports = class Planet {
 			const playerData = await db.player.find(inputData.id);
 
 			Player.refreshPoints(playerData, (newPlayerData) => {
-				db.player.update(newPlayerData);
+				db.player.update({
+					id: newPlayerData.id,
+					points: newPlayerData.points,
+					money: newPlayerData.money,
+				});
 			});
 		});
 	}
