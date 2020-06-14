@@ -9,14 +9,14 @@ module.exports = {
 			callback(objReturned.rows);
 		});
 	},
-	find: async (id) => {
+	find: async(id) => {
 		try {
 			return (await serverClient.query('SELECT * FROM users WHERE id = $1 LIMIT 1', [id])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	findByName: async (name) => {
+	findByName: async(name) => {
 		try {
 			return (await serverClient.query('SELECT * FROM users WHERE name = $1 LIMIT 1', [name])).rows[0];
 		} catch(err) {
@@ -79,7 +79,7 @@ module.exports = {
 			}
 		});
 	},
-	joinAlly: async (userId, allyId) => {
+	joinAlly: async(userId, allyId) => {
 		try {
 			await serverClient.query(
 				'UPDATE users SET ally = $2 WHERE id = $1',
@@ -101,7 +101,7 @@ module.exports = {
 			log('List cleared !') ;
 		});
 	},
-	delPlanet: async (ply, planet) => {
+	delPlanet: async(ply, planet) => {
 		const player = await db.player.find(ply);
 		player.planetlist = player.planetlist.filter((elt) => elt !== planet);
 
@@ -116,7 +116,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	addPlanet: async (ply, planet) => {
+	addPlanet: async(ply, planet) => {
 		const player = await db.player.find(ply);
 		player.planetlist = Array.from(new Set([...player.planetlist, planet]));
 

@@ -1,5 +1,5 @@
 module.exports = {
-	findbyAddress: async (addr) => {
+	findbyAddress: async(addr) => {
 		try {
 			return (await serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr])).rows[0];
 		} catch(err) {
@@ -50,7 +50,7 @@ module.exports = {
 			}
 		});
 	},
-	findBySystemWithOwners: async (systemAddr, callback) => {
+	findBySystemWithOwners: async(systemAddr, callback) => {
 		let planetList;
 		try {
 			planetList =  (await serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'])).rows;
