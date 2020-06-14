@@ -216,7 +216,10 @@ module.exports = class Chat {
 					io.to('' + target.sid).emit('server-kick', banMessage);
 
 					target.sid = -1;
-					await db.player.update(target);
+					await db.player.update({
+						id: target.id,
+						sid: target.sid,
+					});
 				}
 				break;
 			case '!mute':

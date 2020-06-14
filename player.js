@@ -1,22 +1,22 @@
 module.exports = class Player {
 	/* Is Valid ? */
-	static isValid(user,callback) {
-		db.player.searchBySid(user.sid, async(playerData) => {
-			if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
-				if(Player.canAct(playerData)) { // Don't spam
+	static async isValid(user,callback) {
+		const playerData = await db.player.findBySid(user.sid);
 
-					await db.player.update({
-						id: playerData.id,
-						lastAction: new Date(),
-					});
+		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
+			if(Player.canAct(playerData)) { // Don't spam
 
-					callback(playerData);
-				}
-			} else {
-				// Kick that Hacker ...
-				io.to(user.sid).emit('server-kick','INVALID_SESSION');
+				await db.player.update({
+					id: playerData.id,
+					lastAction: new Date(),
+				});
+
+				callback(playerData);
 			}
-		});
+		} else {
+			// Kick that Hacker ...
+			io.to(user.sid).emit('server-kick','INVALID_SESSION');
+		}
 	}
 
 	/* Does the player can act ? */
@@ -76,25 +76,16 @@ module.exports = class Player {
 				io.to(data.sid).emit('server-kick','ERR_WHITELIST');
 				return;
 			}
-
-			db.player.searchByName(data.username,function(dataReturned) {
-				if(!isset(dataReturned, 'object')) {
-					console.error('User: ' + data.username + ' not found !');
-					return;
-				}
-
-				Player.traitementsConnexion(data, dataReturned);
-			});
-		} else { // Normal behavior
-			db.player.searchByName(data.username,function(dataReturned) {
-				if(!isset(dataReturned, 'object')) {
-					console.error('User: ' + data.username + ' not found !');
-					return;
-				}
-
-				Player.traitementsConnexion(data, dataReturned);
-			});
 		}
+
+		const userReturned = await db.player.findByName(data.username);
+
+		if(!isset(userReturned, 'object')) {
+			console.error('User: ' + data.username + ' not found !');
+			return;
+		}
+
+		Player.traitementsConnexion(data, userReturned);
 	}
 
 	static async traitementsConnexion(data, playerData) {
@@ -124,7 +115,7 @@ module.exports = class Player {
 		playerData.sid = data.sid;
 
 		// We need this to prevent next action being considered as "hacker" by validation system
-		db.player.update({
+		await db.player.update({
 			id: playerData.id,
 			sid: playerData.sid,
 		});
@@ -164,28 +155,28 @@ module.exports = class Player {
 		Tactics.refresh(data.id, data.sid);
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
-			Research.refreshUserResearch(userNewPoints, function(userNewResearch) {
-				db.player.update(userNewResearch, function() {
-					if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
-						data.pid = userNewResearch.planetlist[0];
-					}
+			Research.refreshUserResearch(userNewPoints, async function(userNewResearch) {
+				await db.player.update(userNewResearch);
 
-					Reports.refresh(playerData.id, data.sid);
+				if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
+					data.pid = userNewResearch.planetlist[0];
+				}
 
-					db.planet.find(data.pid, function(planetReturned) {
-						Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+				Reports.refresh(playerData.id, data.sid);
 
-						Conquest.refresh(data.sid, data.id, data.pid); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
-					});
+				db.planet.find(data.pid, function(planetReturned) {
+					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+
+					Conquest.refresh(data.sid, data.id, data.pid); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
 				});
 			});
 		});
 	}
 
 	/* Disconnect Player */
-	static disconnect(userData) {
+	static async disconnect(userData) {
 		userData.sid = '-1';
-		db.player.update(userData);
+		await db.player.update(userData);
 	}
 	static calcTotalPlanetPoints(user,callback,i,points) {
 		db.planet.find(user.planetlist[i],function(planetReturned) {
@@ -304,7 +295,7 @@ module.exports = class Player {
 	}
 
 	/* dayBonus */
-	static dayBonus(data,inputData,choice) {
+	static async dayBonus(data,inputData,choice) {
 		const {
 			credits,
 			helium,
@@ -327,7 +318,7 @@ module.exports = class Player {
 
 				log(inputData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
-				db.player.update(newPlayerData);
+				await db.player.update(newPlayerData);
 
 				Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid });
 			});
@@ -335,7 +326,7 @@ module.exports = class Player {
 			newPlayerData.money = data.money + credits;
 			log(inputData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
 
-			db.player.update(newPlayerData);
+			await db.player.update(newPlayerData);
 			io.to(inputData.sid).emit('player-recieve-data',{
 				money: newPlayerData.money,
 				points: newPlayerData.points,

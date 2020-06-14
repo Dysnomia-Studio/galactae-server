@@ -50,7 +50,7 @@ module.exports = class Planet {
 				userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
 				if(Object.keys(userReturned.tutorials).length !== oldCount) {
-					db.player.update({
+					await db.player.update({
 						id: userReturned.id,
 						tutorials: userReturned.tutorials,
 					});
@@ -112,8 +112,8 @@ module.exports = class Planet {
 
 			const playerData = await db.player.find(inputData.id);
 
-			Player.refreshPoints(playerData, (newPlayerData) => {
-				db.player.update({
+			Player.refreshPoints(playerData, async(newPlayerData) => {
+				await db.player.update({
 					id: newPlayerData.id,
 					points: newPlayerData.points,
 					money: newPlayerData.money,
