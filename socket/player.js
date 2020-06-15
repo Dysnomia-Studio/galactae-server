@@ -113,12 +113,12 @@ module.exports = function(socket) {
 
 				userReturned.tutorials[data.tutorial] = true;
 
-				await db.player.update({
+				if(await db.player.update({
 					id: data.id,
 					tutorials: userReturned.tutorials,
-				});
-
-				Planet.refresh(data);
+				})) {
+					Planet.refresh(data);
+				}
 			}, true);
 		});
 	});

@@ -6,12 +6,12 @@ module.exports = class Player {
 		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
 			if(Player.canAct(playerData)) { // Don't spam
 
-				await db.player.update({
+				if(await db.player.update({
 					id: playerData.id,
 					lastAction: new Date(),
-				});
-
-				callback(playerData);
+				})) {
+					callback(playerData);
+				}
 			}
 		} else {
 			// Kick that Hacker ...
@@ -115,10 +115,12 @@ module.exports = class Player {
 		playerData.sid = data.sid;
 
 		// We need this to prevent next action being considered as "hacker" by validation system
-		await db.player.update({
+		if(!(await db.player.update({
 			id: playerData.id,
 			sid: playerData.sid,
-		});
+		}))) {
+			return;
+		}
 
 		const jour = TIME.DAY_TO_MS;
 		const minuit = Date.now() - (Date.now()%jour);
@@ -156,7 +158,9 @@ module.exports = class Player {
 		Units.refresh(data);
 		Player.refreshPoints(playerData, function(userNewPoints) {
 			Research.refreshUserResearch(userNewPoints, async function(userNewResearch) {
-				await db.player.update(userNewResearch);
+				if(!(await db.player.update(userNewResearch))) {
+					return;
+				}
 
 				if(data.pid === '' || userNewResearch.planetlist.indexOf(data.pid) === -1) {
 					data.pid = userNewResearch.planetlist[0];
@@ -318,19 +322,20 @@ module.exports = class Player {
 
 				log(inputData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
-				await db.player.update(newPlayerData);
-
-				Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid });
+				if(await db.player.update(newPlayerData)) {
+					Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid })
+				}
 			});
 		} else {
 			newPlayerData.money = data.money + credits;
 			log(inputData.username + ' takes its Daily Bonus ! ' + credits + ' credits');
 
-			await db.player.update(newPlayerData);
-			io.to(inputData.sid).emit('player-recieve-data',{
-				money: newPlayerData.money,
-				points: newPlayerData.points,
-			});
+			if(await db.player.update(newPlayerData)) {
+				io.to(inputData.sid).emit('player-recieve-data',{
+					money: newPlayerData.money,
+					points: newPlayerData.points,
+				});
+			}
 		}
 	}
 };

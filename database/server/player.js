@@ -54,8 +54,12 @@ module.exports = {
 
 		try {
 			await serverClient.query(query, values);
+
+			return true;
 		} catch(err) {
 			log(err, 'error');
+
+			return false;
 		}
 	},
 	joinAlly: async(userId, allyId) => {

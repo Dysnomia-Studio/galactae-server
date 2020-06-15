@@ -64,7 +64,9 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 			}
 
 			Research.refreshUserResearch(userReturned, async function(userNewResearch) {
-				await db.player.update(userNewResearch);
+				if(!(await db.player.update(userNewResearch))) {
+					return;
+				}
 
 				// Check if you have parent research
 				const researchedParent = Research.researchedParent(userNewResearch, planetReturned, researchName);
@@ -92,9 +94,9 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 
 		Research.refreshUserResearch(player, function(userNewResearch) {
 			db.planet.find(data.pid, async function(planetReturned) {
-				await db.player.update(userNewResearch);
-
-				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+				if(await db.player.update(userNewResearch)) {
+					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+				}
 			});
 		});
 	}
