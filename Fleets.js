@@ -147,7 +147,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		}
 	}
 
-	static recalcFuel(address, fleetList, callback) {
+	static async recalcFuel(address, fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) {
@@ -164,19 +164,19 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.planet.find(address, async function(planetData) {
-			if(!haveToUpdate) {
-				callback(fleetList, planetData);
-				return;
-			}
+		const planetData = await db.planet.findbyAddress(address);
 
-			const userData = await db.player.find(planetData.owner);
-
-			let newPlanet;
-			[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
-
+		if(!haveToUpdate) {
 			callback(fleetList, planetData);
-		});
+			return;
+		}
+
+		const userData = await db.player.find(planetData.owner);
+
+		let newPlanet;
+		[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
+
+		callback(fleetList, planetData);
 	}
 
 	static async create(data,planetData,callback) {

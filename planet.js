@@ -23,10 +23,11 @@ module.exports = class Planet {
 			if(!valid) {
 				pid = userReturned.planetlist[0];
 			}
-			db.planet.find(pid,async function(planetReturned) {
-				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
-				callback(planetReturned,userReturned,fleetReturned);
-			});
+
+			const planetReturned = await db.planet.findbyAddress(pid);
+			const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
+
+			callback(planetReturned,userReturned,fleetReturned);
 		}
 	}
 
@@ -467,12 +468,12 @@ module.exports = class Planet {
 		return points;
 	}
 
-	static setPriorityFleet(planet, fleet, sid) {
-		db.planet.find(planet, function(planetData) {
-			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
-				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData.address, sid);
-			});
+	static async setPriorityFleet(planet, fleet, sid) {
+		const planetData = await db.planet.findbyAddress(planet);
+
+		db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
+			Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
+			Fleets.refresh(planetData.address, sid);
 		});
 	}
 };

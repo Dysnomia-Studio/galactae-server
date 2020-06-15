@@ -18,39 +18,39 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 		return user.research;
 	}
 
-	static recalc(user,researchData,callback,i=0) {
+	static async recalc(user,researchData,callback,i=0) {
 		const time = (Date.now() - user.lastResearchUpdate.getTime())/TIME.HOUR_TO_MS;
 
-		db.planet.find(user.planetlist[i],async function(planetData) {
-			const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetData.address);
+		const planetData = await db.planet.findbyAddress(user.planetlist[i]);
 
-			if(isset(planetData.currResearch, 'string') &&
-				planetData.currResearch !== 'researchCenter' &&
-				isset(researchList[planetData.currResearch].cost, 'number') &&
-				researchData[planetData.currResearch] !== -1 &&
-				conquestList.length === 0
-			) {
-				researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
+		const conquestList = await db.conquest.getActiveConquestsOnPlanet(planetData.address);
 
-				if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
-					researchData[planetData.currResearch] = -1;
-					db.planet.update(planetData);
-					log(user.name + ' has unlocked research ' + planetData.currResearch,'success');
-					Websocket.sendNotification(user.sid, 'research', { research: planetData.currResearch });
-				}
+		if(isset(planetData.currResearch, 'string') &&
+			planetData.currResearch !== 'researchCenter' &&
+			isset(researchList[planetData.currResearch].cost, 'number') &&
+			researchData[planetData.currResearch] !== -1 &&
+			conquestList.length === 0
+		) {
+			researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
+
+			if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
+				researchData[planetData.currResearch] = -1;
+				db.planet.update(planetData);
+				log(user.name + ' has unlocked research ' + planetData.currResearch,'success');
+				Websocket.sendNotification(user.sid, 'research', { research: planetData.currResearch });
 			}
+		}
 
-			// Next planet
-			if(i+1<user.planetlist.length) {
-				Research.recalc(user,researchData,callback,i+1);
-			} else {
-				user.research = researchData;
+		// Next planet
+		if(i+1<user.planetlist.length) {
+			Research.recalc(user,researchData,callback,i+1);
+		} else {
+			user.research = researchData;
 
-				user.research = Research.addChilds(user);
+			user.research = Research.addChilds(user);
 
-				callback(user);
-			}
-		});
+			callback(user);
+		}
 	}
 
 	static ChangePlanetResearch(data, researchName) {
@@ -92,12 +92,12 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 	static async sync(data) {
 		const player = await db.player.findByName(data.username);
 
-		Research.refreshUserResearch(player, function(userNewResearch) {
-			db.planet.find(data.pid, async function(planetReturned) {
-				if(await db.player.update(userNewResearch)) {
-					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
-				}
-			});
+		Research.refreshUserResearch(player, async function(userNewResearch) {
+			const planetReturned = await db.planet.findbyAddress(data.pid);
+
+			if(await db.player.update(userNewResearch)) {
+				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+			}
 		});
 	}
 

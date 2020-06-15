@@ -6,18 +6,6 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	find: (addr,callback) => {
-		serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr], (err, planetReturned) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			if(isset(planetReturned, 'object') && isset(planetReturned.rows[0], 'object')) {
-				callback(planetReturned.rows[0]);
-			}
-		});
-	},
 	findByOwner: (userId, callback) => {
 		serverClient.query('SELECT * FROM planets WHERE owner = $1', [userId], (err, planetReturned) => {
 			if(err) {

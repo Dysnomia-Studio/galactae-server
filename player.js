@@ -168,11 +168,11 @@ module.exports = class Player {
 
 				Reports.refresh(playerData.id, data.sid);
 
-				db.planet.find(data.pid, function(planetReturned) {
-					Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+				const planetReturned = await db.planet.findbyAddress(data.pid);
 
-					Conquest.refresh(data.sid, data.id, data.pid); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
-				});
+				Research.sendResearchDataToUser(data, planetReturned, userNewResearch);
+
+				Conquest.refresh(data.sid, data.id, data.pid); // THIS HAVE TO BE AFTER RESEARCHS, AND WILL LOAD PLANETS
 			});
 		});
 	}
@@ -182,21 +182,21 @@ module.exports = class Player {
 		userData.sid = '-1';
 		await db.player.update(userData);
 	}
-	static calcTotalPlanetPoints(user,callback,i,points) {
-		db.planet.find(user.planetlist[i],function(planetReturned) {
-			points += planetReturned.points;
+	static async calcTotalPlanetPoints(user,callback,i,points) {
+		const planetReturned = await db.planet.findbyAddress(user.planetlist[i]);
 
-			i++;
+		points += planetReturned.points;
 
-			if(i<user.planetlist.length) {
-				Player.calcTotalPlanetPoints(user,callback,i,points);
-			} else {
-				points *= pointsCoef.planet;
+		i++;
 
-				user.points = points;
-				callback(user);
-			}
-		});
+		if(i<user.planetlist.length) {
+			Player.calcTotalPlanetPoints(user,callback,i,points);
+		} else {
+			points *= pointsCoef.planet;
+
+			user.points = points;
+			callback(user);
+		}
 	}
 	static calcResearchPoints(user) {
 		let points = 0;
