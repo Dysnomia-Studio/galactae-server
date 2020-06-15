@@ -555,7 +555,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		callback(from, to, data);
 	}
 
-	static transferSomeUnits(from, to, data) {
+	static async transferSomeUnits(from, to, data) {
 		data.unitCount = parseInt(data.unitCount);
 		if(Number.isNaN(data.unitCount)) {
 			return;
@@ -580,34 +580,33 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.unit.find(data.unitId, function(unit) {
-			if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) {
-				return;
-			}
+		const unit = await db.unit.findById(data.unitId);
 
-			// Transfer fuel
-			const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
-			const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
+		if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) {
+			return;
+		}
 
-			from.maxFuel -= transferMaxFuel;
-			to.maxFuel += transferMaxFuel;
+		// Transfer fuel
+		const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
+		const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
 
-			from.fuel -= transferFuel;
-			to.fuel += transferFuel;
+		from.maxFuel -= transferMaxFuel;
+		to.maxFuel += transferMaxFuel;
 
-			// @TODO: move cargo
+		from.fuel -= transferFuel;
+		to.fuel += transferFuel;
 
-			Fleets.removeEmptyUnits(from);
+		// @TODO: move cargo
 
-			db.fleet.update(from, function() {
-				db.fleet.update(to, function() {
-					log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
-					Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-					Fleets.refresh(from.motherPlanetAddress, data.sid);
-				});
+		Fleets.removeEmptyUnits(from);
+
+		db.fleet.update(from, function() {
+			db.fleet.update(to, function() {
+				log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
-
 	}
 
 	static mergeFleet(from, to, data) {

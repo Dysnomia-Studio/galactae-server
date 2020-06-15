@@ -1,29 +1,16 @@
 module.exports = {
-	create: (unit,callback) => {
+	create: async(unit) => {
 		const [query, values] = db.buildInsertQuery('units', unit);
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback(unit);
-			}
-		});
-	},
-	find: (id,callback) => {
-		serverClient.query('SELECT * FROM units WHERE id=$1',[id], (err, obj) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+			return true;
+		} catch(err) {
+			log(err, 'error');
 
-			if(callback) {
-				callback(obj.rows[0]);
-			}
-		});
+			return false;
+		}
 	},
 	findById: async(id) => {
 		try {
@@ -46,7 +33,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: (inputUser, callback) => {
+	update: async(inputUser) => {
 		const unit = Object.assign({}, inputUser);
 		const id = unit.id;
 		delete unit.id;
@@ -55,16 +42,15 @@ module.exports = {
 		values.push(id);
 		query += ' WHERE id = $' + values.length;
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback();
-			}
-		});
+			return true;
+		} catch(err) {
+			log(err, 'error');
+
+			return false;
+		}
 	},
 	bulkUpdate: async(units) => {
 		let query = 'UPDATE units SET ' +
@@ -92,16 +78,15 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	delete: (id,callback) => {
-		serverClient.query('DELETE FROM units WHERE id=$1',[id], (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+	delete: async(id) => {
+		try {
+			await serverClient.query('DELETE FROM units WHERE id=$1',[id]);
 
-			if(callback) {
-				callback();
-			}
-		});
+			return true;
+		} catch(err) {
+			log(err, 'error');
+
+			return false;
+		}
 	},
 };
