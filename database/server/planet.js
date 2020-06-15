@@ -6,17 +6,12 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwner: (userId, callback) => {
-		serverClient.query('SELECT * FROM planets WHERE owner = $1', [userId], (err, planetReturned) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			if(isset(planetReturned, 'object')) {
-				callback(planetReturned.rows);
-			}
-		});
+	findByOwner: async(userId) => {
+		try {
+			return (await serverClient.query('SELECT * FROM planets WHERE owner = $1', [userId])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	update: (inputPlanet, callback) => {
 		const planet = Object.assign({}, inputPlanet);

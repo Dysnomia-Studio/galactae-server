@@ -83,42 +83,42 @@ module.exports = class Planet {
 		}
 
 		let found = false;
-		db.planet.findByOwner(inputData.id, async(planetsReturned) => {
-			for(const currPlanet of planetsReturned) {
-				if(await Planet.traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback)) {
+		const planetList = await db.planet.findByOwner(inputData.id);
+
+		for(const currPlanet of planetList) {
+			if(await Planet.traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback)) {
+				found = true;
+			}
+		}
+
+		if(!found) {
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(inputData.pid);
+
+			for(const conquest of conquestList) {
+				if(conquest.newOwner === inputData.id) {
+					const currPlanet = await db.planet.findbyAddress(conquest.planet);
+
+					delete currPlanet.owner;
+
+					Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
+
 					found = true;
 				}
 			}
+		}
 
-			if(!found) {
-				const conquestList = await db.conquest.getActiveConquestsOnPlanet(inputData.pid);
+		if(!found) {
+			inputData.pid = planetList[0].address;
+			await Planet.traitementsPlanete(planetList[0], userReturned, inputData, disableTutorials, callback);
+		}
 
-				for(const conquest of conquestList) {
-					if(conquest.newOwner === inputData.id) {
-						const currPlanet = await db.planet.findbyAddress(conquest.planet);
+		const playerData = await db.player.find(inputData.id);
 
-						delete currPlanet.owner;
-
-						Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
-
-						found = true;
-					}
-				}
-			}
-
-			if(!found) {
-				inputData.pid = planetsReturned[0].address;
-				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
-			}
-
-			const playerData = await db.player.find(inputData.id);
-
-			Player.refreshPoints(playerData, async(newPlayerData) => {
-				await db.player.update({
-					id: newPlayerData.id,
-					points: newPlayerData.points,
-					money: newPlayerData.money,
-				});
+		Player.refreshPoints(playerData, async(newPlayerData) => {
+			await db.player.update({
+				id: newPlayerData.id,
+				points: newPlayerData.points,
+				money: newPlayerData.money,
 			});
 		});
 	}
