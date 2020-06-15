@@ -38,7 +38,7 @@ module.exports = class Planet {
 			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.address);
 			newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 
-			db.planet.update(newPlanet);
+			await db.planet.update(newPlanet);
 		}
 
 		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
@@ -241,9 +241,9 @@ module.exports = class Planet {
 				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
 			}
 
-			db.planet.update(newData);
-
-			Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
+			if(await db.planet.update(newData)) {
+				Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
+			}
 		});
 	}
 	/**
@@ -383,7 +383,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data    data
 	 */
 	static rename(data) {
-		Planet.find(data,data.pid,function(planetReturned) {
+		Planet.find(data,data.pid,async function(planetReturned) {
 			if(data.pid!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');
@@ -418,7 +418,7 @@ module.exports = class Planet {
 
 			planetReturned.name = data.name;
 
-			db.planet.update(planetReturned);
+			await db.planet.update(planetReturned);
 		});
 	}
 	/**
@@ -471,9 +471,9 @@ module.exports = class Planet {
 	static async setPriorityFleet(planet, fleet, sid) {
 		const planetData = await db.planet.findbyAddress(planet);
 
-		db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
+		if(await db.planet.update({ id: planetData.id, highPriorityFleet: fleet })) {
 			Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
 			Fleets.refresh(planetData.address, sid);
-		});
+		}
 	}
 };

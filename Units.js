@@ -374,7 +374,9 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 				}
 
 				// Update planet
-				db.planet.update(newPlanet);
+				if(!(await db.planet.update(newPlanet))) {
+					return;
+				}
 
 				if(specialUnitsUID[inputData.unit] === undefined) {
 					// Update unit

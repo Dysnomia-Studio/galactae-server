@@ -318,7 +318,9 @@ module.exports = class Player {
 
 				newPlanetData.resources[1]+=helium;
 
-				db.planet.update(newPlanetData);
+				if(!(await db.planet.update(newPlanetData))) {
+					return;
+				}
 
 				log(inputData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 

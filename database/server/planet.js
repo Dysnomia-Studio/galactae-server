@@ -13,7 +13,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: (inputPlanet, callback) => {
+	update: async(inputPlanet) => {
 		const planet = Object.assign({}, inputPlanet);
 		const id = planet.id;
 		delete planet.id;
@@ -22,16 +22,15 @@ module.exports = {
 		values.push(id);
 		query += ' WHERE id = $' + values.length;
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback();
-			}
-		});
+			return true;
+		} catch(err) {
+			log(err, 'error');
+
+			return false;
+		}
 	},
 	findBySystemWithOwners: async(systemAddr, callback) => {
 		let planetList;

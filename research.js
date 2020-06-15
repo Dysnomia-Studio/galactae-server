@@ -35,9 +35,11 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 
 			if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
 				researchData[planetData.currResearch] = -1;
-				db.planet.update(planetData);
-				log(user.name + ' has unlocked research ' + planetData.currResearch,'success');
-				Websocket.sendNotification(user.sid, 'research', { research: planetData.currResearch });
+
+				if(await db.planet.update(planetData)) {
+					log(user.name + ' has unlocked research ' + planetData.currResearch,'success');
+					Websocket.sendNotification(user.sid, 'research', { research: planetData.currResearch });
+				}
 			}
 		}
 
@@ -80,7 +82,9 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 					Websocket.SendMessageToClient({ sid: data.sid, message: 'MISSING_PARENTS'});
 				}
 
-				db.planet.update(newData);
+				if(!(await db.planet.update(newData))) {
+					return;
+				}
 
 				Planet.sendPlanetDataToUser({data: newData, id: data.id, sid: data.sid });
 
