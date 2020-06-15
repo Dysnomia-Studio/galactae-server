@@ -123,29 +123,29 @@ module.exports = class Planet {
 		});
 	}
 
-	static getWholeSystem(inputData) {
-		db.planet.findBySystemWithOwners(inputData.systemAddress, function(planetList) {
-			const retour = {};
+	static async getWholeSystem(inputData) {
+		const planetList = await db.planet.findBySystemWithOwners(inputData.systemAddress);
 
-			for(let i=0; i<planetList.length; i++) {
-				const p = planetList[i];
+		const retour = {};
 
-				retour[p.address] = {
-					name: p.name,
-					ownerName: p.ownerName,
-					ally: p.ally,
-					points: p.points,
-					orbitDist: p.orbitDist,
-					orbitDuration: p.orbitDuration,
-					galacticPos: p.galacticPos,
-					planetType: p.planetType,
-				};
-			}
+		for(let i=0; i<planetList.length; i++) {
+			const p = planetList[i];
 
-			retour.systemAddress = inputData.systemAddress;
+			retour[p.address] = {
+				name: p.name,
+				ownerName: p.ownerName,
+				ally: p.ally,
+				points: p.points,
+				orbitDist: p.orbitDist,
+				orbitDuration: p.orbitDuration,
+				galacticPos: p.galacticPos,
+				planetType: p.planetType,
+			};
+		}
 
-			io.to(inputData.sid).emit('map-recieve-data', retour);
-		});
+		retour.systemAddress = inputData.systemAddress;
+
+		io.to(inputData.sid).emit('map-recieve-data', retour);
 	}
 
 	/**

@@ -32,7 +32,7 @@ module.exports = {
 			return false;
 		}
 	},
-	findBySystemWithOwners: async(systemAddr, callback) => {
+	findBySystemWithOwners: async(systemAddr) => {
 		let planetList;
 		try {
 			planetList =  (await serverClient.query('SELECT * FROM planets WHERE address LIKE $1', [systemAddr + '%'])).rows;
@@ -58,7 +58,8 @@ module.exports = {
 				}
 			}
 		}
-		callback(planetList);
+
+		return planetList;
 	},
 	setOwner: async(planet, owner) => {
 		try {
