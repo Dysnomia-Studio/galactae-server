@@ -458,7 +458,9 @@ module.exports = class Alliances {
 
 		log(currPlayer.name + ' edited its alliance (' + newName + ', ' + newDescription + ')');
 
-		await db.alliance.update(currPlayer.ally, newName, newDescription);
+		if(!(await db.alliance.update(currPlayer.ally, newName, newDescription))) {
+			return;
+		}
 
 		Alliances.reSyncAllAllyMembers(currPlayer.ally);
 
