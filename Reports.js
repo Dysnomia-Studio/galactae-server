@@ -11,9 +11,11 @@ module.exports = class Reports extends require('./_shared/Reports')._Reports {
 			return;
 		}
 
+		const battleLogList = await db.battleLogAccess.fetchByPlayer(plyId);
+
 		io.to(sid).emit(
 			'player-report-list',
-			await db.battleLogAccess.fetchByPlayer(plyId)
+			battleLogList
 		);
 	}
 };
