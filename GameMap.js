@@ -5,10 +5,16 @@ module.exports = class GameMap extends require('./_shared/GameMap')._GameMap {
 		}
 
 		console.log(sid);
+		console.log(plyId);
+
+		const influenceZones = await db.planet.getInfluenceZones(plyId);
+
+		console.log(sid);
+		console.log(plyId);
 
 		io.to(sid).emit(
 			'map-influence-zones',
-			await db.planet.getInfluenceZones(plyId)
+			influenceZones
 		);
 	}
 };
