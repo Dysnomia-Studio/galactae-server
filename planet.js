@@ -340,7 +340,9 @@ module.exports = class Planet {
 
 		// Update resources
 		if(conquestList.length === 0) {
-			planetData.resources = Planet.UpdateResources(planetData,user);
+			const fleetFuelAvailable = fleetList.map((elt) => elt.maxFuel).reduce((acc, val) => acc + val, 0) - fleetList.map((elt) => elt.fuel).reduce((acc, val) => acc + val, 0);
+
+			planetData.resources = Planet.UpdateResources(planetData, user, fleetFuelAvailable);
 		}
 		planetData.lastResourcesUpdate = currTime;
 
@@ -427,20 +429,20 @@ module.exports = class Planet {
 	 * @class      CalcResources (name)
 	 * @param      {<type>}  planetData  Input planet data
 	 */
-	static UpdateResources(planetData,user) {
+	static UpdateResources(planetData,user,fleetFuelAvailable) {
 		const nextBuildingTime = (planetData.nextBuildingTime === null) ? -1 : planetData.nextBuildingTime.getTime();
 		const Dtime = Date.now()-nextBuildingTime;
 		let resources = planetData.resources;
 
 		if(Dtime<0 || !planetData.nextBuildingTime) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding, fleetFuelAvailable);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (nextBuildingTime-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (nextBuildingTime-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding, fleetFuelAvailable);
 			// Calcul avec les nouveaux bâtiments
 			const tmpBuildings = planetData.Buildings.slice();
 			tmpBuildings[planetData.nextBuilding]++;
-			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1);
+			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1, fleetFuelAvailable);
 		}
 
 		return resources;
