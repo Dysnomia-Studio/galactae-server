@@ -519,7 +519,7 @@ module.exports = class Alliances {
 		Alliances.sendToPlayer(currPlayer);
 	}
 
-	static async askToPact(sid, plyId, allyId, otherAllyName) {
+	static async askAPact(sid, plyId, allyId, otherAllyName, allied, event) {
 		if(!(await Alliances.hasDiplomacyPermissions(plyId))) {
 			Websocket.SendMessageToClient({
 				sid,
@@ -547,7 +547,7 @@ module.exports = class Alliances {
 			return;
 		}
 
-		await db.alliance.askPact(allyId, alliance.id);
+		await db.alliance.askPact(allyId, alliance.id, allied);
 
 		log(allyId + ' asked to pact with alliance ' + otherAllyName);
 
@@ -556,9 +556,17 @@ module.exports = class Alliances {
 
 		Alliances.sendNotifToAllianceStaff(
 			alliance.id,
-			'ally_askToPact',
+			event,
 			{ name: currAlly.name }
 		);
+	}
+
+	static async askToPact(sid, plyId, allyId, otherAllyName) {
+		await Alliances.askAPact(sid, plyId, allyId, otherAllyName, true, 'ally_askToPact');
+	}
+
+	static async askToEnnemy(sid, plyId, allyId, otherAllyName) {
+		await Alliances.askAPact(sid, plyId, allyId, otherAllyName, false, 'ally_askToEnnemy');
 	}
 
 	static async pactChoice(sid, plyId, allyId, otherAllyId, choice) {

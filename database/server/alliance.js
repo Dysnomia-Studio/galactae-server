@@ -238,13 +238,13 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	askPact: async(allyId, otherAllyId) => {
+	askPact: async(allyId, otherAllyId, allied) => {
 		if(await db.alliance.hasPact(allyId, otherAllyId)) {
 			return;
 		}
 
 		try {
-			await serverClient.query('INSERT INTO alliances_pacts (first, second, accepted) VALUES ($1, $2, false)', [allyId, otherAllyId]);
+			await serverClient.query('INSERT INTO alliances_pacts (first, second, accepted, allied) VALUES ($1, $2, false, $3)', [allyId, otherAllyId, allied]);
 		} catch(err) {
 			log(err, 'error');
 		}
