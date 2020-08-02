@@ -91,7 +91,7 @@
 		 * @param      {number}  time        The time period
 		 * @param      {object}  user        The user
 		 */
-		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding) {
+		static CalcNewResources(resources,buildings,planetType,time,user,currentBuilding,fleetFuelAvailable) {
 			time = time/3600/1000; // Passage en heures
 
 			const ratio = Resources.GetRatiosPerPlanet(planetType);
@@ -141,10 +141,10 @@
 
 
 			// Si Max de tout les metaux
-			if((resources[5]>metalsStorageBase*ratio.titanRatio) &&
-				(resources[4]>metalsStorageBase*ratio.copperRatio) &&
-				(resources[3]>metalsStorageBase*ratio.aluRatio) &&
-				(resources[2]>metalsStorageBase*ratio.ironRatio)) {
+			if((resources[5] > metalsStorageBase*ratio.titanRatio) &&
+				(resources[4] > metalsStorageBase*ratio.copperRatio) &&
+				(resources[3] > metalsStorageBase*ratio.aluRatio) &&
+				(resources[2] > metalsStorageBase*ratio.ironRatio)) {
 
 				let min = (resources[2] - metalsStorageBase*ratios[0])/ratios[0];
 
@@ -163,12 +163,12 @@
 			}
 
 			//Max Storage
-			if(resources[0]>mineralStorageBase) {
+			if(resources[0] > mineralStorageBase) {
 				resources[0] = mineralStorageBase;
 			}
 
-			if(resources[1]>storageHelium) {
-				resources[1] = storageHelium;
+			if(resources[1] > (storageHelium + fleetFuelAvailable)) {
+				resources[1] = storageHelium + fleetFuelAvailable;
 			}
 
 			// On detruit tout ce qui est > au max

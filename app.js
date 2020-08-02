@@ -59,7 +59,7 @@ db.connect(async function(success,general=false) {
 	}
 
 	if(!general && !globalCfg.dev) {
-		db.player.clearList();
+		await db.player.clearList();
 	}
 
 	if(general) {

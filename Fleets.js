@@ -147,7 +147,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		}
 	}
 
-	static recalcFuel(address, fleetList, callback) {
+	static async recalcFuel(address, fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
 			if(fleetList[i].fuel === undefined) {
@@ -164,19 +164,19 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.planet.find(address, async function(planetData) {
-			if(!haveToUpdate) {
-				callback(fleetList, planetData);
-				return;
-			}
+		const planetData = await db.planet.findbyAddress(address);
 
-			const userData = await db.player.find(planetData.owner);
-
-			let newPlanet;
-			[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
-
+		if(!haveToUpdate) {
 			callback(fleetList, planetData);
-		});
+			return;
+		}
+
+		const userData = await db.player.find(planetData.owner);
+
+		let newPlanet;
+		[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
+
+		callback(fleetList, planetData);
 	}
 
 	static async create(data,planetData,callback) {
@@ -555,7 +555,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		callback(from, to, data);
 	}
 
-	static transferSomeUnits(from, to, data) {
+	static async transferSomeUnits(from, to, data) {
 		data.unitCount = parseInt(data.unitCount);
 		if(Number.isNaN(data.unitCount)) {
 			return;
@@ -580,34 +580,33 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		db.unit.find(data.unitId, function(unit) {
-			if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) {
-				return;
-			}
+		const unit = await db.unit.findById(data.unitId);
 
-			// Transfer fuel
-			const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
-			const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
+		if(!isset(unit, 'object') || !isset(unit.shipShape, 'string')) {
+			return;
+		}
 
-			from.maxFuel -= transferMaxFuel;
-			to.maxFuel += transferMaxFuel;
+		// Transfer fuel
+		const transferMaxFuel = fuelStorage[unit.shipShape] * data.unitCount;
+		const transferFuel = Math.round(transferMaxFuel/from.maxFuel * from.fuel);
 
-			from.fuel -= transferFuel;
-			to.fuel += transferFuel;
+		from.maxFuel -= transferMaxFuel;
+		to.maxFuel += transferMaxFuel;
 
-			// @TODO: move cargo
+		from.fuel -= transferFuel;
+		to.fuel += transferFuel;
 
-			Fleets.removeEmptyUnits(from);
+		// @TODO: move cargo
 
-			db.fleet.update(from, function() {
-				db.fleet.update(to, function() {
-					log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
-					Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-					Fleets.refresh(from.motherPlanetAddress, data.sid);
-				});
+		Fleets.removeEmptyUnits(from);
+
+		db.fleet.update(from, function() {
+			db.fleet.update(to, function() {
+				log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
+				Fleets.refresh(from.motherPlanetAddress, data.sid);
 			});
 		});
-
 	}
 
 	static mergeFleet(from, to, data) {

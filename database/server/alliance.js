@@ -1,19 +1,19 @@
 module.exports = {
-	find: async (id) => {
+	find: async(id) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances WHERE id = $1 LIMIT 1', [id])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	findByName: async (name) => {
+	findByName: async(name) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances WHERE name = $1 LIMIT 1', [name])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	create: async (ally) => {
+	create: async(ally) => {
 		try {
 			await serverClient.query('INSERT INTO alliances (name, description) VALUES ($1, $2)', [ally.name, ally.description]);
 			return (await db.alliance.findByName(ally.name)).id;
@@ -21,14 +21,18 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: async (id, name, desc) => {
+	update: async(id, name, desc) => {
 		try {
 			await serverClient.query('UPDATE alliances SET description = $1, name = $2 WHERE id = $3', [desc, name, id]);
+
+			return true;
 		} catch(err) {
 			log(err, 'error');
+
+			return false;
 		}
 	},
-	delete: async (id) => {
+	delete: async(id) => {
 		try {
 			await serverClient.query('BEGIN');
 
@@ -47,7 +51,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	search: async (searchText) => {
+	search: async(searchText) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances WHERE name ILIKE $1', ['%' + searchText + '%'])).rows;
 		} catch(err) {
@@ -57,14 +61,14 @@ module.exports = {
 	/**
 	 * Perms
 	 */
-	getMembers: async (id) => {
+	getMembers: async(id) => {
 		try {
 			return (await serverClient.query('SELECT users.name, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	getMembersSystems: async (id) => {
+	getMembersSystems: async(id) => {
 		try {
 			const allyMembers = (await serverClient.query('SELECT player FROM alliances_permissions WHERE ally = $1', [id])).rows;
 
@@ -84,14 +88,14 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	getExtendedMemberList: async (id) => {
+	getExtendedMemberList: async(id) => {
 		try {
 			return (await serverClient.query('SELECT users.name, users.sid, founder, leader, diplomacy FROM alliances_permissions INNER JOIN users ON users.id = player WHERE users.ally = $1', [id])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	createPermissions: async (playerId, allyId) => {
+	createPermissions: async(playerId, allyId) => {
 		try {
 			await serverClient.query(
 				'INSERT INTO alliances_permissions (ally, player, founder, leader, diplomacy) VALUES ($1, $2, false, false, false)',
@@ -101,21 +105,21 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	getPermissions: async (playerId) => {
+	getPermissions: async(playerId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_permissions WHERE player = $1', [playerId])).rows[0];
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	setPermissions: async (playerId, founder, leader, diplomacy) => {
+	setPermissions: async(playerId, founder, leader, diplomacy) => {
 		try {
 			await serverClient.query('UPDATE alliances_permissions SET founder = $2, leader = $3, diplomacy = $4 WHERE player = $1', [playerId, founder, leader, diplomacy]);
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	dropPermissions: async (playerId) => {
+	dropPermissions: async(playerId) => {
 		try {
 			return await serverClient.query('DELETE FROM alliances_permissions WHERE player = $1', [playerId]);
 		} catch(err) {
@@ -125,7 +129,7 @@ module.exports = {
 	/**
 	 * Join
 	 */
-	hasAskedToJoin: async (playerName, allyId) => {
+	hasAskedToJoin: async(playerName, allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_join WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
 		} catch(err) {
@@ -146,7 +150,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	askToJoin: async (playerName, allyId) => {
+	askToJoin: async(playerName, allyId) => {
 		if(await db.alliance.hasAskedToJoin(playerName, allyId)) {
 			return;
 		}
@@ -157,7 +161,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	removeJoinAsk: async (playerName, ally) => {
+	removeJoinAsk: async(playerName, ally) => {
 		try {
 			if(!ally) {
 				await serverClient.query('DELETE FROM alliances_join WHERE player = $1', [playerName]);
@@ -188,7 +192,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	invite: async (playerName, allyId) => {
+	invite: async(playerName, allyId) => {
 		if(await db.alliance.hasBeenInvited(playerName, allyId)) {
 			return;
 		}
@@ -199,14 +203,14 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	hasBeenInvited: async (playerName, allyId) => {
+	hasBeenInvited: async(playerName, allyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_invitations WHERE player = $1 AND alliance = $2', [playerName, allyId])).rows.length > 0;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	removeInvitations: async (playerName, ally) => {
+	removeInvitations: async(playerName, ally) => {
 		try {
 			if(!ally) {
 				await serverClient.query('DELETE FROM alliances_invitations WHERE player = $1', [playerName]);
@@ -220,21 +224,21 @@ module.exports = {
 	/**
 	 * Pacts
 	 */
-	hasPact: async (allyId, otherAllyId) => {
+	hasPact: async(allyId, otherAllyId) => {
 		try {
 			return (await serverClient.query('SELECT * FROM alliances_pacts WHERE (first = $1 AND second = $2) OR (first = $2 AND second = $1)', [allyId, otherAllyId])).rows.length > 0;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	getPacts: async (allyId) => {
+	getPacts: async(allyId) => {
 		try {
 			return (await serverClient.query('SELECT alliances_pacts.*, a1.name as ally_1_name, a2.name as ally_2_name FROM alliances_pacts INNER JOIN alliances AS a1 ON a1.id = first INNER JOIN alliances AS a2 ON a2.id = second WHERE first = $1 OR second = $1', [allyId])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	askPact: async (allyId, otherAllyId) => {
+	askPact: async(allyId, otherAllyId) => {
 		if(await db.alliance.hasPact(allyId, otherAllyId)) {
 			return;
 		}
@@ -245,14 +249,14 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	acceptPact: async (allyId, otherAllyId) => {
+	acceptPact: async(allyId, otherAllyId) => {
 		try {
 			await serverClient.query('UPDATE alliances_pacts SET accepted = true WHERE ((first = $1 AND second = $2) OR (first = $2 AND second = $1))', [allyId, otherAllyId]);
 		} catch(err) {
 			log(err, 'error');
 		}
 	},
-	removePact: async (allyId, otherAllyId) => {
+	removePact: async(allyId, otherAllyId) => {
 		try {
 			await serverClient.query('DELETE FROM alliances_pacts WHERE ((first = $1 AND second = $2) OR (first = $2 AND second = $1))', [allyId, otherAllyId]);
 		} catch(err) {

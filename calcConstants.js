@@ -367,7 +367,6 @@ module.exports = function() {
 		]},
 		prop_plasma:				{ cost: 2500, 	parents: [
 			{ type: 'research', name: 'prop_ions' },
-			{ type: 'research', name: 'misc_phyQuantique' },
 		]},
 		prop_vsl: 					{ cost: 15000, 	parents: [
 			{ type: 'research', name: 'prop_ions' },
@@ -405,7 +404,10 @@ module.exports = function() {
 		]},
 		// Armes
 		wep_railgun:				{ cost: 50, 	parents: [{ type: 'research', name: 'phyContemporaine' }] },
-		wep_nuke:					{ cost: 180, 	parents: [{ type: 'research', name: 'wep_railgun' }] },
+		wep_nuke:					{ cost: 180, 	parents: [
+			{ type: 'research', name: 'misc_phyQuantique' },
+			{ type: 'building', id: 8, lvl: 5 },
+		]},
 		wep_laser:					{ cost: 260, 	parents: [
 			{ type: 'research', name: 'wep_railgun' },
 			{ type: 'research', name: 'misc_phyQuantique' },
@@ -476,12 +478,12 @@ module.exports = function() {
 		carrier_medium: 			{ cost: 2850, 	parents: [{ type: 'research', name: 'carrier_small' }] },
 		// Colony ship
 		colony_ship:  				{ cost: 3500,	parents: [
-			{ type: 'research', name: 'prop_vsl' },
 			{ type: 'research', name: 'misc_colony' },
 			{ type: 'research', name: 'cp_molecular_compression' },
 			{ type: 'building', id: 11, lvl: 10 },
 		]},
 		heavy_colony_ship: 			{ cost: 8500, 	parents: [
+			{ type: 'research', name: 'prop_vsl' },
 			{ type: 'research', name: 'colony_ship' },
 			{ type: 'building', id: 11, lvl: 15 },
 		]},
@@ -503,10 +505,12 @@ module.exports = function() {
 		// Autres recherches
 		misc_astronomie:			{ cost: 45, 	parents: [{ type: 'research', name: 'phyContemporaine' }] },
 		misc_telemetrie: 			{ cost: 90, 	parents: [{ type: 'research', name: 'misc_astronomie' }] },
-		misc_advTelemetrie:			{ cost: 320, 	parents: [{ type: 'research', name: 'misc_telemetrie' }] },
+		misc_advTelemetrie:			{ cost: 320, 	parents: [
+			{ type: 'research', name: 'misc_telemetrie' },
+			{ type: 'building', id: 9, lvl: 1 },
+		] },
 		misc_mecStellaire: 			{ cost: 600, 	parents: [
 			{ type: 'research', name: 'misc_calcGravit' },
-			{ type: 'research', name: 'misc_phySolaire' },
 		]},
 		misc_phyQuantique: 			{ cost: 120, 	parents: [
 			{ type: 'research', name: 'phyContemporaine' },

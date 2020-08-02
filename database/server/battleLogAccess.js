@@ -1,5 +1,5 @@
 module.exports = {
-	add: async (battleLogId, players) => {
+	add: async(battleLogId, players) => {
 		let query = 'INSERT INTO public."battleLogAccess"' +
 			'("battleLogId", "userId", "read") VALUES ';
 

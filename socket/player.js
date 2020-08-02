@@ -55,26 +55,26 @@ module.exports = function(socket) {
 	/**
 	 * Security auto-disconnect
 	 */
-	socket.on('disconnect', function() {
+	socket.on('disconnect', async function() {
 		const data = {};
 		data.sid = socket.id;
 
-		db.player.searchBySid(data.sid, function(user) {
-			if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) {
-				return;
-			}
+		const user = await db.player.findBySid(user.sid);
+
+		if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) {
+			return;
+		}
 
 
-			if(!playerList.has(user.name)) {
-				return;
-			}
+		if(!playerList.has(user.name)) {
+			return;
+		}
 
-			playerList.delete(user.name);
+		playerList.delete(user.name);
 
-			// Log
-			log(user.name + ' ('+socket.id+') disconnected');
-			Player.disconnect(user);
-		});
+		// Log
+		log(user.name + ' ('+socket.id+') disconnected');
+		Player.disconnect(user);
 	});
 
 	// Daily Bonus
@@ -113,12 +113,12 @@ module.exports = function(socket) {
 
 				userReturned.tutorials[data.tutorial] = true;
 
-				db.player.update({
+				if(await db.player.update({
 					id: data.id,
 					tutorials: userReturned.tutorials,
-				}, () => {
+				})) {
 					Planet.refresh(data);
-				});
+				}
 			}, true);
 		});
 	});

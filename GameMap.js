@@ -4,9 +4,11 @@ module.exports = class GameMap extends require('./_shared/GameMap')._GameMap {
 			return;
 		}
 
+		const influenceZones = await db.planet.getInfluenceZones(plyId);
+
 		io.to(sid).emit(
 			'map-influence-zones',
-			await db.planet.getInfluenceZones(plyId)
+			influenceZones
 		);
 	}
 };

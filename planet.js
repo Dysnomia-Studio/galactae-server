@@ -23,10 +23,11 @@ module.exports = class Planet {
 			if(!valid) {
 				pid = userReturned.planetlist[0];
 			}
-			db.planet.find(pid,async function(planetReturned) {
-				const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
-				callback(planetReturned,userReturned,fleetReturned);
-			});
+
+			const planetReturned = await db.planet.findbyAddress(pid);
+			const fleetReturned = await db.fleet.findByMotherPlanet(planetReturned.address);
+
+			callback(planetReturned,userReturned,fleetReturned);
 		}
 	}
 
@@ -37,7 +38,7 @@ module.exports = class Planet {
 			fleetsReturned = await db.fleet.findByMotherPlanet(currPlanet.address);
 			newPlanet = await Planet.update(currPlanet,userReturned,fleetsReturned);
 
-			db.planet.update(newPlanet);
+			await db.planet.update(newPlanet);
 		}
 
 		Fleets.refresh(newPlanet.address,inputData.sid,inputData.pid);
@@ -50,7 +51,7 @@ module.exports = class Planet {
 				userReturned = Tutorials.updateTutorialList(userReturned, newPlanet, fleetsReturned, unitsList);
 
 				if(Object.keys(userReturned.tutorials).length !== oldCount) {
-					db.player.update({
+					await db.player.update({
 						id: userReturned.id,
 						tutorials: userReturned.tutorials,
 					});
@@ -82,69 +83,69 @@ module.exports = class Planet {
 		}
 
 		let found = false;
-		db.planet.findByOwner(inputData.id, async(planetsReturned) => {
-			for(const currPlanet of planetsReturned) {
-				if(await Planet.traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback)) {
+		const planetList = await db.planet.findByOwner(inputData.id);
+
+		for(const currPlanet of planetList) {
+			if(await Planet.traitementsPlanete(currPlanet, userReturned, inputData, disableTutorials, callback)) {
+				found = true;
+			}
+		}
+
+		if(!found) {
+			const conquestList = await db.conquest.getActiveConquestsOnPlanet(inputData.pid);
+
+			for(const conquest of conquestList) {
+				if(conquest.newOwner === inputData.id) {
+					const currPlanet = await db.planet.findbyAddress(conquest.planet);
+
+					delete currPlanet.owner;
+
+					Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
+
 					found = true;
 				}
 			}
+		}
 
-			if(!found) {
-				const conquestList = await db.conquest.getActiveConquestsOnPlanet(inputData.pid);
+		if(!found) {
+			inputData.pid = planetList[0].address;
+			await Planet.traitementsPlanete(planetList[0], userReturned, inputData, disableTutorials, callback);
+		}
 
-				for(const conquest of conquestList) {
-					if(conquest.newOwner === inputData.id) {
-						const currPlanet = await db.planet.findbyAddress(conquest.planet);
+		const playerData = await db.player.find(inputData.id);
 
-						delete currPlanet.owner;
-
-						Planet.traitementsPlanete(currPlanet, userReturned, inputData, true, callback);
-
-						found = true;
-					}
-				}
-			}
-
-			if(!found) {
-				inputData.pid = planetsReturned[0].address;
-				await Planet.traitementsPlanete(planetsReturned[0], userReturned, inputData, disableTutorials, callback);
-			}
-
-			const playerData = await db.player.find(inputData.id);
-
-			Player.refreshPoints(playerData, (newPlayerData) => {
-				db.player.update({
-					id: newPlayerData.id,
-					points: newPlayerData.points,
-					money: newPlayerData.money,
-				});
+		Player.refreshPoints(playerData, async(newPlayerData) => {
+			await db.player.update({
+				id: newPlayerData.id,
+				points: newPlayerData.points,
+				money: newPlayerData.money,
 			});
 		});
 	}
 
-	static getWholeSystem(inputData) {
-		db.planet.findBySystemWithOwners(inputData.systemAddress, function(planetList) {
-			const retour = {};
+	static async getWholeSystem(inputData) {
+		const planetList = await db.planet.findBySystemWithOwners(inputData.systemAddress);
 
-			for(let i=0; i<planetList.length; i++) {
-				const p = planetList[i];
+		const retour = {};
 
-				retour[p.address] = {
-					name: p.name,
-					ownerName: p.ownerName,
-					ally: p.ally,
-					points: p.points,
-					orbitDist: p.orbitDist,
-					orbitDuration: p.orbitDuration,
-					galacticPos: p.galacticPos,
-					planetType: p.planetType,
-				};
-			}
+		for(let i=0; i<planetList.length; i++) {
+			const p = planetList[i];
 
-			retour.systemAddress = inputData.systemAddress;
+			retour[p.address] = {
+				name: p.name,
+				ownerName: p.ownerName,
+				ally: p.ally,
+				points: p.points,
+				orbitDist: p.orbitDist,
+				orbitDuration: p.orbitDuration,
+				galacticPos: p.galacticPos,
+				planetType: p.planetType,
+			};
+		}
 
-			io.to(inputData.sid).emit('map-recieve-data', retour);
-		});
+		retour.systemAddress = inputData.systemAddress;
+
+		io.to(inputData.sid).emit('map-recieve-data', retour);
 	}
 
 	/**
@@ -240,9 +241,9 @@ module.exports = class Planet {
 				log(data.username+' failed to update building '+data.building+' on planet ' + planetReturned.name + ' (' + planetReturned.address + ') to next level ' + errormsg,'fail');
 			}
 
-			db.planet.update(newData);
-
-			Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
+			if(await db.planet.update(newData)) {
+				Planet.sendPlanetDataToUser({data: newData, planet: data.planet, id: data.id, sid: data.sid });
+			}
 		});
 	}
 	/**
@@ -265,62 +266,62 @@ module.exports = class Planet {
 			return;
 		}
 
-		db.unit.find(newPlanet.unitBuildingID, function(unitReturned) {
-			const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
-			if(key !== undefined) {
-				newPlanet.unitBuildingID = key;
+		let unitReturned = await db.unit.findById(newPlanet.unitBuildingID);
 
-				unitReturned = {};
-				unitReturned.id = newPlanet.unitBuildingID;
-				unitReturned.shipType = 'SHIP_DEF';
-				unitReturned.name = key;
-				unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
-				unitReturned.ownerId = user.id;
-			}
+		const key = Object.keys(specialUnitsUID).find((key) => specialUnitsUID[key] === newPlanet.unitBuildingID);
+		if(key !== undefined) {
+			newPlanet.unitBuildingID = key;
 
-			let unitCount = 0;
+			unitReturned = {};
+			unitReturned.id = newPlanet.unitBuildingID;
+			unitReturned.shipType = 'SHIP_DEF';
+			unitReturned.name = key;
+			unitReturned.cost = shipCosts[newPlanet.unitBuildingID];
+			unitReturned.ownerId = user.id;
+		}
 
-			if(fleetReturned.maxFuel === undefined) {
-				fleetReturned.maxFuel = 0;
-			}
+		let unitCount = 0;
 
-			let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
-			timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
+		if(fleetReturned.maxFuel === undefined) {
+			fleetReturned.maxFuel = 0;
+		}
 
-			const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
-			if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add
-				unitCount = restantDepuisSynchro;
+		let timeCost = unitReturned.cost[4]*TIME.HOUR_TO_MS;
+		timeCost *= (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11])));
 
-				fleetReturned.inBuilding = false;
+		const restantDepuisSynchro = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - newPlanet.lastUnitUpdate.getTime())/timeCost);
+		if(currTime.getTime()>newPlanet.unitBuildingEndTime.getTime()) { // total add
+			unitCount = restantDepuisSynchro;
 
-				Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
-			} else { // Partial add
-				const restant = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - currTime.getTime())/timeCost);
-				unitCount = restantDepuisSynchro - restant;
-			}
+			fleetReturned.inBuilding = false;
 
-			if(unitCount === 0) { // Prevent some bugs
-				return;
-			}
+			Websocket.sendNotification(user.sid, 'unit', { unitName: unitReturned.name, unitCount: newPlanet.unitBuildingCount });
+		} else { // Partial add
+			const restant = Math.ceil((newPlanet.unitBuildingEndTime.getTime() - currTime.getTime())/timeCost);
+			unitCount = restantDepuisSynchro - restant;
+		}
 
-			if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
-				unitCount = newPlanet.unitBuildingCount;
-			}
+		if(unitCount === 0) { // Prevent some bugs
+			return;
+		}
 
-			if(!fleetReturned.units[newPlanet.unitBuildingID]) {
-				fleetReturned.units[newPlanet.unitBuildingID] = 0;
-			}
-			fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
+		if(unitCount > newPlanet.unitBuildingCount) { // Ca ne devrait jamais arriver, dans le pire des cas la derniere update est la demande de construction
+			unitCount = newPlanet.unitBuildingCount;
+		}
 
-			if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
-				fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
-			}
+		if(!fleetReturned.units[newPlanet.unitBuildingID]) {
+			fleetReturned.units[newPlanet.unitBuildingID] = 0;
+		}
+		fleetReturned.units[newPlanet.unitBuildingID] += unitCount;
 
-			db.fleet.update(fleetReturned, function() {
-				Units.refresh(user);
-				Fleets.refresh(newPlanet.address,user.sid);
-				Tactics.refresh(user.id, user.sid);
-			});
+		if(unitReturned.shipType !== 'SHIP_DEF' && fuelStorage[unitReturned.shipShape]) {
+			fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
+		}
+
+		db.fleet.update(fleetReturned, function() {
+			Units.refresh(user);
+			Fleets.refresh(newPlanet.address,user.sid);
+			Tactics.refresh(user.id, user.sid);
 		});
 	}
 
@@ -339,7 +340,9 @@ module.exports = class Planet {
 
 		// Update resources
 		if(conquestList.length === 0) {
-			planetData.resources = Planet.UpdateResources(planetData,user);
+			const fleetFuelAvailable = fleetList.map((elt) => elt.maxFuel).reduce((acc, val) => acc + val, 0) - fleetList.map((elt) => elt.fuel).reduce((acc, val) => acc + val, 0);
+
+			planetData.resources = Planet.UpdateResources(planetData, user, fleetFuelAvailable);
 		}
 		planetData.lastResourcesUpdate = currTime;
 
@@ -382,7 +385,7 @@ module.exports = class Planet {
 	 * @param      {<type>}  data    data
 	 */
 	static rename(data) {
-		Planet.find(data,data.pid,function(planetReturned) {
+		Planet.find(data,data.pid,async function(planetReturned) {
 			if(data.pid!==planetReturned.address) { // Stop if not belonging
 				Websocket.SendMessageToClient({ sid: data.sid, message: 'ERROR_NOT_BELONGING' });
 				log(data.username+' failed to change name on planet ' + planetReturned.name + ' (' + planetReturned.address + ') he doesn\'t own it !','fail');
@@ -417,7 +420,7 @@ module.exports = class Planet {
 
 			planetReturned.name = data.name;
 
-			db.planet.update(planetReturned);
+			await db.planet.update(planetReturned);
 		});
 	}
 	/**
@@ -426,20 +429,20 @@ module.exports = class Planet {
 	 * @class      CalcResources (name)
 	 * @param      {<type>}  planetData  Input planet data
 	 */
-	static UpdateResources(planetData,user) {
+	static UpdateResources(planetData,user,fleetFuelAvailable) {
 		const nextBuildingTime = (planetData.nextBuildingTime === null) ? -1 : planetData.nextBuildingTime.getTime();
 		const Dtime = Date.now()-nextBuildingTime;
 		let resources = planetData.resources;
 
 		if(Dtime<0 || !planetData.nextBuildingTime) { // Cas ou aucun bâtiment est en construction ou quand le bâtiment n'est pas encore fini
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (Date.now()-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding, fleetFuelAvailable);
 		} else {
 			// Calcul avec les anciens bâtiments jusqu'a l'update
-			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (nextBuildingTime-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding);
+			resources = Resources.CalcNewResources(resources, planetData.Buildings, planetData.planetType, (nextBuildingTime-planetData.lastResourcesUpdate.getTime()), user, planetData.nextBuilding, fleetFuelAvailable);
 			// Calcul avec les nouveaux bâtiments
 			const tmpBuildings = planetData.Buildings.slice();
 			tmpBuildings[planetData.nextBuilding]++;
-			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1);
+			resources = Resources.CalcNewResources(resources, tmpBuildings, planetData.planetType, Dtime, user, -1, fleetFuelAvailable);
 		}
 
 		return resources;
@@ -467,12 +470,12 @@ module.exports = class Planet {
 		return points;
 	}
 
-	static setPriorityFleet(planet, fleet, sid) {
-		db.planet.find(planet, function(planetData) {
-			db.planet.update({ id: planetData.id, highPriorityFleet: fleet }, function() {
-				Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
-				Fleets.refresh(planetData.address, sid);
-			});
-		});
+	static async setPriorityFleet(planet, fleet, sid) {
+		const planetData = await db.planet.findbyAddress(planet);
+
+		if(await db.planet.update({ id: planetData.id, highPriorityFleet: fleet })) {
+			Planet.sendPlanetDataToUser({ data: { address: planet, highPriorityFleet: fleet }, sid: sid });
+			Fleets.refresh(planetData.address, sid);
+		}
 	}
 };

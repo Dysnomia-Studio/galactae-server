@@ -1,5 +1,5 @@
 module.exports = {
-	save: async (battleLog, players) => {
+	save: async(battleLog, players) => {
 		try {
 			await serverClient.query('BEGIN');
 

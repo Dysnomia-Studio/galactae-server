@@ -4,9 +4,11 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 			return;
 		}
 
+		const conquestList = await db.conquest.getConquestsByPlayer(plyId);
+
 		io.to(sid).emit(
 			'player-conquest-list',
-			await db.conquest.getConquestsByPlayer(plyId)
+			conquestList
 		);
 	}
 

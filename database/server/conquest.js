@@ -1,5 +1,5 @@
 module.exports = {
-	getActiveConquestsByPlayer: async (plyId) => {
+	getActiveConquestsByPlayer: async(plyId) => {
 		try {
 			return (await serverClient.query(
 				'SELECT prev_player.name as prevPlayer, new_player.name as newPlayer, conquest.planet, conquest."endDate" FROM public."conquest" INNER JOIN users AS prev_player ON prev_player.id = "prevOwner" INNER JOIN users AS new_player ON new_player.id = "newOwner" WHERE ("prevOwner" = $1 OR "newOwner" = $1) AND "endDate" < $2 AND done = false AND aborted = false',
@@ -10,7 +10,7 @@ module.exports = {
 		}
 	},
 
-	setDone: async (planet) => {
+	setDone: async(planet) => {
 		try {
 			return (await serverClient.query(
 				'UPDATE conquest SET done = true WHERE planet = $1 AND done = false AND aborted = false',
@@ -21,7 +21,7 @@ module.exports = {
 		}
 	},
 
-	getConquestsByPlayer: async (plyId) => {
+	getConquestsByPlayer: async(plyId) => {
 		try {
 			return (await serverClient.query(
 				'SELECT prev_player.name as prevPlayer, new_player.name as newPlayer, conquest.planet, conquest."endDate" FROM public."conquest" INNER JOIN users AS prev_player ON prev_player.id = "prevOwner" INNER JOIN users AS new_player ON new_player.id = "newOwner" WHERE ("prevOwner" = $1 OR "newOwner" = $1) AND done = false AND aborted = false',
@@ -32,7 +32,7 @@ module.exports = {
 		}
 	},
 
-	getActiveConquestsOnPlanet: async (address, date = new Date()) => {
+	getActiveConquestsOnPlanet: async(address, date = new Date()) => {
 		try {
 			return (await serverClient.query(
 				'SELECT * FROM public."conquest" WHERE "planet" = $1 AND "endDate" > $2 AND aborted = false',
@@ -43,7 +43,7 @@ module.exports = {
 		}
 	},
 
-	beginConquest: async (planet, prevOwner, newOwner, battleDate) => {
+	beginConquest: async(planet, prevOwner, newOwner, battleDate) => {
 		try {
 			await serverClient.query('BEGIN');
 
@@ -85,7 +85,7 @@ module.exports = {
 		}
 	},
 
-	abortAllMilitaryConquest: async (planet, beginDate) => {
+	abortAllMilitaryConquest: async(planet, beginDate) => {
 		try {
 			return (await serverClient.query(
 				'UPDATE public."conquest" SET aborted = true WHERE "planet" = $1 AND "endDate" != $2',
