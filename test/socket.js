@@ -4,7 +4,6 @@ describe('• Websocket', () => {
 			Websocket.init();
 
 			assert(isset(socketEvents['game-connect']), true);
-			assert(isset(socketEvents['game-disconnect']), true);
 			assert(isset(socketEvents['disconnect']), true);
 			assert(isset(socketEvents['chat-send']), true);
 
