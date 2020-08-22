@@ -233,7 +233,7 @@ module.exports = {
 	},
 	getPacts: async(allyId) => {
 		try {
-			return (await serverClient.query('SELECT alliances_pacts.*, a1.name as ally_1_name, a2.name as ally_2_name FROM alliances_pacts INNER JOIN alliances AS a1 ON a1.id = first INNER JOIN alliances AS a2 ON a2.id = second WHERE first = $1 OR second = $1', [allyId])).rows;
+			return (await serverClient.query('SELECT alliances_pacts.*, a1.name as ally_1_name, a2.name as ally_2_name, allied FROM alliances_pacts INNER JOIN alliances AS a1 ON a1.id = first INNER JOIN alliances AS a2 ON a2.id = second WHERE first = $1 OR second = $1', [allyId])).rows;
 		} catch(err) {
 			log(err, 'error');
 		}
