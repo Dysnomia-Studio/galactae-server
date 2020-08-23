@@ -98,6 +98,10 @@ module.exports = {
 				)
 			);
 
+			systems.alliedSystems = [];
+			systems.allyAlliedSystems = [];
+			systems.ennemiesSystems = [];
+
 			if(userData.ally !== null) {
 				// Current alliance
 				systems.alliedSystems = Array.from(
@@ -106,29 +110,30 @@ module.exports = {
 					)
 				);
 
-				// Allied alliances
+				// Allied & Ennemies alliances
 				const allyAllied = await db.alliance.getPacts(userData.ally);
-				systems.allyAlliedSystems = [];
 				for(const allied of allyAllied) {
 					let allyId = allied.first;
 					if(allied.first === userData.ally) {
 						allyId = allied.second;
 					}
 
-					systems.allyAlliedSystems = Array.from(
-						new Set([
-							...(await db.alliance.getMembersSystems(allyId)),
-							...systems.allyAlliedSystems
-						])
-					);
+					if(allied.allied) {
+						systems.allyAlliedSystems = Array.from(
+							new Set([
+								...(await db.alliance.getMembersSystems(allyId)),
+								...systems.allyAlliedSystems
+							])
+						);
+					} else {
+						systems.ennemiesSystems = Array.from(
+							new Set([
+								...(await db.alliance.getMembersSystems(allyId)),
+								...systems.ennemiesSystems
+							])
+						);
+					}
 				}
-
-				// @TODO: get ennemies
-				systems.ennemiesSystems = [];
-			} else {
-				systems.alliedSystems = [];
-				systems.allyAlliedSystems = [];
-				systems.ennemiesSystems = [];
 			}
 
 			// alliedSystems / playerSystems filter

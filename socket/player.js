@@ -25,41 +25,14 @@ module.exports = function(socket) {
 		Player.connect(user);
 	});
 
-	socket.on('game-disconnect', function(user) {
-		// Vars
-		if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id, 'string')) {
-			return;
-		}
-
-
-		if(!playerList.has(user.name)) {
-			return;
-		}
-
-		// User
-		user.sid = socket.id;
-		Player.isValid(user,function(userData) { // Verify identity
-			if(!isset(userData, 'object') || !isset(userData.name, 'string') || !isset(userData.id,'string')) {
-				return;
-			}
-
-
-			playerList.delete(userData.name);
-
-			// Log
-			log(user.username + ' (' + socket.id + ') disconnected');
-			Player.disconnect(userData);
-		});
-	});
-
 	/**
-	 * Security auto-disconnect
+	 * Automatic disconnecting
 	 */
 	socket.on('disconnect', async function() {
 		const data = {};
 		data.sid = socket.id;
 
-		const user = await db.player.findBySid(user.sid);
+		const user = await db.player.findBySid(data.sid);
 
 		if(!isset(user, 'object') || !isset(user.name, 'string') || !isset(user.id,'string')) {
 			return;

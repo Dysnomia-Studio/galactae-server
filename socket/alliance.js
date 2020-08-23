@@ -195,6 +195,20 @@ module.exports = function(socket) {
 		});
 	});
 
+	// Ask for ennemies
+	socket.on('alliance-ennemies-ask', (data) => {
+		// Vars
+		if(!isset(data, 'object') || !isset(data.id, 'string') || !isset(data.username, 'string') || !isset(data.allyName, 'string')) {
+			return;
+		}
+
+		// User
+		data.sid = socket.id;
+		Player.isValid(data, (user) => { // Verify identity
+			Alliances.askToEnnemy(data.sid, data.id, user.ally, data.allyName);
+		});
+	});
+
 	// Accept/Refuse pact
 	socket.on('alliance-pact-choice', (data) => {
 		// Vars
