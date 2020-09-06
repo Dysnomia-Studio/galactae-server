@@ -232,7 +232,7 @@ module.exports = class Player {
 	static async updateAfterConquest(playerName) {
 		const playerData = await db.player.findByName(playerName);
 
-		Player.refreshPoins(playerData, (newPlayerData) => {
+		Player.refreshPoints(playerData, (newPlayerData) => {
 			if(newPlayerData.sid === null || newPlayerData.sid === '-1') {
 				return;
 			}
