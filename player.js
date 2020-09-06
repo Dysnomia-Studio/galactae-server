@@ -122,9 +122,8 @@ module.exports = class Player {
 			return;
 		}
 
-		const jour = TIME.DAY_TO_MS;
-		const minuit = Date.now() - (Date.now()%jour);
-		const hierMinuit = minuit - jour;
+		const minuit = Date.now() - (Date.now() % TIME.DAY_TO_MS);
+		const hierMinuit = minuit - TIME.DAY_TO_MS;
 		let dayStreak = 0 + playerData.dayBonusStreak + 1;
 		let bonusBest = 0 + playerData.dayBonusBest;
 
@@ -246,9 +245,8 @@ module.exports = class Player {
 	}
 
 	static getDayBonus(userData, choice) {
-		const jour = 24*60*60*1000;
-		const minuit = Date.now() - (Date.now()%jour);
-		const hierMinuit = minuit - jour;
+		const minuit = Date.now() - (Date.now() % TIME.DAY_TO_MS);
+		const hierMinuit = minuit - TIME.DAY_TO_MS;
 
 		const bonus = {
 			credits: 0,
