@@ -103,8 +103,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 				return;
 			}
 
-			let haveToDone = 0;
-			let done = 0;
 			for(let i=0; i<FleetList.length; i++) {
 				const id = i;
 
@@ -114,24 +112,13 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					continue;
 				}
 
-				haveToDone++;
-
-				const newFleet = {
+				await db.fleet.update({
 					id: FleetList[id].id,
 					fuel: FleetList[id].fuel,
-				};
-
-				db.fleet.update(newFleet, function() {
-					++done;
-					if(done === haveToDone) {
-						Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
-					}
 				});
 			}
 
-			if(haveToDone === 0) {
-				Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
-			}
+			Fleets.sendtoPlayer(FleetList, newPlanet, sid, playerAddress);
 		});
 	}
 
@@ -473,11 +460,11 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			});
 		}
 
-		db.fleet.update(fleetReturned, function() {
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
-			Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
-			Fleets.syncNextFleet();
-		});
+		await db.fleet.update(fleetReturned);
+
+		Websocket.SendMessageToClient({ sid: user.sid, message: 'FLEET_MOVING' });
+		Fleets.refresh(fleetReturned.motherPlanetAddress, user.sid);
+		Fleets.syncNextFleet();
 	}
 
 	static async moveTo(user, fleetId, destination, moveType) {
@@ -509,10 +496,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			name: data.fleetNewName,
 		};
 
-		db.fleet.update(newFleet, function() {
-			log(data.username + ' has succed to rename fleet type old:' + fleetReturned.name + ', new: ' + data.fleetNewName,'success');
-			Fleets.refresh(fleetReturned.motherPlanetAddress, data.sid);
-		});
+		await db.fleet.update(newFleet);
+
+		log(data.username + ' has succed to rename fleet type old:' + fleetReturned.name + ', new: ' + data.fleetNewName,'success');
+		Fleets.refresh(fleetReturned.motherPlanetAddress, data.sid);
 	}
 
 	static moveUnits(unitId, count, from, to) {
@@ -600,16 +587,15 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		Fleets.removeEmptyUnits(from);
 
-		db.fleet.update(from, function() {
-			db.fleet.update(to, function() {
-				log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
-				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetAddress, data.sid);
-			});
-		});
+		await db.fleet.update(from);
+		await db.fleet.update(to);
+
+		log(data.username + ' has tranfered units from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+		Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_UNIT_TRANSFER_SUCCESSFUL' });
+		Fleets.refresh(from.motherPlanetAddress, data.sid);
 	}
 
-	static mergeFleet(from, to, data) {
+	static async mergeFleet(from, to, data) {
 		if(typeof(from) === 'string' || typeof(to) === 'string') {
 			Fleets.fetchFleets(from, to, data, Fleets.mergeFleet);
 			return;
@@ -638,16 +624,15 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 
 		// @TODO: move cargo
 
-		db.fleet.update(from, function() {
-			db.fleet.update(to, function() {
-				log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
-				Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetAddress, data.sid);
-			});
-		});
+		await db.fleet.update(from);
+		await db.fleet.update(to);
+
+		log(data.username + ' has merged fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+		Websocket.SendMessageToClient( { sid: data.sid, message: 'FLEET_MERGE_SUCCESSFUL' });
+		Fleets.refresh(from.motherPlanetAddress, data.sid);
 	}
 
-	static transferFuelBetweenFleets(from, to, data) {
+	static async transferFuelBetweenFleets(from, to, data) {
 		if(typeof(from) === 'string' || typeof(to) === 'string') {
 			Fleets.fetchFleets(from, to, data, Fleets.transferFuelBetweenFleets);
 			return;
@@ -675,13 +660,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			to.fuel = to.maxFuel;
 		}
 
-		db.fleet.update(from, function() {
-			db.fleet.update(to, function() {
-				log(data.username + ' has tranfered fuel from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
-				Websocket.SendMessageToClient( { sid: data.sid, message: 'FUEL_TRANSFER_SUCCESSFUL' });
-				Fleets.refresh(from.motherPlanetAddress, data.sid);
-			});
-		});
+		await db.fleet.update(from);
+		await db.fleet.update(to);
+
+		log(data.username + ' has tranfered fuel from fleet ' + from.name + ' to ' + to.name + ' orbiting planet ' + from.position);
+		Websocket.SendMessageToClient( { sid: data.sid, message: 'FUEL_TRANSFER_SUCCESSFUL' });
+		Fleets.refresh(from.motherPlanetAddress, data.sid);
 	}
 
 	static extractPublicInfo(fleet, playerName, unitsList) {

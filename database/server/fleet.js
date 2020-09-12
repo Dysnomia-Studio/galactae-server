@@ -75,7 +75,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: (inputFleet,callback) => {
+	update: async(inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
 		delete fleet.id;
@@ -85,16 +85,14 @@ module.exports = {
 		values.push(id);
 		query += ' WHERE id = $' + values.length;
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback();
-			}
-		});
+			return true;
+		} catch(err) {
+			log(err, 'error');
+			return false;
+		}
 	},
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +

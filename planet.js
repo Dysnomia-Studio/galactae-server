@@ -318,11 +318,11 @@ module.exports = class Planet {
 			fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
 		}
 
-		db.fleet.update(fleetReturned, function() {
-			Units.refresh(user);
-			Fleets.refresh(newPlanet.address,user.sid);
-			Tactics.refresh(user.id, user.sid);
-		});
+		await db.fleet.update(fleetReturned);
+
+		Units.refresh(user);
+		Fleets.refresh(newPlanet.address,user.sid);
+		Tactics.refresh(user.id, user.sid);
 	}
 
 	/**

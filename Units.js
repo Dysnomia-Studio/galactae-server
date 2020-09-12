@@ -389,7 +389,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 				fleetReturned.population += totalCost[5];
 				fleetReturned.inBuilding = true;
 
-				db.fleet.update(fleetReturned);
+				await db.fleet.update(fleetReturned);
 
 				Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 
