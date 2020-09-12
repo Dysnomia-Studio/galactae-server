@@ -36,20 +36,17 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwner: (owner, callback) => {
-		serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], async(err, tacticListQuery) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			const tacticList = tacticListQuery.rows;
+	findByOwner: async(owner) => {
+		try {
+			const tacticList = (await serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner])).rows;
 			for(const tactic of tacticList) {
 				tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 			}
 
-			callback(tacticList);
-		});
+			return tacticList;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	findByOwnerAndName: (tactic, callback) => {
 		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], async(err, tacticListQuery) => {

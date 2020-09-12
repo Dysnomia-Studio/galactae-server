@@ -1,8 +1,8 @@
 module.exports = class Tactics {
-	static refresh(uid, sid) {
-		db.tactics.findByOwner(uid, (obj) => {
-			io.to(sid).emit('tactics-recieve-data', obj);
-		});
+	static async refresh(uid, sid) {
+		const tacticList = await db.tactics.findByOwner(uid);
+
+		io.to(sid).emit('tactics-recieve-data', tacticList);
 	}
 
 	static async checkOwner(uid, tacticId, callback) {
