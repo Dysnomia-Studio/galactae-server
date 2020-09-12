@@ -136,13 +136,12 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	remove: (id) => {
-		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-		});
+	remove: async(id) => {
+		try {
+			await serverClient.query('DELETE FROM fleets WHERE id=$1', [id]);
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	assignFleet: (fid, tid, callback) => {
 		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
