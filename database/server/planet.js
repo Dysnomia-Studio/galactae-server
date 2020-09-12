@@ -1,4 +1,11 @@
 module.exports = {
+	getAllColonizedPlanets: async() => { // /!\ Tools only DataAccess /!\
+		try {
+			return (await serverClient.query('SELECT * FROM planets WHERE points > 50', [])).rows;
+		} catch(err) {
+			log(err, 'error');
+		}
+	},
 	findbyAddress: async(addr) => {
 		try {
 			return (await serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr])).rows[0];
