@@ -48,12 +48,9 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwnerAndName: (tactic, callback) => {
-		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], async(err, tacticListQuery) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+	findByOwnerAndName: async(tactic, callback) => {
+		try {
+			const tacticListQuery = (await serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name])).rows;
 
 			if(tacticListQuery.rows.length === 0) {
 				callback();
@@ -63,8 +60,10 @@ module.exports = {
 			const tactic = tacticListQuery.rows[0];
 			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 
-			callback(tactic);
-		});
+			return tactic;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	upsert: (inputTactic, callback) => {
 		inputTactic.id = (inputTactic.id) ? inputTactic.id : '';
@@ -82,10 +81,10 @@ module.exports = {
 
 			const tactic = await db.tactics.find(inputTactic.id);
 			if(!isset(tactic)) {
-				db.tactics.insert(inputTactic, () => {
-					db.tactics.findByOwnerAndName(inputTactic, (newTactic) => {
-						db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
-					});
+				db.tactics.insert(inputTactic, async() => {
+					const newTactic = await db.tactics.findByOwnerAndName(inputTactic);
+
+					db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
 				});
 			} else if(tactic.name !== inputTactic.name) {
 				db.tactics.updateName(inputTactic, () =>
