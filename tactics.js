@@ -123,14 +123,14 @@ module.exports = class Tactics {
 
 	static assign(user, fleetId, tacticId) {
 		Tactics.checkOwner(user.id, tacticId, () => {
-			Fleets.checkOwner(user.id, fleetId, (fleet) => {
+			Fleets.checkOwner(user.id, fleetId, async(fleet) => {
 				if(tacticId === '-1') { tacticId = null; }
 
-				db.fleet.assignFleet(fleetId, tacticId, () => {
-					log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
-					Websocket.SendMessageToClient('TACTIC_ASSIGNED');
-					Fleets.refresh(fleet.position, user.sid);
-				});
+				await db.fleet.assignFleet(fleetId, tacticId);
+
+				log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
+				Websocket.SendMessageToClient('TACTIC_ASSIGNED');
+				Fleets.refresh(fleet.position, user.sid);
 			});
 		});
 	}

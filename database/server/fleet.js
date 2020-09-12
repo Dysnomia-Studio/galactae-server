@@ -143,14 +143,11 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	assignFleet: (fid, tid, callback) => {
-		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback();
-		});
+	assignFleet: async(fid, tid) => {
+		try {
+			await serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid]);
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 };
