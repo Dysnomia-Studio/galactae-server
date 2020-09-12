@@ -125,19 +125,16 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	create: (fleet,callback) => {
+	create: async(fleet) => {
 		const [query, values] = db.buildInsertQuery('fleets', fleet);
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback(fleet);
-			}
-		});
+			return fleet;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 	remove: (id) => {
 		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {

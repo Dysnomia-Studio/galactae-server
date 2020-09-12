@@ -204,17 +204,17 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			inBuilding: false,
 		};
 
-		db.fleet.create(newFleet, async(createdFleet) => {
-			// Send new list to client
-			Fleets.refresh(planetData.address,data.sid);
+		await db.fleet.create(newFleet);
 
-			if(callback) {
-				callback(
-					(await db.fleet.findByMotherPlanet(planetData.address))
-						.filter((f) => f.name === data.fleetName)[0]
-				);
-			}
-		});
+		// Send new list to client
+		Fleets.refresh(planetData.address,data.sid);
+
+		if(callback) {
+			callback(
+				(await db.fleet.findByMotherPlanet(planetData.address))
+					.filter((f) => f.name === data.fleetName)[0]
+			);
+		}
 	}
 
 	static hasEnoughCarrier(currFleet, unitList) {
