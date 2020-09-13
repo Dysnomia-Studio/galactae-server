@@ -6,6 +6,7 @@
   "scripts": {
     "start-old": "pm2 start ecosystem.config.js",
     "start": "node app.js",
+    "dev-start": "node --trace-uncaught app.js",
     "test": "nyc --reporter=lcov --reporter=text-summary --report-dir reports/ npm run tests",
     "tests": "mocha test --require ./test/__include --recursive --color",
     "test-watch": "mocha test/**/*.js --color --watch"
