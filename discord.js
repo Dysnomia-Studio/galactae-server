@@ -34,9 +34,9 @@ module.exports = {
 				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
 				let role = '';
-				if(message.member && message.member.roles.find('name', 'Administrathor')) {
+				if(message.member && message.member.roles.cache.find((elt) => elt.name === 'Administrathor')) {
 					role = Privileges.getChatRank(4);
-				} else if(message.member && message.member.roles.find('name', 'Moderathor')) {
+				} else if(message.member && message.member.roles.cache.find((elt) => elt.name === 'Moderathor')) {
 					role = Privileges.getChatRank(3);
 				}
 
@@ -65,7 +65,7 @@ module.exports = {
 	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
-		const channel = client.channels.find((channel) => channel.name === channelName);
+		const channel = client.channels.cache.find((channel) => channel.name === channelName);
 		channel.send(unNormalizeText(message));
 	},
 
@@ -76,7 +76,7 @@ module.exports = {
 	 */
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
-		const channel = client.channels.find((channel) => channel.name === channelName);
+		const channel = client.channels.cache.find((channel) => channel.name === channelName);
 		channel.send('**[SYSTEM MESSAGE]** ' + unNormalizeText(message));
 	},
 };
