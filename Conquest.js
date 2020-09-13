@@ -16,6 +16,8 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 		const conquestList = await db.conquest.getActiveConquestsByPlayer(plyId);
 		let   lastUpdatedPlanet = pid;
 
+		const players = new Set();
+
 		for(const conquest of conquestList) {
 			const prevOwner = await db.player.findByName(conquest.prevplayer);
 			const newOwner = await db.player.findByName(conquest.newplayer);
@@ -30,6 +32,9 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 			// @TODO: notif
 
 			lastUpdatedPlanet = conquest.planet;
+
+			players.add(conquest.prevplayer);
+			players.add(conquest.newplayer);
 		}
 
 		Planet.refresh({
@@ -39,7 +44,8 @@ module.exports = class Conquest extends require('./_shared/Conquest')._Conquest 
 		});
 
 		// Update planetList of both players
-		Player.updateAfterConquest(conquest.prevplayer);
-		Player.updateAfterConquest(conquest.newplayer);
+		for(const player of players) {
+			Player.updateAfterConquest(player);
+		}
 	}
 };
