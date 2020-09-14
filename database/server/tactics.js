@@ -48,10 +48,10 @@ module.exports = {
 				return;
 			}
 
-			const tactic = tacticListQuery.rows[0];
-			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
+			const foundTactic = tacticListQuery.rows[0];
+			foundTactic.orders = await db.tacticsOrders.findByTactic(foundTactic.id);
 
-			return tactic;
+			return foundTactic;
 		} catch(err) {
 			log(err, 'error');
 		}
@@ -78,7 +78,7 @@ module.exports = {
 			}
 
 			await serverClient.query('COMMIT');
-		} catch(e) {
+		} catch(err) {
 			log(err, 'error');
 			await serverClient.query('ROLLBACK');
 		}
