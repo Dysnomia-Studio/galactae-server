@@ -22,7 +22,9 @@ module.exports = {
 				return;
 			}
 
-			if(message.channel.name.substr(0,globalCfg.serverName.length) === globalCfg.serverName) { // If it's a message for this server then send it to chat
+			const serverChannels = globalCfg.serverName + '-';
+
+			if(message.channel.name.substr(0,serverChannels.length) === serverChannels) { // If it's a message for this server then send it to chat
 				const msg = message.cleanContent;
 				if(msg !== msg.replace('http','')) {
 					return;
@@ -31,7 +33,7 @@ module.exports = {
 					return;
 				}
 
-				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
+				const channel = 'hud-chat-' + message.channel.name.substr((serverChannels.length),message.channel.name.length);
 
 				let role = '';
 				if(message.member && message.member.roles.cache.find((elt) => elt.name === 'Administrathor')) {
