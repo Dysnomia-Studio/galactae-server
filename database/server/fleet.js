@@ -41,7 +41,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findAllFleetReferingToPosition: async(address,callback) => {
+	findAllFleetReferingToPosition: async(address) => {
 		try {
 			const fleetList = (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
 
@@ -54,7 +54,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByTactic: async(tid,callback) => {
+	findByTactic: async(tid) => {
 		try {
 			return (await serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid])).rows;
 		} catch(err) {
@@ -75,7 +75,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: async(inputFleet,callback) => {
+	update: async(inputFleet) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
 		delete fleet.id;

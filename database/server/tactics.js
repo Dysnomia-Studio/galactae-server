@@ -12,7 +12,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	find: async(tid, callback) => {
+	find: async(tid) => {
 		if(tid === '' || !tid) {
 			return;
 		}
@@ -39,12 +39,11 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwnerAndName: async(tactic, callback) => {
+	findByOwnerAndName: async(tactic) => {
 		try {
 			const tacticListQuery = (await serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name])).rows;
 
 			if(tacticListQuery.rows.length === 0) {
-				callback();
 				return;
 			}
 
@@ -97,7 +96,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	delete: async(tid, callback) => {
+	delete: async(tid) => {
 		try {
 			await serverClient.query('BEGIN');
 

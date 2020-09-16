@@ -6,7 +6,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	upsertAll: async(orders, tid, callback) => {
+	upsertAll: async(orders, tid) => {
 		await db.tacticsOrders.delete(tid);
 
 		for(const order of orders) {
@@ -23,7 +23,7 @@ module.exports = {
 			throw err;
 		}
 	},
-	delete: async(tid, callback) => {
+	delete: async(tid) => {
 		try {
 			await serverClient.query('DELETE FROM tactics_orders WHERE tactic_id=$1', [tid]);
 		} catch(err) {
