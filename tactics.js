@@ -7,15 +7,12 @@ module.exports = class Tactics {
 
 	static async checkOwner(uid, tacticId, callback) {
 		if(tacticId === '-1') {
-			callback();
-			return;
+			return true;
 		}
 
 		const obj = await db.tactics.find(tacticId);
 
-		if(obj.owner === uid) {
-			callback();
-		}
+		return obj.owner === uid;
 	}
 
 	static checkTactic(tactic, user) {
@@ -95,34 +92,34 @@ module.exports = class Tactics {
 		Tactics.refresh(user.id, user.sid);
 	}
 
-	static update(user, tactic) {
+	static async update(user, tactic) {
 		if(!Tactics.checkTactic(tactic, user)) {
 			return;
 		}
 
-		Tactics.checkOwner(user.id, tactic.id, async() => {
+		if(await Tactics.checkOwner(user.id, tactic.id)) {
 			await db.tactics.upsert(tactic);
 
 			log(user.username + ' has updated his tactic named ' + tactic.name);
 			Websocket.SendMessageToClient('TACTIC_UPDATED');
 			Tactics.refresh(user.id, user.sid);
-		});
+		}
 	}
 
-	static delete(user, tacticId) {
-		Tactics.checkFleetUsage(tacticId, user, () => {
-			Tactics.checkOwner(user.id, tacticId, async() => {
+	static async delete(user, tacticId) {
+		Tactics.checkFleetUsage(tacticId, user, async() => {
+			if(await Tactics.checkOwner(user.id, tacticId)) {
 				await db.tactics.delete(tacticId);
 
 				log(user.username + ' has deleted his tactic ' + tacticId);
 				Websocket.SendMessageToClient('TACTIC_DELETED');
 				Tactics.refresh(user.id, user.sid);
-			});
+			}
 		});
 	}
 
-	static assign(user, fleetId, tacticId) {
-		Tactics.checkOwner(user.id, tacticId, () => {
+	static async assign(user, fleetId, tacticId) {
+		if(await Tactics.checkOwner(user.id, tacticId)) {
 			Fleets.checkOwner(user.id, fleetId, async(fleet) => {
 				if(tacticId === '-1') { tacticId = null; }
 
@@ -132,6 +129,6 @@ module.exports = class Tactics {
 				Websocket.SendMessageToClient('TACTIC_ASSIGNED');
 				Fleets.refresh(fleet.position, user.sid);
 			});
-		});
+		}
 	}
 };
