@@ -5,7 +5,7 @@ module.exports = class Tactics {
 		io.to(sid).emit('tactics-recieve-data', tacticList);
 	}
 
-	static async checkOwner(uid, tacticId, callback) {
+	static async checkOwner(uid, tacticId) {
 		if(tacticId === '-1') {
 			return true;
 		}
@@ -70,14 +70,16 @@ module.exports = class Tactics {
 		return true;
 	}
 
-	static async checkFleetUsage(tid, user, callback) {
+	static async checkFleetUsage(tid, user) {
 		const list = await db.fleet.findByTactic(tid);
 		if(list.length === 0) {
-			callback();
-		} else {
-			log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
+			return true;
 		}
+
+		log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
+		Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
+
+		return false;
 	}
 
 	static async create(user, tactic) {
@@ -107,15 +109,15 @@ module.exports = class Tactics {
 	}
 
 	static async delete(user, tacticId) {
-		Tactics.checkFleetUsage(tacticId, user, async() => {
-			if(await Tactics.checkOwner(user.id, tacticId)) {
-				await db.tactics.delete(tacticId);
+		if(await Tactics.checkFleetUsage(tacticId, user) &&
+			await Tactics.checkOwner(user.id, tacticId)) {
 
-				log(user.username + ' has deleted his tactic ' + tacticId);
-				Websocket.SendMessageToClient('TACTIC_DELETED');
-				Tactics.refresh(user.id, user.sid);
-			}
-		});
+			await db.tactics.delete(tacticId);
+
+			log(user.username + ' has deleted his tactic ' + tacticId);
+			Websocket.SendMessageToClient('TACTIC_DELETED');
+			Tactics.refresh(user.id, user.sid);
+		}
 	}
 
 	static async assign(user, fleetId, tacticId) {
