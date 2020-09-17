@@ -122,18 +122,6 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		});
 	}
 
-	static async checkOwner(uid, fleetId, callback) {
-		if(fleetId === '-1') {
-			callback();
-			return;
-		}
-
-		const obj = await db.fleet.find(fleetId);
-		if(obj.ownerId === uid) {
-			callback(obj);
-		}
-	}
-
 	static async recalcFuel(address, fleetList, callback) {
 		let haveToUpdate = false;
 		for(let i=0; i<fleetList.length; i++) {
