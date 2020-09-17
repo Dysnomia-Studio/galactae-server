@@ -3,7 +3,7 @@ process.on('uncaughtException', function (exception) {
 });
 
 process.on('unhandledRejection', (reason, p) => {
-	console.log("Unhandled Rejection at: Promise ", p, " reason: ", reason);
+	console.log('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
 });
 
 /**
@@ -122,5 +122,3 @@ if(!globalCfg.dev) {
 		Websocket.restart();
 	});
 }
-
-console.log('EOF');
