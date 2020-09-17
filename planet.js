@@ -393,14 +393,7 @@ module.exports = class Planet {
 			}
 
 			// Planetes sans nom ...
-			let empty = true;
-			for(let i=0; i<data.name.length; i++) {
-				if(data.name[i]!==' ') {
-					empty = false;
-					break;
-				}
-			}
-			if(empty) {
+			if(data.name.trim().length === 0) {
 				return;
 			}
 
