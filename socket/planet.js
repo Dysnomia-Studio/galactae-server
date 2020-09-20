@@ -90,7 +90,7 @@ module.exports = function(socket) {
 	// Change name
 	socket.on('planet-rename', function(data) {
 		// Vars
-		if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string') || !isset(data.pid, 'string') || !isset(data.name, 'string') || data.name==='') {
+		if(!isset(data, 'object') || !isset(data.username, 'string') || !isset(data.id, 'string') || !isset(data.pid, 'string') || !isset(data.name, 'string') || data.name.trim() ==='') {
 			return;
 		}
 

@@ -1,21 +1,18 @@
 module.exports = class Tactics {
-	static refresh(uid, sid) {
-		db.tactics.findByOwner(uid, (obj) => {
-			io.to(sid).emit('tactics-recieve-data', obj);
-		});
+	static async refresh(uid, sid) {
+		const tacticList = await db.tactics.findByOwner(uid);
+
+		io.to(sid).emit('tactics-recieve-data', tacticList);
 	}
 
-	static async checkOwner(uid, tacticId, callback) {
+	static async checkOwner(uid, tacticId) {
 		if(tacticId === '-1') {
-			callback();
-			return;
+			return true;
 		}
 
 		const obj = await db.tactics.find(tacticId);
 
-		if(obj.owner === uid) {
-			callback();
-		}
+		return obj.owner === uid;
 	}
 
 	static checkTactic(tactic, user) {
@@ -73,65 +70,68 @@ module.exports = class Tactics {
 		return true;
 	}
 
-	static async checkFleetUsage(tid, user, callback) {
+	static async checkFleetUsage(tid, user) {
 		const list = await db.fleet.findByTactic(tid);
 		if(list.length === 0) {
-			callback();
-		} else {
-			log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
-			Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
+			return true;
 		}
+
+		log(user.username + ' failed to delete tactic because it\'s used by some fleets.');
+		Websocket.SendMessageToClient({ sid: user.sid, message: 'TACTIC_USED_BY_FLEETS' });
+
+		return false;
 	}
 
-	static create(user, tactic) {
+	static async create(user, tactic) {
 		if(!Tactics.checkTactic(tactic, user)) {
 			return;
 		}
 
-		db.tactics.upsert(tactic, () => {
-			log(user.username + ' has created a new tactic named ' + tactic.name);
-			Websocket.SendMessageToClient('TACTIC_CREATED');
+		await db.tactics.upsert(tactic);
+
+		log(user.username + ' has created a new tactic named ' + tactic.name);
+		Websocket.SendMessageToClient('TACTIC_CREATED');
+		Tactics.refresh(user.id, user.sid);
+	}
+
+	static async update(user, tactic) {
+		if(!Tactics.checkTactic(tactic, user)) {
+			return;
+		}
+
+		if(await Tactics.checkOwner(user.id, tactic.id)) {
+			await db.tactics.upsert(tactic);
+
+			log(user.username + ' has updated his tactic named ' + tactic.name);
+			Websocket.SendMessageToClient('TACTIC_UPDATED');
 			Tactics.refresh(user.id, user.sid);
-		});
-	}
-
-	static update(user, tactic) {
-		if(!Tactics.checkTactic(tactic, user)) {
-			return;
 		}
-
-		Tactics.checkOwner(user.id, tactic.id, () => {
-			db.tactics.upsert(tactic, () => {
-				log(user.username + ' has updated his tactic named ' + tactic.name);
-				Websocket.SendMessageToClient('TACTIC_UPDATED');
-				Tactics.refresh(user.id, user.sid);
-			});
-		});
 	}
 
-	static delete(user, tacticId) {
-		Tactics.checkFleetUsage(tacticId, user, () => {
-			Tactics.checkOwner(user.id, tacticId, () => {
-				db.tactics.delete(tacticId, () => {
-					log(user.username + ' has deleted his tactic ' + tacticId);
-					Websocket.SendMessageToClient('TACTIC_DELETED');
-					Tactics.refresh(user.id, user.sid);
-				});
-			});
-		});
+	static async delete(user, tacticId) {
+		if(await Tactics.checkFleetUsage(tacticId, user) &&
+			await Tactics.checkOwner(user.id, tacticId)) {
+
+			await db.tactics.delete(tacticId);
+
+			log(user.username + ' has deleted his tactic ' + tacticId);
+			Websocket.SendMessageToClient('TACTIC_DELETED');
+			Tactics.refresh(user.id, user.sid);
+		}
 	}
 
-	static assign(user, fleetId, tacticId) {
-		Tactics.checkOwner(user.id, tacticId, () => {
-			Fleets.checkOwner(user.id, fleetId, (fleet) => {
-				if(tacticId === '-1') { tacticId = null; }
+	static async assign(user, fleetId, tacticId) {
+		if(await Tactics.checkOwner(user.id, tacticId)) {
+			if(tacticId === '-1') { tacticId = null; }
+			if(fleet.ownerId !== user.id) {
+				return;
+			}
 
-				db.fleet.assignFleet(fleetId, tacticId, () => {
-					log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
-					Websocket.SendMessageToClient('TACTIC_ASSIGNED');
-					Fleets.refresh(fleet.position, user.sid);
-				});
-			});
-		});
+			await db.fleet.assignFleet(fleetId, tacticId);
+
+			log(user.username + ' has assigned his tactic ' + tacticId + ' to fleet ' + fleetId);
+			Websocket.SendMessageToClient('TACTIC_ASSIGNED');
+			Fleets.refresh(fleet.position, user.sid);
+		}
 	}
 };

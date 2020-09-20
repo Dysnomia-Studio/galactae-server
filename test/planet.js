@@ -20,7 +20,7 @@ describe('• Planet', () => {
 			const buildings = buildingMaxLvl[101];
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
-				1414
+				1315
 			);
 		});
 
@@ -28,7 +28,7 @@ describe('• Planet', () => {
 			const buildings = buildingMaxLvl[113];
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
-				1535
+				1525
 			);
 		});
 
@@ -36,7 +36,7 @@ describe('• Planet', () => {
 			const buildings = buildingMaxLvl[103];
 			assert.equal(
 				Planet.calcPlanetPoints({Buildings: buildings}),
-				1108
+				1385
 			);
 		});
 	});

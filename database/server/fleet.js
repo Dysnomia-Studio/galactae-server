@@ -41,7 +41,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findAllFleetReferingToPosition: async(address,callback) => {
+	findAllFleetReferingToPosition: async(address) => {
 		try {
 			const fleetList = (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
 
@@ -54,7 +54,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByTactic: async(tid,callback) => {
+	findByTactic: async(tid) => {
 		try {
 			return (await serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid])).rows;
 		} catch(err) {
@@ -75,7 +75,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: (inputFleet,callback) => {
+	update: async(inputFleet) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
 		delete fleet.id;
@@ -85,16 +85,14 @@ module.exports = {
 		values.push(id);
 		query += ' WHERE id = $' + values.length;
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback();
-			}
-		});
+			return true;
+		} catch(err) {
+			log(err, 'error');
+			return false;
+		}
 	},
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +
@@ -127,36 +125,29 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	create: (fleet,callback) => {
+	create: async(fleet) => {
 		const [query, values] = db.buildInsertQuery('fleets', fleet);
 
-		serverClient.query(query, values, (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
+		try {
+			await serverClient.query(query, values);
 
-			if(callback) {
-				callback(fleet);
-			}
-		});
+			return fleet;
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	remove: (id) => {
-		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-		});
+	remove: async(id) => {
+		try {
+			await serverClient.query('DELETE FROM fleets WHERE id=$1', [id]);
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
-	assignFleet: (fid, tid, callback) => {
-		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
-			if(err) {
-				log(err, 'error');
-				return;
-			}
-
-			callback();
-		});
+	assignFleet: async(fid, tid) => {
+		try {
+			await serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid]);
+		} catch(err) {
+			log(err, 'error');
+		}
 	},
 };
