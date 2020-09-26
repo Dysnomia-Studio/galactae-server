@@ -3,18 +3,16 @@ module.exports = class Player {
 	static async isValid(user,callback) {
 		const playerData = await db.player.findBySid(user.sid);
 
-		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) {
-			if(Player.canAct(playerData)) { // Don't spam
-
-				if(await db.player.update({
-					id: playerData.id,
-					lastAction: new Date(),
-				})) {
-					callback(playerData);
-				}
+		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id && Player.canAct(playerData)) { // Don't spam
+			if(await db.player.update({
+				id: playerData.id,
+				lastAction: new Date(),
+			})) {
+				callback(playerData);
 			}
 		} else {
 			// Kick that Hacker ...
+			log(data.sid + ' was kicked because of invalid session');
 			io.to(user.sid).emit('server-kick','INVALID_SESSION');
 		}
 	}
@@ -48,6 +46,7 @@ module.exports = class Player {
 			log('Error: Invalid user');
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
+			log(playerData.name + ' (' + data.sid + ') was kicked because of invalid session');
 			return;
 		}
 
@@ -92,6 +91,7 @@ module.exports = class Player {
 		if(data.id !== playerData.id) {
 			// Kick that Hacker ...
 			io.to(data.sid).emit('server-kick','INVALID_SESSION');
+			log(playerData.name + ' (' + data.sid + ') was kicked because of invalid session');
 			return;
 		}
 
@@ -99,7 +99,7 @@ module.exports = class Player {
 		const oldSid = playerData.sid;
 		if(oldSid !== '-1') {
 			io.to(oldSid).emit('server-kick','DOUBLE_ACCOUNTS_CONNECTED');
-			//log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
+			log(playerData.name +' ('+ playerData.sid +') was kicked because of double sessions.');
 		}
 
 		if(playerData.ally !== null) {
@@ -239,7 +239,7 @@ module.exports = class Player {
 			io.to(newPlayerData.sid).emit('player-recieve-data',{
 				planetlist: newPlayerData.planetlist,
 				money: newPlayerData.money,
-				points: newPlayerData.points
+				points: newPlayerData.points,
 			});
 		});
 	}
@@ -323,7 +323,7 @@ module.exports = class Player {
 				log(inputData.username + ' takes its Daily Bonus ! ' + helium + 't of helium 3');
 
 				if(await db.player.update(newPlayerData)) {
-					Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid })
+					Planet.sendPlanetDataToUser({data: newPlanetData, planet: inputData.pid, id: inputData.id, sid: inputData.sid });
 				}
 			});
 		} else {

@@ -326,7 +326,9 @@ module.exports = class Combat {
 		}
 
 		for(let i=0; i<this.unitCache[target.unit].parts.length; i++) {
-			if(this.unitCache[target.unit].parts[i].tech === 'none' || this.unitCache[target.unit].parts[i].tech === 'noPartResearched') { continue; }
+			if(this.unitCache[target.unit].parts[i].tech === 'none' || this.unitCache[target.unit].parts[i].tech === 'noPartResearched') {
+				continue;
+			}
 
 			switch(this.unitCache[target.unit].parts[i].type) {
 				case 'hangar':
@@ -403,10 +405,10 @@ module.exports = class Combat {
 
 		let atk = true;
 
-		let action;
-		let breakOrNo;
-
 		while( (currDefFleets.fleetCounter + currAtkFleets.fleetCounter) < (this.defFleets.length + this.atkFleets.length) ) {
+			let action;
+			let breakOrNo;
+
 			if(currAtkFleets.fleetCounter >= this.atkFleets.length) {
 				atk = false;
 			}
@@ -431,8 +433,6 @@ module.exports = class Combat {
 			atk = !atk;
 
 			this.battleLog.push(action);
-
-			action = {};
 		}
 	}
 

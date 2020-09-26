@@ -158,10 +158,10 @@ module.exports = class Chat {
 
 			if(currUser.lvl > targetLvl) {
 				return dataReturned;
-			} else {
-				Chat.sendSM(currUser.sid,'PERMISSION_DENIED');
-				log('Permission denied');
-			};
+			}
+
+			Chat.sendSM(currUser.sid,'PERMISSION_DENIED');
+			log('Permission denied');
 		}
 	}
 

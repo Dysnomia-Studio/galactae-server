@@ -129,14 +129,14 @@ module.exports = {
 						systems.allyAlliedSystems = Array.from(
 							new Set([
 								...(await db.alliance.getMembersSystems(allyId)),
-								...systems.allyAlliedSystems
+								...systems.allyAlliedSystems,
 							])
 						);
 					} else {
 						systems.ennemiesSystems = Array.from(
 							new Set([
 								...(await db.alliance.getMembersSystems(allyId)),
-								...systems.ennemiesSystems
+								...systems.ennemiesSystems,
 							])
 						);
 					}
@@ -155,5 +155,5 @@ module.exports = {
 		} catch(err) {
 			log(err, 'error');
 		}
-	}
+	},
 };
