@@ -12,7 +12,7 @@ module.exports = class Player {
 			}
 		} else {
 			// Kick that Hacker ...
-			log(data.sid + ' was kicked because of invalid session');
+			log(user.sid + ' was kicked because of invalid session');
 			io.to(user.sid).emit('server-kick','INVALID_SESSION');
 		}
 	}
