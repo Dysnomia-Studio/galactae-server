@@ -122,7 +122,9 @@ module.exports = class Tactics {
 
 	static async assign(user, fleetId, tacticId) {
 		if(await Tactics.checkOwner(user.id, tacticId)) {
-			if(tacticId === '-1') { tacticId = null; }
+			if(tacticId === '-1') {
+				tacticId = null;
+			}
 			if(fleet.ownerId !== user.id) {
 				return;
 			}
