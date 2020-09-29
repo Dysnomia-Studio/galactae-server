@@ -3,11 +3,7 @@ module.exports = class Player {
 	static async isValid(user,callback) {
 		const playerData = await db.player.findBySid(user.sid);
 
-		if(!Player.canAct(playerData)) {
-			return;
-		}
-
-		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id) { // Don't spam
+		if(isset(playerData, 'object') && playerData.name === user.username && playerData.id === user.id && Player.canAct(playerData)) { // Don't spam
 			if(await db.player.update({
 				id: playerData.id,
 				lastAction: new Date(),
