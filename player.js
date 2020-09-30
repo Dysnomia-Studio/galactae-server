@@ -19,6 +19,8 @@ module.exports = class Player {
 
 	/* Does the player can act ? */
 	static canAct(user) {
+		return true;
+
 		const minTime = 100; //time in ms
 
 		return ((Date.now()-user.lastAction.getTime())>minTime);
