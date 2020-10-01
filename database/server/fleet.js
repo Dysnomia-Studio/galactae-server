@@ -150,4 +150,36 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
+	getAlliedForces: async(plyId, allyId) => {
+		try {
+			let fleets = [];
+
+			if(allyId !== null) {
+				const members = await db.alliance.getMemberIdList(allyId);
+
+				for(const member of members) {
+					const currFleets = (await serverClient.query('SELECT position, population FROM fleets WHERE "ownerId" = $1', [member.id])).rows || [];
+					fleets = [...fleets, ...currFleets];
+				}
+			} else {
+				fleets = (await serverClient.query('SELECT position, population FROM fleets WHERE "ownerId" = $1', [plyId])).rows || [];
+			}
+
+			const forces = {};
+			for(const fleet of fleets) {
+				const system = GameMap.getSystemFromAdress(fleet.position);
+
+				if(!forces[system]) {
+					forces[system] = 0;
+				}
+
+				forces[system] += fleet.population;
+			}
+
+			return forces;
+		} catch(err) {
+			log(err, 'error');
+			return {};
+		}
+	}
 };

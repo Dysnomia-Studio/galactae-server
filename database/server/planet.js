@@ -151,6 +151,9 @@ module.exports = {
 			systems.allyAlliedSystems = systems.allyAlliedSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
 			systems.ennemiesSystems = systems.ennemiesSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
 
+			systems.alliedForces = await db.fleet.getAlliedForces(plyId, userData.ally);
+			systems.enemiesForces = []; // @TODO, do that when spies are available
+
 			return systems;
 		} catch(err) {
 			log(err, 'error');
