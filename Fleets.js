@@ -151,7 +151,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		let newPlanet;
 		[newPlanet, fleetList] = Fleets.distributeFuel(planetData, fleetList.slice(0), userData);
 
-		callback(fleetList, planetData);
+		callback(fleetList, newPlanet);
 	}
 
 	static async create(data,planetData,callback) {

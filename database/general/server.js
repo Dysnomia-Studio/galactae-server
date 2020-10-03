@@ -8,11 +8,11 @@ module.exports = {
 	},
 	update: async(inputServerData) => {
 		const serverData = Object.assign({}, inputServerData);
-		const server_name = serverData.server_name;
+		const serverName = serverData.server_name;
 		delete serverData.server_name;
 
 		let [query, values] = db.buildUpdateQuery('servers', serverData);
-		values.push(server_name);
+		values.push(serverName);
 		query += ' WHERE server_name = $' + values.length;
 
 		try {

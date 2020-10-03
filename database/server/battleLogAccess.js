@@ -3,8 +3,7 @@ module.exports = {
 		let query = 'INSERT INTO public."battleLogAccess"' +
 			'("battleLogId", "userId", "read") VALUES ';
 
-		let i = 1;
-		for(const player of players) {
+		for(let i = 0; i < players.length; i++) {
 			query += '($1,$' + ++i + ',false),';
 		}
 

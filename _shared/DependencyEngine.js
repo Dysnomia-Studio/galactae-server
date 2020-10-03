@@ -99,7 +99,7 @@
 
 			return [
 				validatedDependencies,
-				notValidatedDependencies
+				notValidatedDependencies,
 			];
 		}
 
