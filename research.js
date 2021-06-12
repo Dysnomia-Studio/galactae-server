@@ -31,7 +31,7 @@ module.exports = class Research extends require('./_shared/Research')._Research 
 			researchData[planetData.currResearch] !== -1 &&
 			conquestList.length === 0
 		) {
-			researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time);
+			researchData[planetData.currResearch] += (Research.getResearchProduction(planetData.Buildings[8])*time)*globalCfg.gameSpeeds.research;
 
 			if(researchData[planetData.currResearch] >= researchList[planetData.currResearch].cost) {
 				researchData[planetData.currResearch] = -1;

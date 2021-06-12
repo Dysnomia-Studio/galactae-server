@@ -422,7 +422,12 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			instability /= 2;
 		}
 
-		fleetReturned.endMoveTime = new Date(now.getTime() + Math.round((time + instability) * TIME.HOUR_TO_MS));
+		fleetReturned.endMoveTime = new Date(
+			now.getTime() +
+			Math.round((time + instability) *
+			TIME.HOUR_TO_MS /
+			globalCfg.gameSpeeds.unitMoving
+		));
 		fleetReturned.position = destination;
 		fleetReturned.orbitPosition = moveType;
 		if(destination === fleetReturned.motherPlanetAddress) {
