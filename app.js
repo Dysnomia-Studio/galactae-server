@@ -98,8 +98,9 @@ db.connect(async function(success,general=false) {
 		/**
 		 * Socket.io server
 		 */
-		global.io = require('socket.io').listen(globalCfg.serverPort);
-		io.set('transports', ['websocket']);
+		global.io = require('socket.io')(globalCfg.serverPort, {
+			transports: ['websocket']
+		});
 
 		/**
 		 * Lancement du serveur en écoute
