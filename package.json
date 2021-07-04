@@ -1,0 +1,18 @@
+{
+  "name": "galactae-server",
+  "version": "0.11.0",
+  "private": true,
+  "description": "Galactae: Space Age Dawn server",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon --experimental-modules app",
+    "test-disabled": "c8 -r lcov -r text npm run tests",
+    "tests": "mocha *.spec.js --color"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitea.dysnomia.studio/elanis/galactae-server"
+  },
+  "author": "",
+  "license": "ISC"
+}
