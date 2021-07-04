@@ -42,7 +42,7 @@ steps:
     branch:
     - master
     - dev
-    - feature/next
+    - next
 
 - name: discord
   pull: default
