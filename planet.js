@@ -193,7 +193,7 @@ module.exports = class Planet {
 				return;
 			}
 
-			let timeSpeed = 1;
+			let timeSpeed = globalCfg.gameSpeeds.building;
 
 			const currTime = new Date();
 
