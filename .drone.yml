@@ -19,7 +19,9 @@ steps:
     event:
     - push
     branch:
+    - master
     - dev
+    - next
     - feature/*
 
 - name: docker
