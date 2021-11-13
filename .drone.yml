@@ -15,11 +15,14 @@ steps:
       from_secret: SONAR_HOST
     sonar_token: 
       from_secret: SONAR_TOKEN
+    branchAnalysis: true
   when:
     event:
     - push
     branch:
+    - master
     - dev
+    - next
     - feature/*
 
 - name: docker
