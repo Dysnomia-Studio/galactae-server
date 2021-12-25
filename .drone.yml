@@ -3,7 +3,7 @@ name: galactae-server
 
 steps:
 - name: tests
-  image: node:14
+  image: node:16
   commands:
   - npm install
   - npm test
