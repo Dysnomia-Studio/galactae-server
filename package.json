@@ -22,6 +22,7 @@
     "nodemon": "^2.0.15"
   },
   "dependencies": {
+    "@dysnomia/galactae-shared": "^1.0.0",
     "@dysnomia/logger": "^1.0.2",
     "@dysnomia/pg-data-access": "^1.0.0",
     "socket.io": "^4.4.0"
