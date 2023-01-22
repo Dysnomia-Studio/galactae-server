@@ -7,59 +7,59 @@
 			const ratios = [];
 
 			ratios[0] = ratios[1] = ratios[2] = ratios[3] = ratios[4] = ratios[5] = ratios[6] = ratios[7] = ratios[8] = ratios[9] = {
-				ironRatio: 0.35, aluRatio: 0.50, copperRatio: 0.04, titanRatio: 0.10,
+				ironRatio: 0.35, aluRatio: 0.50, copperRatio: 0.04, titanRatio: 0.10
 			}; // Earth type
 
 			ratios[101] = {
-				ironRatio: 0.41, aluRatio: 0.42, copperRatio: 0.06, titanRatio: 0.10,
+				ironRatio: 0.41, aluRatio: 0.42, copperRatio: 0.06, titanRatio: 0.10
 			}; // Lave I
 
 			ratios[102] = {
-				ironRatio: 0.38, aluRatio: 0.43, copperRatio: 0.07, titanRatio: 0.11,
+				ironRatio: 0.38, aluRatio: 0.43, copperRatio: 0.07, titanRatio: 0.11
 			}; // Pierre Grise I
 
 			ratios[103] = {
-				ironRatio: 0.39, aluRatio: 0.48, copperRatio: 0.04, titanRatio: 0.08,
+				ironRatio: 0.39, aluRatio: 0.48, copperRatio: 0.04, titanRatio: 0.08
 			}; // Glace
 
 			ratios[104] = {
-				ironRatio: 0.41, aluRatio: 0.42, copperRatio: 0.07, titanRatio: 0.09,
+				ironRatio: 0.41, aluRatio: 0.42, copperRatio: 0.07, titanRatio: 0.09
 			}; // Lave II
 
 			ratios[105] = {
-				ironRatio: 0.26, aluRatio: 0.57, copperRatio: 0.05, titanRatio: 0.11,
+				ironRatio: 0.26, aluRatio: 0.57, copperRatio: 0.05, titanRatio: 0.11
 			}; // Pierre Rouge I
 
 			ratios[106] = {
-				ironRatio: 0.36, aluRatio: 0.48, copperRatio: 0.04, titanRatio: 0.11,
+				ironRatio: 0.36, aluRatio: 0.48, copperRatio: 0.04, titanRatio: 0.11
 			}; // Montagnes, forets I
 
 			ratios[107] = {
-				ironRatio: 0.38, aluRatio: 0.46, copperRatio: 0.05, titanRatio: 0.10,
+				ironRatio: 0.38, aluRatio: 0.46, copperRatio: 0.05, titanRatio: 0.10
 			}; // Montagnes, forets II
 
 			ratios[108] = {
-				ironRatio: 0.37, aluRatio: 0.46, copperRatio: 0.07, titanRatio: 0.09,
+				ironRatio: 0.37, aluRatio: 0.46, copperRatio: 0.07, titanRatio: 0.09
 			}; // Montagnes, glace
 
 			ratios[109] = {
-				ironRatio: 0.32, aluRatio: 0.42, copperRatio: 0.10, titanRatio: 0.15,
+				ironRatio: 0.32, aluRatio: 0.42, copperRatio: 0.10, titanRatio: 0.15
 			}; // Pierre Rouge II
 
 			ratios[110] = {
-				ironRatio: 0.38, aluRatio: 0.41, copperRatio: 0.09, titanRatio: 0.11,
+				ironRatio: 0.38, aluRatio: 0.41, copperRatio: 0.09, titanRatio: 0.11
 			}; // Pierre Marron
 
 			ratios[111] = {
-				ironRatio: 0.24, aluRatio: 0.59, copperRatio: 0.04, titanRatio: 0.12,
+				ironRatio: 0.24, aluRatio: 0.59, copperRatio: 0.04, titanRatio: 0.12
 			}; // Pierre couleur rouille
 
 			ratios[112] = {
-				ironRatio: 0.48, aluRatio: 0.41, copperRatio: 0.03, titanRatio: 0.07,
+				ironRatio: 0.48, aluRatio: 0.41, copperRatio: 0.03, titanRatio: 0.07
 			}; // Pierre bleue et blanche
 
 			ratios[113] = {
-				ironRatio: 0.34, aluRatio: 0.49, copperRatio: 0.05, titanRatio: 0.11,
+				ironRatio: 0.34, aluRatio: 0.49, copperRatio: 0.05, titanRatio: 0.11
 			}; // Pierre Grise II
 
 			return ratios;

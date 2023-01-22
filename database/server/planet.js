@@ -1,11 +1,4 @@
 module.exports = {
-	getAllColonizedPlanets: async() => { // /!\ Tools only DataAccess /!\
-		try {
-			return (await serverClient.query('SELECT * FROM planets WHERE points > 50', [])).rows;
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
 	findbyAddress: async(addr) => {
 		try {
 			return (await serverClient.query('SELECT * FROM planets WHERE address = $1 LIMIT 1', [addr])).rows[0];
@@ -129,14 +122,14 @@ module.exports = {
 						systems.allyAlliedSystems = Array.from(
 							new Set([
 								...(await db.alliance.getMembersSystems(allyId)),
-								...systems.allyAlliedSystems,
+								...systems.allyAlliedSystems
 							])
 						);
 					} else {
 						systems.ennemiesSystems = Array.from(
 							new Set([
 								...(await db.alliance.getMembersSystems(allyId)),
-								...systems.ennemiesSystems,
+								...systems.ennemiesSystems
 							])
 						);
 					}
@@ -151,12 +144,9 @@ module.exports = {
 			systems.allyAlliedSystems = systems.allyAlliedSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
 			systems.ennemiesSystems = systems.ennemiesSystems.filter((elt) => !systems.alliedAndEnnemiesSystems.includes(elt));
 
-			systems.alliedForces = await db.fleet.getAlliedForces(plyId, userData.ally);
-			systems.enemiesForces = []; // @TODO, do that when spies are available
-
 			return systems;
 		} catch(err) {
 			log(err, 'error');
 		}
-	},
+	}
 };

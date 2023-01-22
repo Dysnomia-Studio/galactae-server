@@ -95,13 +95,6 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	getMemberIdList: async(id) => {
-		try {
-			return (await serverClient.query('SELECT users.id FROM users WHERE users.ally = $1', [id])).rows;
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
 	createPermissions: async(playerId, allyId) => {
 		try {
 			await serverClient.query(

@@ -70,13 +70,13 @@ module.exports = function() {
 	this.buildingMaxLvl[101] = this.buildingMaxLvl[104] = [
 		15,	// Carriere
 		30,	// Metallurgie
-		20,	// Habitations
-		20,	// Serres
-		25,	// Centrales Solaires
+		22,	// Habitations
+		22,	// Serres
+		26,	// Centrales Solaires
 		20,	// Entrepôts
 		5,	// Etat Major
-		25,	// Centre de lancement
-		20,	// Centre de recherches
+		30,	// Centre de lancement
+		25,	// Centre de recherches
 		10,	// Radar
 		25,	// Reservoir
 		25,	// Chantier naval
@@ -87,8 +87,8 @@ module.exports = function() {
 	this.buildingMaxLvl[102] = this.buildingMaxLvl[113] = [
 		30,	// Carriere
 		20,	// Metallurgie
-		20,	// Habitations
-		20,	// Serres
+		21,	// Habitations
+		21,	// Serres
 		25,	// Centrales Solaires
 		25,	// Entrepôts
 		5,	// Etat Major
@@ -104,13 +104,13 @@ module.exports = function() {
 	this.buildingMaxLvl[103] = [
 		15,	// Carriere
 		15,	// Metallurgie
-		20,	// Habitations
-		20,	// Serres
-		25,	// Centrales Solaires
+		18,	// Habitations
+		18,	// Serres
+		17,	// Centrales Solaires
 		15,	// Entrepôts
 		5,	// Etat Major
-		35,	// Centre de lancement
-		35,	// Centre de recherches
+		20,	// Centre de lancement
+		20,	// Centre de recherches
 		10,	// Radar
 		20,	// Reservoir
 		20,	// Chantier naval
@@ -121,12 +121,12 @@ module.exports = function() {
 	this.buildingMaxLvl[105] = this.buildingMaxLvl[109] = [
 		25,	// Carriere
 		25,	// Metallurgie
-		25,	// Habitations
-		25,	// Serres
-		30,	// Centrales Solaires
+		23,	// Habitations
+		23,	// Serres
+		26,	// Centrales Solaires
 		25,	// Entrepôts
 		5,	// Etat Major
-		35,	// Centre de lancement
+		30,	// Centre de lancement
 		25,	// Centre de recherches
 		10,	// Radar
 		25,	// Reservoir
@@ -140,7 +140,7 @@ module.exports = function() {
 		30,	// Metallurgie
 		25,	// Habitations
 		25,	// Serres
-		30,	// Centrales Solaires
+		29,	// Centrales Solaires
 		20,	// Entrepôts
 		5,	// Etat Major
 		25,	// Centre de lancement
@@ -153,15 +153,15 @@ module.exports = function() {
 	];
 	// Montagnes, glace
 	this.buildingMaxLvl[108] = [
-		20,	// Carriere
+		25,	// Carriere
 		15,	// Metallurgie
 		20,	// Habitations
 		20,	// Serres
-		25,	// Centrales Solaires
+		21,	// Centrales Solaires
 		15,	// Entrepôts
 		5,	// Etat Major
-		30,	// Centre de lancement
-		35,	// Centre de recherches
+		20,	// Centre de lancement
+		25,	// Centre de recherches
 		10,	// Radar
 		20,	// Reservoir
 		20,	// Chantier naval
@@ -172,10 +172,10 @@ module.exports = function() {
 	this.buildingMaxLvl[110] = [
 		20,	// Carriere
 		20,	// Metallurgie
-		20,	// Habitations
-		20,	// Serres
-		25,	// Centrales Solaires
-		25,	// Entrepôts
+		21,	// Habitations
+		21,	// Serres
+		22,	// Centrales Solaires
+		20,	// Entrepôts
 		5,	// Etat Major
 		25,	// Centre de lancement
 		25,	// Centre de recherches
@@ -189,9 +189,9 @@ module.exports = function() {
 	this.buildingMaxLvl[111] = [
 		30,	// Carriere
 		30,	// Metallurgie
-		25,	// Habitations
-		25,	// Serres
-		30,	// Centrales Solaires
+		24,	// Habitations
+		24,	// Serres
+		29,	// Centrales Solaires
 		25,	// Entrepôts
 		5,	// Etat Major
 		30,	// Centre de lancement
@@ -206,8 +206,8 @@ module.exports = function() {
 	this.buildingMaxLvl[112] = [
 		25,	// Carriere
 		25,	// Metallurgie
-		25,	// Habitations
-		25,	// Serres
+		22,	// Habitations
+		22,	// Serres
 		25,	// Centrales Solaires
 		20,	// Entrepôts
 		5,	// Etat Major
@@ -603,9 +603,32 @@ module.exports = function() {
 	};
 	this.shipShapesDetails = {
 		SHIP_DEF: {
-			SHIP_SAT_AG1: {'svg':[['cannon','rect','295','225',50,50,'cannon_1'],['cannon','rect','220','225',50,50,'cannon_2'],['struct','path','M360,200','l 10,10','v 80','l -10,10','H 120','V 200','H 360'],['struct','path','M415,185','l -40-35','H 70'],['struct','path','M415,315','l -40,35','H 70'],['struct','rect','290','150','10','50'],['struct','rect','190','150','10','50'],['struct','rect','290','300','10','50'],['struct','rect','190','300','10','50'],['struct','path','M95,175','l25,25','v100','l-25,25'],['struct','poly','130','210','130','290','200','260','200','240'],['struct','path','M135,245','h45','l10,5','l-10,5','h-45','l5-5','L135,245','z'],['struct','path','M470-49']],'content':{'cannon':['railgun','none','laser']},'partCount':2},
-			SHIP_SAT_AG2: {'svg':[['struct','rect',75,175,250,150],['struct','line',125,185,125,315],['struct','line',175,185,175,315],['struct','line',225,185,225,315],['struct','line',275,185,275,315],['struct','rect',325,125,150,250],['struct','rect',475,175,250,150],['struct','line',525,185,525,315],['struct','line',575,185,575,315],['struct','line',625,185,625,315],['struct','line',675,185,675,315],['cannon','rect',375,150,50,50,'cannon_1'],['shield','rect',375,300,50,50,'shield_1']],'content':{'cannon':['laser'],'shield':['none','magnetic']},'partCount':2},
-			SHIP_SAT_AG3: {'svg':[['cannon','rect','275','300',50,50,'cannon_1'],['shield','rect','150','110',50,50,'shield_1'],['shield','rect','400','110',50,50,'shield_2'],['struct','poly','150','196','75','80','225','80','75','80'],['struct','poly','375','80','525','80','450','196','525','80'],['struct','poly','375','312','300','430','225','312','300','430'],['struct','path','M225,312','A1,1','0','0,0','150,196'],['struct','path','M375,312','A1,1','0','0,1','450,196'],['struct','path','M225,80','A1,1','0','0,0','375,80'],['struct','path','M300,208','L75,80',0],['struct','path','M300,208','L525,80',0],['struct','path','M300,208','L300,430',0],['struct','circle','300','208','30'],['struct','circle','300','208','5'],['struct','circle','300','208','3'],['struct','circle','300','208','1']],'content':{'cannon':['laser','plasma'],'shield':['magnetic','none','turret']},'partCount':3},
+			SHIP_SAT_AG1: {
+				svg: [
+					// Aile Gauche
+					['struct','rect', 75,175,250,150],
+					['struct','line',125,185,125,315],
+					['struct','line',175,185,175,315],
+					['struct','line',225,185,225,315],
+					['struct','line',275,185,275,315],
+					// Centre
+					['struct','rect',325,125,150,250],
+					// Aile droite
+					['struct','rect',475,175,250,150],
+					['struct','line',525,185,525,315],
+					['struct','line',575,185,575,315],
+					['struct','line',625,185,625,315],
+					['struct','line',675,185,675,315],
+					// Contenu
+					['cannon','rect',375,150, 50, 50, 'cannon_1'],
+					['shield','rect',375,300, 50, 50, 'shield_1'],
+				],
+				content: {
+					cannon: ['railgun','laser','plasma'],
+					shield: ['none','magnetic','projector'],
+				},
+				partCount: 2,
+			},
 		},
 		SHIP_BATTLECRUISER: {
 			SHIP_BATTLECRUISER_ATRIOS: {

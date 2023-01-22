@@ -193,7 +193,7 @@ module.exports = class Planet {
 				return;
 			}
 
-			let timeSpeed = globalCfg.gameSpeeds.building;
+			let timeSpeed = 1;
 
 			const currTime = new Date();
 
@@ -318,11 +318,11 @@ module.exports = class Planet {
 			fleetReturned.maxFuel += fuelStorage[unitReturned.shipShape] * unitCount;
 		}
 
-		await db.fleet.update(fleetReturned);
-
-		Units.refresh(user);
-		Fleets.refresh(newPlanet.address,user.sid);
-		Tactics.refresh(user.id, user.sid);
+		db.fleet.update(fleetReturned, function() {
+			Units.refresh(user);
+			Fleets.refresh(newPlanet.address,user.sid);
+			Tactics.refresh(user.id, user.sid);
+		});
 	}
 
 	/**
@@ -393,7 +393,14 @@ module.exports = class Planet {
 			}
 
 			// Planetes sans nom ...
-			if(data.name.trim().length === 0) {
+			let empty = true;
+			for(let i=0; i<data.name.length; i++) {
+				if(data.name[i]!==' ') {
+					empty = false;
+					break;
+				}
+			}
+			if(empty) {
 				return;
 			}
 

@@ -46,7 +46,7 @@ module.exports = class Websocket {
 	 * @param      {string}  msg     The message
 	 */
 	static SendGeneralMessage(msg) {
-		io.emit('server-general-alert', unNormalizeText(msg));
+		io.emit('server-general-alert',msg);
 		Discord.alert(msg);
 	}
 

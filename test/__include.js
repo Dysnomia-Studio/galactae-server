@@ -9,7 +9,7 @@ global.assert = require('assert');
 require('../calcConstants')();
 require('../misc')();
 
-global.Alliances    = require('../Alliances');
+global.Alliances    		= require('../Alliances');
 global.Buildings    		= require('../Buildings');
 global.Combat 				= require('../combat');
 global.Conquest 			= require('../Conquest');
@@ -25,6 +25,7 @@ global.Reports 				= require('../Reports');
 global.Research 			= require('../research');
 global.Resources   			= require('../Resources');
 global.Tactics    			= require('../tactics');
+global.Trading 				= require('../Trading');
 global.Tutorials 			= require('../Tutorials');
 global.Units				= require('../Units');
 global.Websocket 			= require('../socket');

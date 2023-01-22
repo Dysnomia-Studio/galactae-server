@@ -48,12 +48,12 @@ module.exports = {
 			await serverClient.query('BEGIN');
 
 			const endDate = new Date(battleDate);
-			endDate.setDate(endDate.getDate() + (1 / globalCfg.gameSpeeds.conquest));
+			endDate.setDate(endDate.getDate() + 1); // @TODO: use config to determine speed
 
 			// Get latest end of conquest on this planet
 			const conquestsList = await db.conquest.getActiveConquestsOnPlanet(planet);
 
-			let conquestReportTime = TIME.DAY_TO_MS / globalCfg.gameSpeeds.conquest;
+			let conquestReportTime = TIME.DAY_TO_MS; // @TODO: use config to determine speed
 			let lastConquest = endDate.getTime();
 
 			for(const conquest of conquestsList) {

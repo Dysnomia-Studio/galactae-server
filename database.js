@@ -112,6 +112,7 @@ module.exports = {
 	unit: require('./database/server/unit'),
 	tactics: require('./database/server/tactics'),
 	tacticsOrders: require('./database/server/tacticsOrders'),
+	trading: require('./database/server/trading'),
 
 	getAttacksAgainstPlayer: async(playerId) => {
 		try {

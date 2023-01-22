@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 
 // Create an instance of a Discord client
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Discord.Client();
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 const token = globalCfg.discordToken;
@@ -22,9 +22,7 @@ module.exports = {
 				return;
 			}
 
-			const serverChannels = globalCfg.serverName + '-';
-
-			if(message.channel.name.substr(0,serverChannels.length) === serverChannels) { // If it's a message for this server then send it to chat
+			if(message.channel.name.substr(0,globalCfg.serverName.length) === globalCfg.serverName) { // If it's a message for this server then send it to chat
 				const msg = message.cleanContent;
 				if(msg !== msg.replace('http','')) {
 					return;
@@ -33,12 +31,12 @@ module.exports = {
 					return;
 				}
 
-				const channel = 'hud-chat-' + message.channel.name.substr((serverChannels.length),message.channel.name.length);
+				const channel = 'hud-chat-' + message.channel.name.substr((globalCfg.serverName.length+1),message.channel.name.length);
 
 				let role = '';
-				if(message.member && message.member.roles.cache.find((elt) => elt.name === 'Administrathor')) {
+				if(message.member && message.member.roles.find('name', 'Administrathor')) {
 					role = Privileges.getChatRank(4);
-				} else if(message.member && message.member.roles.cache.find((elt) => elt.name === 'Moderathor')) {
+				} else if(message.member && message.member.roles.find('name', 'Moderathor')) {
 					role = Privileges.getChatRank(3);
 				}
 
@@ -67,8 +65,8 @@ module.exports = {
 	 */
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
-		const channel = client.channels.cache.find((channel) => channel.name === channelName);
-		channel.send({ content: unNormalizeText(message) });
+		const channel = client.channels.find((channel) => channel.name === channelName);
+		channel.send(unNormalizeText(message));
 	},
 
 	/**
@@ -78,7 +76,7 @@ module.exports = {
 	 */
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
-		const channel = client.channels.cache.find((channel) => channel.name === channelName);
-		channel.send({ content: '**[SYSTEM MESSAGE]** ' + unNormalizeText(message) });
+		const channel = client.channels.find((channel) => channel.name === channelName);
+		channel.send('**[SYSTEM MESSAGE]** ' + unNormalizeText(message));
 	},
 };

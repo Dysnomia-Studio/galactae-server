@@ -357,15 +357,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 
 				// Create entry in planet db for in-build unit
 				newPlanet.unitBuildingID = inputData.unit;
-				newPlanet.unitBuildingEndTime = new Date(
-					currTime.getTime() +
-					Math.round(
-						totalCost[4] *
-						(1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11]))) *
-						TIME.HOUR_TO_MS /
-						globalCfg.gameSpeeds.unitBuilding
-					)
-				);
+				newPlanet.unitBuildingEndTime = new Date(currTime.getTime() + Math.round(totalCost[4] * (1-(buildLvlUnitBuildingSpeedBonus*(newPlanet.Buildings[7] + newPlanet.Buildings[11]))) * TIME.HOUR_TO_MS));
 				newPlanet.unitBuildingCount = inputData.count;
 				newPlanet.unitBuildingFleetID = fleetReturned.id;
 
@@ -397,7 +389,7 @@ module.exports = class Units extends require('./_shared/Units')._Units {
 				fleetReturned.population += totalCost[5];
 				fleetReturned.inBuilding = true;
 
-				await db.fleet.update(fleetReturned);
+				db.fleet.update(fleetReturned);
 
 				Planet.sendPlanetDataToUser({data: newPlanet, id: inputData.id, sid: inputData.sid });
 

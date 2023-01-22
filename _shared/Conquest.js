@@ -3,7 +3,7 @@
 		static minPointForPlanetCount(count) {
 			count--; // On doit compter le nombre de planetes supplementaires a la premiere
 
-			return Math.ceil(0.018*Math.pow(count, 3) - 1.5*Math.pow(count, 2) + 1720 * count - 800);
+			return Math.ceil(0.013*Math.pow(count, 3) - 1.85*Math.pow(count, 2) + 1520 * count - 750);
 		}
 
 		/**

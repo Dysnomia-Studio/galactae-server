@@ -1,3 +1,12 @@
+function rollback() {
+	serverClient.query('ROLLBACK', (err) => {
+		if(err) {
+			log(err, 'error');
+			return;
+		}
+	});
+}
+
 module.exports = {
 	findAll: async() => {
 		try {
@@ -12,7 +21,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	find: async(tid) => {
+	find: async(tid, callback) => {
 		if(tid === '' || !tid) {
 			return;
 		}
@@ -27,87 +36,100 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByOwner: async(owner) => {
-		try {
-			const tacticList = (await serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner])).rows;
+	findByOwner: (owner, callback) => {
+		serverClient.query('SELECT * FROM tactics WHERE owner=$1', [owner], async(err, tacticListQuery) => {
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
+			const tacticList = tacticListQuery.rows;
 			for(const tactic of tacticList) {
 				tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
 			}
 
-			return tacticList;
-		} catch(err) {
-			log(err, 'error');
-		}
+			callback(tacticList);
+		});
 	},
-	findByOwnerAndName: async(tactic) => {
-		try {
-			const tacticListQuery = (await serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name])).rows;
-
-			if(tacticListQuery.rows.length === 0) {
+	findByOwnerAndName: (tactic, callback) => {
+		serverClient.query('SELECT * FROM tactics WHERE owner=$1 AND name=$2', [tactic.owner, tactic.name], async(err, tacticListQuery) => {
+			if(err) {
+				log(err, 'error');
 				return;
 			}
 
-			const foundTactic = tacticListQuery.rows[0];
-			foundTactic.orders = await db.tacticsOrders.findByTactic(foundTactic.id);
+			if(tacticListQuery.rows.length === 0) {
+				callback();
+				return;
+			}
 
-			return foundTactic;
-		} catch(err) {
-			log(err, 'error');
-		}
+			const tactic = tacticListQuery.rows[0];
+			tactic.orders = await db.tacticsOrders.findByTactic(tactic.id);
+
+			callback(tactic);
+		});
 	},
-	upsert: async(inputTactic) => {
+	upsert: (inputTactic, callback) => {
 		inputTactic.id = (inputTactic.id) ? inputTactic.id : '';
 
-		try {
-			await serverClient.query('BEGIN');
+		function innerCallback() {
+			serverClient.query('COMMIT', (err) => {
+				callback();
+			});
+		}
+
+		serverClient.query('BEGIN', async(err) => {
+			if(err) {
+				rollback();
+			}
 
 			const tactic = await db.tactics.find(inputTactic.id);
 			if(!isset(tactic)) {
-				await db.tactics.insert(inputTactic);
-
-				const newTactic = await db.tactics.findByOwnerAndName(inputTactic);
-
-				await db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id);
+				db.tactics.insert(inputTactic, () => {
+					db.tactics.findByOwnerAndName(inputTactic, (newTactic) => {
+						db.tacticsOrders.upsertAll(inputTactic.orders, newTactic.id, innerCallback);
+					});
+				});
 			} else if(tactic.name !== inputTactic.name) {
-				await db.tactics.updateName(inputTactic);
-
-				await db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id);
+				db.tactics.updateName(inputTactic, () =>
+					db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback)
+				);
 			} else {
-				await db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id);
+				db.tacticsOrders.upsertAll(inputTactic.orders, tactic.id, innerCallback);
+			}
+		});
+
+	},
+	insert: (tactic, callback) => {
+		serverClient.query('INSERT INTO tactics (name, owner) VALUES ($1, $2)', [tactic.name, tactic.owner], (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
 			}
 
-			await serverClient.query('COMMIT');
-		} catch(err) {
-			log(err, 'error');
-			await serverClient.query('ROLLBACK');
-		}
+			callback();
+		});
 	},
-	insert: async(tactic) => {
-		try {
-			await serverClient.query('INSERT INTO tactics (name, owner) VALUES ($1, $2)', [tactic.name, tactic.owner]);
-		} catch(err) {
-			log(err, 'error');
-		}
+	updateName: (tactic, callback) => {
+		serverClient.query('UPDATE tactics SET name=$1 WHERE id=$2', [tactic.name, tactic.id], (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+
+			callback();
+		});
 	},
-	updateName: async(tactic) => {
-		try {
-			await serverClient.query('UPDATE tactics SET name=$1 WHERE id=$2', [tactic.name, tactic.id]);
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	delete: async(tid) => {
-		try {
-			await serverClient.query('BEGIN');
+	delete: (tid, callback) => {
+		db.tacticsOrders.delete(tid, () => {
+			serverClient.query('DELETE FROM tactics WHERE id=$1', [tid], (err) => {
+				if(err) {
+					log(err, 'error');
+					return;
+				}
 
-			await db.tacticsOrders.delete(tid);
-
-			await serverClient.query('DELETE FROM tactics WHERE id=$1');
-
-			await serverClient.query('COMMIT');
-		} catch(err) {
-			log(err, 'error');
-			await serverClient.query('ROLLBACK');
-		}
+				callback();
+			});
+		});
 	},
 };

@@ -41,7 +41,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findAllFleetReferingToPosition: async(address) => {
+	findAllFleetReferingToPosition: async(address,callback) => {
 		try {
 			const fleetList = (await serverClient.query('SELECT * FROM fleets WHERE position=$1 OR "motherPlanetAddress"=$1', [address])).rows;
 
@@ -54,7 +54,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	findByTactic: async(tid) => {
+	findByTactic: async(tid,callback) => {
 		try {
 			return (await serverClient.query('SELECT * FROM fleets WHERE tactic=$1', [tid])).rows;
 		} catch(err) {
@@ -75,7 +75,7 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	update: async(inputFleet) => {
+	update: (inputFleet,callback) => {
 		const fleet = Object.assign({}, inputFleet);
 		const id = fleet.id;
 		delete fleet.id;
@@ -85,14 +85,16 @@ module.exports = {
 		values.push(id);
 		query += ' WHERE id = $' + values.length;
 
-		try {
-			await serverClient.query(query, values);
+		serverClient.query(query, values, (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
+			}
 
-			return true;
-		} catch(err) {
-			log(err, 'error');
-			return false;
-		}
+			if(callback) {
+				callback();
+			}
+		});
 	},
 	bulkUpdate: async(fleets) => {
 		let query = 'UPDATE fleets SET ' +
@@ -125,61 +127,36 @@ module.exports = {
 			log(err, 'error');
 		}
 	},
-	create: async(fleet) => {
+	create: (fleet,callback) => {
 		const [query, values] = db.buildInsertQuery('fleets', fleet);
 
-		try {
-			await serverClient.query(query, values);
-
-			return fleet;
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	remove: async(id) => {
-		try {
-			await serverClient.query('DELETE FROM fleets WHERE id=$1', [id]);
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	assignFleet: async(fid, tid) => {
-		try {
-			await serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid]);
-		} catch(err) {
-			log(err, 'error');
-		}
-	},
-	getAlliedForces: async(plyId, allyId) => {
-		try {
-			let fleets = [];
-
-			if(allyId !== null) {
-				const members = await db.alliance.getMemberIdList(allyId);
-
-				for(const member of members) {
-					const currFleets = (await serverClient.query('SELECT position, population FROM fleets WHERE "ownerId" = $1', [member.id])).rows || [];
-					fleets = [...fleets, ...currFleets];
-				}
-			} else {
-				fleets = (await serverClient.query('SELECT position, population FROM fleets WHERE "ownerId" = $1', [plyId])).rows || [];
+		serverClient.query(query, values, (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
 			}
 
-			const forces = {};
-			for(const fleet of fleets) {
-				const system = GameMap.getSystemFromAdress(fleet.position);
-
-				if(!forces[system]) {
-					forces[system] = 0;
-				}
-
-				forces[system] += fleet.population;
+			if(callback) {
+				callback(fleet);
+			}
+		});
+	},
+	remove: (id) => {
+		serverClient.query('DELETE FROM fleets WHERE id=$1', [id], (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
+			}
+		});
+	},
+	assignFleet: (fid, tid, callback) => {
+		serverClient.query('UPDATE fleets SET tactic=$1 WHERE id=$2', [tid, fid], (err) => {
+			if(err) {
+				log(err, 'error');
+				return;
 			}
 
-			return forces;
-		} catch(err) {
-			log(err, 'error');
-			return {};
-		}
-	}
+			callback();
+		});
+	},
 };

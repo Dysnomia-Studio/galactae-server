@@ -1,11 +1,3 @@
-process.on('uncaughtException', function (exception) {
-	console.log(exception);
-});
-
-process.on('unhandledRejection', (reason, p) => {
-	console.log('Unhandled Rejection at: Promise ', p, ' reason: ', reason);
-});
-
 /**
  * Npm libs
  */
@@ -51,6 +43,7 @@ global.Reports    = require('./Reports');
 global.Research   = require('./research');
 global.Resources  = require('./Resources');
 global.Tactics    = require('./tactics');
+global.Trading    = require('./Trading');
 global.Tutorials  = require('./Tutorials');
 global.Units      = require('./Units');
 // And that's in last
@@ -98,9 +91,8 @@ db.connect(async function(success,general=false) {
 		/**
 		 * Socket.io server
 		 */
-		global.io = require('socket.io')(globalCfg.serverPort, {
-			transports: ['websocket']
-		});
+		global.io = require('socket.io').listen(globalCfg.serverPort);
+		io.set('transports', ['websocket']);
 
 		/**
 		 * Lancement du serveur en écoute

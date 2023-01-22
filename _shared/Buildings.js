@@ -403,12 +403,16 @@
 			currentPlanet.Buildings[building]++; // Only for calcs
 
 			// Energie ? Habitants ?
-			if(errormsg === '' && !Buildings.enoughEnergy(currentPlanet.Buildings) && building <= globalConst.groundBuildingNumber && building !== 4) { // Only ground buildings affected by this
-				errormsg = 'BUILDING_ERROR_ENERGY';
+			if(errormsg === '') {
+				if(!Buildings.enoughEnergy(currentPlanet.Buildings) && building <= globalConst.groundBuildingNumber && building !== 4) { // Only ground buildings affected by this
+					errormsg = 'BUILDING_ERROR_ENERGY';
+				}
 			}
 
-			if(errormsg === '' && !Buildings.enoughPeople(currentPlanet, fleetList)) {
-				errormsg = 'BUILDING_ERROR_PEOPLE';
+			if(errormsg === '') {
+				if(!Buildings.enoughPeople(currentPlanet, fleetList)) {
+					errormsg = 'BUILDING_ERROR_PEOPLE';
+				}
 			}
 
 			currentPlanet.Buildings[building]--; // Revert

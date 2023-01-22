@@ -1,5 +1,5 @@
 module.exports = class Privileges {
-	static async isBannedFromChat(userId) {
+	static async isBannedFromChat(userId, callback) {
 		const banObj = await db.ban.find(userId, 1);
 
 		if(isset(banObj, 'array')) {
