@@ -41,7 +41,7 @@
 			// Tutorials
 			const tutorialsDependencies = dependencies.filter((dependency) => dependency.type === 'tutorial');
 			for(const tutorialDependency of tutorialsDependencies) {
-				if(user.tutorials[tutorialDependency.name]) {
+				if(user.tutorials && user.tutorials[tutorialDependency.name]) {
 					validatedDependencies.push('tutorial_' + tutorialDependency.name);
 				} else {
 					notValidatedDependencies.push('tutorial_' + tutorialDependency.name);

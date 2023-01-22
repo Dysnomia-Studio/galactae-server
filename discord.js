@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 
 // Create an instance of a Discord client
-const client = new Discord.Client();
+const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 const token = globalCfg.discordToken;
@@ -68,7 +68,7 @@ module.exports = {
 	sendChatMessage: function(channelName,message) {
 		channelName = globalCfg.serverName + '-' + channelName.substr(9);
 		const channel = client.channels.cache.find((channel) => channel.name === channelName);
-		channel.send(unNormalizeText(message));
+		channel.send({ content: unNormalizeText(message) });
 	},
 
 	/**
@@ -79,6 +79,6 @@ module.exports = {
 	alert: function(message) {
 		const channelName = globalCfg.serverName + '-global';
 		const channel = client.channels.cache.find((channel) => channel.name === channelName);
-		channel.send('**[SYSTEM MESSAGE]** ' + unNormalizeText(message));
+		channel.send({ content: '**[SYSTEM MESSAGE]** ' + unNormalizeText(message) });
 	},
 };

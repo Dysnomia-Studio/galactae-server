@@ -33,7 +33,7 @@ steps:
   settings:
     repo: dysnomia/galactae-server
     dockerfile: Dockerfile
-    tags: ${DRONE_BRANCH//\//-}
+    tags: ${DRONE_BRANCH}
     dry_run: true
     pull-image: false
   environment:
