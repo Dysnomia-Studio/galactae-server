@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 // The token of your bot - https://discordapp.com/developers/applications/me
-const token = '***REMOVED***';
+const token = globalCfg.discordToken;
 
 module.exports = {
 	/**

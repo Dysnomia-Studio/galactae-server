@@ -8,8 +8,8 @@ module.exports = function(socket) {
 
 		const clientIpAddress = socket.request.headers['x-forwarded-for'] || socket.request.connection.remoteAddress;
 
-		if(data.username ===  '***REMOVED***' &&
-			data.password === '***REMOVED***') {
+		if(data.username === globalCfg.adminUsername &&
+			data.password === globalCfg.adminPassword) {
 
 			adminSid = socket.id;
 			log('Admin connected from ' + clientIpAddress);
