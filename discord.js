@@ -2,7 +2,7 @@
 const Discord = require('discord.js');
 
 // Create an instance of a Discord client
-const client = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS, Discord.Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Discord.Client({ intents: [Discord.GatewayIntentBits.Guilds, Discord.GatewayIntentBits.GuildMessages] });
 
 // The token of your bot - https://discordapp.com/developers/applications/me
 const token = globalCfg.discordToken;
