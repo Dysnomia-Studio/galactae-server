@@ -6,8 +6,8 @@ module.exports = {
 			const fleet = dbObj.rows[0];
 
 			if(isset(fleet, 'object')) {
-				fleet.fuel = parseInt(fleet.fuel);
-				fleet.maxFuel = parseInt(fleet.maxFuel);
+				fleet.fuel = parseInt(fleet.fuel, 10);
+				fleet.maxFuel = parseInt(fleet.maxFuel, 10);
 
 				if(Number.isNaN(fleet.fuel) || Number.isNaN(fleet.maxFuel)) {
 					log('Can\'t parse fuel/maxFuel for fleet ' + fleet.name + '!', 'warn');

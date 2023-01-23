@@ -21,9 +21,9 @@ module.exports = class Player {
 	static canAct(user) {
 		return true;
 
-		const minTime = 100; //time in ms
+		/*const minTime = 100; //time in ms
 
-		return ((Date.now()-user.lastAction.getTime())>minTime);
+		return ((Date.now()-user.lastAction.getTime())>minTime);*/
 	}
 
 	/* Get player ally */

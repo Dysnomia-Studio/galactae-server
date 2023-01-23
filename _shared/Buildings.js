@@ -242,7 +242,7 @@
 			let cons = 0;
 
 			for(let i=0; i<globalConst.groundBuildingNumber; i++) {
-				cons += parseInt(Buildings.GetCost(i,buildings[i]).energy);
+				cons += parseInt(Buildings.GetCost(i,buildings[i]).energy, 10);
 			}
 
 			return cons;
@@ -337,10 +337,10 @@
 
 				if(i===currPlanet.nextBuilding) {
 					// Current in-build building
-					cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants);
+					cons += parseInt(Buildings.GetCost(i,buildings[i] + 1).habitants, 10);
 					continue;
 				}
-				cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants);
+				cons += parseInt(Buildings.GetCost(i,buildings[i]).habitants, 10);
 			}
 
 			// Units builded and in-build

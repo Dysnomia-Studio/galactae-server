@@ -68,6 +68,10 @@ module.exports = {
 		const values = [];
 
 		for(const key in fields) {
+			if (!fields.hasOwnProperty(key)) {
+				continue;
+			}
+			
 			values.push(fields[key]);
 			query += ' "' + key + '" = $' + values.length + ',';
 		}
@@ -84,6 +88,10 @@ module.exports = {
 		const values = [];
 
 		for(const key in fields) {
+			if (!fields.hasOwnProperty(key)) {
+				continue;
+			}
+
 			values.push(fields[key]);
 
 			columns += '"' + key + '",';

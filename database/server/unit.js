@@ -60,6 +60,10 @@ module.exports = {
 		let i = 0;
 		const queryParameters = [];
 		for(const unitId in units) {
+			if (!units.hasOwnProperty(unitId)) {
+				continue;
+			}
+			
 			const unit = units[unitId];
 
 			query += '($' + (++i) + '::integer, $' + (++i) + '::uuid), ';
