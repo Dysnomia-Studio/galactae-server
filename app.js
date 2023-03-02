@@ -24,7 +24,7 @@ global.adminSid = '';
  * Configs & Constants
  */
 require('./calcConstants')();
-require('./config')();
+require('./config/config')();
 
 require('./misc')();
 require('./console')();
