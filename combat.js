@@ -121,6 +121,10 @@ module.exports = class Combat {
 		const compatibleUnits = [];
 		if(type !== '') {
 			for(const id in this.unitCache) {
+				if (!this.unitCache.hasOwnProperty(id)) {
+					continue;
+				}
+
 				const currUnit = this.unitCache[id];
 				if(currUnit.shipType === type) {
 					compatibleUnits.push(currUnit.id);
@@ -131,6 +135,10 @@ module.exports = class Combat {
 		let i = 0;
 		do {
 			for(const unitId in fleetList[i].units) {
+				if (!fleetList[i].units.hasOwnProperty(unitId)) {
+					continue;
+				}
+
 				if(compatibleUnits.includes(unitId)) {
 					return [fleetList[i].id, unitId];
 				}
@@ -536,6 +544,10 @@ module.exports = class Combat {
 				db.conquest.beginConquest(this.location, this.defUser.id, this.atkUser.id, this.battleDate);
 
 				for(const fid in this.atkFleets) {
+					if (!this.atkFleets.hasOwnProperty(fid)) {
+						continue;
+					}
+
 					const fleet = this.atkFleets[fid];
 					if(fleet.id === this.atkFleetId) {
 						[ this.atkFleets[fid], this.unitCache ] = Fleets.removeColonyShip(fleet, this.unitCache);
@@ -641,6 +653,10 @@ module.exports = class Combat {
 		await db.battleLog.save(this.finalBattleLog, playerList);
 
 		for(const ply in this.playerList) {
+			if (!this.playerList.hasOwnProperty(ply)) {
+				continue;
+			}
+
 			Reports.refresh(ply.id, ply.sid);
 		}
 	}
@@ -657,6 +673,10 @@ module.exports = class Combat {
 
 		// Add all fleets to fight
 		for(const i in fleetList) {
+			if (!fleetList.hasOwnProperty(i)) {
+				continue;
+			}
+
 			if(fleetList[i].endMoveTime !== null && fleetList[i].endMoveTime.getTime() > currTime) {
 				continue;
 			}

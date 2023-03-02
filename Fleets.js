@@ -219,6 +219,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 					fighterCount += fighterWeight[unitList[u].shipShape] * currFleet.units[f];
 				} else if(unitList[u].shipType === 'SHIP_CARRIER') {
 					for(const p in unitList[u].parts) {
+						if (!unitList[u].parts.hasOwnProperty(p)) {
+							continue;
+						}
+
 						if(unitList[u].parts[p].type === 'hangar') {
 							fighterCap += hangarSize[unitList[u].parts[p].tech] * currFleet.units[f];
 						}
@@ -536,7 +540,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 	}
 
 	static async transferSomeUnits(from, to, data) {
-		data.unitCount = parseInt(data.unitCount);
+		data.unitCount = parseInt(data.unitCount, 10);
 		if(Number.isNaN(data.unitCount)) {
 			return;
 		}
@@ -603,6 +607,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		// @TODO: check people limit for fleet & planet
 
 		for(const key in from.units) {
+			if (!from.units.hasOwnProperty(key)) {
+				continue;
+			}
+
 			[from, to] = Fleets.moveUnits(key, from.units[key], from, to);
 			if(from === -1) {
 				return;
@@ -637,7 +645,7 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 			return;
 		}
 
-		data.fuelCount = parseInt(data.fuelCount);
+		data.fuelCount = parseInt(data.fuelCount, 10);
 		if(Number.isNaN(data.fuelCount) || data.fuelCount <= 0) {
 			return;
 		}
@@ -670,6 +678,10 @@ module.exports = class Fleets extends require('./_shared/Fleets')._Fleets {
 		};
 
 		for(const unitId in fleet.units) {
+			if (!fleet.units.hasOwnProperty(unitId)) {
+				continue;
+			}
+			
 			let unitsListId = unitId;
 			if(typeof specialUnitsUID[unitsListId] !== 'undefined') {
 				unitsListId = specialUnitsUID[unitsListId];

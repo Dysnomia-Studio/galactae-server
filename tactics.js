@@ -19,6 +19,10 @@ module.exports = class Tactics {
 		// Check variables types:
 		// Keep only "name": string, "id": string or null or undefined, owner: string or null or undefined, orders: array
 		for(const key in tactic) {
+			if (!tactic.hasOwnProperty(key)) {
+				continue;
+			}
+			
 			switch(key) {
 				case 'name':
 					if(!isset(tactic[key],'string')) {

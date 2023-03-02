@@ -7,7 +7,7 @@
 		 * @return     {boolean}  True if has finished tutorials, False otherwise.
 		 */
 		static hasFinishedTutorials(user) {
-			return Object.keys(user.tutorials).length === tutorialsList.length;
+			return user.tutorials && Object.keys(user.tutorials).length === tutorialsList.length;
 		}
 
 		static hasAllDependancies(currTuto, user, planet) {
@@ -25,7 +25,7 @@
 			}
 
 			for(let currTuto=0; currTuto<tutorialsList.length; currTuto++) {
-				if( !user.tutorials[tutorialsList[currTuto]] &&
+				if(user.tutorials && !user.tutorials[tutorialsList[currTuto]] &&
 					Tutorials.hasAllDependancies(tutorialsList[currTuto], user, planet)) {
 
 					Websocket.sendTutorial(user, tutorialsList[currTuto]);
@@ -40,7 +40,7 @@
 			}
 
 			for(let currTuto=0; currTuto<tutorialsList.length; currTuto++) {
-				if( !user.tutorials[tutorialsList[currTuto]] &&
+				if(user.tutorials && !user.tutorials[tutorialsList[currTuto]] &&
 					Tutorials.hasCompletedTutorial(tutorialsList[currTuto], user, planet, fleets, units)) {
 
 					user.tutorials[tutorialsList[currTuto]] = true;
@@ -51,7 +51,7 @@
 		}
 
 		static hasCompletedTutorial(currTuto, user, planet, fleets, units, manually=true) {
-			if(user.tutorials[currTuto]) {
+			if(user.tutorials && user.tutorials[currTuto]) {
 				return true;
 			}
 

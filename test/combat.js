@@ -981,6 +981,10 @@ describe('• Combat', () => {
 
 		// Generate tests
 		for(const simulationName in simulations) {
+			if (!simulations.hasOwnProperty(simulationName)) {
+				continue;
+			}
+
 			it(simulationName, (done) => {
 				if(simulations[simulationName].fleets) {
 					globalFleetList = JSON.parse(JSON.stringify(simulations[simulationName].fleets)).map((fleet) => {
@@ -1056,6 +1060,10 @@ describe('• Combat', () => {
 						assert(!Number.isNaN(fleet.population));
 
 						for(const unit in fleet.units) {
+							if (!fleet.units.hasOwnProperty(unit)) {
+								continue;
+							}
+
 							assert(!Number.isNaN(unit));
 						}
 					}
@@ -1064,6 +1072,10 @@ describe('• Combat', () => {
 					delete logs.finalDefenseFleets;
 
 					for(const unit in logs.finalUnitCache) {
+						if (!logs.finalUnitCache.hasOwnProperty(unit)) {
+							continue;
+						}
+
 						assert(!Number.isNaN(logs.finalUnitCache[unit].owned));
 					}
 

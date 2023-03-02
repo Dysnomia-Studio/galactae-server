@@ -3,6 +3,8 @@
  */
 global.assert = require('assert');
 
+global.globalCfg = {};
+
 /**
  * My libs
  */
@@ -30,7 +32,6 @@ global.Units				= require('../Units');
 global.Websocket 			= require('../socket');
 
 global.log = (data) => console.log('\t > ' + data);
-
 
 /**
  * DB & IO

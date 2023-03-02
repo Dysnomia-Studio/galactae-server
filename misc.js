@@ -239,7 +239,7 @@ module.exports = function() {
 	 */
 	this.parseChatTime = function(str) {
 		const unit = str.charAt(str.length-1).toLowerCase();
-		const count = parseInt(str.substr(0,str.length-1));
+		const count = parseInt(str.substr(0,str.length-1), 10);
 
 		if(typeof count !== 'number' || Number.isNaN(count)) {
 			return -1; // Send error code

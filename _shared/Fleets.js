@@ -44,6 +44,10 @@
 			}
 
 			for(const i in unit.parts) {
+				if (!unit.parts.hasOwnProperty(i)) {
+					continue;
+				}
+
 				if(unit.parts[i].type === type) {
 					tech = unit.parts[i].tech;
 					count++;
@@ -88,6 +92,10 @@
 			let cost = 0;
 
 			for(const i in engines) {
+				if (!engines.hasOwnProperty(i)) {
+					continue;
+				}
+
 				cost += fuelCost[i] * engines[i];
 			}
 
@@ -128,6 +136,10 @@
 			const unitListId = unitList.map((unit) => unit.id);
 
 			for(const key in fleetUnits) {
+				if (!fleetUnits.hasOwnProperty(key)) {
+					continue;
+				}
+
 				const currUnit = unitList[unitListId.indexOf(key)];
 
 				const curr = Fleets.calcSubSpeed(currUnit);
@@ -167,6 +179,10 @@
 			const unitListId = unitList.map((unit) => unit.id);
 
 			for(const key in fleetUnits) {
+				if (!fleetUnits.hasOwnProperty(key)) {
+					continue;
+				}
+
 				const currUnit = unitList[unitListId.indexOf(key)];
 
 				if(currUnit.shipType === 'SHIP_FIGHTER') { // Don't care about fighter they are carried
@@ -247,8 +263,8 @@
 					fleetList[i].fuel = 0;
 				}
 
-				fleetList[i].fuel = parseInt(fleetList[i].fuel);
-				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel);
+				fleetList[i].fuel = parseInt(fleetList[i].fuel, 10);
+				fleetList[i].maxFuel = parseInt(fleetList[i].maxFuel, 10);
 
 				if(fleetList[i].fuel < fleetList[i].maxFuel) {
 					if(fleetList[i].position === fleetList[i].motherPlanetAddress) {
@@ -306,6 +322,10 @@
 				fleet.maxFuel = 0;
 
 				for(const unitId in fleet.units) {
+					if (!fleet.units.hasOwnProperty(unitId)) {
+						continue;
+					}
+
 					fleet.maxFuel += fleet.units[unitId] * fuelStorage[units[unitId].shipShape];
 				}
 
@@ -319,6 +339,10 @@
 
 		static removeEmptyUnits(fleet) {
 			for(const unit in fleet.units) {
+				if (!fleet.units.hasOwnProperty(unit)) {
+					continue;
+				}
+
 				if(fleet.units[unit] <= 0) {
 					delete fleet.units[unit];
 				}
@@ -329,6 +353,10 @@
 
 		static hasOffensiveCapacity(currFleet, unitCache) {
 			for(const currUnit in currFleet.units) {
+				if (!currFleet.units.hasOwnProperty(currUnit)) {
+					continue;
+				}
+
 				let realUnitId = currUnit;
 				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
 					realUnitId = specialUnitsUID[realUnitId];
@@ -362,6 +390,10 @@
 
 		static hasColonyShip(currFleet, unitCache) {
 			for(const currUnit in currFleet.units) {
+				if (!currFleet.units.hasOwnProperty(currUnit)) {
+					continue;
+				}
+
 				let realUnitId = currUnit;
 				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
 					realUnitId = specialUnitsUID[realUnitId];
@@ -377,6 +409,10 @@
 
 		static removeColonyShip(currFleet, unitCache) {
 			for(const currUnit in currFleet.units) {
+				if (!currFleet.units.hasOwnProperty(currUnit)) {
+					continue;
+				}
+
 				let realUnitId = currUnit;
 				if(typeof specialUnitsUID[realUnitId] !== 'undefined') {
 					realUnitId = specialUnitsUID[realUnitId];
@@ -402,6 +438,10 @@
 			let total = 0;
 
 			for(const currUnit in currFleet.units) {
+				if (!currFleet.units.hasOwnProperty(currUnit)) {
+					continue;
+				}
+				
 				total += Units.cargoSize(
 					unitCache[currUnit].shipShape
 				) * currFleet.units[currUnit];

@@ -20,6 +20,10 @@ module.exports = {
 				let battleLogActionsId = 0;
 
 				for(const currLogId in battleLog.logs) {
+					if (!battleLog.logs.hasOwnProperty(currLogId)) {
+						continue;
+					}
+					
 					const currLog = battleLog.logs[currLogId];
 
 					battleLogActions += '($' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + ',$' + ++battleLogActionsId + '),';
