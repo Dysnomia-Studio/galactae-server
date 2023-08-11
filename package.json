@@ -12,7 +12,7 @@
     "test-watch": "mocha test/**/*.js --color --watch"
   },
   "dependencies": {
-    "discord.js": "^14.11.0",
+    "discord.js": "^14.12.1",
     "pg": "^8.11.2",
     "socket.io": "^4.7.2"
   },
