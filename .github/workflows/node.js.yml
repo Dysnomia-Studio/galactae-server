@@ -1,17 +1,21 @@
 name: Build & Test
 
-on: [push, pull_request]
+on: [push]
 
 permissions:
   packages: write
   contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: dysnomia-studio/galactae-server
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 22
@@ -34,44 +38,45 @@ jobs:
       env:
        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  build_tag:
+  build:
+    needs: test
+  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set env.DOCKER_TAG / env.DOCKER_IMAGE_PUSH
+        run:
+          if [[ "${{ startsWith(github.event.ref, 'refs/tags/') }}" == "true" ]]; then
+            echo "DOCKER_TAG=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV;
+            echo "DOCKER_IMAGE_PUSH=true"  >> $GITHUB_ENV;
+          else
+            echo "DOCKER_TAG=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:temp" >> $GITHUB_ENV;
+            echo "DOCKER_IMAGE_PUSH=false"  >> $GITHUB_ENV;
+          fi
+
+      - name: Build & Push Docker image
+        uses: docker/build-push-action@v6.10.0
+        with:
+          push: ${{ env.DOCKER_IMAGE_PUSH }}
+          tags: ${{ env.DOCKER_TAG }}
+          build-args: |
+            NPM_TOKEN=${{secrets.GITHUB_TOKEN}}  
+ 
+  deploy_app:
+    needs: build
     if: startsWith(github.event.ref, 'refs/tags/')
-    needs: test
-  
+
     runs-on: ubuntu-latest
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Update infra
+        uses: peter-evans/repository-dispatch@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build & Push Docker image
-        uses: docker/build-push-action@v6.10.0
-        with:
-          push: true
-          tags: ghcr.io/dysnomia-studio/galactae-server:${{github.ref_name}}
-          build-args: |
-            NPM_TOKEN=${{secrets.GITHUB_TOKEN}}  
-  
-  build_branch:
-    if: ${{ (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/feature/')) && github.event_name == 'push' }}
-    needs: test
-  
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build & Push Docker image
-        uses: docker/build-push-action@v6.10.0
-        with:
-          push: true
-          tags: ghcr.io/dysnomia-studio/galactae-server:${{ github.head_ref || github.ref_name }} 
-          build-args: |
-            NPM_TOKEN=${{secrets.GITHUB_TOKEN}}  
+          token: ${{ secrets.UPDATE_INFRA_TOKEN }}
+          repository: Dysnomia-studio/argocd-infra
+          event-type: update-infra
