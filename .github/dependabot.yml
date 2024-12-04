@@ -4,14 +4,14 @@ updates:
     target-branch: "develop"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "npm"
     target-branch: "develop"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
   - package-ecosystem: "docker"
     target-branch: "develop"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
