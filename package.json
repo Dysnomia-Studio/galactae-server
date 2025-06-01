@@ -17,7 +17,7 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "mocha": "^11.2.2",
+    "mocha": "^11.5.0",
     "nyc": "^17.1.0"
   }
 }
