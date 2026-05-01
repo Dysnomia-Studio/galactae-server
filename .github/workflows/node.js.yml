@@ -61,7 +61,7 @@ jobs:
           fi
 
       - name: Build & Push Docker image
-        uses: docker/build-push-action@v7.0.0
+        uses: docker/build-push-action@v7.1.0
         with:
           push: ${{ env.DOCKER_IMAGE_PUSH }}
           tags: ${{ env.DOCKER_TAG }}
